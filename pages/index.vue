@@ -1,10 +1,11 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import { ref, computed } from 'vue';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import TopupPulsa from '@/components/features/TopupPulsa.vue';
+import TopupComingSoon from '@/components/features/TopupComingSoon.vue';
+import TopupPaketData from '@/components/features/TopupPaketData.vue';
+import TopupGame from '@/components/features/TopupGame.vue';
 
 const categories = [
   {
@@ -39,51 +40,14 @@ const categories = [
   },
 ];
 
-const phoneNumber = ref('');
-const operator = ref(null);
-const products = ref([]);
-const selectedProduct = ref('');
+const selectedProduct = ref(null);
 
-// Computed property untuk mendapatkan detail produk yang dipilih
-const selectedProductDetails = computed(() => {
-  if (!selectedProduct.value || !products.value.length) return null;
-  return products.value.find((product) => product.product_id === selectedProduct.value);
-});
-
-// Computed property untuk format harga
 const formattedPrice = computed(() => {
-  if (!selectedProductDetails.value) return 'Rp 0';
-  return `Rp ${Number(selectedProductDetails.value.price_personal).toLocaleString('id-ID')}`;
-});
-
-const checkOperator = async (prefix) => {
-  try {
-    const response = await fetch(`https://tripay.id/process/prefixproduct?category_id=1&prefix=${prefix}`);
-    const data = await response.json();
-
-    if (data.operator && data.operator.length > 0) {
-      operator.value = data.operator[0];
-      products.value = data.produk || [];
-    }
-  } catch (error) {
-    console.error('Error fetching operator:', error);
-  }
-};
-
-watch(phoneNumber, (newValue) => {
-  const cleanNumber = newValue.replace(/\D/g, '');
-
-  phoneNumber.value = cleanNumber;
-
-  if (cleanNumber.length >= 4) {
-    const prefix = cleanNumber.substring(0, 4);
-    checkOperator(prefix);
-  } else {
-    operator.value = null;
-    products.value = [];
-  }
+  if (!selectedProduct.value) return 'Rp 0';
+  return `Rp ${Number(selectedProduct.value.price_personal).toLocaleString('id-ID')}`;
 });
 </script>
+
 <template>
   <div class="min-h-screen text-gray-700 font-display pb-24 bg-slate-100">
     <!-- Header -->
@@ -102,7 +66,7 @@ watch(phoneNumber, (newValue) => {
 
     <!-- Navigation Menu using Tabs -->
     <Tabs default-value="pulsa" class="w-full">
-      <div class="">
+      <div class="bg-white shadow">
         <div class="max-w-6xl mx-auto">
           <TabsList class="h-auto w-full flex bg-transparent px-21 font-normal">
             <TabsTrigger
@@ -120,69 +84,10 @@ watch(phoneNumber, (newValue) => {
 
       <TabsContent v-for="category in categories" :key="category.id" :value="category.id" class="m-0">
         <div class="max-w-6xl mx-auto flex flex-col gap-y-4 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{{ category.name }}</CardTitle>
-            </CardHeader>
-            <CardContent class="space-y-4">
-              <!-- Konten spesifik untuk Pulsa -->
-              <template v-if="category.id === 'pulsa'">
-                <div class="space-y-4">
-                  <label class="block text-sm text-gray-600">Nomor Telepon</label>
-                  <div class="relative w-full items-center">
-                    <Input
-                      v-model="phoneNumber"
-                      type="text"
-                      placeholder="Masukkan No. Handphone-mu"
-                      maxlength="13"
-                      class="p-5 w-full focus-visible:ring-3"
-                    />
-                    <span class="absolute end-0 inset-y-0 flex items-center justify-center px-2">
-                      <NuxtImg
-                        v-if="operator"
-                        :src="'https://tripay.id/assets/images/provider/' + operator.img"
-                        alt="Shopee"
-                        class="h-6 w-auto pr-2"
-                      />
-                    </span>
-                  </div>
-                </div>
-                <Separator class="my-6" />
-                <div v-if="products.length > 0" class="space-y-4">
-                  <div v-if="operator" class="mt-2 text-sm text-gray-600">
-                    <p class="font-bold">{{ operator.product_name }}</p>
-                  </div>
-                  <RadioGroup v-model="selectedProduct" class="grid grid-cols-4 gap-2">
-                    <div v-for="product in products" :key="product.product_id" class="relative">
-                      <RadioGroupItem :value="product.product_id" class="peer sr-only" :id="product.product_id" />
-                      <Label
-                        :for="product.product_id"
-                        class="flex justify-between p-4 border rounded-lg cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10"
-                      >
-                        <div class="flex flex-col gap-y-1">
-                          <span class="text-sm font-bold">{{ product.product_name }}</span>
-                          <span class="text-xs text-gray-600">{{ product.desc }}</span>
-                        </div>
-                        <span class="text-primary text-base font-bold">Rp {{ Number(product.price_personal).toLocaleString('id-ID') }}</span>
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <div v-else class="flex flex-col items-center justify-center h-full p-6 gap-y-4">
-                  <img src="/empty.png" alt="No Product" class="w-48" />
-                  <p class="text-gray-400 font-medium">Masukkan nomor telepon untuk melihat produk yang tersedia</p>
-                </div>
-              </template>
-
-              <!-- Konten untuk kategori lain -->
-              <template v-else>
-                <div class="flex flex-col items-center justify-center h-full p-6 gap-y-4">
-                  <img src="/empty.png" alt="Coming Soon" class="w-48" />
-                  <p class="text-gray-400 font-medium">Fitur ini akan segera hadir</p>
-                </div>
-              </template>
-            </CardContent>
-          </Card>
+          <TopupPulsa v-if="category.id === 'pulsa'" v-model:selectedProduct="selectedProduct" />
+          <TopupPaketData v-else-if="category.id === 'paket-data'" v-model:selectedProduct="selectedProduct" />
+          <TopupGame v-else-if="category.id === 'voucher-game'" v-model:selectedProduct="selectedProduct" />
+          <TopupComingSoon v-else :title="category.name" />
         </div>
       </TabsContent>
     </Tabs>
@@ -195,7 +100,7 @@ watch(phoneNumber, (newValue) => {
             <span class="text-xs text-gray-600">Total</span>
             <span class="text-primary text-base font-bold">{{ formattedPrice }}</span>
           </div>
-          <Button class="bg-primary text-white px-8 py-6 rounded-lg hover:bg-primary/80 transition-colors" :disabled="!selectedProductDetails">
+          <Button class="bg-primary text-white px-8 py-6 rounded-lg hover:bg-primary/80 transition-colors" :disabled="!selectedProduct">
             Beli Sekarang
           </Button>
         </div>
