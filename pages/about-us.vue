@@ -63,7 +63,7 @@ const statsData = [
 const teamMembersData = [
   {
     id: 1,
-    name: 'Jahida Aprilya Mahmudah',
+    name: 'Jahda Agniya Mahmudah',
     position: 'Chief Executive Officer',
     image: '/images/rise_jahda.png',
   },
@@ -75,7 +75,7 @@ const teamMembersData = [
   },
   {
     id: 3,
-    name: 'Aswandatu Putra Indrarajja',
+    name: 'Aswandatu Putra Inderajao​',
     position: 'Partnership & Outreach',
     image: '/images/rise_aswandatu.png',
   },
