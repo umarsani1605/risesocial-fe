@@ -55,10 +55,10 @@
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222.2 84% 4.9%);
 
-  --primary: hsl(205, 100%, 51%);
-  --primary-foreground: hsl(210 40% 98%);
+  --primary: hsl(21, 100%, 65%);
+  --primary-foreground: hsl(0 0% 100%);
 
-  --secondary: hsl(210 40% 96.1%);
+  --secondary: hsl(179, 76%, 12%);
   --secondary-foreground: hsl(222.2 47.4% 11.2%);
 
   --muted: hsl(210 40% 96.1%);
@@ -72,7 +72,7 @@
 
   --border: hsl(214.3 31.8% 91.4%);
   --input: hsl(214.3 31.8% 91.4%);
-  --ring: hsl(205, 100%, 51%);
+  --ring: hsl(21, 100%, 65%);
   --radius: 0.625rem;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -99,10 +99,10 @@
   --popover: hsl(222.2 84% 4.9%);
   --popover-foreground: hsl(210 40% 98%);
 
-  --primary: hsl(205, 100%, 51%);
+  --primary: hsl(21, 100%, 65%);
   --primary-foreground: hsl(222.2 47.4% 11.2%);
 
-  --secondary: hsl(217.2 32.6% 17.5%);
+  --secondary: hsl(179, 76%, 12%);
   --secondary-foreground: hsl(210 40% 98%);
 
   --muted: hsl(217.2 32.6% 17.5%);
@@ -116,7 +116,7 @@
 
   --border: hsl(217.2 32.6% 17.5%);
   --input: hsl(217.2 32.6% 17.5%);
-  --ring: hsl(205, 100%, 51%);
+  --ring: hsl(21, 100%, 65%);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -139,4 +139,185 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom animations and utilities */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Layout Components */
+@layer components {
+  /* ========================================
+     SECTION SPACING PATTERNS (vertical padding only)
+     ======================================== */
+
+  /* Hero section - py-10 sm:py-16 lg:pt-40 lg:pb-24 */
+  .section-py-hero {
+    @apply pt-20 pb-16 lg:pt-40 lg:pb-24;
+  }
+
+  /* Small sections - py-8 sm:py-12 lg:py-16 */
+  .section-py-sm {
+    @apply py-8 sm:py-12 lg:py-14;
+  }
+
+  /* Medium sections - py-12 lg:py-16 */
+  .section-py-md {
+    @apply py-12 lg:py-16;
+  }
+
+  /* Large sections - py-12 sm:py-16 lg:py-20 */
+  .section-py-lg {
+    @apply py-14 sm:py-16 lg:py-20;
+  }
+
+  /* Extra large sections - py-20 */
+  .section-py-xl {
+    @apply py-20;
+  }
+
+  /* ========================================
+     CONTAINER WRAPPERS
+     ======================================== */
+
+  .container-wrapper {
+    @apply max-w-7xl mx-auto px-6 sm:px-6 lg:px-8;
+  }
+
+  .container-wrapper-lg {
+    @apply max-w-7xl mx-auto px-6 lg:px-8;
+  }
+
+  /* ========================================
+     SECTION TITLE WRAPPERS
+     ======================================== */
+
+  /* Standard title wrapper - mb-12 lg:mb-16 */
+  .section-title-wrapper {
+    @apply text-center mb-12 lg:mb-16;
+  }
+
+  /* Small title wrapper - mb-8 lg:mb-16 */
+  .section-title-wrapper-sm {
+    @apply text-center mb-8 lg:mb-16;
+  }
+
+  /* Minimal title wrapper - mb-8 */
+  .section-title-wrapper-xs {
+    @apply text-center mb-8;
+  }
+
+  /* ========================================
+     TYPOGRAPHY PATTERNS
+     ======================================== */
+
+  /* Section headings */
+
+  .heading-section-hero {
+    @apply text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
+  }
+  .heading-section {
+    @apply text-4xl font-bold text-gray-900 mb-4;
+  }
+
+  .heading-section-no-margin {
+    @apply text-4xl font-bold text-gray-900;
+  }
+
+  /* Card headings */
+  .heading-card {
+    @apply text-xl font-semibold text-gray-900;
+  }
+
+  .heading-card-sm {
+    @apply text-lg sm:text-xl font-semibold text-gray-900;
+  }
+
+  /* ========================================
+     NAVBAR PATTERNS
+     ======================================== */
+
+  /* Mobile navbar link base */
+  .navbar-mobile-link {
+    @apply block px-3 relative py-2 text-base font-medium hover:bg-gray-50 rounded-md;
+  }
+
+  /* Mobile navbar link active state */
+  .navbar-mobile-link-active {
+    @apply relative text-primary after:content-[''] after:absolute after:left-0 after:w-full after:-bottom-2 after:h-[2px] after:bg-primary after:rounded-full;
+  }
+
+  /* Mobile navbar link inactive state */
+  .navbar-mobile-link-inactive {
+    @apply relative text-white;
+  }
+
+  /* ========================================
+     FORM PATTERNS
+     ======================================== */
+
+  /* Form label base */
+  .form-label {
+    @apply block text-sm font-medium text-gray-900 mb-2;
+  }
+
+  /* Input with icon */
+  .input-icon {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400;
+  }
+
+  /* ========================================
+     JOB CARD PATTERNS
+     ======================================== */
+
+  /* Job card meta info (location, date, etc) */
+  .job-card-meta {
+    @apply flex items-center text-xs sm:text-sm text-gray-500;
+  }
+
+  /* Job card salary display */
+  .job-card-salary {
+    @apply flex items-center space-x-2;
+  }
+
+  /* Job card salary icon */
+  .job-card-salary-icon {
+    @apply bg-gray-100 rounded-full size-6 flex items-center justify-center;
+  }
+
+  /* Job card salary amount */
+  .job-card-salary-amount {
+    @apply font-semibold text-gray-900 text-base sm:text-lg;
+  }
+
+  /* Job card salary period */
+  .job-card-salary-period {
+    @apply text-xs sm:text-sm text-gray-500;
+  }
+}
+
+/* ========================================
+   PAGE TRANSITIONS - SIMPLE FADE ONLY
+   ======================================== */
+
+/* Fade Transition - used for both pages and layouts */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }

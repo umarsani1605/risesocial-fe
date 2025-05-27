@@ -6,6 +6,36 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/main.css'],
 
+  // Uncomment the line below if you want to use SPA mode instead of SSR
+  // ssr: false,
+
+  app: {
+    head: {
+      title: 'Rise Social - Green Jobs Platform',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Platform pekerjaan hijau terdepan untuk karir berkelanjutan' }
+      ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }
+      ]
+    },
+    // Page transitions - simple fade only
+    pageTransition: { 
+      name: 'fade', 
+      mode: 'out-in' 
+    },
+    // Layout transitions - simple fade only
+    layoutTransition: { 
+      name: 'fade', 
+      mode: 'out-in' 
+    }
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },
@@ -16,6 +46,12 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/image'
   ],
+  
+  // Image configuration
+  image: {
+    dir: 'assets/images'
+  },
+  
   shadcn: {
     prefix: '',
     componentDir: './components/ui'

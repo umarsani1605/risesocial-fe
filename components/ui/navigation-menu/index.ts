@@ -10,5 +10,16 @@ export { default as NavigationMenuTrigger } from './NavigationMenuTrigger.vue'
 export { default as NavigationMenuViewport } from './NavigationMenuViewport.vue'
 
 export const navigationMenuTriggerStyle = cva(
-  'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1',
+  'group inline-flex text-white h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium hover:text-white hover:bg-white/3 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent data-[state=open]:text-primary data-[state=open]:focus:bg-accent data-[state=open]:bg-accent/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 after:content-[""] after:absolute after:bottom-0 after:left-1/4 after:w-1/2 after:h-[2px] after:bg-primary after:rounded-full after:scale-x-0 after:transition-transform after:duration-300 after:ease-in-out hover:after:scale-x-100',
+  {
+    variants: {
+      active: {
+        true: 'text-primary! bg-transparent after:scale-x-100',
+        false: ''
+      }
+    },
+    defaultVariants: {
+      active: false
+    }
+  }
 )

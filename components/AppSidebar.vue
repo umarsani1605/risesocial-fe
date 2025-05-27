@@ -198,7 +198,7 @@ const data = {
     <SidebarHeader>
       <div class="flex h-[60px] items-center px-6">
         <a href="/" class="flex items-center gap-2 font-semibold">
-          <img src="/logo.png" alt="Logo" />
+          <img src="/logo.png" alt="Logo" class="h-10 w-auto" />
         </a>
       </div>
     </SidebarHeader>
