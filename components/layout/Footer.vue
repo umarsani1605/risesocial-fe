@@ -52,7 +52,7 @@
       <div class="container-wrapper">
         <div class="flex flex-col gap-2 md:flex-row justify-between items-center space-y-3 text-center md:text-left">
           <!-- Copyright -->
-          <div class="text-xs sm:text-sm text-muted-foreground order-2 md:order-1">© 2024 PT. Rise Edukasi Inspirasi. All Rights Reserved.</div>
+          <div class="text-xs sm:text-sm text-muted-foreground order-2 md:order-1">© 2025 PT. Rise Edukasi Inspirasi. All Rights Reserved.</div>
 
           <!-- Links -->
           <div class="flex flex-row space-x-4 text-xs order-1 md:order-2">
