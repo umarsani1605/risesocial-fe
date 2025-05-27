@@ -6,8 +6,13 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/main.css'],
 
-  // Uncomment the line below if you want to use SPA mode instead of SSR
-  // ssr: false,
+  // SSR enabled for better SEO and performance
+  ssr: true,
+
+  // Nitro configuration for Netlify deployment
+  nitro: {
+    preset: 'netlify'
+  },
 
   app: {
     head: {
@@ -47,9 +52,9 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
   
-  // Image configuration
+  // Image configuration - now using public folder
   image: {
-    dir: 'assets/images'
+    dir: 'public'
   },
   
   shadcn: {

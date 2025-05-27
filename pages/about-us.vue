@@ -17,19 +17,19 @@ const pillarsData = [
   {
     id: 1,
     title: 'Education and Knowledge Sharing',
-    image: 'rise_pillars_1.png',
+    image: '/images/rise_pillars_1.png',
     description: 'Educating and enlightening young people with access to knowledge, skills and opportunities around the world.',
   },
   {
     id: 2,
     title: 'Inclusivity',
-    image: 'rise_pillars_2.png',
+    image: '/images/rise_pillars_2.png',
     description: 'Ensure inclusivity between organizations and youth for educational and job equity.',
   },
   {
     id: 3,
     title: 'Empowerment & Sustainability',
-    image: 'rise_pillars_3.png',
+    image: '/images/rise_pillars_3.png',
     description:
       'Commit to sustainability work with the goal of creating solutions that support long-term well-being for individuals and communities.',
   },
@@ -65,19 +65,19 @@ const teamMembersData = [
     id: 1,
     name: 'Jahida Aprilya Mahmudah',
     position: 'Chief Executive Officer',
-    image: 'rise_jahda.png',
+    image: '/images/rise_jahda.png',
   },
   {
     id: 2,
     name: 'Zahrotul Fauziah',
     position: 'Chief Project Officer',
-    image: 'rise_zahrotul.png',
+    image: '/images/rise_zahrotul.png',
   },
   {
     id: 3,
     name: 'Aswandatu Putra Indrarajja',
     position: 'Partnership & Outreach',
-    image: 'rise_aswandatu.png',
+    image: '/images/rise_aswandatu.png',
   },
 ];
 </script>
@@ -91,7 +91,7 @@ const teamMembersData = [
           <!-- Left Illustration -->
           <div class="flex-2 flex justify-center">
             <div class="size-80 lg:size-128 flex items-center justify-center">
-              <NuxtImg src="rise_about_us.png" alt="About Rise Social" class="w-full h-full object-contain" loading="eager" format="webp" />
+              <NuxtImg src="/images/rise_about_us.png" alt="About Rise Social" class="w-full h-full object-contain" loading="eager" format="webp" />
             </div>
           </div>
           <!-- Right Content -->
@@ -144,7 +144,7 @@ const teamMembersData = [
     <section class="section-py-lg relative overflow-hidden">
       <!-- Background Image -->
       <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-900/60">
-        <NuxtImg src="rise_stats.png" alt="Team gathering" class="w-full h-full object-cover" loading="lazy" format="webp" />
+        <NuxtImg src="/images/rise_stats.png" alt="Team gathering" class="w-full h-full object-cover" loading="lazy" format="webp" />
       </div>
 
       <!-- Overlay -->

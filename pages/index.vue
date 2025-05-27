@@ -92,28 +92,28 @@ const howItWorksSteps = [
     stepNumber: '1',
     title: 'Set Your Goals',
     description: 'Tell us about your career goals and we will find you the right path.',
-    image: 'rise_step_1.png',
+    image: '/images/rise_step_1.png',
   },
   {
     step: 2,
     stepNumber: '2',
     title: 'Finish Courses',
     description: 'AI career buddy will find the right courses to achieve your dream.',
-    image: 'rise_step_2.png',
+    image: '/images/rise_step_2.png',
   },
   {
     step: 3,
     stepNumber: '3',
     title: 'Build Resume',
     description: 'Complete your application with CV builder to optimize your chances.',
-    image: 'rise_step_3.png',
+    image: '/images/rise_step_3.png',
   },
   {
     step: 4,
     stepNumber: '4',
     title: 'Track Your Application',
     description: 'Track your application while finish more course and application.',
-    image: 'rise_step_4.png',
+    image: '/images/rise_step_4.png',
   },
 ];
 
@@ -173,67 +173,67 @@ const ctaFeaturesData = [
 const partnersData = [
   {
     name: 'GoTo Impact',
-    src: 'goto_impact.png',
+    src: '/images/goto_impact.png',
     alt: 'GoTo Impact',
   },
   {
     name: 'Kyoto University',
-    src: 'kyoto_univ.png',
+    src: '/images/kyoto_univ.png',
     alt: 'Kyoto University',
   },
   {
     name: 'Inspire',
-    src: 'inspire.png',
+    src: '/images/inspire.png',
     alt: 'Inspire',
   },
   {
     name: 'Universitas Syiah Kuala',
-    src: 'unsyiah.png',
+    src: '/images/unsyiah.png',
     alt: 'Universitas Syiah Kuala',
   },
   {
     name: 'Universitas Airlangga',
-    src: 'unair.png',
+    src: '/images/unair.png',
     alt: 'Universitas Airlangga',
   },
   {
     name: 'Universitas Pendidikan Indonesia',
-    src: 'upi.png',
+    src: '/images/upi.png',
     alt: 'Universitas Pendidikan Indonesia',
   },
   {
     name: 'Youth Force ID',
-    src: 'youth_force_id.png',
+    src: '/images/youth_force_id.png',
     alt: 'Youth Force ID',
   },
   {
     name: 'Changemaker Catalyst',
-    src: 'changemaker_catalyst.jpeg',
+    src: '/images/changemaker_catalyst.jpeg',
     alt: 'Changemaker Catalyst',
   },
   {
     name: 'Biops Agrotechno',
-    src: 'biops_agrotechno.png',
+    src: '/images/biops_agrotechno.png',
     alt: 'Biops Agrotechno',
   },
   {
     name: 'FAM Rural',
-    src: 'fam_rural.jpeg',
+    src: '/images/fam_rural.jpeg',
     alt: 'FAM Rural',
   },
   {
     name: 'Komben',
-    src: 'komben.png',
+    src: '/images/komben.png',
     alt: 'Komben',
   },
   {
     name: 'Desamind',
-    src: 'desamind.png',
+    src: '/images/desamind.png',
     alt: 'Desamind',
   },
   {
     name: 'Siaga Bencana',
-    src: 'siaga_bencana.png',
+    src: '/images/siaga_bencana.png',
     alt: 'Siaga Bencana',
   },
 ];
@@ -453,7 +453,13 @@ const goToPartnerSlide = (index) => {
           <div class="lg:flex-2 flex justify-end order-1 lg:order-2">
             <div class="relative">
               <div class="w-full h-[14rem] pt-6 py-4 lg:h-[24rem] flex items-center justify-center">
-                <NuxtImg src="rise_hero.png" alt="Rise Social Hero Illustration" class="w-full h-full object-contain" loading="eager" format="webp" />
+                <NuxtImg
+                  src="/images/rise_hero.png"
+                  alt="Rise Social Hero Illustration"
+                  class="w-full h-full object-contain"
+                  loading="eager"
+                  format="webp"
+                />
               </div>
             </div>
           </div>
@@ -603,7 +609,7 @@ const goToPartnerSlide = (index) => {
           <!-- Left Illustration -->
           <div class="flex-1 relative">
             <div class="w-full h-auto mx-auto hidden lg:flex items-center justify-center">
-              <NuxtImg src="rise_cta.png" alt="Get the Perfect Job for You" class="w-full object-contain" loading="lazy" format="webp" />
+              <NuxtImg src="/images/rise_cta.png" alt="Get the Perfect Job for You" class="w-full object-contain" loading="lazy" format="webp" />
             </div>
           </div>
           <!-- Right Content -->

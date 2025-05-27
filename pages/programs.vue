@@ -18,14 +18,14 @@ const programsData = [
   {
     id: 1,
     title: 'Rise Young Leaders Summit',
-    image: 'rise_young_leader.png',
+    image: '/images/rise_young_leader.png',
     description1: 'Rise Young Leaders Summit is an annual program to improve youth capacity for young people aged 16-25 in various topics.',
     description2: 'The program encourages youth through competitions for fully and partially funded Leadership Trip Programs in 6 lot of countries.',
   },
   {
     id: 2,
     title: "Rise Educator's Skills Accelerator",
-    image: 'rise_educator.png',
+    image: '/images/rise_educator.png',
     description1: "Rise Educator's Skills Accelerator is and online learning program to help teachers and online bootcamps in various topic.",
     description2:
       'This program is for educators/teacher aged 20-45 years old to improve expert of changes, equipped with grant for sustainable project in their own institution.',
@@ -33,7 +33,7 @@ const programsData = [
   {
     id: 3,
     title: 'Little Hero Camp',
-    image: 'rise_little_hero.png',
+    image: '/images/rise_little_hero.png',
     description1: 'Little Hero Camp is an offline summer training for children aged 7-15 years old.',
     description2:
       'Equipped with various topics in sustainability, to enhance their skills and interests and become more empowered during their summer vacation.',
@@ -129,7 +129,7 @@ onMounted(() => {
         <!-- Logo Icon -->
         <div class="flex justify-center mb-6">
           <div class="h-16 sm:h-24 flex items-center justify-center">
-            <NuxtImg src="rise_icon.png" alt="Rise Icon" class="w-full h-full object-contain" loading="eager" format="webp" />
+            <NuxtImg src="/images/rise_icon.png" alt="Rise Icon" class="w-full h-full object-contain" loading="eager" format="webp" />
           </div>
         </div>
 
@@ -280,7 +280,7 @@ onMounted(() => {
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-24 items-center">
           <!-- Left Mobile Mockups -->
           <div class="w-64 sm:w-80 lg:w-[40rem]">
-            <NuxtImg src="rise_mobile_app.png" alt="Rise Mobile App" class="w-full object-contain" loading="lazy" format="webp" />
+            <NuxtImg src="/images/rise_mobile_app.png" alt="Rise Mobile App" class="w-full object-contain" loading="lazy" format="webp" />
           </div>
           <!-- Right Content -->
           <div class="space-y-6">
