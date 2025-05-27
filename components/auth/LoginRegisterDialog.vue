@@ -87,13 +87,13 @@ watch(isOpen, (newValue) => {
       <form v-if="!isRegisterMode" @submit.prevent="handleLogin" class="space-y-6">
         <!-- Email Field -->
         <div class="flex flex-col gap-2">
-          <label class="">Email</label>
+          <label class="text-sm">Email</label>
           <Input type="email" v-model="loginForm.email" class="bg-gray-50" required />
         </div>
 
         <!-- Password Field -->
         <div class="flex flex-col gap-2">
-          <label class="">Password</label>
+          <label class="text-sm">Password</label>
           <div class="relative">
             <Input :type="showPassword ? 'text' : 'password'" v-model="loginForm.password" class="bg-gray-50" required />
           </div>
@@ -103,9 +103,9 @@ watch(isOpen, (newValue) => {
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center space-x-2">
             <Checkbox id="keep-signed-in" v-model:checked="loginForm.keepSignedIn" class="bg-gray-50" />
-            <label for="keep-signed-in" class="cursor-pointer"> Keep me signed in </label>
+            <label for="keep-signed-in" class="cursor-pointer text-sm"> Keep me signed in </label>
           </div>
-          <button type="button" class="text-primary cursor-pointer">Forgotten password?</button>
+          <button type="button" class="text-primary cursor-pointer text-sm">Forgotten password?</button>
         </div>
 
         <!-- Login Button -->
@@ -113,8 +113,8 @@ watch(isOpen, (newValue) => {
 
         <!-- Register Link -->
         <div class="">
-          <span class="">Don't you have an account? </span>
-          <button type="button" @click="toggleMode" class="text-primary cursor-pointer">Register</button>
+          <span class="text-sm">Don't you have an account? </span>
+          <button type="button" @click="toggleMode" class="text-primary cursor-pointer text-sm">Register</button>
         </div>
       </form>
 
@@ -122,19 +122,19 @@ watch(isOpen, (newValue) => {
       <form v-else @submit.prevent="handleRegister" class="space-y-4">
         <!-- Name Field -->
         <div class="flex flex-col gap-2">
-          <label class="">Full Name</label>
+          <label class="text-sm">Full Name</label>
           <Input type="text" v-model="registerForm.name" class="bg-gray-50" required />
         </div>
 
         <!-- Email Field -->
         <div class="flex flex-col gap-2">
-          <label class="">Email</label>
+          <label class="text-sm">Email</label>
           <Input type="email" v-model="registerForm.email" class="bg-gray-50" required />
         </div>
 
         <!-- Password Field -->
         <div class="flex flex-col gap-2">
-          <label class="">Password</label>
+          <label class="text-sm">Password</label>
           <div class="relative">
             <Input :type="showPassword ? 'text' : 'password'" v-model="registerForm.password" class="bg-gray-50" required />
             <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -145,7 +145,7 @@ watch(isOpen, (newValue) => {
 
         <!-- Confirm Password Field -->
         <div class="flex flex-col gap-2">
-          <label class="">Confirm Password</label>
+          <label class="text-sm">Confirm Password</label>
           <div class="relative">
             <Input :type="showConfirmPassword ? 'text' : 'password'" v-model="registerForm.confirmPassword" class="bg-gray-50" required />
             <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -159,8 +159,8 @@ watch(isOpen, (newValue) => {
 
         <!-- Login Link -->
         <div class="text-center">
-          <span class="text-gray-600">Already have an account? </span>
-          <button type="button" @click="toggleMode" class="text-primary cursor-pointer">Login</button>
+          <span class="text-sm">Already have an account? </span>
+          <button type="button" @click="toggleMode" class="text-primary cursor-pointer text-sm">Login</button>
         </div>
       </form>
     </DialogContent>

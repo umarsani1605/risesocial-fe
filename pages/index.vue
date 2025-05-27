@@ -511,7 +511,7 @@ const goToPartnerSlide = (index) => {
                 <NuxtImg :src="stepData.image" :alt="stepData.title" class="h-50! object-contain" loading="lazy" format="webp" />
               </div>
 
-              <div class="flex-3 flex flex-col lg:items-center lg:justify-center lg:pb-8">
+              <div class="flex-3 flex flex-col lg:items-center lg:justify-center lg:pb-8 text-wrap">
                 <!-- Step Indicator -->
                 <div class="flex mb-4 flex-row lg:flex-col items-center lg:justify-center gap-4">
                   <StepperIndicator
