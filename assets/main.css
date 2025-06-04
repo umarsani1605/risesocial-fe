@@ -195,6 +195,10 @@
     @apply max-w-7xl mx-auto px-6 sm:px-6 lg:px-8;
   }
 
+  .container-wrapper-no-padding {
+    @apply max-w-7xl mx-auto;
+  }
+
   .container-wrapper-lg {
     @apply max-w-7xl mx-auto px-6 lg:px-8;
   }
@@ -228,7 +232,7 @@
     @apply text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
   }
   .heading-section {
-    @apply text-4xl font-bold text-gray-900 mb-4;
+    @apply text-3xl font-bold text-gray-900 mb-4;
   }
 
   .heading-section-no-margin {

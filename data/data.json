@@ -1,0 +1,966 @@
+{
+  "coursesData": [
+    {
+      "id": 1,
+      "path_slug": "climate-science-fundamentals",
+      "title": "Climate Science Fundamentals for Sustainability Professionals",
+      "category": "Climate science",
+      "moduleCount": 4,
+      "duration": "18 jam",
+      "description": "Pelajari dasar-dasar ilmu iklim dan dampaknya terhadap lingkungan secara komprehensif dalam course yang dirancang untuk para profesional masa depan. Program ini mencakup teori fundamental hingga aplikasi praktis dalam kehidupan sehari-hari dan industri. Anda akan memahami mekanisme perubahan iklim, dampaknya terhadap ekosistem global, strategi mitigasi yang efektif, serta mengembangkan solusi inovatif untuk menciptakan masa depan yang berkelanjutan. Course ini mengintegrasikan scientific knowledge dengan practical skills yang dibutuhkan untuk berkarir di bidang climate action, environmental consulting, renewable energy, dan sustainable development. Dengan pendekatan interdisciplinary, Anda akan dibekali tools dan metodologi untuk menganalisis climate data, mengembangkan climate adaptation strategies, dan mengimplementasikan solution-based approaches dalam berbagai konteks organisasi dan komunitas.",
+      "shortDescription": "Memahami ilmu iklim dari teori fundamental hingga aplikasi praktis untuk membangun solusi berkelanjutan bagi lingkungan. Course ini dirancang khusus untuk para profesional yang ingin berkontribusi dalam mengatasi krisis iklim global melalui pendekatan scientific-based solutions. Anda akan mempelajari sistem iklim bumi, analisis data cuaca dan iklim, serta mengembangkan strategi adaptasi dan mitigasi yang dapat diimplementasikan di berbagai sektor industri dan komunitas.",
+      "modules": [
+        {
+          "id": 1,
+          "module_slug": "introduction-to-climate-science",
+          "name": "Introduction to Climate Science",
+          "title": "Pengenalan Dasar Ilmu Iklim",
+          "completed": true,
+          "duration": "12 jam",
+          "materialCount": 8,
+          "certificate": true,
+          "rating": 4.85,
+          "ratingCount": 25,
+          "price": 250000,
+          "image": "/images/courses/1.webp",
+          "description": "Memahami konsep dasar sistem iklim global, komponen atmosfer, dan faktor-faktor yang mempengaruhi perubahan iklim secara mendalam. Modul ini memberikan fondasi teoritis yang kuat tentang mekanisme iklim bumi, termasuk atmospheric science, ocean-atmosphere interactions, dan climate system dynamics. Anda akan mempelajari historical climate patterns, paleoclimatology, dan modern climate monitoring techniques yang essential untuk memahami kompleksitas perubahan iklim kontemporer.",
+          "instructor": {
+            "name": "Dr. Sarah Climate",
+            "avatar": "https://placehold.co/100x100/34D399/FFFFFF?text=SC",
+            "expertise": "Climate Science Expert",
+            "description": "Dengan pengalaman 15 tahun di bidang climate science dan research di IPCC, Dr. Sarah telah membantu ratusan professional memahami kompleksitas perubahan iklim global. Beliau memiliki publikasi 50+ paper di jurnal internasional dan aktif dalam policy advisory untuk climate adaptation strategies."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Pengenalan Sistem Iklim Global",
+              "description": "Memahami komponen dasar sistem iklim bumi dan interaksinya, termasuk atmosfer, hidrosfer, litosfer, dan biosfer."
+            },
+            {
+              "id": 2,
+              "title": "Atmospheric Science Fundamentals",
+              "description": "Mempelajari struktur atmosfer dan proses-proses yang terjadi di dalamnya, radiative transfer, dan atmospheric chemistry."
+            },
+            {
+              "id": 3,
+              "title": "Climate Monitoring & Data Analysis",
+              "description": "Teknik monitoring iklim modern dan analisis data cuaca, including satellite observations dan climate modeling."
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Ahmad Pratama",
+              "avatar": "https://placehold.co/50x50/0EA5E9/FFFFFF?text=AP",
+              "comment": "Course yang sangat komprehensif dan mudah dipahami. Dr. Sarah menjelaskan konsep kompleks dengan sangat clear. Sangat recommended untuk pemula!",
+              "rating": 5
+            },
+            {
+              "id": 2,
+              "name": "Maria Santos",
+              "avatar": "https://placehold.co/50x50/EF4444/FFFFFF?text=MS",
+              "comment": "Dr. Sarah menjelaskan konsep kompleks dengan cara yang sangat engaging dan praktis. Materi sangat up-to-date dengan research terbaru.",
+              "rating": 5
+            },
+            {
+              "id": 3,
+              "name": "Budi Setiawan",
+              "avatar": "https://placehold.co/50x50/10B981/FFFFFF?text=BS",
+              "comment": "Materi climate science yang paling comprehensive yang pernah saya ikuti. Sangat aplikatif untuk pekerjaan saya!",
+              "rating": 5
+            },
+            {
+              "id": 4,
+              "name": "Sari Dewi",
+              "avatar": "https://placehold.co/50x50/8B5CF6/FFFFFF?text=SD",
+              "comment": "Instructor sangat berpengalaman dan materinya selalu updated dengan perkembangan terbaru di bidang climate science.",
+              "rating": 5
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah course ini cocok untuk pemula?",
+              "answer": "Ya, course ini dirancang khusus untuk pemula yang ingin memahami dasar-dasar ilmu iklim. Tidak diperlukan background khusus sebelumnya."
+            },
+            {
+              "id": 2,
+              "question": "Berapa lama waktu yang dibutuhkan untuk menyelesaikan?",
+              "answer": "Rata-rata 2-3 minggu dengan belajar 1-2 jam per hari. Anda bisa mengatur pace sesuai dengan schedule Anda."
+            },
+            {
+              "id": 3,
+              "question": "Apakah ada sertifikat yang diberikan?",
+              "answer": "Ya, Anda akan mendapatkan sertifikat completion setelah menyelesaikan semua materi dan lulus quiz akhir."
+            },
+            {
+              "id": 4,
+              "question": "Apakah materi bisa diakses selamanya?",
+              "answer": "Ya, setelah pembelian Anda memiliki lifetime access ke semua materi course ini termasuk update-update terbaru."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "module_slug": "climate-change-impacts",
+          "name": "Climate Change Impacts",
+          "title": "Dampak Perubahan Iklim Global",
+          "completed": true,
+          "duration": "15 jam",
+          "materialCount": 10,
+          "certificate": true,
+          "rating": 4.92,
+          "ratingCount": 18,
+          "price": 320000,
+          "image": "/images/courses/2.webp",
+          "description": "Menganalisis dampak perubahan iklim terhadap ekosistem, biodiversitas, dan kehidupan manusia melalui pendekatan systematic dan evidence-based. Modul ini mengexplore berbagai climate impacts seperti sea level rise, extreme weather events, ecosystem disruption, dan socio-economic consequences. Anda akan mempelajari vulnerability assessment, risk analysis, dan impact modeling techniques.",
+          "instructor": {
+            "name": "Prof. Michael Green",
+            "avatar": "https://placehold.co/100x100/059669/FFFFFF?text=MG",
+            "expertise": "Environmental Impact Specialist",
+            "description": "Professor Michael memiliki expertise dalam environmental impact assessment dengan track record research di berbagai universitas internasional selama 20 tahun."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Ecosystem Impact Assessment",
+              "description": "Menganalisis dampak perubahan iklim pada berbagai ekosistem"
+            },
+            {
+              "id": 2,
+              "title": "Socio-Economic Consequences",
+              "description": "Memahami dampak sosial dan ekonomi dari perubahan iklim"
+            },
+            {
+              "id": 3,
+              "title": "Vulnerability & Risk Analysis",
+              "description": "Teknik analisis kerentanan dan risk modeling"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Lisa Wijaya",
+              "avatar": "https://placehold.co/50x50/8B5CF6/FFFFFF?text=LW",
+              "comment": "Materi yang sangat update dengan case studies yang relevan. Sangat helpful!"
+            },
+            {
+              "id": 2,
+              "name": "David Chen",
+              "avatar": "https://placehold.co/50x50/F59E0B/FFFFFF?text=DC",
+              "comment": "Prof. Michael expertise nya luar biasa. Explanasi yang detail dan mudah dimengerti."
+            },
+            {
+              "id": 3,
+              "name": "Rina Kartika",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=RK",
+              "comment": "Case studies nya sangat real dan relevan dengan kondisi Indonesia. Sangat recommend!"
+            },
+            {
+              "id": 4,
+              "name": "Tommy Wijaya",
+              "avatar": "https://placehold.co/50x50/059669/FFFFFF?text=TW",
+              "comment": "Prof. Michael berhasil menjelaskan impact assessment dengan cara yang mudah dipahami dan praktis."
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah ada prerequisite untuk mengikuti course ini?",
+              "answer": "Disarankan sudah mengikuti Introduction to Climate Science terlebih dahulu."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada project assignment?",
+              "answer": "Ya, ada final project berupa impact assessment case study."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "module_slug": "mitigation-strategies",
+          "name": "Mitigation Strategies",
+          "title": "Strategi Mitigasi Perubahan Iklim",
+          "completed": false,
+          "duration": "18 jam",
+          "materialCount": 12,
+          "certificate": true,
+          "rating": 4.78,
+          "ratingCount": 32,
+          "price": 380000,
+          "image": "/images/courses/3.webp",
+          "description": "Eksplorasi mendalam berbagai strategi mitigasi perubahan iklim, teknologi ramah lingkungan, dan kebijakan internasional untuk climate action. Anda akan mempelajari renewable energy technologies, energy efficiency measures, sustainable transportation systems, dan nature-based solutions. Modul ini mengcover carbon pricing mechanisms, emissions trading systems, dan policy instruments.",
+          "instructor": {
+            "name": "Dr. Emma Sustain",
+            "avatar": "https://placehold.co/100x100/10B981/FFFFFF?text=ES",
+            "expertise": "Sustainable Technology Expert",
+            "description": "Dr. Emma adalah pioneer dalam sustainable technology development dengan pengalaman implementasi mitigation strategies di 15+ negara."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Renewable Energy Technologies",
+              "description": "Overview teknologi energi terbarukan dan implementasinya"
+            },
+            {
+              "id": 2,
+              "title": "Carbon Pricing & Trading",
+              "description": "Memahami mekanisme carbon pricing dan emissions trading"
+            },
+            {
+              "id": 3,
+              "title": "Policy Instruments",
+              "description": "Analisis kebijakan dan instrumen mitigasi internasional"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Budi Santoso",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=BS",
+              "comment": "Course yang sangat practical dengan real-world examples. Sangat applicable!"
+            },
+            {
+              "id": 2,
+              "name": "Jennifer Lee",
+              "avatar": "https://placehold.co/50x50/7C3AED/FFFFFF?text=JL",
+              "comment": "Dr. Emma memberikan insight yang valuable tentang latest mitigation technologies."
+            },
+            {
+              "id": 3,
+              "name": "Agus Rahman",
+              "avatar": "https://placehold.co/50x50/0EA5E9/FFFFFF?text=AR",
+              "comment": "Materi renewable energy dan carbon pricing sangat lengkap dan up-to-date!"
+            },
+            {
+              "id": 4,
+              "name": "Maya Putri",
+              "avatar": "https://placehold.co/50x50/10B981/FFFFFF?text=MP",
+              "comment": "Dr. Emma expertise di sustainable technology development benar-benar inspiring!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah course ini membahas latest technology?",
+              "answer": "Ya, semua materi diupdate dengan teknologi dan policy terbaru 2024."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada networking opportunity?",
+              "answer": "Ya, ada exclusive access ke climate professionals community."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "module_slug": "practical-implementation",
+          "name": "Practical Implementation",
+          "title": "Implementasi Praktis Solusi Iklim",
+          "completed": false,
+          "duration": "20 jam",
+          "materialCount": 15,
+          "certificate": true,
+          "rating": 4.95,
+          "ratingCount": 12,
+          "price": 450000,
+          "image": "/images/courses/4.webp",
+          "description": "Penerapan comprehensive pengetahuan iklim dalam kehidupan sehari-hari, professional practice, dan career development di bidang climate action. Module ini menggunakan project-based learning approach untuk mengembangkan solusi inovatif terhadap tantangan perubahan iklim di komunitas lokal dan organizational level.",
+          "instructor": {
+            "name": "Dr. Alex Impact",
+            "avatar": "https://placehold.co/100x100/EF4444/FFFFFF?text=AI",
+            "expertise": "Climate Action Practitioner",
+            "description": "Dr. Alex telah memimpin 50+ climate action projects di Asia-Pacific dengan total impact reduction 2M tons CO2 equivalent."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Project Planning & Management",
+              "description": "Metodologi perencanaan dan management climate projects"
+            },
+            {
+              "id": 2,
+              "title": "Stakeholder Engagement",
+              "description": "Teknik engaging stakeholders untuk climate initiatives"
+            },
+            {
+              "id": 3,
+              "title": "Impact Measurement",
+              "description": "Tools dan metodologi untuk mengukur climate impact"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Sari Dewi",
+              "avatar": "https://placehold.co/50x50/EC4899/FFFFFF?text=SD",
+              "comment": "Hands-on approach yang luar biasa! Langsung bisa implement di workplace."
+            },
+            {
+              "id": 2,
+              "name": "Robert Kim",
+              "avatar": "https://placehold.co/50x50/06B6D4/FFFFFF?text=RK",
+              "comment": "Dr. Alex sharing real experience yang sangat valuable untuk career development."
+            },
+            {
+              "id": 3,
+              "name": "Linda Sari",
+              "avatar": "https://placehold.co/50x50/F59E0B/FFFFFF?text=LS",
+              "comment": "Project-based learning approach sangat effective. Portfolio climate action jadi kece!"
+            },
+            {
+              "id": 4,
+              "name": "Danny Pratama",
+              "avatar": "https://placehold.co/50x50/8B5CF6/FFFFFF?text=DP",
+              "comment": "Mentoring session dengan Dr. Alex sangat helpful untuk mengembangkan climate action projects!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah ada mentoring session?",
+              "answer": "Ya, ada 3x one-on-one mentoring session dengan instructor."
+            },
+            {
+              "id": 2,
+              "question": "Bagaimana format final project?",
+              "answer": "Final project berupa proposal climate action project untuk organisasi atau komunitas Anda."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "path_slug": "sustainable-software-development",
+      "title": "Sustainable Software Development",
+      "category": "Software/Tech",
+      "moduleCount": 5,
+      "duration": "35 jam",
+      "description": "Kuasai teknologi software terkini dengan pendekatan hands-on yang comprehensive dan industry-relevant. Program ini dirancang untuk memberikan skills praktis yang dibutuhkan di industri teknologi hijau dan sustainable tech solutions. Dari konsep programming fundamental hingga advanced development frameworks, course ini mengintegrasikan technical excellence dengan environmental consciousness. Anda akan mempelajari modern development practices, sustainable software architecture, green computing principles, dan energy-efficient application development. Course ini mencakup full-stack development, cloud computing, DevOps practices, dan emerging technologies yang mendukung sustainability goals. Dengan emphasis pada real-world projects dan industry best practices, Anda akan dibekali skills untuk mengembangkan software solutions yang tidak hanya technically robust namun juga environmentally responsible dan socially impactful.",
+      "shortDescription": "Menguasai teknologi software modern melalui pembelajaran hands-on untuk membangun solusi teknologi berkelanjutan. Program komprehensif ini mengcover full-stack development dengan focus pada green computing, sustainable software architecture, dan energy-efficient applications. Anda akan belajar menggunakan teknologi terdepan seperti React, Node.js, Python, dan cloud computing untuk mengembangkan aplikasi yang tidak hanya powerful namun juga environmentally responsible.",
+      "modules": [
+        {
+          "id": 1,
+          "module_slug": "programming-fundamentals",
+          "name": "Programming Fundamentals",
+          "title": "Fundamental Programming",
+          "completed": true,
+          "duration": "8 jam",
+          "materialCount": 12,
+          "certificate": true,
+          "rating": 4.92,
+          "ratingCount": 38,
+          "price": 180000,
+          "image": "/images/courses/5.webp",
+          "description": "Menguasai dasar-dasar programming dengan fokus pada clean code, sustainable development practices, dan industry-standard methodologies. Module ini mengcover programming fundamentals menggunakan multiple languages including Python, JavaScript, dan Java dengan emphasis pada efficient algorithms dan optimal data structures untuk green computing.",
+          "instructor": {
+            "name": "Ahmad Setiawan",
+            "avatar": "https://placehold.co/100x100/3B82F6/FFFFFF?text=AS",
+            "expertise": "Senior Software Engineer",
+            "description": "Ahmad adalah senior software engineer dengan 10+ tahun pengalaman di tech companies multinasional. Spesialisasi dalam clean code architecture dan sustainable software development practices."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Clean Code Principles",
+              "description": "Memahami prinsip-prinsip clean code dan best practices dalam programming"
+            },
+            {
+              "id": 2,
+              "title": "Data Structures & Algorithms",
+              "description": "Implementasi data structures dan algorithms yang efficient untuk green computing"
+            },
+            {
+              "id": 3,
+              "title": "Version Control dengan Git",
+              "description": "Mastering Git workflow dan collaborative development practices"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Rina Sari",
+              "avatar": "https://placehold.co/50x50/EC4899/FFFFFF?text=RS",
+              "comment": "Penjelasan Ahmad sangat clear dan practical. Dari zero knowledge jadi confident coding!"
+            },
+            {
+              "id": 2,
+              "name": "Kevin Tan",
+              "avatar": "https://placehold.co/50x50/10B981/FFFFFF?text=KT",
+              "comment": "Best programming course ever! Materinya up-to-date dan exercise-nya challenging."
+            },
+            {
+              "id": 3,
+              "name": "Dina Kartika",
+              "avatar": "https://placehold.co/50x50/0EA5E9/FFFFFF?text=DK",
+              "comment": "Ahmad teaching approach sangat systematic. Clean code principles nya sangat helpful!"
+            },
+            {
+              "id": 4,
+              "name": "Ryan Wijaya",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=RW",
+              "comment": "Hands-on projects yang sangat practical. Portfolio GitHub jadi impressive setelah course ini!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah cocok untuk absolute beginner?",
+              "answer": "Ya! Course ini designed khusus untuk pemula yang belum pernah coding sama sekali."
+            },
+            {
+              "id": 2,
+              "question": "Bahasa programming apa yang dipelajari?",
+              "answer": "Kita akan belajar Python, JavaScript, dan Java sebagai foundation languages."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "module_slug": "modern-web-development",
+          "name": "Modern Web Development",
+          "title": "Pengembangan Web Modern",
+          "completed": true,
+          "duration": "15 jam",
+          "materialCount": 18,
+          "certificate": true,
+          "rating": 4.88,
+          "ratingCount": 42,
+          "price": 320000,
+          "image": "/images/courses/6.webp",
+          "description": "Eksplorasi mendalam framework modern seperti React, Vue.js, Angular, dan teknologi web terbaru dengan focus pada performance optimization dan sustainability. Module ini mengcover front-end development, responsive design, progressive web applications, dan modern CSS frameworks. Anda akan mempelajari component-based architecture, state management, dan API integration.",
+          "instructor": {
+            "name": "Sarah Johnson",
+            "avatar": "https://placehold.co/100x100/06B6D4/FFFFFF?text=SJ",
+            "expertise": "Frontend Architect",
+            "description": "Sarah adalah frontend architect dengan expertise dalam modern web technologies. Berpengalaman membangun scalable web applications untuk startup unicorn di Silicon Valley."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "React & Component Architecture",
+              "description": "Mastering React ecosystem dan modern component development patterns"
+            },
+            {
+              "id": 2,
+              "title": "State Management & API Integration",
+              "description": "Advanced state management dengan Redux/Zustand dan REST/GraphQL integration"
+            },
+            {
+              "id": 3,
+              "title": "Performance & SEO Optimization",
+              "description": "Web performance optimization techniques dan SEO best practices"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "David Lim",
+              "avatar": "https://placehold.co/50x50/F59E0B/FFFFFF?text=DL",
+              "comment": "Sarah teaching style luar biasa! Complex concepts jadi mudah dimengerti."
+            },
+            {
+              "id": 2,
+              "name": "Maya Putri",
+              "avatar": "https://placehold.co/50x50/8B5CF6/FFFFFF?text=MP",
+              "comment": "Project-based learning approach sangat effective. Portfolio jadi kece!"
+            },
+            {
+              "id": 3,
+              "name": "Tommy Chen",
+              "avatar": "https://placehold.co/50x50/059669/FFFFFF?text=TC",
+              "comment": "Sarah expertise di React ecosystem sangat mendalam. Best frontend course!"
+            },
+            {
+              "id": 4,
+              "name": "Siti Nurhaliza",
+              "avatar": "https://placehold.co/50x50/EC4899/FFFFFF?text=SN",
+              "comment": "Performance optimization techniques yang diajarkan sangat practical dan up-to-date!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Prerequisite apa yang diperlukan?",
+              "answer": "Sebaiknya sudah familiar dengan HTML, CSS, dan JavaScript basics."
+            },
+            {
+              "id": 2,
+              "question": "Framework apa yang akan dipelajari?",
+              "answer": "Focus utama React, tapi juga overview Vue.js dan Angular."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "module_slug": "backend-development-apis",
+          "name": "Backend Development & APIs",
+          "title": "Pengembangan Backend & API",
+          "completed": false,
+          "duration": "12 jam",
+          "materialCount": 16,
+          "certificate": true,
+          "rating": 4.85,
+          "ratingCount": 24,
+          "price": 350000,
+          "image": "/images/courses/1.webp",
+          "description": "Menguasai pengembangan backend aplikasi dengan teknologi modern seperti Node.js, Express.js, dan RESTful API design. Module ini mengcover server-side programming, database integration, authentication & authorization, dan API security best practices. Anda akan mempelajari microservices architecture, message queues, dan scalable backend solutions untuk sustainable applications.",
+          "instructor": {
+            "name": "Ryan Pratama",
+            "avatar": "https://placehold.co/100x100/059669/FFFFFF?text=RP",
+            "expertise": "Backend Engineer & API Architect",
+            "description": "Ryan adalah senior backend engineer dengan 8+ tahun pengalaman membangun scalable APIs untuk fintech dan e-commerce platforms. Expertise dalam Node.js, Python, dan cloud architecture."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "RESTful API Design & Development",
+              "description": "Best practices dalam designing dan building RESTful APIs yang scalable dan maintainable"
+            },
+            {
+              "id": 2,
+              "title": "Database Integration & ORM",
+              "description": "Working dengan databases menggunakan modern ORM tools dan optimization techniques"
+            },
+            {
+              "id": 3,
+              "title": "Authentication & Security",
+              "description": "Implementing authentication, authorization, dan security measures untuk APIs"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Andi Kurniawan",
+              "avatar": "https://placehold.co/50x50/0EA5E9/FFFFFF?text=AK",
+              "comment": "Ryan teaching approach sangat practical. Dari basic API sampai production-ready backend!"
+            },
+            {
+              "id": 2,
+              "name": "Priya Sharma",
+              "avatar": "https://placehold.co/50x50/EF4444/FFFFFF?text=PS",
+              "comment": "Best backend course! Real-world projects dan industry standards yang up-to-date."
+            },
+            {
+              "id": 3,
+              "name": "Fajar Ramadhan",
+              "avatar": "https://placehold.co/50x50/10B981/FFFFFF?text=FR",
+              "comment": "Ryan expertise di Node.js dan database integration sangat impressive!"
+            },
+            {
+              "id": 4,
+              "name": "Lisa Wijaya",
+              "avatar": "https://placehold.co/50x50/8B5CF6/FFFFFF?text=LW",
+              "comment": "Security best practices dan authentication implementation nya sangat comprehensive!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Database apa yang akan dipelajari?",
+              "answer": "Kita akan cover PostgreSQL, MongoDB, dan Redis untuk different use cases."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada deployment ke cloud?",
+              "answer": "Ya, ada hands-on deployment ke AWS dan Heroku dengan best practices."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "module_slug": "cloud-computing-devops",
+          "name": "Cloud Computing & DevOps",
+          "title": "Cloud Computing & DevOps Practices",
+          "completed": false,
+          "duration": "14 jam",
+          "materialCount": 20,
+          "certificate": true,
+          "rating": 4.91,
+          "ratingCount": 19,
+          "price": 420000,
+          "image": "/images/courses/2.webp",
+          "description": "Eksplorasi mendalam cloud computing platforms dan DevOps practices untuk sustainable software deployment. Module ini mengcover containerization dengan Docker, orchestration dengan Kubernetes, CI/CD pipelines, dan cloud infrastructure management. Anda akan mempelajari AWS/GCP services, monitoring & logging, dan green computing practices untuk efficient resource utilization.",
+          "instructor": {
+            "name": "Dewi Sartika",
+            "avatar": "https://placehold.co/100x100/8B5CF6/FFFFFF?text=DS",
+            "expertise": "DevOps Engineer & Cloud Architect",
+            "description": "Dewi adalah certified cloud architect dengan expertise dalam AWS dan Google Cloud. Berpengalaman 12+ tahun dalam DevOps transformation untuk enterprise companies."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Containerization & Docker",
+              "description": "Mastering Docker containers dan container orchestration untuk scalable applications"
+            },
+            {
+              "id": 2,
+              "title": "CI/CD Pipeline Implementation",
+              "description": "Building automated CI/CD pipelines dengan GitHub Actions dan Jenkins"
+            },
+            {
+              "id": 3,
+              "title": "Cloud Infrastructure Management",
+              "description": "Managing cloud resources efficiently dengan infrastructure as code (IaC)"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Michael Torres",
+              "avatar": "https://placehold.co/50x50/F59E0B/FFFFFF?text=MT",
+              "comment": "Dewi expertise di cloud sangat mendalam. Hands-on projects yang sangat valuable!"
+            },
+            {
+              "id": 2,
+              "name": "Siti Nurhaliza",
+              "avatar": "https://placehold.co/50x50/EC4899/FFFFFF?text=SN",
+              "comment": "Best DevOps course! Dari zero knowledge jadi confident deploy applications ke cloud."
+            },
+            {
+              "id": 3,
+              "name": "Ahmad Rahman",
+              "avatar": "https://placehold.co/50x50/059669/FFFFFF?text=AR",
+              "comment": "Dewi teaching approach untuk Docker dan Kubernetes sangat systematic dan clear!"
+            },
+            {
+              "id": 4,
+              "name": "Maya Santos",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=MS",
+              "comment": "CI/CD pipeline implementation nya sangat practical. Langsung applicable di workplace!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Cloud platform mana yang dipelajari?",
+              "answer": "Focus utama AWS, dengan overview GCP dan Azure untuk comparison."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada hands-on lab?",
+              "answer": "Ya, ada 10+ hands-on labs dengan real cloud resources dan free tier credits."
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "module_slug": "mobile-development",
+          "name": "Mobile Development",
+          "title": "Pengembangan Aplikasi Mobile Berkelanjutan",
+          "completed": false,
+          "duration": "16 jam",
+          "materialCount": 22,
+          "certificate": true,
+          "rating": 4.87,
+          "ratingCount": 31,
+          "price": 380000,
+          "image": "/images/courses/3.webp",
+          "description": "Comprehensive mobile app development dengan focus pada sustainability dan energy-efficient applications. Module ini mengcover React Native, Flutter, dan native iOS/Android development dengan emphasis pada green mobile practices, battery optimization, dan sustainable user experience design. Anda akan mempelajari cross-platform development, mobile performance optimization, dan sustainable mobile architecture patterns.",
+          "instructor": {
+            "name": "Fajar Ramadhan",
+            "avatar": "https://placehold.co/100x100/10B981/FFFFFF?text=FR",
+            "expertise": "Mobile App Developer & UX Engineer",
+            "description": "Fajar adalah senior mobile developer dengan track record building 20+ mobile apps untuk startup dan enterprise. Spesialisasi dalam React Native dan sustainable mobile development practices."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Cross-Platform Development",
+              "description": "Mastering React Native dan Flutter untuk efficient cross-platform mobile apps"
+            },
+            {
+              "id": 2,
+              "title": "Mobile Performance Optimization",
+              "description": "Techniques untuk optimizing mobile app performance dan battery efficiency"
+            },
+            {
+              "id": 3,
+              "title": "App Store Deployment",
+              "description": "Best practices untuk deploying apps ke App Store dan Google Play Store"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Lestari Wijaya",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=LW",
+              "comment": "Fajar teaching method sangat engaging! Portfolio mobile apps jadi impressive."
+            },
+            {
+              "id": 2,
+              "name": "Ahmad Rahman",
+              "avatar": "https://placehold.co/50x50/7C3AED/FFFFFF?text=AR",
+              "comment": "Comprehensive mobile development course dengan real-world examples yang applicable."
+            },
+            {
+              "id": 3,
+              "name": "Dina Kartika",
+              "avatar": "https://placehold.co/50x50/0EA5E9/FFFFFF?text=DK",
+              "comment": "Fajar expertise di React Native sangat mendalam. Cross-platform development jadi mudah!"
+            },
+            {
+              "id": 4,
+              "name": "Ryan Pratama",
+              "avatar": "https://placehold.co/50x50/10B981/FFFFFF?text=RP",
+              "comment": "Mobile performance optimization techniques nya sangat valuable untuk battery efficiency!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Framework apa yang dipelajari?",
+              "answer": "Focus utama React Native, dengan introduction ke Flutter dan native development."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada publishing ke app store?",
+              "answer": "Ya, ada guidance lengkap untuk publishing ke both iOS App Store dan Google Play Store."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "path_slug": "green-finance-sustainable-business",
+      "title": "Green Finance & Sustainable Business",
+      "category": "Accounting/Finance",
+      "moduleCount": 3,
+      "duration": "27 jam",
+      "description": "Pahami prinsip-prinsip akuntansi dan keuangan untuk mengelola bisnis dengan efektif dalam era sustainability dan responsible business practices. Course comprehensive ini mencakup analisis laporan keuangan, perencanaan budget, financial modeling, dan strategic financial management dengan focus khusus pada green finance, sustainable business practices, dan ESG (Environmental, Social, Governance) reporting. Anda akan mempelajari integration antara financial performance dengan environmental dan social impact measurement. Program ini mengcover sustainable finance instruments, green bonds, impact investing, carbon accounting, dan climate risk assessment dalam financial decision making. Dengan pendekatan praktis dan industry-relevant, course ini membekali Anda dengan skills untuk navigasi kompleksitas modern finance yang increasingly focused pada sustainability, transparency, dan long-term value creation untuk stakeholders.",
+      "shortDescription": "Menguasai akuntansi dan keuangan bisnis berkelanjutan dengan fokus pada green finance dan sustainable practices. Course ini membekali Anda dengan knowledge mendalam tentang sustainable finance, ESG reporting, carbon accounting, dan green investment strategies. Anda akan mempelajari bagaimana mengintegrasikan environmental dan social factors dalam decision making finansial, serta mengembangkan business model yang profitable sekaligus sustainable untuk jangka panjang.",
+      "modules": [
+        {
+          "id": 1,
+          "module_slug": "sustainable-accounting",
+          "name": "Sustainable Accounting",
+          "title": "Akuntansi Berkelanjutan",
+          "completed": true,
+          "duration": "10 jam",
+          "materialCount": 14,
+          "certificate": true,
+          "rating": 4.76,
+          "ratingCount": 28,
+          "price": 290000,
+          "image": "/images/courses/4.webp",
+          "description": "Memahami prinsip-prinsip akuntansi dengan perspektif sustainability yang comprehensive dan forward-looking. Module ini mengcover environmental accounting, carbon accounting methodologies, dan sustainable financial reporting frameworks yang align dengan international standards. Anda akan mempelajari integrated reporting, sustainability accounting standards (SASB), dan Global Reporting Initiative (GRI).",
+          "instructor": {
+            "name": "Dr. Indira Finance",
+            "avatar": "https://placehold.co/100x100/059669/FFFFFF?text=IF",
+            "expertise": "Sustainable Finance Expert",
+            "description": "Dr. Indira adalah certified public accountant dengan specialization di sustainable finance. Beliau advisor untuk berbagai corporate dalam implementasi ESG reporting dan green accounting practices."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Environmental Accounting Principles",
+              "description": "Foundation environmental accounting dan integration dengan traditional accounting"
+            },
+            {
+              "id": 2,
+              "title": "Carbon Accounting & Measurement",
+              "description": "Metodologi carbon accounting dan greenhouse gas reporting standards"
+            },
+            {
+              "id": 3,
+              "title": "Integrated Reporting Framework",
+              "description": "Implementing integrated reporting untuk comprehensive business performance"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Budi Hartono",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=BH",
+              "comment": "Dr. Indira expertise di sustainable finance sangat mendalam. Materinya very applicable!"
+            },
+            {
+              "id": 2,
+              "name": "Lisa Chen",
+              "avatar": "https://placehold.co/50x50/7C3AED/FFFFFF?text=LC",
+              "comment": "Course ini opened my mind tentang future of accounting. Highly recommended!"
+            },
+            {
+              "id": 3,
+              "name": "Agus Setiawan",
+              "avatar": "https://placehold.co/50x50/059669/FFFFFF?text=AS",
+              "comment": "Dr. Indira carbon accounting methodology nya sangat comprehensive dan practical!"
+            },
+            {
+              "id": 4,
+              "name": "Maya Dewi",
+              "avatar": "https://placehold.co/50x50/F59E0B/FFFFFF?text=MD",
+              "comment": "Integrated reporting framework yang diajarkan sangat valuable untuk corporate reporting!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah perlu background accounting?",
+              "answer": "Basic accounting knowledge akan helpful, tapi kita akan review fundamentals di awal."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada certification yang diakui industri?",
+              "answer": "Ya, certificate completion diakui oleh Indonesia Sustainability Reporting Awards."
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "module_slug": "green-investment-strategies",
+          "name": "Green Investment Strategies",
+          "title": "Strategi Investasi Hijau & ESG",
+          "completed": false,
+          "duration": "12 jam",
+          "materialCount": 16,
+          "certificate": true,
+          "rating": 4.83,
+          "ratingCount": 22,
+          "price": 340000,
+          "image": "/images/courses/5.webp",
+          "description": "Comprehensive exploration of green investment strategies, ESG analysis, dan sustainable portfolio management. Module ini mengcover green bonds, sustainable mutual funds, impact investing, dan climate-conscious investment decisions. Anda akan mempelajari ESG scoring methodologies, risk assessment for sustainable investments, dan building diversified green portfolios yang balance financial returns dengan positive environmental dan social impact.",
+          "instructor": {
+            "name": "Prof. Bambang Sustainable",
+            "avatar": "https://placehold.co/100x100/10B981/FFFFFF?text=BS",
+            "expertise": "ESG Investment Specialist",
+            "description": "Prof. Bambang adalah chartered financial analyst (CFA) dengan 15+ tahun pengalaman di sustainable investing. Beliau advisor untuk pension funds dan institutional investors dalam ESG strategy development."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "ESG Analysis Framework",
+              "description": "Methodology untuk analyzing Environmental, Social, dan Governance factors dalam investment decisions"
+            },
+            {
+              "id": 2,
+              "title": "Green Bonds & Sustainable Instruments",
+              "description": "Understanding green bonds, sustainability-linked loans, dan innovative green financial instruments"
+            },
+            {
+              "id": 3,
+              "title": "Portfolio Construction & Risk Management",
+              "description": "Building sustainable portfolios dengan proper risk assessment dan diversification strategies"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Dewi Lestari",
+              "avatar": "https://placehold.co/50x50/059669/FFFFFF?text=DL",
+              "comment": "Prof. Bambang expertise dalam ESG investing luar biasa! Practical insights yang very applicable."
+            },
+            {
+              "id": 2,
+              "name": "James Wilson",
+              "avatar": "https://placehold.co/50x50/3B82F6/FFFFFF?text=JW",
+              "comment": "Comprehensive course untuk understanding sustainable investment landscape. Highly recommended!"
+            },
+            {
+              "id": 3,
+              "name": "Sari Wijaya",
+              "avatar": "https://placehold.co/50x50/EC4899/FFFFFF?text=SW",
+              "comment": "Prof. Bambang ESG analysis framework nya sangat systematic dan practical untuk portfolio management!"
+            },
+            {
+              "id": 4,
+              "name": "Tommy Chen",
+              "avatar": "https://placehold.co/50x50/DC2626/FFFFFF?text=TC",
+              "comment": "Green bonds dan sustainable instruments coverage nya sangat comprehensive! Best investment course!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Apakah perlu background investment sebelumnya?",
+              "answer": "Basic knowledge tentang investment akan helpful, tapi kita akan review fundamentals di awal."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada case study real investments?",
+              "answer": "Ya, ada analysis mendalam untuk real green investment cases dan portfolio examples."
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "module_slug": "climate-risk-financial-modeling",
+          "name": "Climate Risk & Financial Modeling",
+          "title": "Manajemen Risiko Iklim & Pemodelan Finansial",
+          "completed": false,
+          "duration": "15 jam",
+          "materialCount": 18,
+          "certificate": true,
+          "rating": 4.89,
+          "ratingCount": 16,
+          "price": 390000,
+          "image": "/images/courses/6.webp",
+          "description": "Advanced climate risk assessment dan financial modeling untuk sustainable business planning. Module ini mengcover physical dan transition risks, scenario analysis, stress testing, dan climate-adjusted financial projections. Anda akan mempelajari TCFD (Task Force on Climate-related Financial Disclosures) framework, carbon pricing models, dan integration climate risks dalam business strategy dan financial planning untuk long-term resilience.",
+          "instructor": {
+            "name": "Dr. Rina Climate Risk",
+            "avatar": "https://placehold.co/100x100/EF4444/FFFFFF?text=RC",
+            "expertise": "Climate Risk Analyst & Financial Modeler",
+            "description": "Dr. Rina adalah risk management expert dengan specialization dalam climate risk assessment. Beliau consultant untuk banks dan corporations dalam climate stress testing dan TCFD implementation."
+          },
+          "syllabus": [
+            {
+              "id": 1,
+              "title": "Climate Risk Assessment Framework",
+              "description": "Comprehensive approach untuk identifying dan quantifying physical dan transition climate risks"
+            },
+            {
+              "id": 2,
+              "title": "Financial Modeling & Scenario Analysis",
+              "description": "Advanced financial modeling techniques dengan climate scenario integration dan stress testing"
+            },
+            {
+              "id": 3,
+              "title": "TCFD Reporting & Disclosure",
+              "description": "Implementing TCFD framework untuk comprehensive climate-related financial disclosure"
+            }
+          ],
+          "testimonials": [
+            {
+              "id": 1,
+              "name": "Agus Prasetyo",
+              "avatar": "https://placehold.co/50x50/8B5CF6/FFFFFF?text=AP",
+              "comment": "Dr. Rina methodology dalam climate risk assessment sangat systematic dan practical!"
+            },
+            {
+              "id": 2,
+              "name": "Maria Santos",
+              "avatar": "https://placehold.co/50x50/F59E0B/FFFFFF?text=MS",
+              "comment": "Advanced financial modeling course yang essential untuk modern finance professionals."
+            },
+            {
+              "id": 3,
+              "name": "Budi Setiawan",
+              "avatar": "https://placehold.co/50x50/0EA5E9/FFFFFF?text=BS",
+              "comment": "Dr. Rina TCFD framework implementation nya sangat clear dan applicable untuk corporate disclosure!"
+            },
+            {
+              "id": 4,
+              "name": "Linda Dewi",
+              "avatar": "https://placehold.co/50x50/10B981/FFFFFF?text=LD",
+              "comment": "Climate scenario analysis dan stress testing techniques nya sangat valuable untuk risk management!"
+            }
+          ],
+          "faq": [
+            {
+              "id": 1,
+              "question": "Software apa yang digunakan untuk modeling?",
+              "answer": "Kita akan menggunakan Excel advanced features, Python, dan specialized climate risk tools."
+            },
+            {
+              "id": 2,
+              "question": "Apakah ada certification untuk TCFD?",
+              "answer": "Ya, completion certificate mencakup TCFD framework competency yang diakui industri."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
