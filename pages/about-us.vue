@@ -65,19 +65,31 @@ const teamMembersData = [
     id: 1,
     name: 'Jahda Agniya Mahmudah',
     position: 'Chief Executive Officer',
-    image: '/images/rise_jahda.png',
+    image: '/images/teams/jahda.png',
   },
   {
     id: 2,
     name: 'Zahrotul Fauziah',
     position: 'Chief Project Officer',
-    image: '/images/rise_zahrotul.png',
+    image: '/images/teams/zahrotul.png',
   },
   {
     id: 3,
     name: 'Aswandatu Putra Inderajao​',
     position: 'Partnership & Outreach',
-    image: '/images/rise_aswandatu.png',
+    image: '/images/teams/aswandatu.png',
+  },
+  {
+    id: 4,
+    name: 'Dwi Putri Handayani',
+    position: 'Product Officer',
+    image: '/images/teams/dwi.png',
+  },
+  {
+    id: 5,
+    name: 'Alya Firda Rahmawati',
+    position: 'Project Officer',
+    image: '/images/teams/alya.png',
   },
 ];
 </script>
@@ -175,7 +187,7 @@ const teamMembersData = [
         </div>
 
         <!-- Team Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+        <div class="flex flex-wrap justify-center items-center gap-10 lg:gap-24">
           <div v-for="member in teamMembersData" :key="member.id" class="text-center">
             <div class="h-52 aspect-square lg:h-64 mx-auto mb-4 rounded-3xl overflow-hidden bg-green-100">
               <NuxtImg :src="member.image" :alt="member.name" class="h-full object-cover" loading="lazy" format="webp" />

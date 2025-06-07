@@ -19,21 +19,25 @@ const programsData = [
     id: 1,
     title: 'Rise Young Leaders Summit',
     image: '/images/rise_young_leader.png',
+    link: '/programs/rise-young-leaders-summit',
     description1: 'Rise Young Leaders Summit is an annual program to improve youth capacity for young people aged 16-25 in various topics.',
     description2: 'The program encourages youth through competitions for fully and partially funded Leadership Trip Programs in 6 lot of countries.',
   },
   {
     id: 2,
-    title: "Rise Educator's Skills Accelerator",
+    title: 'Rise Sustainability Bootcamp',
     image: '/images/rise_educator.png',
-    description1: "Rise Educator's Skills Accelerator is and online learning program to help teachers and online bootcamps in various topic.",
+    link: '/programs/rise-sustainability-bootcamp',
+    description1:
+      "Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic.",
     description2:
-      'This program is for educators/teacher aged 20-45 years old to improve expert of changes, equipped with grant for sustainable project in their own institution.',
+      'This program is for young professional, career switchers, sustainability and green workers to improve their knowledge and skills in this topic, equipped with JOB ACCELERATOR program with our hiring partners.',
   },
   {
     id: 3,
     title: 'Little Hero Camp',
     image: '/images/rise_little_hero.png',
+    link: '/programs/little-hero-camp',
     description1: 'Little Hero Camp is an offline summer training for children aged 7-15 years old.',
     description2:
       'Equipped with various topics in sustainability, to enhance their skills and interests and become more empowered during their summer vacation.',
@@ -184,7 +188,7 @@ onMounted(() => {
           <Card
             v-for="program in programsData"
             :key="program.id"
-            class="hover:shadow-xl hover:scale-102 hover:outline-2 hover:outline-emerald-600 transition-all duration-300 flex flex-col h-full"
+            class="hover:shadow-lg! hover:scale-102 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full"
           >
             <CardContent class="flex flex-col gap-4 flex-grow">
               <div class="aspect-w-16 aspect-h-10 rounded-lg overflow-hidden">
@@ -197,10 +201,13 @@ onMounted(() => {
               <p class="text-sm leading-relaxed flex-grow">
                 {{ program.description2 }}
               </p>
-              <Button class="bg-emerald-600 hover:bg-emerald-700">
+              <NuxtLink
+                :to="program.link"
+                class="flex items-center justify-center gap-2 text-white py-1.5 transition-all duration-300 rounded-lg bg-emerald-600 hover:bg-emerald-700"
+              >
                 <span>Start Now</span>
                 <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
-              </Button>
+              </NuxtLink>
             </CardContent>
           </Card>
         </div>

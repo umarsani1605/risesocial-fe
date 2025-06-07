@@ -1,11 +1,11 @@
 <script setup>
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 // Use default layout
 definePageMeta({
@@ -22,177 +22,113 @@ useHead({
 const jobsData = [
   {
     id: 1,
-    title: 'Software Engineer',
-    category: 'IT & Networking',
-    categoryBg: 'bg-green-50',
-    categoryText: 'text-green-600',
-    categoryBorder: 'border-green-200',
-    location: '32 Irving Pl, NY',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Temporary', variant: 'secondary' }],
-    salary: '$400 - $450',
-    salaryPeriod: '/ month',
-    deadline: 'June 14, 2030',
-    isVerified: true,
+    title: 'Data Scientist',
+    company: 'PT. Rise Edukasi Inspirasi',
+    location: 'Bandung, Indonesia',
+    postedDate: '1 minggu yang lalu',
+    type: 'Remote',
+    typeColor: 'bg-yellow-100 text-yellow-800',
+    cardColor: 'bg-orange-400',
   },
   {
     id: 2,
-    title: 'Sales Specialist',
-    category: 'IT & Networking',
-    categoryBg: 'bg-green-50',
-    categoryText: 'text-green-600',
-    categoryBorder: 'border-green-200',
-    location: '433 Graham Ave',
-    postedDate: 'June 20, 2023',
-    badges: [
-      { text: 'Full Time', variant: 'secondary' },
-      { text: 'Urgent', variant: 'destructive' },
-    ],
-    salary: '$750 - $800',
-    salaryPeriod: '/ month',
-    deadline: 'June 5, 2031',
-    isVerified: true,
+    title: 'Sustainability Specialist',
+    company: 'GreenTech Solutions',
+    location: 'Jakarta, Indonesia',
+    postedDate: '2 hari yang lalu',
+    type: 'Full Time',
+    typeColor: 'bg-blue-100 text-blue-800',
+    cardColor: 'bg-emerald-500',
   },
   {
     id: 3,
-    title: 'Junior Graphic Designer',
-    category: 'Accounting',
-    categoryBg: 'bg-blue-50',
-    categoryText: 'text-blue-600',
-    categoryBorder: 'border-blue-200',
-    location: '398 Manhattan Ave',
-    postedDate: 'June 20, 2023',
-    badges: [
-      { text: 'On-site', variant: 'secondary' },
-      { text: 'Urgent', variant: 'destructive' },
-    ],
-    salary: '$650 - $700',
-    salaryPeriod: '/ month',
-    deadline: 'June 4, 2031',
-    isVerified: true,
+    title: 'Environmental Engineer',
+    company: 'EcoDesign Indonesia',
+    location: 'Surabaya, Indonesia',
+    postedDate: '3 hari yang lalu',
+    type: 'On-site',
+    typeColor: 'bg-green-100 text-green-800',
+    cardColor: 'bg-blue-500',
   },
   {
     id: 4,
-    title: 'Finance Manager',
-    category: 'Data Science',
-    categoryBg: 'bg-purple-50',
-    categoryText: 'text-purple-600',
-    categoryBorder: 'border-purple-200',
-    location: '269 Norman Ave',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Remote', variant: 'secondary' }],
-    salary: '$450 - $550',
-    salaryPeriod: '/ month',
-    deadline: 'June 22, 2029',
-    isVerified: true,
+    title: 'Climate Change Analyst',
+    company: 'Sustainable Future Corp',
+    location: 'Yogyakarta, Indonesia',
+    postedDate: '5 hari yang lalu',
+    type: 'Remote',
+    typeColor: 'bg-yellow-100 text-yellow-800',
+    cardColor: 'bg-purple-500',
   },
   {
     id: 5,
-    title: 'Marketing Manager',
-    category: 'Sales & Marketing',
-    categoryBg: 'bg-orange-50',
-    categoryText: 'text-orange-600',
-    categoryBorder: 'border-orange-200',
-    location: '178 7th Ave S, NY',
-    postedDate: 'June 20, 2023',
-    badges: [
-      { text: 'Internship', variant: 'secondary' },
-      { text: 'Temporary', variant: 'secondary' },
-    ],
-    salary: '$8 - $10',
-    salaryPeriod: '/ hour',
-    deadline: 'June 12, 2031',
-    isVerified: true,
+    title: 'Green Energy Consultant',
+    company: 'Renewable Power Ltd',
+    location: 'Bali, Indonesia',
+    postedDate: '1 minggu yang lalu',
+    type: 'Hybrid',
+    typeColor: 'bg-orange-100 text-orange-800',
+    cardColor: 'bg-teal-500',
   },
   {
     id: 6,
-    title: 'Full Stack Development',
-    category: 'IT & Networking',
-    categoryBg: 'bg-green-50',
-    categoryText: 'text-green-600',
-    categoryBorder: 'border-green-200',
-    location: '77 Irving Pl, NY',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Freelance', variant: 'secondary' }],
-    salary: '$850 - $900',
-    salaryPeriod: '/ month',
-    deadline: 'June 18, 2031',
-    isVerified: true,
+    title: 'Carbon Footprint Analyst',
+    company: 'EcoMetrics Indonesia',
+    location: 'Bandung, Indonesia',
+    postedDate: '1 minggu yang lalu',
+    type: 'Contract',
+    typeColor: 'bg-purple-100 text-purple-800',
+    cardColor: 'bg-indigo-500',
   },
   {
     id: 7,
-    title: 'Senior Developer',
-    category: 'Engineering',
-    categoryBg: 'bg-slate-50',
-    categoryText: 'text-slate-600',
-    categoryBorder: 'border-slate-200',
-    location: '192 3rd Ave, NY',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Full Time', variant: 'secondary' }],
-    salary: '$50 - $65',
-    salaryPeriod: '/ day',
-    deadline: 'June 18, 2031',
-    isVerified: true,
+    title: 'Renewable Energy Engineer',
+    company: 'Solar Indonesia',
+    location: 'Jakarta, Indonesia',
+    postedDate: '2 minggu yang lalu',
+    type: 'Full Time',
+    typeColor: 'bg-blue-100 text-blue-800',
+    cardColor: 'bg-red-500',
   },
   {
     id: 8,
-    title: 'Project manager',
-    category: 'Accounting',
-    categoryBg: 'bg-blue-50',
-    categoryText: 'text-blue-600',
-    categoryBorder: 'border-blue-200',
-    location: '160 West St, Brooklyn',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Internship', variant: 'secondary' }],
-    salary: '$450 - $550',
-    salaryPeriod: '/ month',
-    deadline: 'June 13, 2029',
-    isVerified: true,
+    title: 'Sustainability Project Manager',
+    company: 'Green Development Co',
+    location: 'Medan, Indonesia',
+    postedDate: '2 minggu yang lalu',
+    type: 'Remote',
+    typeColor: 'bg-yellow-100 text-yellow-800',
+    cardColor: 'bg-pink-500',
   },
   {
     id: 9,
-    title: 'HR Administration',
-    category: 'Accounting',
-    categoryBg: 'bg-blue-50',
-    categoryText: 'text-blue-600',
-    categoryBorder: 'border-blue-200',
-    location: '5 - 48 49th Ave',
-    postedDate: 'May 23, 2023',
-    badges: [{ text: 'Freelance', variant: 'secondary' }],
-    salary: '$100 - $120',
-    salaryPeriod: '/ week',
-    deadline: 'June 17, 2032',
-    isVerified: true,
+    title: 'ESG Compliance Officer',
+    company: 'Sustainable Corp',
+    location: 'Semarang, Indonesia',
+    postedDate: '3 minggu yang lalu',
+    type: 'Hybrid',
+    typeColor: 'bg-orange-100 text-orange-800',
+    cardColor: 'bg-cyan-500',
   },
   {
     id: 10,
-    title: 'Social Media Marketing',
-    category: 'Customer Service',
-    categoryBg: 'bg-orange-50',
-    categoryText: 'text-orange-600',
-    categoryBorder: 'border-orange-200',
-    location: '114 Kenyon St',
-    postedDate: 'May 13, 2023',
-    badges: [{ text: 'Part Time', variant: 'secondary' }],
-    salary: '$10 - $15',
-    salaryPeriod: '/ hour',
-    deadline: 'May 19, 2029',
-    isVerified: true,
+    title: 'Green Marketing Specialist',
+    company: 'EcoMarketing Agency',
+    location: 'Malang, Indonesia',
+    postedDate: '3 minggu yang lalu',
+    type: 'Part Time',
+    typeColor: 'bg-green-100 text-green-800',
+    cardColor: 'bg-amber-500',
   },
   {
     id: 11,
-    title: 'Senior UI/UX Designer',
-    category: 'Customer Service',
-    categoryBg: 'bg-indigo-50',
-    categoryText: 'text-indigo-600',
-    categoryBorder: 'border-indigo-200',
-    location: '279 Franklin St',
-    postedDate: 'May 13, 2023',
-    badges: [{ text: 'Remote', variant: 'secondary' }],
-    salary: '$500 - $550',
-    salaryPeriod: '/ month',
-    deadline: 'May 15, 2029',
-    isVerified: true,
+    title: 'Climate Tech Developer',
+    company: 'Future Tech Solutions',
+    location: 'Denpasar, Indonesia',
+    postedDate: '1 bulan yang lalu',
+    type: 'Remote',
+    typeColor: 'bg-yellow-100 text-yellow-800',
+    cardColor: 'bg-violet-500',
   },
 ];
 
@@ -548,46 +484,47 @@ const isFilterOpen = ref(false);
         <main class="col-span-1 lg:col-span-3">
           <!-- Job Cards Grid -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card v-for="job in jobsData" :key="job.id" class="p-4 hover:shadow-md cursor-pointer transition-shadow duration-300 gap-0">
-              <CardHeader class="py-3 sm:py-4 pl-4 pr-2!">
-                <div class="flex items-start justify-between mb-2">
-                  <Badge variant="outline" :class="['text-xs', job.categoryBg, job.categoryText, job.categoryBorder]">
-                    {{ job.category }}
-                  </Badge>
-                  <Icon name="lucide:bookmark" class="size-6! text-gray-400 hover:text-gray-600 cursor-pointer" />
-                </div>
-                <CardTitle class="heading-card-sm mb-1">
-                  {{ job.title }}
-                  <Icon v-if="job.isVerified" name="lucide:verified" class="inline-block ml-1 h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
-                </CardTitle>
-                <div class="flex items-center gap-4">
-                  <div class="job-card-meta">
-                    <Icon name="lucide:map-pin" class="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    <span>{{ job.location }}</span>
-                  </div>
-                  <div class="job-card-meta">
-                    <Icon name="lucide:calendar" class="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    <span>{{ job.postedDate }}</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent class="p-4">
-                <div class="flex flex-col sm:justify-between gap-2">
-                  <div class="flex gap-2 flex-wrap mb-2">
-                    <Badge v-for="badge in job.badges" :key="badge.text" :variant="badge.variant" class="text-xs">
-                      {{ badge.text }}
-                    </Badge>
-                  </div>
-                  <Separator class="my-2" />
-                  <div class="job-card-salary">
-                    <div class="job-card-salary-icon">
-                      <span class="text-gray-500 text-sm sm:text-base font-bold">$</span>
+            <Card
+              v-for="job in jobsData"
+              :key="job.id"
+              class="p-0 hover:shadow-lg cursor-pointer transition-shadow duration-300 border border-gray-200 rounded-lg overflow-hidden min-h-[140px]"
+            >
+              <div class="flex h-full">
+                <!-- Colored Square -->
+                <div class="w-20 h-full flex-shrink-0" :class="job.cardColor"></div>
+
+                <!-- Content -->
+                <div class="flex-1 p-4 flex flex-col justify-between">
+                  <div>
+                    <!-- Top section with title and badge -->
+                    <div class="flex justify-between items-start mb-2">
+                      <h3 class="text-lg sm:text-xl font-bold text-gray-900 flex-1 pr-3">
+                        {{ job.title }}
+                      </h3>
+                      <Badge :class="job.typeColor" class="text-xs font-medium px-2 py-1 whitespace-nowrap">
+                        {{ job.type }}
+                      </Badge>
                     </div>
-                    <span class="job-card-salary-amount">{{ job.salary }}</span>
-                    <span class="job-card-salary-period">{{ job.salaryPeriod }}</span>
+
+                    <!-- Company Name -->
+                    <p class="text-gray-600 text-sm sm:text-base mb-4">
+                      {{ job.company }}
+                    </p>
+                  </div>
+
+                  <!-- Meta Information -->
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                    <div class="flex items-center text-gray-500 text-sm">
+                      <Icon name="lucide:calendar" class="h-4 w-4 mr-2" />
+                      <span>{{ job.postedDate }}</span>
+                    </div>
+                    <div class="flex items-center text-gray-500 text-sm">
+                      <Icon name="lucide:map-pin" class="h-4 w-4 mr-2" />
+                      <span>{{ job.location }}</span>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
 
