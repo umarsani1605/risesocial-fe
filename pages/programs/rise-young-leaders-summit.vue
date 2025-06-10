@@ -250,7 +250,6 @@ const goToAlumniSlide = (index) => {
           src="/images/rise-young-leaders/banner.png"
           alt="Rise Young Leaders Summit Japan 2025"
           class="w-full sm:h-[400px] lg:h-[600px] object-bottom rounded-2xl object-cover"
-          loading="lazy"
           format="webp"
         />
         <div class="flex flex-col gap-4 lg:gap-6 items-center text-center px-4">
@@ -353,7 +352,6 @@ const goToAlumniSlide = (index) => {
                   :src="activeBenefitImage"
                   alt="What you will get from Rise Young Leaders Summit"
                   class="w-full h-[300px] lg:h-[440px] object-cover rounded-3xl shadow-2xl transform"
-                  loading="lazy"
                   format="webp"
                 />
               </Transition>
@@ -385,7 +383,7 @@ const goToAlumniSlide = (index) => {
             <CarouselItem v-for="event in previousEvents" :key="event.id" class="pl-2 md:pl-4 lg:basis-1/3">
               <div class="p-2">
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <NuxtImg :src="event.image" :alt="event.alt" class="w-full h-48 sm:h-56 lg:h-64 object-cover" loading="lazy" format="webp" />
+                  <NuxtImg :src="event.image" :alt="event.alt" class="w-full h-48 sm:h-56 lg:h-64 object-cover" format="webp" />
                 </div>
               </div>
             </CarouselItem>

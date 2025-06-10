@@ -508,7 +508,7 @@ const goToPartnerSlide = (index) => {
               <div
                 class="flex-2 h-40 lg:h-48 mx-auto bg-transparent rounded-lg flex items-center justify-center lg:group-hover:scale-105 transition-transform duration-300"
               >
-                <NuxtImg :src="stepData.image" :alt="stepData.title" class="h-50! object-contain" loading="lazy" format="webp" />
+                <NuxtImg :src="stepData.image" :alt="stepData.title" class="h-50! object-contain" format="webp" />
               </div>
 
               <div class="flex-3 flex flex-col lg:items-center lg:justify-center lg:pb-8 text-wrap">
@@ -609,7 +609,7 @@ const goToPartnerSlide = (index) => {
           <!-- Left Illustration -->
           <div class="flex-1 relative">
             <div class="w-full h-auto mx-auto hidden lg:flex items-center justify-center">
-              <NuxtImg src="/images/rise_cta.png" alt="Get the Perfect Job for You" class="w-full object-contain" loading="lazy" format="webp" />
+              <NuxtImg src="/images/rise_cta.png" alt="Get the Perfect Job for You" class="w-full object-contain" format="webp" />
             </div>
           </div>
           <!-- Right Content -->
@@ -741,7 +741,7 @@ const goToPartnerSlide = (index) => {
           <CarouselContent class="py-4">
             <CarouselItem v-for="(partner, index) in partnersData" :key="`partner-${index}`" class="pl-4 basis-1/2 md:basis-1/3 lg:basis-1/6">
               <div class="flex items-center justify-center rounded-lg transition-colors duration-300 h-24">
-                <NuxtImg :src="partner.src" :alt="partner.alt" class="h-full object-contain" loading="lazy" format="webp" />
+                <NuxtImg :src="partner.src" :alt="partner.alt" class="h-full object-contain" format="webp" />
               </div>
             </CarouselItem>
           </CarouselContent>

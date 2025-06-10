@@ -140,7 +140,7 @@ const teamMembersData = [
           <div v-for="pillar in pillarsData" :key="pillar.id" class="text-center space-y-6">
             <div class="flex justify-center">
               <div class="h-56 flex items-center justify-center">
-                <NuxtImg :src="pillar.image" :alt="pillar.title" class="h-full object-contain" loading="lazy" format="webp" />
+                <NuxtImg :src="pillar.image" :alt="pillar.title" class="h-full object-contain" format="webp" />
               </div>
             </div>
             <h3 class="heading-card">{{ pillar.title }}</h3>
@@ -156,7 +156,7 @@ const teamMembersData = [
     <section class="section-py-lg relative overflow-hidden">
       <!-- Background Image -->
       <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-900/60">
-        <NuxtImg src="/images/rise_stats.png" alt="Team gathering" class="w-full h-full object-cover" loading="lazy" format="webp" />
+        <NuxtImg src="/images/rise_stats.png" alt="Team gathering" class="w-full h-full object-cover" format="webp" />
       </div>
 
       <!-- Overlay -->
@@ -190,7 +190,7 @@ const teamMembersData = [
         <div class="flex flex-wrap justify-center items-center gap-10 lg:gap-24">
           <div v-for="member in teamMembersData" :key="member.id" class="text-center">
             <div class="h-52 aspect-square lg:h-64 mx-auto mb-4 rounded-3xl overflow-hidden bg-green-100">
-              <NuxtImg :src="member.image" :alt="member.name" class="h-full object-cover" loading="lazy" format="webp" />
+              <NuxtImg :src="member.image" :alt="member.name" class="h-full object-cover" format="webp" />
             </div>
             <h3 class="heading-card mb-2">{{ member.name }}</h3>
             <p class="text-gray-600 font-medium">{{ member.position }}</p>

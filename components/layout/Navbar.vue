@@ -24,12 +24,12 @@ const navigationMenus = computed(() => [
     path: '/',
     isActive: route.path === '/',
   },
-  {
-    id: 'courses',
-    name: 'Courses',
-    path: '/courses',
-    isActive: route.path.startsWith('/courses'),
-  },
+  // {
+  //   id: 'courses',
+  //   name: 'Courses',
+  //   path: '/courses',
+  //   isActive: route.path.startsWith('/courses'),
+  // },
   {
     id: 'opportunities',
     name: 'Jobs',
@@ -123,12 +123,12 @@ onUnmounted(() => {
           </nav>
 
           <!-- Desktop Login Button -->
-          <div class="hidden lg:flex items-center">
+          <!-- <div class="hidden lg:flex items-center">
             <Button @click="openLoginDialog" class="bg-transparent! hover:bg-white/5! text-white">
               <Icon name="lucide:user" class="size-4!" />
               Login / Register
             </Button>
-          </div>
+          </div> -->
 
           <!-- Mobile menu button -->
           <div class="lg:hidden flex items-center space-x-2">
@@ -155,18 +155,18 @@ onUnmounted(() => {
             </NuxtLink>
 
             <!-- Mobile Login Button -->
-            <div class="pt-4">
+            <!-- <div class="pt-4">
               <Button @click="openLoginDialog" class="w-full justify-center">
                 <Icon name="lucide:user" class="mr-2 h-4 w-4" />
                 Login / Register
               </Button>
-            </div>
+            </div> -->
           </div>
         </div>
       </Transition>
     </header>
 
     <!-- Login/Register Dialog -->
-    <LoginRegisterDialog v-model:open="showLoginDialog" />
+    <!-- <LoginRegisterDialog v-model:open="showLoginDialog" /> -->
   </div>
 </template>

@@ -51,7 +51,6 @@ const submitForm = () => {
         height="100%"
         style="border: 0"
         allowfullscreen=""
-        loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         class="relative md:absolute inset-0 w-full h-96 lg:h-full"
       ></iframe>

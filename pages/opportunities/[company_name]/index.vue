@@ -166,9 +166,6 @@ const processedJobs = computed(() => {
                   <a :href="companyInfo.linkedin_org_url" target="_blank" class="text-sm text-blue-600 hover:underline"> Website </a>
                 </div>
               </div>
-
-              <!-- Company Slogan -->
-              <p v-if="companyInfo.linkedin_org_slogan" class="text-gray-600 text-lg italic mb-4">"{{ companyInfo.linkedin_org_slogan }}"</p>
             </div>
           </div>
         </CardContent>

@@ -192,7 +192,7 @@ onMounted(() => {
           >
             <CardContent class="flex flex-col gap-4 flex-grow">
               <div class="aspect-w-16 aspect-h-10 rounded-lg overflow-hidden">
-                <NuxtImg :src="program.image" :alt="program.title" class="w-full h-48 object-cover" loading="lazy" format="webp" />
+                <NuxtImg :src="program.image" :alt="program.title" class="w-full h-48 object-cover" format="webp" />
               </div>
               <CardTitle class="heading-card">{{ program.title }}</CardTitle>
               <p class="text-sm leading-relaxed">
@@ -287,7 +287,7 @@ onMounted(() => {
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-24 items-center">
           <!-- Left Mobile Mockups -->
           <div class="w-64 sm:w-80 lg:w-[40rem]">
-            <NuxtImg src="/images/rise_mobile_app.png" alt="Rise Mobile App" class="w-full object-contain" loading="lazy" format="webp" />
+            <NuxtImg src="/images/rise_mobile_app.png" alt="Rise Mobile App" class="w-full object-contain" format="webp" />
           </div>
           <!-- Right Content -->
           <div class="space-y-6">
