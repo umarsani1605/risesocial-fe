@@ -314,7 +314,6 @@ watch(
                             :src="job.organization_logo"
                             :alt="`${job.organization} logo`"
                             class="w-full h-full object-contain"
-                            loading="lazy"
                             @error="$event.target.style.display = 'none'"
                           />
                         </div>
