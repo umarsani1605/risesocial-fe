@@ -119,33 +119,29 @@ const goToAlumniSlide = (index) => {
     <!-- Hero Section -->
     <section class="bg-white section-py-lg py-8 lg:py-12">
       <div class="container-wrapper">
-        <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
           <!-- Left Content -->
-          <div class="space-y-6 lg:space-y-8 px-4 lg:px-0">
+          <div class="flex-1 space-y-6 lg:space-y-8 px-4 lg:px-0">
             <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-primary leading-tight">Little Hero Camp</h1>
 
             <div class="space-y-3 lg:space-y-4">
               <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
-                Little Hero Camp is an offline summer training for children aged 7-15 years old.
-              </p>
-              <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
-                Equipped with various topics in sustainability, to enhance their skills and interests and become more empowered during their summer
-                vacation.
+                Little Hero Camp is an offline summer training for children aged 7-15 years old. Equipped with various topics in sustainability, to
+                enhance their skills and interests and become more empowered during their summer vacation.
               </p>
             </div>
 
             <div class="pt-2 lg:pt-4">
-              <Button size="lg" class="bg-black text-white hover:bg-gray-800 px-6 lg:px-8 py-2 lg:py-3 text-sm lg:text-lg"> Enroll Now! </Button>
+              <Button size="lg"> Enroll Now! </Button>
             </div>
           </div>
 
           <!-- Right Image -->
-          <div class="relative">
+          <div class="relative flex-1 flex items-end justify-end">
             <NuxtImg
               src="/images/rise-young-leaders/gallery-8.png"
               alt="Little Hero Camp - Children learning with interactive floor projection"
-              class="w-full h-[300px] sm:h-[400px] lg:h-[500px] object-cover rounded-2xl shadow-xl"
-              loading="lazy"
+              class="w-full aspect-[3/2] object-cover rounded-2xl shadow-xl"
               format="webp"
             />
           </div>
@@ -187,7 +183,7 @@ const goToAlumniSlide = (index) => {
             <h3 class="text-lg lg:text-xl font-bold leading-tight">{{ step.id }}. {{ step.title }}</h3>
 
             <!-- Description -->
-            <p class="text-xs lg:text-sm leading-relaxed text-gray-600">
+            <p class="text-sm leading-relaxed text-gray-600">
               {{ step.description }}
             </p>
           </div>
@@ -214,15 +210,11 @@ const goToAlumniSlide = (index) => {
           @init-api="setAlumniApi"
         >
           <CarouselContent class="-ml-2 md:-ml-4 py-4 cursor-pointer">
-            <CarouselItem
-              v-for="testimonial in alumniTestimonials"
-              :key="testimonial.id"
-              class="pl-2 md:pl-4 basis-4/5 sm:basis-3/5 md:basis-1/2 lg:basis-1/3"
-            >
+            <CarouselItem v-for="testimonial in alumniTestimonials" :key="testimonial.id" class="pl-2 md:pl-4 lg:basis-1/3">
               <Card class="p-4 sm:p-6 lg:p-8 text-center h-full">
                 <CardContent class="flex flex-col justify-between p-0 h-full">
                   <div class="space-y-3 lg:space-y-4">
-                    <p class="text-xs sm:text-sm lg:text-base text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
+                    <p class="text-sm text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
                   </div>
 
                   <!-- Parent Info -->
@@ -239,12 +231,12 @@ const goToAlumniSlide = (index) => {
                     </div>
 
                     <!-- Name -->
-                    <h4 class="text-xs sm:text-sm lg:text-base font-semibold text-gray-900">
+                    <h4 class="text-sm lg:text-base font-semibold text-gray-900">
                       {{ testimonial.name }}
                     </h4>
 
                     <!-- Country -->
-                    <p class="text-xs lg:text-sm text-primary font-medium">Parent from {{ testimonial.country }}</p>
+                    <p class="text-sm text-primary font-medium">Parent from {{ testimonial.country }}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -265,6 +257,24 @@ const goToAlumniSlide = (index) => {
               currentAlumniSlide === index ? 'bg-primary' : 'bg-gray-300 hover:bg-gray-400',
             ]"
           ></button>
+        </div>
+        <div class="mt-8 lg:mt-16 text-center bg-gradient-to-r from-primary/10 to-emerald-500/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12">
+          <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">Ready to Accelerate Your Sustainability Career?</h3>
+          <p class="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 lg:mb-6 max-w-2xl mx-auto">
+            Join our comprehensive bootcamp programs and get direct access to job opportunities with our hiring partners
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
+            <Button size="lg" class="bg-primary text-white hover:bg-primary/80 text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3">
+              View All Programs
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              class="border-primary text-primary hover:bg-primary hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
+            >
+              Contact Our Team
+            </Button>
+          </div>
         </div>
       </div>
     </section>

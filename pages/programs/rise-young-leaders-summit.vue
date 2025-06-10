@@ -73,12 +73,12 @@ const benefitsData = [
   },
 ];
 
-// State untuk gambar aktif
+// State for active image
 const activeBenefitImage = ref(benefitsData[0].image);
-// State untuk benefit aktif
+// State for active benefit
 const activeBenefitId = ref(benefitsData[0].id);
 
-// Function untuk mengubah gambar dan benefit aktif saat hover
+// Function to change image and active benefit on hover
 const changeImage = (image, benefitId) => {
   activeBenefitImage.value = image;
   activeBenefitId.value = benefitId;
@@ -249,14 +249,14 @@ const goToAlumniSlide = (index) => {
         <NuxtImg
           src="/images/rise-young-leaders/banner.png"
           alt="Rise Young Leaders Summit Japan 2025"
-          class="w-full h-[300px] sm:h-[400px] lg:h-[600px] object-bottom rounded-2xl object-cover"
+          class="w-full sm:h-[400px] lg:h-[600px] object-bottom rounded-2xl object-cover"
           loading="lazy"
           format="webp"
         />
         <div class="flex flex-col gap-4 lg:gap-6 items-center text-center px-4">
           <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-primary leading-tight">Rise Young Leaders Summit</h1>
           <div class="space-y-3 lg:space-y-4 text-gray-600 leading-relaxed max-w-4xl">
-            <p class="text-sm sm:text-base lg:text-lg">
+            <p class="text-sm lg:text-lg">
               Rise Young Leaders Summit is an annual program to improve youth capacity for young people aged 19-35 in various topic. The program
               encourages youth through competitions for fully and partially funded Leadership Trip Programs in a lot of countries.
             </p>
@@ -305,7 +305,7 @@ const goToAlumniSlide = (index) => {
             <h3 class="text-lg lg:text-xl font-bold leading-tight">{{ step.id }}. {{ step.title }}</h3>
 
             <!-- Description -->
-            <p class="text-xs lg:text-sm leading-relaxed text-gray-600">
+            <p class="text-sm leading-relaxed text-gray-600">
               {{ step.description }}
             </p>
           </div>
@@ -317,7 +317,7 @@ const goToAlumniSlide = (index) => {
     <section class="section-py-lg bg-gradient-to-br from-gray-50 to-white">
       <div class="container-wrapper">
         <!-- Section Title -->
-        <div class="text-center mb-8 lg:mb-16 px-4">
+        <div class="section-title-wrapper-sm">
           <h2 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4">What Will You Get?</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
@@ -367,7 +367,7 @@ const goToAlumniSlide = (index) => {
     <section class="section-py-lg bg-gray-100">
       <div class="container-wrapper">
         <!-- Section Title -->
-        <div class="section-title-wrapper">
+        <div class="section-title-wrapper-sm">
           <h2 class="heading-section">Previous Rise Young Leaders</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
@@ -382,7 +382,7 @@ const goToAlumniSlide = (index) => {
           @init-api="setPreviousEventsApi"
         >
           <CarouselContent class="-ml-2 md:-ml-4 py-4 cursor-pointer">
-            <CarouselItem v-for="event in previousEvents" :key="event.id" class="pl-2 md:pl-4 basis-4/5 sm:basis-3/5 md:basis-1/2 lg:basis-1/3">
+            <CarouselItem v-for="event in previousEvents" :key="event.id" class="pl-2 md:pl-4 lg:basis-1/3">
               <div class="p-2">
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <NuxtImg :src="event.image" :alt="event.alt" class="w-full h-48 sm:h-56 lg:h-64 object-cover" loading="lazy" format="webp" />
@@ -413,7 +413,7 @@ const goToAlumniSlide = (index) => {
     <section class="section-py-lg bg-white">
       <div class="container-wrapper">
         <!-- Section Title -->
-        <div class="section-title-wrapper">
+        <div class="section-title-wrapper-sm">
           <h2 class="heading-section">Hear from Our Alumni</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
@@ -428,15 +428,11 @@ const goToAlumniSlide = (index) => {
           @init-api="setAlumniApi"
         >
           <CarouselContent class="-ml-2 md:-ml-4 py-4 cursor-pointer">
-            <CarouselItem
-              v-for="testimonial in alumniTestimonials"
-              :key="testimonial.id"
-              class="pl-2 md:pl-4 basis-4/5 sm:basis-3/5 md:basis-1/2 lg:basis-1/3"
-            >
+            <CarouselItem v-for="testimonial in alumniTestimonials" :key="testimonial.id" class="pl-2 md:pl-4 lg:basis-1/3">
               <Card class="p-4 sm:p-6 lg:p-8 text-center h-full">
                 <CardContent class="flex flex-col justify-between p-0 h-full">
                   <div class="space-y-3 lg:space-y-4">
-                    <p class="text-xs sm:text-sm lg:text-base text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
+                    <p class="text-sm lg:text-base text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
                   </div>
 
                   <!-- Author Info -->
@@ -453,12 +449,12 @@ const goToAlumniSlide = (index) => {
                     </div>
 
                     <!-- Name -->
-                    <h4 class="text-xs sm:text-sm lg:text-base font-semibold text-gray-900">
+                    <h4 class="text-sm lg:text-base font-semibold text-gray-900">
                       {{ testimonial.name }}
                     </h4>
 
                     <!-- Country -->
-                    <p class="text-xs lg:text-sm text-primary font-medium">
+                    <p class="text-sm lg:text-base text-primary font-medium">
                       {{ testimonial.country }}
                     </p>
                   </div>
@@ -482,13 +478,23 @@ const goToAlumniSlide = (index) => {
             ]"
           ></button>
         </div>
+        <div class="mt-8 lg:mt-16 text-center bg-gradient-to-r from-primary/10 to-emerald-500/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12">
+          <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">Ready to Accelerate Your Sustainability Career?</h3>
+          <p class="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 lg:mb-6 max-w-2xl mx-auto">
+            Join our comprehensive bootcamp programs and get direct access to job opportunities with our hiring partners
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
+            <Button> View All Programs </Button>
+            <Button variant="outline"> Contact Our Team </Button>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <style scoped>
-/* Fade transition untuk pergantian gambar */
+/* Fade transition for image changes */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s ease-in-out;

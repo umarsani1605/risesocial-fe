@@ -45,12 +45,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: [
-    'shadcn-nuxt',
-    '@nuxt/icon',
-    '@nuxt/fonts',
-    '@nuxt/image'
-  ],
+  modules: ['shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt'],
   
   // Image configuration - now using public folder
   image: {

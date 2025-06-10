@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-// Props untuk mengontrol dialog dari luar
+// Props to control dialog from outside
 const props = defineProps({
   open: {
     type: Boolean,
@@ -12,7 +12,7 @@ const props = defineProps({
   },
 });
 
-// Emit untuk komunikasi dengan parent
+// Emit for communication with parent
 const emit = defineEmits(['update:open']);
 
 // Local state
@@ -21,7 +21,7 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 });
 
-// State untuk toggle antara login dan register
+// State to toggle between login and register
 const isRegisterMode = ref(false);
 
 // Form states
@@ -45,14 +45,14 @@ const showConfirmPassword = ref(false);
 // Handle login
 const handleLogin = () => {
   console.log('Login:', loginForm.value);
-  // Implementasi login logic
+  // Implement login logic
   isOpen.value = false;
 };
 
 // Handle register
 const handleRegister = () => {
   console.log('Register:', registerForm.value);
-  // Implementasi register logic
+  // Implement register logic
   isOpen.value = false;
 };
 
@@ -74,7 +74,7 @@ watch(isOpen, (newValue) => {
 </script>
 
 <template>
-  <Dialog v-model:open="isOpen">
+  <Dialog :open="isOpen" @update:open="isOpen = $event">
     <DialogContent class="sm:max-w-lg p-8">
       <!-- Header -->
       <DialogHeader class="mb-4">
@@ -102,7 +102,7 @@ watch(isOpen, (newValue) => {
         <!-- Keep me signed in & Forgot password -->
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center space-x-2">
-            <Checkbox id="keep-signed-in" v-model:checked="loginForm.keepSignedIn" class="bg-gray-50" />
+            <Checkbox id="keep-signed-in" :checked="loginForm.keepSignedIn" @update:checked="loginForm.keepSignedIn = $event" class="bg-gray-50" />
             <label for="keep-signed-in" class="cursor-pointer text-sm"> Keep me signed in </label>
           </div>
           <button type="button" class="text-primary cursor-pointer text-sm">Forgotten password?</button>
