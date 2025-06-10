@@ -119,9 +119,9 @@ const processedJobs = computed(() => {
           <div class="flex flex-col lg:flex-row gap-6">
             <!-- Company Logo -->
             <div class="flex-shrink-0">
-              <div class="w-24 h-24 bg-orange-100 rounded-2xl flex items-center justify-center">
-                <div v-if="companyInfo.organization_logo" class="w-20 h-20 rounded-lg overflow-hidden">
-                  <NuxtImg
+              <div class="rounded-2xl flex items-center justify-center">
+                <div v-if="companyInfo.organization_logo" class="size-32 rounded-lg overflow-hidden">
+                  <img
                     :src="companyInfo.organization_logo"
                     :alt="`${companyInfo.organization} logo`"
                     class="w-full h-full object-contain"
@@ -150,7 +150,7 @@ const processedJobs = computed(() => {
               </div>
 
               <!-- Company Details -->
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              <div class="flex flex-col lg:flex-row gap-6 mb-4">
                 <div class="flex items-center text-gray-600">
                   <Icon name="lucide:map-pin" class="mr-3 h-4 w-4 flex-shrink-0" />
                   <span class="text-sm">{{ getCleanLocation(companyInfo) }}</span>
@@ -163,7 +163,7 @@ const processedJobs = computed(() => {
 
                 <div v-if="companyInfo.linkedin_org_url" class="flex items-center text-gray-600">
                   <Icon name="lucide:globe" class="mr-3 h-4 w-4 flex-shrink-0" />
-                  <a :href="companyInfo.linkedin_org_url" target="_blank" class="text-sm text-blue-600 hover:underline"> Website </a>
+                  <a :href="companyInfo.linkedin_org_url" target="_blank" class="text-sm hover:underline">{{ companyInfo.linkedin_org_url }}</a>
                 </div>
               </div>
             </div>

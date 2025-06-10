@@ -186,7 +186,7 @@ const handleApply = () => {
               <!-- Job Header -->
               <div class="mb-6">
                 <div v-if="job.organization_logo" class="lg:hidden h-28 w-fit rounded-lg overflow-hidden mb-4">
-                  <NuxtImg :src="job.organization_logo" :alt="`${job.organization} logo`" class="size-full object-contain" loading="lazy" />
+                  <img :src="job.organization_logo" :alt="`${job.organization} logo`" class="size-full object-contain" loading="lazy" />
                 </div>
                 <div class="flex flex-wrap gap-2">
                   <Badge class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
@@ -200,7 +200,7 @@ const handleApply = () => {
                 <div class="flex flex-col lg:flex-row justify-between lg:items-center mb-6 gap-4">
                   <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">{{ job.title }}</h1>
                   <!-- Action Buttons -->
-                  <div class="flex gap-3 flex-wrap">
+                  <div class="flex gap-3 flex-wrap min-w-[15rem]">
                     <Button variant="outline" class="flex items-center">
                       <Icon name="lucide:bookmark" class="size-4" />
                       Save
@@ -262,10 +262,10 @@ const handleApply = () => {
           <Card>
             <CardContent class="p-6">
               <!-- Company Logo & Info -->
-              <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-2xl flex items-center justify-center">
-                  <div v-if="job.organization_logo" class="w-12 h-12 rounded-lg overflow-hidden">
-                    <NuxtImg :src="job.organization_logo" :alt="`${job.organization} logo`" class="w-full h-full object-contain" loading="lazy" />
+              <div class="text-left mb-6">
+                <div class="mb-4 rounded-2xl">
+                  <div v-if="job.organization_logo" class="size-20 rounded-lg overflow-hidden">
+                    <img :src="job.organization_logo" :alt="`${job.organization} logo`" class="w-full h-full object-contain" loading="lazy" />
                   </div>
                   <Icon v-else name="lucide:building-2" class="w-8 h-8 text-orange-500" />
                 </div>
@@ -329,9 +329,9 @@ const handleApply = () => {
               >
                 <CardContent class="p-4">
                   <div class="flex items-start space-x-3">
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <div v-if="similarJob.organization_logo" class="w-8 h-8 rounded overflow-hidden">
-                        <NuxtImg
+                    <div class="rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div v-if="similarJob.organization_logo" class="size-14 rounded overflow-hidden">
+                        <img
                           :src="similarJob.organization_logo"
                           :alt="`${similarJob.organization} logo`"
                           class="w-full h-full object-contain"

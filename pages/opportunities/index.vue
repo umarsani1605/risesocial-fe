@@ -333,7 +333,7 @@ watch(
                             {{ job.organization }}
                           </p>
 
-                          <Badge class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
+                          <Badge v-if="job.linkedin_org_industry" class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
                             {{ job.linkedin_org_industry }}
                           </Badge>
                         </div>
