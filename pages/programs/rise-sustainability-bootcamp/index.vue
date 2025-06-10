@@ -65,7 +65,7 @@ const bootcampPrograms = bootcampsData;
     </section>
 
     <!-- Bootcamp Programs Section -->
-    <section class="section-py-sm">
+    <section>
       <div class="container-wrapper">
         <!-- Section Title -->
         <div class="mb-8 lg:mb-12">

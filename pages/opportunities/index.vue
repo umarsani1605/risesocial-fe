@@ -309,8 +309,8 @@ watch(
                     <div class="flex w-full relative">
                       <!-- Company Logo -->
                       <div class="h-full px-4 flex items-center justify-center flex-shrink-0 rounded-l-lg">
-                        <div class="rounded-2xl overflow-hidden">
-                          <NuxtImg
+                        <div class="h-28 rounded-2xl overflow-hidden">
+                          <img
                             :src="job.organization_logo"
                             :alt="`${job.organization} logo`"
                             class="w-full h-full object-contain"
