@@ -20,6 +20,22 @@ import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperSepa
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 
+// Import jobs store
+import { useJobsStore } from '@/store/jobs';
+
+// Initialize jobs store
+const jobsStore = useJobsStore();
+
+// Initialize jobs data on mount
+onMounted(async () => {
+  await jobsStore.initializeJobs();
+});
+
+// Get featured jobs (top 6 jobs)
+const featuredJobs = computed(() => {
+  return jobsStore.jobs.slice(0, 6);
+});
+
 // Testimonials data and functionality
 const allTestimonials = [
   {
@@ -238,108 +254,64 @@ const partnersData = [
   },
 ];
 
-// Featured Jobs data
-const featuredJobsData = [
-  {
-    id: 1,
-    title: 'Software Engineer',
-    category: 'IT & Networking',
-    categoryBg: 'bg-green-50',
-    categoryText: 'text-green-600',
-    categoryBorder: 'border-green-200',
-    location: '32 Irving Pl, NY',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Temporary', variant: 'secondary' }],
-    salary: '$400 - $450',
-    salaryPeriod: '/ month',
-    deadline: 'June 14, 2030',
-    isVerified: true,
-  },
-  {
-    id: 2,
-    title: 'Sales Specialist',
-    category: 'IT & Networking',
-    categoryBg: 'bg-green-50',
-    categoryText: 'text-green-600',
-    categoryBorder: 'border-green-200',
-    location: '433 Graham Ave',
-    postedDate: 'June 20, 2023',
-    badges: [
-      { text: 'Full Time', variant: 'secondary' },
-      { text: 'Urgent', variant: 'destructive' },
-    ],
-    salary: '$750 - $800',
-    salaryPeriod: '/ month',
-    deadline: 'June 5, 2031',
-    isVerified: true,
-  },
-  {
-    id: 3,
-    title: 'Junior Graphic Designer',
-    category: 'Accounting',
-    categoryBg: 'bg-blue-50',
-    categoryText: 'text-blue-600',
-    categoryBorder: 'border-blue-200',
-    location: '398 Manhattan Ave',
-    postedDate: 'June 20, 2023',
-    badges: [
-      { text: 'On-site', variant: 'secondary' },
-      { text: 'Urgent', variant: 'destructive' },
-    ],
-    salary: '$650 - $700',
-    salaryPeriod: '/ month',
-    deadline: 'June 4, 2031',
-    isVerified: true,
-  },
-  {
-    id: 4,
-    title: 'Finance Manager',
-    category: 'Data Science',
-    categoryBg: 'bg-purple-50',
-    categoryText: 'text-purple-600',
-    categoryBorder: 'border-purple-200',
-    location: '269 Norman Ave',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Remote', variant: 'secondary' }],
-    salary: '$450 - $550',
-    salaryPeriod: '/ month',
-    deadline: 'June 22, 2029',
-    isVerified: true,
-  },
-  {
-    id: 5,
-    title: 'Marketing Manager',
-    category: 'Sales & Marketing',
-    categoryBg: 'bg-orange-50',
-    categoryText: 'text-orange-600',
-    categoryBorder: 'border-orange-200',
-    location: '178 7th Ave S, NY',
-    postedDate: 'June 20, 2023',
-    badges: [
-      { text: 'Internship', variant: 'secondary' },
-      { text: 'Temporary', variant: 'secondary' },
-    ],
-    salary: '$8 - $10',
-    salaryPeriod: '/ hour',
-    deadline: 'June 12, 2031',
-    isVerified: true,
-  },
-  {
-    id: 6,
-    title: 'Full Stack Development',
-    category: 'IT & Networking',
-    categoryBg: 'bg-green-50',
-    categoryText: 'text-green-600',
-    categoryBorder: 'border-green-200',
-    location: '77 Irving Pl, NY',
-    postedDate: 'June 20, 2023',
-    badges: [{ text: 'Freelance', variant: 'secondary' }],
-    salary: '$850 - $900',
-    salaryPeriod: '/ month',
-    deadline: 'June 18, 2031',
-    isVerified: true,
-  },
-];
+// Helper function to get clean location
+const getCleanLocation = (job) => {
+  if (job.cities_derived && job.cities_derived.length > 0 && job.countries_derived && job.countries_derived.length > 0) {
+    return `${job.cities_derived[0]}, ${job.countries_derived[0]}`;
+  }
+  if (job.countries_derived && job.countries_derived.length > 0) {
+    return job.countries_derived[0];
+  }
+  return 'Remote';
+};
+
+// Helper function to get relative time
+const getRelativeTime = (dateString) => {
+  const now = new Date();
+  const postDate = new Date(dateString);
+  const diffInMs = now - postDate;
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  if (diffInDays === 0) return 'Today';
+  if (diffInDays === 1) return '1d ago';
+  if (diffInDays < 7) return `${diffInDays}d ago`;
+  if (diffInDays < 14) return '1w ago';
+  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}w ago`;
+  if (diffInDays < 60) return '1mo ago';
+  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)}mo ago`;
+  return `${Math.floor(diffInDays / 365)}y ago`;
+};
+
+// Helper function to normalize company name for URL
+const normalizeCompanyName = (name) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .trim();
+};
+
+// Helper function to normalize job name for URL
+const normalizeJobName = (title) => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .trim();
+};
+
+// Process featured jobs with additional data
+const processedFeaturedJobs = computed(() => {
+  if (!featuredJobs.value || featuredJobs.value.length === 0) return [];
+
+  return featuredJobs.value.map((job) => ({
+    ...job,
+    cleanLocation: getCleanLocation(job),
+    relativeTime: getRelativeTime(job.date_posted),
+    companySlug: normalizeCompanyName(job.organization),
+    jobSlug: normalizeJobName(job.title),
+  }));
+});
 
 // Partners carousel API functionality
 const partnersApi = ref(null);
@@ -545,56 +517,87 @@ const goToPartnerSlide = (index) => {
         <!-- Section Title -->
         <div class="section-title-wrapper">
           <h2 class="heading-section">Featured Jobs</h2>
+          <p class="text-lg text-gray-600">Discover the latest green career opportunities from top employers</p>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="jobsStore.isLoading" class="text-center py-12">
+          <Icon name="lucide:loader-2" class="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
+          <p class="text-gray-600">Loading featured jobs...</p>
         </div>
 
         <!-- Jobs Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 lg:mb-12">
-          <Card v-for="job in featuredJobsData" :key="job.id" class="p-4 hover:shadow-md cursor-pointer transition-shadow duration-300 gap-0">
-            <CardHeader class="py-3 sm:py-4 pl-4 pr-2!">
-              <div class="flex items-start justify-between mb-2">
-                <Badge variant="outline" :class="['text-xs', job.categoryBg, job.categoryText, job.categoryBorder]">
-                  {{ job.category }}
-                </Badge>
-                <Icon name="lucide:bookmark" class="size-6! text-gray-400 hover:text-gray-600 cursor-pointer" />
-              </div>
-              <CardTitle class="heading-card-sm mb-1">
-                {{ job.title }}
-                <Icon v-if="job.isVerified" name="lucide:verified" class="inline-block ml-1 h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
-              </CardTitle>
-              <div class="flex items-center gap-4">
-                <div class="flex items-center text-xs sm:text-sm text-gray-500">
-                  <Icon name="lucide:map-pin" class="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                  <span>{{ job.location }}</span>
-                </div>
-                <div class="flex items-center text-xs sm:text-sm text-gray-500">
-                  <Icon name="lucide:calendar" class="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                  <span>{{ job.postedDate }}</span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent class="p-4">
-              <div class="flex flex-col sm:justify-between gap-2">
-                <div class="flex gap-2 flex-wrap mb-2">
-                  <Badge v-for="badge in job.badges" :key="badge.text" :variant="badge.variant" class="text-xs">
-                    {{ badge.text }}
-                  </Badge>
-                </div>
-                <Separator class="my-2" />
-                <div class="flex items-center space-x-2">
-                  <div class="bg-gray-100 rounded-full size-6 flex items-center justify-center">
-                    <span class="text-gray-500 text-sm sm:text-base font-bold">$</span>
+        <div v-else-if="processedFeaturedJobs.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 lg:mb-12">
+          <Card
+            v-for="job in processedFeaturedJobs"
+            :key="job.id"
+            class="hover:shadow-lg hover:-translate-y-1 cursor-pointer transition-all duration-300 overflow-hidden"
+            @click="$router.push(`/opportunities/${job.companySlug}/${job.jobSlug}`)"
+          >
+            <CardContent class="p-0">
+              <div class="flex">
+                <!-- Company Logo -->
+                <div class="w-20 sm:w-24 flex-shrink-0 p-3 sm:p-4 flex items-center justify-center bg-gray-50">
+                  <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden">
+                    <img
+                      v-if="job.organization_logo"
+                      :src="job.organization_logo"
+                      :alt="`${job.organization} logo`"
+                      class="w-full h-full object-contain"
+                      @error="$event.target.style.display = 'none'"
+                    />
+                    <div v-else class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                      <Icon name="lucide:building-2" class="w-6 h-6 text-gray-400" />
+                    </div>
                   </div>
-                  <span class="font-semibold text-gray-900 text-base sm:text-lg">{{ job.salary }}</span>
-                  <span class="text-xs sm:text-sm text-gray-500">{{ job.salaryPeriod }}</span>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 p-3 sm:p-4 flex flex-col justify-between min-h-[120px] min-w-0">
+                  <!-- Top Section -->
+                  <div class="space-y-1 sm:space-y-2 min-w-0">
+                    <!-- Job Title -->
+                    <h3 class="font-bold text-gray-900 text-sm sm:text-base line-clamp-2">
+                      {{ job.title }}
+                    </h3>
+
+                    <!-- Company Name -->
+                    <p class="text-gray-600 text-xs sm:text-sm line-clamp-1">
+                      {{ job.organization }}
+                    </p>
+
+                    <!-- Industry Badge -->
+                    <Badge v-if="job.linkedin_org_industry" class="bg-green-50 text-green-700 text-xs font-medium px-2 py-1 w-fit">
+                      {{ job.linkedin_org_industry }}
+                    </Badge>
+                  </div>
+
+                  <!-- Bottom Section - Meta Information -->
+                  <div class="flex flex-col gap-1 sm:gap-2 text-gray-500 text-xs mt-auto">
+                    <div class="flex items-center">
+                      <Icon name="lucide:calendar" class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                      <span class="whitespace-nowrap">{{ job.relativeTime }}</span>
+                    </div>
+                    <div class="flex items-center min-w-0">
+                      <Icon name="lucide:map-pin" class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                      <span class="line-clamp-1">{{ job.cleanLocation }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
+        <!-- No Jobs State -->
+        <div v-else class="text-center py-12">
+          <Icon name="lucide:briefcase" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p class="text-gray-600">No featured jobs available at the moment.</p>
+        </div>
+
         <!-- See More Jobs Button -->
         <div class="text-center">
-          <Button variant="outline" class="hover:bg-emerald-600 hover:text-white text-md">
+          <Button variant="outline" class="hover:bg-emerald-600 hover:text-white text-md" @click="$router.push('/opportunities')">
             See More Jobs
             <Icon name="lucide:arrow-right" class="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
@@ -765,3 +768,24 @@ const goToPartnerSlide = (index) => {
     </section>
   </div>
 </template>
+
+<style scoped>
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1.4;
+  max-height: 2.8em; /* 2 lines * 1.4 line-height */
+}
+</style>
