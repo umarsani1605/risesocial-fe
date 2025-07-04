@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-// Props to control dialog from outside
+// Define component props and events
 const props = defineProps({
   open: {
     type: Boolean,
@@ -12,8 +12,10 @@ const props = defineProps({
   },
 });
 
-// Emit for communication with parent
 const emit = defineEmits(['update:open']);
+
+// @sidebase/nuxt-auth composables
+const { signIn, data: session, status } = useAuth();
 
 // Local state
 const isOpen = computed({
@@ -23,6 +25,10 @@ const isOpen = computed({
 
 // State to toggle between login and register
 const isRegisterMode = ref(false);
+
+// Error state
+const errorMessage = ref('');
+const isLoading = ref(false);
 
 // Form states
 const loginForm = ref({
@@ -42,23 +48,91 @@ const registerForm = ref({
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle login
-const handleLogin = () => {
-  console.log('Login:', loginForm.value);
-  // Implement login logic
-  isOpen.value = false;
+// Handle login menggunakan @sidebase/nuxt-auth
+const handleLogin = async () => {
+  errorMessage.value = '';
+  isLoading.value = true;
+
+  try {
+    const result = await signIn('credentials', {
+      email: loginForm.value.email,
+      password: loginForm.value.password,
+      rememberMe: loginForm.value.keepSignedIn,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      errorMessage.value = 'Invalid email or password';
+    } else {
+      // Login successful
+      isOpen.value = false;
+      await navigateTo('/');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    errorMessage.value = 'An error occurred during login';
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-// Handle register
-const handleRegister = () => {
-  console.log('Register:', registerForm.value);
-  // Implement register logic
-  isOpen.value = false;
+// Handle register - still using direct API call since NextAuth doesn't handle registration
+const handleRegister = async () => {
+  errorMessage.value = '';
+  isLoading.value = false;
+
+  // Validate passwords match
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    errorMessage.value = 'Passwords do not match';
+    return;
+  }
+
+  isLoading.value = true;
+
+  try {
+    // Split name into firstName and lastName
+    const nameParts = registerForm.value.name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const config = useRuntimeConfig();
+    const response = await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: {
+        firstName: firstName,
+        lastName: lastName,
+        email: registerForm.value.email,
+        phone: '', // Optional field
+        password: registerForm.value.password,
+      },
+      baseURL: config.public.backendUrl,
+    });
+
+    if (response.success && response.data) {
+      // After successful registration, auto-login
+      await signIn('credentials', {
+        email: registerForm.value.email,
+        password: registerForm.value.password,
+        redirect: false,
+      });
+
+      isOpen.value = false;
+      await navigateTo('/');
+    } else {
+      errorMessage.value = response.error || 'Registration failed';
+    }
+  } catch (error) {
+    console.error('Register error:', error);
+    errorMessage.value = error.data?.error || error.message || 'Registration failed';
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 // Toggle between login and register
 const toggleMode = () => {
   isRegisterMode.value = !isRegisterMode.value;
+  errorMessage.value = '';
 };
 
 // Reset forms when dialog closes
@@ -69,6 +143,8 @@ watch(isOpen, (newValue) => {
     isRegisterMode.value = false;
     showPassword.value = false;
     showConfirmPassword.value = false;
+    errorMessage.value = '';
+    isLoading.value = false;
   }
 });
 </script>
@@ -82,6 +158,11 @@ watch(isOpen, (newValue) => {
           {{ isRegisterMode ? 'Create Account' : 'Login to rise' }}
         </DialogTitle>
       </DialogHeader>
+
+      <!-- Error Message -->
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-sm text-red-600">{{ errorMessage }}</p>
+      </div>
 
       <!-- Login Form -->
       <form v-if="!isRegisterMode" @submit.prevent="handleLogin" class="space-y-6">
@@ -109,7 +190,9 @@ watch(isOpen, (newValue) => {
         </div>
 
         <!-- Login Button -->
-        <Button type="submit" class="w-full" size="lg"> Login </Button>
+        <Button type="submit" class="w-full" size="lg" :disabled="isLoading">
+          {{ isLoading ? 'Logging in...' : 'Login' }}
+        </Button>
 
         <!-- Register Link -->
         <div class="">
@@ -155,7 +238,9 @@ watch(isOpen, (newValue) => {
         </div>
 
         <!-- Register Button -->
-        <Button type="submit" class="w-full" size="lg"> Register </Button>
+        <Button type="submit" class="w-full" size="lg" :disabled="isLoading">
+          {{ isLoading ? 'Creating account...' : 'Register' }}
+        </Button>
 
         <!-- Login Link -->
         <div class="text-center">

@@ -45,7 +45,19 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt'],
+  modules: ['@sidebase/nuxt-auth', 'shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt'],
+  
+  // Runtime config
+  runtimeConfig: {
+    // Private keys (only available on server-side)
+    authSecret: process.env.NUXT_AUTH_SECRET || 'your-super-secret-key-change-in-production',
+    
+    // Public keys (exposed to client-side)
+    public: {
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:3001',
+      authUrl: process.env.NUXT_AUTH_BASE_URL || process.env.AUTH_ORIGIN || 'http://localhost:3000'
+    }
+  },
   
   // Image configuration - now using public folder
   image: {

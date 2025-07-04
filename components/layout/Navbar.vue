@@ -9,9 +9,28 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
 
 const route = useRoute();
+
+// @sidebase/nuxt-auth composables
+const { data: session, status, signOut } = useAuth();
+
+// Computed properties dari session data
+const user = computed(() => session.value?.user || null);
+const isAuthenticated = computed(() => status.value === 'authenticated');
+const fullName = computed(() => {
+  if (!user.value) return '';
+  return `${user.value.firstName} ${user.value.lastName}`.trim();
+});
+const initials = computed(() => {
+  if (!user.value) return 'U';
+  const first = user.value.firstName?.[0] || '';
+  const last = user.value.lastName?.[0] || '';
+  return `${first}${last}`.toUpperCase() || 'U';
+});
 
 const mobileMenuOpen = ref(false);
 const isScrolled = ref(false);
@@ -63,6 +82,12 @@ const toggleMobileMenu = () => {
 const openLoginDialog = () => {
   showLoginDialog.value = true;
   mobileMenuOpen.value = false; // Close mobile menu when opening dialog
+};
+
+const handleLogout = async () => {
+  signOut();
+  mobileMenuOpen.value = false;
+  await navigateTo('/');
 };
 
 // Handle scroll detection
@@ -122,9 +147,40 @@ onUnmounted(() => {
             </NavigationMenu>
           </nav>
 
-          <!-- Desktop Login Button -->
-          <div class="hidden lg:flex items-center">
-            <Button @click="openLoginDialog" class="bg-transparent! hover:bg-white/5! text-white">
+          <!-- Desktop Auth Section -->
+          <div class="relative hidden lg:flex items-center">
+            <!-- Authenticated User -->
+            <div v-if="isAuthenticated" class="flex items-center space-x-4">
+              <DropdownMenu :modal="false">
+                <DropdownMenuTrigger as-child>
+                  <Button variant="ghost" class="flex items-center space-x-2 text-white! hover:bg-white/5">
+                    <Avatar class="h-8 w-8">
+                      <AvatarImage :src="user?.avatar" />
+                      <AvatarFallback class="text-xs">{{ initials }}</AvatarFallback>
+                    </Avatar>
+                    <span class="text-sm">{{ fullName }}</span>
+                    <Icon name="lucide:chevron-down" class="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-48">
+                  <DropdownMenuItem @click="navigateTo('/dashboard')" class="cursor-pointer">
+                    <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem @click="navigateTo('/profile')" class="cursor-pointer">
+                    <Icon name="lucide:user" class="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600">
+                    <Icon name="lucide:log-out" class="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <!-- Not Authenticated -->
+            <Button v-else @click="openLoginDialog" class="bg-transparent! hover:bg-white/5! text-white">
               <Icon name="lucide:user" class="size-4!" />
               Login / Register
             </Button>
@@ -154,9 +210,32 @@ onUnmounted(() => {
               </span>
             </NuxtLink>
 
-            <!-- Mobile Login Button -->
+            <!-- Mobile Auth Section -->
             <div class="pt-4">
-              <Button @click="openLoginDialog" class="w-full justify-center">
+              <!-- Authenticated User -->
+              <div v-if="isAuthenticated" class="space-y-2">
+                <div class="flex items-center space-x-3 p-3 rounded-lg bg-white/5">
+                  <Avatar class="h-10 w-10">
+                    <AvatarImage :src="user?.avatar" />
+                    <AvatarFallback class="text-sm">{{ initials }}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p class="text-sm font-medium text-white">{{ fullName }}</p>
+                    <p class="text-xs text-gray-300">{{ user?.email }}</p>
+                  </div>
+                </div>
+                <Button @click="navigateTo('/dashboard')" variant="ghost" class="w-full justify-start text-white">
+                  <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+                <Button @click="handleLogout" variant="ghost" class="w-full justify-start text-red-300 hover:text-red-200">
+                  <Icon name="lucide:log-out" class="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
+
+              <!-- Not Authenticated -->
+              <Button v-else @click="openLoginDialog" class="w-full justify-center">
                 <Icon name="lucide:user" class="mr-2 h-4 w-4" />
                 Login / Register
               </Button>
@@ -167,6 +246,6 @@ onUnmounted(() => {
     </header>
 
     <!-- Login/Register Dialog -->
-    <LoginRegisterDialog v-model:open="showLoginDialog" />
+    <LoginRegisterDialog :open="showLoginDialog" @update:open="showLoginDialog = $event" />
   </div>
 </template>
