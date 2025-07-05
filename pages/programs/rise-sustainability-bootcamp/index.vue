@@ -95,15 +95,15 @@ const bootcampPrograms = bootcampsData;
                     <div class="flex flex-wrap items-center gap-2 lg:gap-4 text-xs sm:text-sm text-gray-600">
                       <div class="flex items-center gap-1 lg:gap-2 bg-gray-100 px-2 lg:px-3 py-1 rounded-md">
                         <Icon name="heroicons:clock" class="w-3 h-3 lg:w-4 lg:h-4" />
-                        <span>Text Meta</span>
+                        <span>{{ bootcamp.duration }}</span>
                       </div>
                       <div class="flex items-center gap-1 lg:gap-2 bg-gray-100 px-2 lg:px-3 py-1 rounded-md">
-                        <Icon name="heroicons:academic-cap" class="w-3 h-3 lg:w-4 lg:h-4" />
-                        <span>Text Meta</span>
+                        <Icon name="heroicons:tag" class="w-3 h-3 lg:w-4 lg:h-4" />
+                        <span>{{ bootcamp.category }}</span>
                       </div>
                       <div class="flex items-center gap-1 lg:gap-2 bg-gray-100 px-2 lg:px-3 py-1 rounded-md">
-                        <Icon name="heroicons:video-camera" class="w-3 h-3 lg:w-4 lg:h-4" />
-                        <span>Text meta</span>
+                        <Icon name="heroicons:document-text" class="w-3 h-3 lg:w-4 lg:h-4" />
+                        <span>{{ bootcamp.syllabus.length }} Tema</span>
                       </div>
                     </div>
 
@@ -116,7 +116,14 @@ const bootcampPrograms = bootcampsData;
                   <!-- Right Visual Section -->
                   <div class="flex-1 relative overflow-hidden items-end justify-end">
                     <!-- Content -->
-                    <div class="w-full relative bg-primary rounded-2xl lg:h-50 aspect-square flex items-center justify-center"></div>
+                    <div class="w-full relative bg-primary rounded-2xl lg:h-50 aspect-square flex items-center justify-center">
+                      <NuxtImg
+                        :src="bootcamp.image"
+                        :alt="bootcamp.title"
+                        class="w-full h-full object-cover rounded-2xl"
+                        format="webp"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
