@@ -150,16 +150,16 @@ onUnmounted(() => {
           <!-- Desktop Auth Section -->
           <div class="relative hidden lg:flex items-center">
             <!-- Authenticated User -->
-            <div v-if="isAuthenticated" class="flex items-center space-x-4">
+            <div v-if="isAuthenticated" class="flex items-center space-x-4 h-full py-4">
               <DropdownMenu :modal="false">
-                <DropdownMenuTrigger as-child>
-                  <Button variant="ghost" class="flex items-center space-x-2 text-white! hover:bg-white/5">
-                    <Avatar class="h-8 w-8">
+                <DropdownMenuTrigger class="h-full" as-child>
+                  <Button variant="ghost" class="flex items-center p-2 text-white! hover:bg-white/5">
+                    <Avatar class="size-8">
                       <AvatarImage :src="user?.avatar" />
-                      <AvatarFallback class="text-xs">{{ initials }}</AvatarFallback>
+                      <AvatarFallback>{{ initials }}</AvatarFallback>
                     </Avatar>
-                    <span class="text-sm">{{ fullName }}</span>
-                    <Icon name="lucide:chevron-down" class="h-4 w-4" />
+                    <span class="hidden sm:block text-sm">{{ fullName }}</span>
+                    <Icon name="lucide:chevron-down" class="size-4 hidden sm:block" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-48">
@@ -167,10 +167,11 @@ onUnmounted(() => {
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="navigateTo('/profile')" class="cursor-pointer">
-                    <Icon name="lucide:user" class="mr-2 h-4 w-4" />
-                    Profile
+                  <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+                    <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
+                    Settings
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600">
                     <Icon name="lucide:log-out" class="mr-2 h-4 w-4" />
                     Logout

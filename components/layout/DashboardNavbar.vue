@@ -1,7 +1,7 @@
 <template>
-  <header class="fixed w-full top-0 z-50 bg-white transition-shadow duration-300 shadow-md">
+  <header class="fixed w-full top-0 z-50 bg-white transition-shadow duration-300 shadow-sm">
     <div class="container-wrapper">
-      <div class="flex gap-10 items-center h-16">
+      <div class="flex gap-5 items-center justify-between h-20">
         <!-- Logo -->
         <div class="flex items-center">
           <NuxtLink to="/dashboard" class="flex items-center">
@@ -10,27 +10,31 @@
         </div>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center space-x-6 ml-auto">
-          <NuxtLink
-            v-for="item in dashboardNavigation"
-            :key="item.name"
-            :to="item.path"
-            :class="[
-              'text-sm font-medium transition-colors duration-200 py-4 ',
-              isActiveRoute(item.path) ? 'font-semibold text-primary' : 'text-gray-500 hover:text-gray-600',
-            ]"
-          >
-            {{ item.name }}
-          </NuxtLink>
+        <nav class="hidden lg:block">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem v-for="menu in dashboardNavigation" :key="menu.id">
+                <NuxtLink
+                  :to="menu.path"
+                  :class="[
+                    navigationMenuTriggerStyle({ active: menu.isActive, dark: false }),
+                    'after:h-[3px]! px-3! data-[state=open]:text-primary!',
+                  ]"
+                >
+                  {{ menu.name }}
+                </NuxtLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </nav>
 
         <!-- Mobile menu button & User Profile -->
-        <div class="flex items-center space-x-2 h-full py-3">
+        <div class="flex items-center space-x-4 h-full py-4">
           <!-- User Profile Dropdown -->
           <DropdownMenu :modal="false">
             <DropdownMenuTrigger class="h-full" as-child>
-              <Button variant="ghost" class="flex items-center space-x-2 p-2">
-                <Avatar class="h-8 w-8">
+              <Button variant="ghost" class="flex items-center p-2">
+                <Avatar class="size-8">
                   <AvatarImage :src="user?.avatar" />
                   <AvatarFallback>{{ initials }}</AvatarFallback>
                 </Avatar>
@@ -39,11 +43,7 @@
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-48">
-              <DropdownMenuItem @click="navigateTo('/profile')" class="cursor-pointer">
-                <Icon name="lucide:user" class="mr-2 h-4 w-4" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="navigateTo('/settings')" class="cursor-pointer">
+              <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
                 <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
@@ -81,7 +81,7 @@
             @click="mobileMenuOpen = false"
             :class="[
               'block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200',
-              isActiveRoute(item.path) ? 'text-orange-600 bg-orange-50' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50',
+              item.isActive ? 'text-orange-600 bg-orange-50' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50',
             ]"
           >
             {{ item.name }}
@@ -96,6 +96,15 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
 
 const route = useRoute();
 const { data: session, signOut } = useAuth();
@@ -117,20 +126,38 @@ const initials = computed(() => {
 });
 
 // Dashboard navigation
-const dashboardNavigation = [
-  { name: 'Dashboard', path: '/dashboard', icon: 'lucide:layout-dashboard' },
-  { name: 'Course', path: '/dashboard/course', icon: 'lucide:book' },
-  { name: 'Jobs', path: '/dashboard/jobs', icon: 'lucide:briefcase' },
-  { name: 'Programs', path: '/dashboard/programs', icon: 'lucide:school' },
-];
+const dashboardNavigation = computed(() => [
+  {
+    id: 'dashboard',
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: 'lucide:layout-dashboard',
+    isActive: route.path === '/dashboard',
+  },
+  {
+    id: 'course',
+    name: 'Course',
+    path: '/dashboard/course',
+    icon: 'lucide:book',
+    isActive: route.path.startsWith('/dashboard/course'),
+  },
+  {
+    id: 'jobs',
+    name: 'Jobs',
+    path: '/dashboard/jobs',
+    icon: 'lucide:briefcase',
+    isActive: route.path.startsWith('/dashboard/jobs'),
+  },
+  {
+    id: 'programs',
+    name: 'Programs',
+    path: '/dashboard/programs',
+    icon: 'lucide:school',
+    isActive: route.path.startsWith('/dashboard/programs'),
+  },
+]);
 
 // Helper functions
-const isActiveRoute = (path) => {
-  if (path === '/dashboard') {
-    return route.path === '/dashboard';
-  }
-  return route.path.startsWith(path);
-};
 
 const handleLogout = async () => {
   mobileMenuOpen.value = false;

@@ -155,7 +155,7 @@ watch(isOpen, (newValue) => {
       <!-- Header -->
       <DialogHeader class="mb-4">
         <DialogTitle class="text-2xl font-bold">
-          {{ isRegisterMode ? 'Create Account' : 'Login to rise' }}
+          {{ isRegisterMode ? 'Create Account' : 'Login to Rise Social' }}
         </DialogTitle>
       </DialogHeader>
 

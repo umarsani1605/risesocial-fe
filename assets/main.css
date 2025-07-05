@@ -217,7 +217,7 @@
 
   /* Small title wrapper - mb-8 lg:mb-16 */
   .section-title-wrapper-sm {
-    @apply text-center mb-8 lg:mb-16;
+    @apply text-center mb-8 lg:mb-12;
   }
 
   /* Minimal title wrapper - mb-8 */

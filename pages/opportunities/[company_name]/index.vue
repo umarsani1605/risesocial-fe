@@ -116,11 +116,11 @@ const processedJobs = computed(() => {
       <!-- Company Header -->
       <Card class="mb-8">
         <CardContent class="p-6 lg:p-8">
-          <div class="flex flex-col lg:flex-row gap-6">
+          <div class="flex flex-col lg:flex-row gap-8">
             <!-- Company Logo -->
             <div class="flex-shrink-0">
-              <div class="w-24 h-24 bg-orange-100 rounded-2xl flex items-center justify-center">
-                <div v-if="companyInfo.organization_logo" class="w-20 h-20 rounded-lg overflow-hidden">
+              <div class="flex items-center justify-center w-full size-24 rounded-lg overflow-hidden">
+                <div v-if="companyInfo.organization_logo" class="flex items-center w-full size-24 rounded-lg overflow-hidden">
                   <NuxtImg
                     :src="companyInfo.organization_logo"
                     :alt="`${companyInfo.organization} logo`"
@@ -128,7 +128,7 @@ const processedJobs = computed(() => {
                     loading="lazy"
                   />
                 </div>
-                <Icon v-else name="lucide:building-2" class="w-12 h-12 text-orange-500" />
+                <Icon v-else name="lucide:building-2" class="size-8 text-orange-500" />
               </div>
             </div>
 
@@ -168,7 +168,7 @@ const processedJobs = computed(() => {
               </div>
 
               <!-- Company Slogan -->
-              <p v-if="companyInfo.linkedin_org_slogan" class="text-gray-600 text-lg italic mb-4">"{{ companyInfo.linkedin_org_slogan }}"</p>
+              <!-- <p v-if="companyInfo.linkedin_org_slogan" class="text-gray-600 text-lg italic mb-4">"{{ companyInfo.linkedin_org_slogan }}"</p> -->
             </div>
           </div>
         </CardContent>

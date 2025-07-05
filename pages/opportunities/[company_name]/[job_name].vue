@@ -262,13 +262,11 @@ const handleApply = () => {
           <Card>
             <CardContent class="p-6">
               <!-- Company Logo & Info -->
-              <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-2xl flex items-center justify-center">
-                  <div v-if="job.organization_logo" class="w-12 h-12 rounded-lg overflow-hidden">
-                    <NuxtImg :src="job.organization_logo" :alt="`${job.organization} logo`" class="w-full h-full object-contain" loading="lazy" />
-                  </div>
-                  <Icon v-else name="lucide:building-2" class="w-8 h-8 text-orange-500" />
+              <div class="mb-6 space-y-4">
+                <div v-if="job.organization_logo" class="size-24 rounded-lg overflow-hidden">
+                  <NuxtImg :src="job.organization_logo" :alt="`${job.organization} logo`" class="size-full object-contain" loading="lazy" />
                 </div>
+                <Icon v-else name="lucide:building-2" class="size-8 text-orange-500" />
                 <h3 class="font-bold text-gray-900 text-lg">{{ job.organization }}</h3>
               </div>
 

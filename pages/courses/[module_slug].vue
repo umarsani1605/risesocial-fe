@@ -6,27 +6,24 @@ definePageMeta({
 });
 
 // Use composable for course data
-const { findModuleBySlug, formatPrice } = useCourses();
+const { findCourseBySlug, formatPrice } = useCourses();
 
 // Get route parameters
 const route = useRoute();
-const currentPathSlug = route.params.path_slug;
 const currentModuleSlug = route.params.module_slug;
 
-// Find course and module
-const result = findModuleBySlug(currentPathSlug, currentModuleSlug);
+// Find module directly
+const course = findCourseBySlug(currentModuleSlug);
 
 // Redirect to 404 if not found
-if (!result) {
-  throw createError({ statusCode: 404, statusMessage: 'Module not found' });
+if (!course) {
+  throw createError({ statusCode: 404, statusMessage: 'Course not found' });
 }
-
-const { course, module } = result;
 
 // Meta tags
 useHead({
-  title: `${module.title} - ${course.title} - Rise Social`,
-  meta: [{ name: 'description', content: module.description }],
+  title: `${course.title} - Rise Social`,
+  meta: [{ name: 'description', content: course.description }],
 });
 </script>
 
@@ -49,40 +46,34 @@ useHead({
                 <ChevronRight class="w-4 h-4" />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbLink :href="`/courses/${course.path_slug}`" class="text-white/80 hover:text-white">{{ course.title }}</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator class="text-white/60">
-                <ChevronRight class="w-4 h-4" />
-              </BreadcrumbSeparator>
-              <BreadcrumbItem>
-                <BreadcrumbPage class="text-white">{{ module.name }}</BreadcrumbPage>
+                <BreadcrumbPage class="text-white">{{ course.name }}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </nav>
 
-        <!-- Module Hero Content -->
-        <div class="text-white">
-          <h1 class="heading-section-hero mb-4">{{ module.title }}</h1>
-          <p class="text-white/90 text-lg mb-6">{{ module.name }}</p>
+        <!-- Course Hero Content -->
+        <div class="w-3/4 text-white">
+          <h1 class="heading-section-hero mb-4">{{ course.title }}</h1>
+          <p class="text-white/90 text-lg mb-6">{{ course.name }}</p>
 
           <!-- Meta info -->
           <div class="flex flex-wrap items-center gap-6 text-white/90 text-sm">
             <div class="flex items-center gap-2">
               <Clock class="w-4 h-4" />
-              <span>{{ module.duration }} belajar</span>
+              <span>{{ course.duration }} belajar</span>
             </div>
             <div class="flex items-center gap-2">
               <BookOpen class="w-4 h-4" />
-              <span>{{ module.materialCount }} materi</span>
+              <span>{{ course.materialCount }} materi</span>
             </div>
-            <div class="flex items-center gap-2" v-if="module.certificate">
+            <div class="flex items-center gap-2" v-if="course.certificate">
               <Award class="w-4 h-4" />
               <span>Sertifikat</span>
             </div>
             <div class="flex items-center gap-2">
               <Star class="w-4 h-4" />
-              <span>{{ module.rating }}/5 ({{ module.ratingCount }})</span>
+              <span>{{ course.rating }}/5 ({{ course.ratingCount }})</span>
             </div>
           </div>
         </div>
@@ -96,7 +87,7 @@ useHead({
             <Card class="py-8">
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">Deskripsi</h2>
-                <p class="text-gray-700 leading-relaxed">{{ module.description }}</p>
+                <p class="text-gray-700 leading-relaxed">{{ course.description }}</p>
               </CardContent>
             </Card>
 
@@ -106,7 +97,7 @@ useHead({
                 <h2 class="heading-section mb-6">Silabus</h2>
                 <div class="space-y-4">
                   <Card
-                    v-for="item in module.syllabus"
+                    v-for="item in course.syllabus"
                     :key="item.id"
                     class="group hover:shadow-md! hover:-translate-y-1 transition-all duration-200 cursor-pointer"
                   >
@@ -131,11 +122,11 @@ useHead({
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">Profil Pengajar</h2>
                 <div class="flex gap-12 items-center">
-                  <img :src="module.instructor.avatar" :alt="module.instructor.name" class="size-32 rounded-full object-cover flex-shrink-0" />
+                  <img :src="course.instructor.avatar" :alt="course.instructor.name" class="size-32 rounded-full object-cover flex-shrink-0" />
                   <div class="flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ module.instructor.name }}</h3>
-                    <p class="text-gray-600 font-medium mb-3">{{ module.instructor.expertise }}</p>
-                    <p class="text-gray-600 leading-relaxed">{{ module.instructor.description }}</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ course.instructor.name }}</h3>
+                    <p class="text-gray-600 font-medium mb-3">{{ course.instructor.expertise }}</p>
+                    <p class="text-gray-600 leading-relaxed">{{ course.instructor.description }}</p>
                   </div>
                 </div>
               </CardContent>
@@ -166,7 +157,7 @@ useHead({
                   class="w-full"
                 >
                   <CarouselContent>
-                    <CarouselItem v-for="testimonial in module.testimonials" :key="testimonial.id" class="md:basis-1/2 lg:basis-1/2 pl-4">
+                    <CarouselItem v-for="testimonial in course.testimonials" :key="testimonial.id" class="md:basis-1/2 lg:basis-1/2 pl-4">
                       <Card class="bg-gray-50 h-full">
                         <CardContent class="p-6 h-full flex flex-col">
                           <div class="flex gap-4 mb-4">
@@ -192,7 +183,7 @@ useHead({
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">FAQ</h2>
                 <Accordion type="single" collapsible class="space-y-4">
-                  <AccordionItem v-for="faq in module.faq" :key="faq.id" :value="`item-${faq.id}`" class="bg-gray-50 rounded-lg px-4">
+                  <AccordionItem v-for="faq in course.faq" :key="faq.id" :value="`item-${faq.id}`" class="bg-gray-50 rounded-lg px-4">
                     <AccordionTrigger class="text-left font-medium text-gray-600 hover:text-gray-900 cursor-pointer">{{
                       faq.question
                     }}</AccordionTrigger>
@@ -208,31 +199,31 @@ useHead({
             <div :class="['w-full transition-all duration-300 sticky top-24 -mt-[19.5rem]']">
               <Card class="shadow-lg">
                 <CardContent>
-                  <img :src="module.image" :alt="module.title" class="w-full h-48 object-cover rounded-lg mb-4" />
+                  <img :src="course.image" :alt="course.title" class="w-full h-48 object-cover rounded-lg mb-4" />
 
                   <!-- Meta Info -->
                   <div class="space-y-3 mb-6">
                     <div class="flex items-center gap-2 text-gray-600">
                       <Clock class="w-4 h-4" />
-                      <span class="text-sm">{{ module.duration }} belajar</span>
+                      <span class="text-sm">{{ course.duration }} belajar</span>
                     </div>
                     <div class="flex items-center gap-2 text-gray-600">
                       <BookOpen class="w-4 h-4" />
-                      <span class="text-sm">{{ module.materialCount }} materi</span>
+                      <span class="text-sm">{{ course.materialCount }} materi</span>
                     </div>
-                    <div class="flex items-center gap-2 text-gray-600" v-if="module.certificate">
+                    <div class="flex items-center gap-2 text-gray-600" v-if="course.certificate">
                       <Award class="w-4 h-4" />
                       <span class="text-sm">Sertifikat</span>
                     </div>
                     <div class="flex items-center gap-2 text-gray-600">
                       <Star class="w-4 h-4" />
-                      <span class="text-sm">{{ module.rating }} / 5 ({{ module.ratingCount }})</span>
+                      <span class="text-sm">{{ course.rating }} / 5 ({{ course.ratingCount }})</span>
                     </div>
                   </div>
 
                   <!-- Price and Button -->
                   <div class="">
-                    <div class="text-2xl font-bold text-gray-900 mb-4">Rp{{ formatPrice(module.price) }}</div>
+                    <div class="text-2xl font-bold text-gray-900 mb-4">Rp{{ formatPrice(course.price) }}</div>
                     <Button class="w-full cursor-pointer"> Beli Sekarang </Button>
                   </div>
                 </CardContent>
