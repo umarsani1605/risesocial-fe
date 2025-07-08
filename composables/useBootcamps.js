@@ -7,46 +7,161 @@ export const useBootcamps = () => {
   const bootcampsData = [
     {
       id: 1,
-      title: 'Bootcamp ESG',
-      name: 'ESG (Environmental, Social, and Governance) Comprehensive Program',
+      title: 'ESG (Environmental, Social, and Governance)',
       path_slug: 'bootcamp-esg',
       description:
-        'Comprehensive ESG (Environmental, Social, and Governance) program covering sustainability reporting, compliance, and strategic implementation for organizations. Master the fundamentals of ESG framework, learn to create impactful sustainability reports, and develop strategies for stakeholder engagement.',
+        'The ESG Bootcamp is an intensive program designed to equip participants with in-demand sustainability skills through 15 live classes led by ESG experts, interactive real-world case studies, and a job accelerator program. Participants will gain practical insights into Environmental, Social, and Governance (ESG) principles, sharpen their problem-solving abilities by working on industry-relevant challenges, and receive tailored career support including CV building, interview preparation, and access to ESG-related job and internship opportunities—making it ideal for students, young professionals, or career switchers looking to thrive in the sustainability sector.',
       duration: '3 bulan',
-      level: 'Intermediate',
       format: 'Online Live Classes',
-      category: 'ESG & Governance',
-      price: 2500000,
-      image: '/images/stock-image/envato-labs-ai-2e12bab4-dec4-496c-9fdb-54e9b51817d1.jpg',
-      color: 'from-blue-500 to-blue-700',
-      materialCount: 45,
-      rating: 4.8,
-      ratingCount: 127,
-      certificate: true,
-      syllabus: [
+      category: 'ESG',
+      pricing: [
         {
           id: 1,
-          title: 'ESG Framework & Fundamentals',
-          description: 'Memahami konsep dasar ESG, standar internasional, dan regulasi yang berlaku di berbagai industri.',
+          name: '1 Tema',
+          original_price: 2390000,
+          discount_price: 1390000,
         },
         {
           id: 2,
-          title: 'Environmental Sustainability',
-          description: 'Mempelajari aspek lingkungan dalam ESG termasuk carbon footprint, waste management, dan energy efficiency.',
+          name: '3 Tema',
+          original_price: 4790000,
+          discount_price: 3790000,
+        },
+      ],
+      image: '/images/stock-image/envato-labs-ai-2e12bab4-dec4-496c-9fdb-54e9b51817d1.jpg',
+      rating: 4.8,
+      ratingCount: 127,
+      certificate: true,
+      portofolio: true,
+      features: [
+        {
+          id: 1,
+          title: 'Full Stack Material + Real Study Case',
+          description: 'Equip participants with full stack material in ESG + real study case',
+          icon: 'heroicons:clipboard-document-check',
+        },
+        {
+          id: 2,
+          title: 'Comprehensive Module',
+          description: 'Comprehensive module, learn in 3 months with experts',
+          icon: 'heroicons:clipboard-document-list',
         },
         {
           id: 3,
-          title: 'Social Responsibility & Governance',
-          description: 'Mendalami aspek sosial dan tata kelola perusahaan yang baik dalam konteks sustainability.',
-        }
+          title: 'Talent Showcase',
+          description: "Talent showcase for companies with participant's presentation and portfolio",
+          icon: 'heroicons:presentation-chart-bar',
+        },
+        {
+          id: 4,
+          title: 'Job Accelerator',
+          description: 'Access to job opportunities from our hiring partners',
+          icon: 'heroicons:briefcase',
+        },
       ],
-      instructor: {
-        name: 'Dr. Maya Sari',
-        expertise: 'ESG Strategy & Sustainability Consultant',
-        avatar: '/images/teams/maya-sari.jpg',
-        description:
-          'Lebih dari 15 tahun pengalaman dalam sustainability consulting untuk perusahaan multinasional. Tersertifikasi GRI Trainer dan SASB Standards Specialist. Telah membantu lebih dari 50 perusahaan dalam implementasi strategi ESG.',
-      },
+      topic: [
+        {
+          id: 1,
+          title: 'Dasar-Dasar ESG',
+          description: 'Memahami konsep dasar ESG, standar internasional, dan regulasi yang berlaku di berbagai industri.',
+          session: [
+            {
+              id: 1,
+              title: 'Perkenalan ESG',
+            },
+            {
+              id: 2,
+              title: 'Lingkungan (Environmental) dalam ESG',
+            },
+            {
+              id: 3,
+              title: 'Sosial (Social) dalam ESG',
+            },
+            {
+              id: 4,
+              title: 'Tata Kelola (Governance) dalam ESG',
+            },
+            {
+              id: 5,
+              title: 'Studi kasus',
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: 'Penerapan ESG dalam Bisnis dan Korporasi',
+          description: 'Mempelajari perencanaan, implementasi, hingga evaluasi ESG dalam bisnis dan korporasi.',
+          session: [
+            {
+              id: 1,
+              title: 'Pendahuluan',
+            },
+            {
+              id: 2,
+              title: 'Perencanaan ESG dalam Bisnis dan Korporasi',
+            },
+            {
+              id: 3,
+              title: 'Implementasi ESG dalam Bisnis dan Korporasi',
+            },
+            {
+              id: 4,
+              title: 'Evaluasi penerapan ESG dalam bisnis dan korporasi',
+            },
+            {
+              id: 5,
+              title: 'Studi kasus',
+            },
+          ],
+        },
+        {
+          id: 3,
+          title: 'Pembuatan ESG Report',
+          description: 'Mendalami pembuatan ESG report yang komprehensif dan sesuai standar internasional.',
+          session: [
+            {
+              id: 1,
+              title: 'Pendahuluan',
+            },
+            {
+              id: 2,
+              title: 'Persiapan penulisan ESG Report',
+            },
+            {
+              id: 3,
+              title: 'Penulisan dan Pelaporan ESG Report',
+            },
+            {
+              id: 4,
+              title: 'Evaluasi dan Analisis ESG Report',
+            },
+            {
+              id: 5,
+              title: 'Studi Kasus',
+            },
+          ],
+        },
+      ],
+      instructor: [
+        {
+          name: 'Dasi Agung Ospaman',
+          job: 'Environmental Product Labeling Analyst at Non-Profit Organization',
+          avatar: '/images/bootcamp/mas-agung.png',
+          description: '',
+        },
+        {
+          name: 'Norlina Pasaribu',
+          job: 'ESG & Sustainability Specialist at Cladtek',
+          avatar: '',
+          description: '',
+        },
+        {
+          name: 'Muamar',
+          job: 'Sustainability & ESG Manager at Manufacture Company',
+          avatar: '',
+          description: '',
+        },
+      ],
       testimonials: [
         {
           id: 1,
@@ -94,175 +209,6 @@ export const useBootcamps = () => {
         },
       ],
     },
-    {
-      id: 2,
-      title: 'Bootcamp Carbon Footprint',
-      name: 'Carbon Accounting & Footprint Management Program',
-      path_slug: 'bootcamp-carbon-footprint',
-      description:
-        'Learn carbon accounting, measurement, and reduction strategies. Master tools and methodologies for calculating and managing organizational carbon footprints. Become expert in Life Cycle Assessment (LCA) and carbon verification processes.',
-      duration: '2 bulan',
-      level: 'Beginner',
-      format: 'Online Live Classes',
-      category: 'Environmental',
-      price: 1800000,
-      image: '/images/stock-image/envato-labs-ai-9c9ce885-958f-4713-a157-7468b9ed0d55.jpg',
-      color: 'from-green-500 to-green-700',
-      materialCount: 32,
-      rating: 4.7,
-      ratingCount: 89,
-      certificate: true,
-      syllabus: [
-        {
-          id: 1,
-          title: 'Introduction to Carbon Footprint',
-          description: 'Memahami konsep carbon footprint, greenhouse gas protocol, dan standar internasional dalam carbon accounting.',
-        },
-        {
-          id: 2,
-          title: 'Carbon Calculation Methodologies',
-          description: 'Mempelajari berbagai metodologi perhitungan carbon footprint untuk scope 1, 2, dan 3 emissions.',
-        },
-        {
-          id: 3,
-          title: 'Life Cycle Assessment (LCA)',
-          description: 'Mendalami teknik LCA untuk menganalisis dampak lingkungan produk dari cradle to grave.',
-        },
-      ],
-      instructor: {
-        name: 'Ir. Bambang Wijaya',
-        expertise: 'Carbon Management & LCA Specialist',
-        avatar: '/images/teams/bambang-wijaya.jpg',
-        description:
-          'Carbon management expert dengan 12 tahun pengalaman di sektor energi dan manufacturing. Bersertifikat ISO 14067 Lead Auditor dan memiliki track record membantu perusahaan mencapai net zero emissions.',
-      },
-      testimonials: [
-        {
-          id: 1,
-          name: 'Lisa Permata',
-          avatar: '/images/testimonials/lisa.jpg',
-          comment: 'Bootcamp yang sangat praktis! Saya langsung bisa apply ilmu carbon accounting di perusahaan tempat saya bekerja.',
-        },
-        {
-          id: 2,
-          name: 'Rudi Hartono',
-          avatar: '/images/testimonials/rudi.jpg',
-          comment: 'Materi LCA-nya sangat detail dan aplikatif. Instruktur memberikan contoh-contoh real case yang mudah dipahami.',
-        },
-        {
-          id: 3,
-          name: 'Indira Sari',
-          avatar: '/images/testimonials/indira.jpg',
-          comment: 'Program yang tepat untuk memulai career di sustainability. Mendapat banyak networking dan referensi job opportunities.',
-        },
-      ],
-      faq: [
-        {
-          id: 1,
-          question: 'Apakah perlu background teknik untuk ikut program ini?',
-          answer:
-            'Tidak harus. Program ini dirancang untuk berbagai background. Yang penting adalah minat pada sustainability dan kemampuan analitis dasar.',
-        },
-        {
-          id: 2,
-          question: 'Tools apa saja yang akan dipelajari?',
-          answer:
-            'Kami akan menggunakan SimaPro untuk LCA, Excel untuk carbon calculator, dan berbagai online tools untuk carbon footprint assessment.',
-        },
-        {
-          id: 3,
-          question: 'Apakah ada hands-on project?',
-          answer: 'Ya, setiap peserta akan mengerjakan final project berupa carbon footprint assessment untuk suatu produk atau organisasi.',
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: 'Bootcamp Sustainable Finance',
-      name: 'Green Finance & Sustainable Investment Program',
-      path_slug: 'bootcamp-sustainable-finance',
-      description:
-        'Master sustainable finance principles, green bonds, impact investing, and financial risk assessment related to climate and environmental factors. Learn to structure sustainable financial products and assess ESG risks in investment decisions.',
-      duration: '4 bulan',
-      level: 'Advanced',
-      format: 'Online Live Classes',
-      category: 'Sustainable Finance',
-      price: 3200000,
-      image: '/images/stock-image/envato-labs-ai-92291fcf-3c3d-406d-b574-0837cf9da3e7.jpg',
-      color: 'from-emerald-500 to-teal-700',
-      materialCount: 58,
-      rating: 4.9,
-      ratingCount: 74,
-      certificate: true,
-      syllabus: [
-        {
-          id: 1,
-          title: 'Sustainable Finance Fundamentals',
-          description: 'Memahami konsep dasar sustainable finance, green taxonomy, dan regulasi global terkait sustainable banking.',
-        },
-        {
-          id: 2,
-          title: 'Green Bonds & Sustainable Debt',
-          description: 'Mempelajari struktur green bonds, sustainability-linked loans, dan instrumen debt financing berkelanjutan lainnya.',
-        },
-        {
-          id: 3,
-          title: 'ESG Risk Assessment in Finance',
-          description: 'Teknik assessment risiko ESG dalam portofolio investasi dan credit risk management.',
-        },
-      ],
-      instructor: {
-        name: 'Dr. Andi Sutrisno, CFA',
-        expertise: 'Sustainable Finance Director & ESG Investment Specialist',
-        avatar: '/images/teams/andi-sutrisno.jpg',
-        description:
-          'Mantan Director Sustainable Finance di bank multinasional dengan 18 tahun pengalaman. Chartered Financial Analyst (CFA) dan bersertifikat Certificate in ESG Investing dari CFA Institute. Expert dalam green bond structuring dan climate risk modeling.',
-      },
-      testimonials: [
-        {
-          id: 1,
-          name: 'Putri Maharani',
-          avatar: '/images/testimonials/putri.jpg',
-          comment:
-            'Program yang sangat komprehensif untuk finance professionals. Materinya sangat advanced dan applicable langsung di banking industry.',
-        },
-        {
-          id: 2,
-          name: 'David Tantra',
-          avatar: '/images/testimonials/david.jpg',
-          comment: 'Instruktur dengan pengalaman real di industry. Mendapat insight mendalam tentang sustainable finance trends dan opportunities.',
-        },
-        {
-          id: 3,
-          name: 'Ratna Sari',
-          avatar: '/images/testimonials/ratna.jpg',
-          comment: 'Bootcamp yang worth it untuk investment banker atau credit analyst yang ingin specialize di sustainable finance.',
-        },
-      ],
-      faq: [
-        {
-          id: 1,
-          question: 'Apakah harus punya background finance?',
-          answer: 'Ya, program ini untuk advanced level sehingga membutuhkan basic understanding finance, accounting, dan investment principles.',
-        },
-        {
-          id: 2,
-          question: 'Apakah ada partnership dengan financial institutions?',
-          answer: 'Ya, kami bekerja sama dengan beberapa bank dan lembaga keuangan untuk job placement dan internship opportunities.',
-        },
-        {
-          id: 3,
-          question: 'Apakah mendapat akses ke financial modeling tools?',
-          answer: 'Ya, peserta akan mendapat akses ke Bloomberg Terminal, climate risk modeling software, dan ESG rating platforms.',
-        },
-        {
-          id: 4,
-          question: 'Bagaimana format final project-nya?',
-          answer:
-            'Final project berupa case study lengkap: structuring green bond untuk specific company atau ESG risk assessment untuk loan portfolio.',
-        },
-      ],
-    },
   ];
 
   /**
@@ -281,6 +227,74 @@ export const useBootcamps = () => {
    */
   const formatPrice = (price) => {
     return new Intl.NumberFormat('id-ID').format(price);
+  };
+
+  /**
+   * Mendapatkan pricing tier berdasarkan ID
+   * @param {object} bootcamp - Bootcamp object
+   * @param {number} tierId - ID tier pricing
+   * @returns {object|undefined} Pricing tier object atau undefined jika tidak ditemukan
+   */
+  const getPricingTier = (bootcamp, tierId) => {
+    return bootcamp.pricing?.find((tier) => tier.id === tierId);
+  };
+
+  /**
+   * Mendapatkan pricing tier termurah
+   * @param {object} bootcamp - Bootcamp object
+   * @returns {object|undefined} Pricing tier dengan harga termurah
+   */
+  const getCheapestTier = (bootcamp) => {
+    if (!bootcamp.pricing || bootcamp.pricing.length === 0) return undefined;
+    return bootcamp.pricing.reduce((cheapest, current) => (current.current_price < cheapest.current_price ? current : cheapest));
+  };
+
+  /**
+   * Menghitung persentase diskon
+   * @param {number} originalPrice - Harga asli
+   * @param {number} currentPrice - Harga sekarang
+   * @returns {number} Persentase diskon
+   */
+  const calculateDiscountPercentage = (originalPrice, currentPrice) => {
+    return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+  };
+
+  /**
+   * Mendapatkan features dari bootcamp
+   * @param {object} bootcamp - Bootcamp object
+   * @returns {array} Array features bootcamp
+   */
+  const getBootcampFeatures = (bootcamp) => {
+    return bootcamp.features || [];
+  };
+
+  /**
+   * Mendapatkan topic dari bootcamp
+   * @param {object} bootcamp - Bootcamp object
+   * @returns {array} Array topic bootcamp
+   */
+  const getBootcampTopics = (bootcamp) => {
+    return bootcamp.topic || [];
+  };
+
+  /**
+   * Mendapatkan topic berdasarkan ID
+   * @param {object} bootcamp - Bootcamp object
+   * @param {number} topicId - ID topic
+   * @returns {object|undefined} Topic object atau undefined jika tidak ditemukan
+   */
+  const getTopicById = (bootcamp, topicId) => {
+    return bootcamp.topic?.find((topic) => topic.id === topicId);
+  };
+
+  /**
+   * Mendapatkan total jumlah session dari semua topic
+   * @param {object} bootcamp - Bootcamp object
+   * @returns {number} Total jumlah session
+   */
+  const getTotalSessionCount = (bootcamp) => {
+    if (!bootcamp.topic) return 0;
+    return bootcamp.topic.reduce((total, topic) => total + (topic.session?.length || 0), 0);
   };
 
   /**
@@ -305,6 +319,13 @@ export const useBootcamps = () => {
     bootcampsData,
     findBootcampBySlug,
     formatPrice,
+    getPricingTier,
+    getCheapestTier,
+    calculateDiscountPercentage,
+    getBootcampFeatures,
+    getBootcampTopics,
+    getTopicById,
+    getTotalSessionCount,
     getBootcampsByLevel,
     getPopularBootcamps,
   };

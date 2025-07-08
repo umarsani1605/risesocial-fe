@@ -6,9 +6,9 @@
         <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.firstName || 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4">
-          <Button @click="navigateTo('/dashboard/course')"> Lanjut Belajar </Button>
+          <Button @click="navigateTo('/dashboard/course')"> Continue Learning</Button>
           <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/courses')">
-            Eksplor Kursus Baru
+            Explore New Courses
           </Button>
         </div>
         <img src="/images/dashboard/graphic.png" alt="Hero Image" class="h-[32rem] absolute -right-24 -top-16 opacity-5 z-10" />
@@ -19,9 +19,9 @@
         <Card class="border border-gray-50 gap-3">
           <CardHeader>
             <div class="flex items-center justify-between">
-              <CardTitle class="heading-card">Kursus Saya</CardTitle>
+              <CardTitle class="heading-card">My Courses</CardTitle>
               <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/dashboard/course')">
-                Lihat Semua
+                View All
               </Button>
             </div>
           </CardHeader>
@@ -48,7 +48,7 @@
                     "
                     class="text-xs"
                   >
-                    {{ getCourseProgress(course) === 100 ? 'Selesai' : 'Progress' }}
+                    {{ getCourseProgress(course) === 100 ? 'Completed' : 'Progress' }}
                   </Badge>
                 </h3>
                 <div class="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 mt-2">
@@ -62,7 +62,7 @@
                 <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
                   <span class="flex items-center gap-2">
                     <Icon name="lucide:check-circle" class="h-4 w-4" />
-                    {{ getCourseModulesCount(course).completed }} / {{ getCourseModulesCount(course).total }} modul diselesaikan
+                    {{ getCourseModulesCount(course).completed }} / {{ getCourseModulesCount(course).total }} modules completed
                   </span>
                   <span class="font-medium">{{ getCourseModulesCount(course).percentage }}%</span>
                 </div>
@@ -75,10 +75,8 @@
         <Card class="border border-gray-50 gap-3 z-30">
           <CardHeader>
             <div class="flex items-center justify-between">
-              <CardTitle class="heading-card">Pekerjaan Tersimpan</CardTitle>
-              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/dashboard/jobs')">
-                Lihat Semua
-              </Button>
+              <CardTitle class="heading-card">Saved Jobs</CardTitle>
+              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/dashboard/jobs')"> View All </Button>
             </div>
           </CardHeader>
 
@@ -86,10 +84,8 @@
             <!-- No Favorite Jobs Message -->
             <div v-if="favoriteJobs.length === 0" class="text-center py-8">
               <Icon name="lucide:bookmark" class="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p class="text-gray-500 text-sm">Belum ada pekerjaan yang disimpan</p>
-              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/dashboard/jobs')">
-                Lihat Semua
-              </Button>
+              <p class="text-gray-500 text-sm">No saved jobs</p>
+              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/dashboard/jobs')"> View All </Button>
             </div>
 
             <!-- Dynamic Job Cards -->
@@ -144,8 +140,8 @@
                   <span>8 - 15 Juni 2025</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <Button variant="outline" size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> Lebih Detail </Button>
-                  <Button size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> Daftar Sekarang </Button>
+                  <Button variant="outline" size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> More Detail </Button>
+                  <Button size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> Register Now </Button>
                 </div>
               </div>
             </div>
@@ -169,7 +165,7 @@
               </p>
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-2 sm:gap-3">
                 <div class="flex items-center gap-2">
-                  <Button variant="outline" size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> Lebih Detail </Button>
+                  <Button variant="outline" size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> More Detail </Button>
                 </div>
               </div>
             </div>
@@ -206,17 +202,17 @@ const dynamicGreeting = computed(() => {
   const hour = new Date().getHours();
 
   if (hour >= 5 && hour < 12) {
-    return 'Selamat pagi';
+    return 'Good morning';
   } else if (hour >= 12 && hour < 18) {
-    return 'Selamat siang';
+    return 'Good afternoon';
   } else {
-    return 'Selamat malam';
+    return 'Good evening';
   }
 });
 
 // Welcome message
 const welcomeMessage = computed(() => {
-  return 'Lanjutkan proses belajarmu atau eksplorasi kursus baru';
+  return 'Continue your learning or explore new courses!';
 });
 
 // User's enrolled courses (sample - first 3 courses)

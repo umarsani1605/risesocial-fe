@@ -44,10 +44,10 @@ const navigationMenus = computed(() => [
     isActive: route.path === '/',
   },
   {
-    id: 'courses',
-    name: 'Courses',
-    path: '/courses',
-    isActive: route.path.startsWith('/courses'),
+    id: 'bootcamp',
+    name: 'Bootcamp',
+    path: '/bootcamp',
+    isActive: route.path.startsWith('/bootcamp'),
   },
   {
     id: 'opportunities',
@@ -187,10 +187,40 @@ onUnmounted(() => {
             </Button>
           </div>
 
-          <!-- Mobile menu button -->
+          <!-- Mobile menu button & User Avatar -->
           <div class="lg:hidden flex items-center space-x-2">
+            <!-- User Avatar Dropdown (Mobile) -->
+            <div v-if="isAuthenticated" class="flex items-center">
+              <DropdownMenu :modal="false">
+                <DropdownMenuTrigger as-child>
+                  <Button variant="ghost" size="icon" class="rounded-full p-1">
+                    <Avatar class="h-8 w-8">
+                      <AvatarImage :src="user?.avatar" />
+                      <AvatarFallback class="text-white text-sm">{{ initials }}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-48">
+                  <DropdownMenuItem @click="navigateTo('/dashboard')" class="cursor-pointer">
+                    <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+                    <Icon name="lucide:user" class="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600">
+                    <Icon name="lucide:log-out" class="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <!-- Hamburger Menu Button -->
             <Button variant="ghost" size="icon" @click="toggleMobileMenu">
-              <Icon name="lucide:menu" class="size-6! bg-white!" />
+              <Icon name="lucide:menu" class="size-6! text-white!" />
             </Button>
           </div>
         </div>
@@ -203,43 +233,30 @@ onUnmounted(() => {
         leave-to-class="opacity-0 -translate-y-4"
       >
         <div v-if="mobileMenuOpen" class="lg:hidden absolute top-full left-0 right-0 bg-secondary text-white backdrop-blur-sm shadow-lg z-40">
-          <div class="container-wrapper py-4 space-y-2">
+          <div class="container-wrapper py-4">
             <!-- Mobile Navigation Links -->
-            <NuxtLink v-for="menu in navigationMenus" :key="menu.id" :to="menu.path" class="navbar-mobile-link">
-              <span :class="menu.isActive ? 'navbar-mobile-link-active' : 'navbar-mobile-link-inactive'">
+            <nav class="space-y-1">
+              <NuxtLink
+                v-for="menu in navigationMenus"
+                :key="menu.id"
+                :to="menu.path"
+                class="flex items-center px-4 py-3 rounded-lg text-base font-medium transition-colors hover:bg-white/10"
+                :class="menu.isActive ? 'text-orange-400 bg-white/5' : 'text-white'"
+                @click="mobileMenuOpen = false"
+              >
                 {{ menu.name }}
-              </span>
-            </NuxtLink>
+              </NuxtLink>
+            </nav>
 
-            <!-- Mobile Auth Section -->
-            <div class="pt-4">
-              <!-- Authenticated User -->
-              <div v-if="isAuthenticated" class="space-y-2">
-                <div class="flex items-center space-x-3 p-3 rounded-lg bg-white/5">
-                  <Avatar class="h-10 w-10">
-                    <AvatarImage :src="user?.avatar" />
-                    <AvatarFallback class="text-sm">{{ initials }}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p class="text-sm font-medium text-white">{{ fullName }}</p>
-                    <p class="text-xs text-gray-300">{{ user?.email }}</p>
-                  </div>
-                </div>
-                <Button @click="navigateTo('/dashboard')" variant="ghost" class="w-full justify-start text-white">
-                  <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
-                  Dashboard
-                </Button>
-                <Button @click="handleLogout" variant="ghost" class="w-full justify-start text-red-300 hover:text-red-200">
-                  <Icon name="lucide:log-out" class="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
-              </div>
-
-              <!-- Not Authenticated -->
-              <Button v-else @click="openLoginDialog" class="w-full justify-center">
-                <Icon name="lucide:user" class="mr-2 h-4 w-4" />
+            <!-- Login/Register Button for Non-Authenticated Users -->
+            <div v-if="!isAuthenticated" class="mt-4 pt-4 border-t border-white/10">
+              <button
+                @click="openLoginDialog"
+                class="flex items-center justify-center w-full px-4 py-3 rounded-lg text-base font-medium text-white bg-orange-600 hover:bg-orange-700 transition-colors"
+              >
+                <Icon name="lucide:user" class="mr-3 h-5 w-5" />
                 Login / Register
-              </Button>
+              </button>
             </div>
           </div>
         </div>
