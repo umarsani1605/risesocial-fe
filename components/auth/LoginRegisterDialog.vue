@@ -76,7 +76,7 @@ const handleLogin = async () => {
   }
 };
 
-// Handle register - still using direct API call since NextAuth doesn't handle registration
+// Handle register - using mock system for demo
 const handleRegister = async () => {
   errorMessage.value = '';
   isLoading.value = false;
@@ -90,26 +90,29 @@ const handleRegister = async () => {
   isLoading.value = true;
 
   try {
+    // DEMO MODE: Call demo register endpoint
+    console.log('🎭 DEMO MODE: Mock registration in progress...');
+
     // Split name into firstName and lastName
     const nameParts = registerForm.value.name.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
 
-    const config = useRuntimeConfig();
-    const response = await $fetch('/api/auth/register', {
+    // Call demo register endpoint untuk menambahkan user ke mock database
+    const response = await $fetch('/api/register-demo', {
       method: 'POST',
       body: {
         firstName: firstName,
         lastName: lastName,
         email: registerForm.value.email,
-        phone: '', // Optional field
         password: registerForm.value.password,
       },
-      baseURL: config.public.backendUrl,
     });
 
-    if (response.success && response.data) {
-      // After successful registration, auto-login
+    if (response.success) {
+      console.log('✅ DEMO MODE: Registration successful!');
+
+      // After successful registration, auto-login dengan credentials yang baru didaftarkan
       await signIn('credentials', {
         email: registerForm.value.email,
         password: registerForm.value.password,
@@ -122,8 +125,8 @@ const handleRegister = async () => {
       errorMessage.value = response.error || 'Registration failed';
     }
   } catch (error) {
-    console.error('Register error:', error);
-    errorMessage.value = error.data?.error || error.message || 'Registration failed';
+    console.error('DEMO MODE Register error:', error);
+    errorMessage.value = 'Registration failed - Demo mode error';
   } finally {
     isLoading.value = false;
   }

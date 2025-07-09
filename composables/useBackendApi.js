@@ -2,10 +2,48 @@
  * Composable untuk API calls ke backend
  * Otomatis menambahkan authorization header jika user sudah login
  * Menggunakan @sidebase/nuxt-auth untuk session management
+ *
+ * DEMO MODE: Includes mock responses untuk frontend-only demo
  */
 export const useBackendApi = () => {
   const { data: session, signOut } = useAuth();
   const config = useRuntimeConfig();
+
+  // DEMO MODE: Check if we're in demo mode (no backend available)
+  const isDemoMode = ref(true); // Set to true for demo frontend-only
+
+  // Mock responses untuk demo
+  const mockResponses = {
+    '/api/users/me': {
+      success: true,
+      data: {
+        id: 'demo-user-001',
+        first_name: 'Demo',
+        last_name: 'User',
+        email: 'demo@risesocial.org',
+        role: 'USER',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    },
+    '/api/auth/register': {
+      success: true,
+      data: {
+        user: {
+          id: 'demo-user-002',
+          first_name: 'New',
+          last_name: 'User',
+          email: 'newuser@example.com',
+          role: 'USER',
+          avatar: null,
+        },
+        token: 'demo-jwt-token-' + Date.now(),
+        expiresIn: '1 day',
+      },
+      message: 'User registered successfully',
+    },
+  };
 
   /**
    * Generic API call dengan automatic token handling
@@ -14,6 +52,29 @@ export const useBackendApi = () => {
    * @returns {Promise} - Response data
    */
   const apiCall = async (endpoint, options = {}) => {
+    // DEMO MODE: Return mock responses
+    if (isDemoMode.value) {
+      console.log('🎭 DEMO MODE: Mock API call to', endpoint);
+
+      // Simulasi delay network
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Return mock response jika ada
+      if (mockResponses[endpoint]) {
+        console.log('✅ DEMO MODE: Returning mock response for', endpoint);
+        return mockResponses[endpoint];
+      }
+
+      // Default mock success response
+      console.log('⚡ DEMO MODE: Returning default mock response for', endpoint);
+      return {
+        success: true,
+        data: {},
+        message: 'Demo mode - operation successful',
+      };
+    }
+
+    // PRODUCTION MODE: Real API calls
     const token = session.value?.accessToken;
 
     const defaultOptions = {
@@ -51,7 +112,7 @@ export const useBackendApi = () => {
    * @returns {Promise} - Response data
    */
   const authenticatedCall = async (endpoint, options = {}) => {
-    if (!session.value?.user) {
+    if (!session.value?.user && !isDemoMode.value) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Authentication required',
@@ -62,56 +123,17 @@ export const useBackendApi = () => {
   };
 
   /**
-   * Admin-only API call - memerlukan user admin
-   * @param {string} endpoint - API endpoint path
-   * @param {object} options - Fetch options
-   * @returns {Promise} - Response data
+   * Toggle demo mode (useful untuk development/testing)
    */
-  const adminCall = async (endpoint, options = {}) => {
-    if (!session.value?.user) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Authentication required',
-      });
-    }
-
-    if (session.value.user.role !== 'ADMIN') {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Admin access required',
-      });
-    }
-
-    return apiCall(endpoint, options);
+  const toggleDemoMode = () => {
+    isDemoMode.value = !isDemoMode.value;
+    console.log('🎭 Demo mode:', isDemoMode.value ? 'ENABLED' : 'DISABLED');
   };
 
   return {
-    // Generic API call
     apiCall,
-
-    // Authenticated calls
     authenticatedCall,
-    adminCall,
-
-    // HTTP method helpers
-    get: (endpoint, options = {}) => apiCall(endpoint, { method: 'GET', ...options }),
-    post: (endpoint, body, options = {}) => apiCall(endpoint, { method: 'POST', body, ...options }),
-    put: (endpoint, body, options = {}) => apiCall(endpoint, { method: 'PUT', body, ...options }),
-    patch: (endpoint, body, options = {}) => apiCall(endpoint, { method: 'PATCH', body, ...options }),
-    delete: (endpoint, options = {}) => apiCall(endpoint, { method: 'DELETE', ...options }),
-
-    // Authenticated HTTP method helpers
-    authGet: (endpoint, options = {}) => authenticatedCall(endpoint, { method: 'GET', ...options }),
-    authPost: (endpoint, body, options = {}) => authenticatedCall(endpoint, { method: 'POST', body, ...options }),
-    authPut: (endpoint, body, options = {}) => authenticatedCall(endpoint, { method: 'PUT', body, ...options }),
-    authPatch: (endpoint, body, options = {}) => authenticatedCall(endpoint, { method: 'PATCH', body, ...options }),
-    authDelete: (endpoint, options = {}) => authenticatedCall(endpoint, { method: 'DELETE', ...options }),
-
-    // Admin HTTP method helpers
-    adminGet: (endpoint, options = {}) => adminCall(endpoint, { method: 'GET', ...options }),
-    adminPost: (endpoint, body, options = {}) => adminCall(endpoint, { method: 'POST', body, ...options }),
-    adminPut: (endpoint, body, options = {}) => adminCall(endpoint, { method: 'PUT', body, ...options }),
-    adminPatch: (endpoint, body, options = {}) => adminCall(endpoint, { method: 'PATCH', body, ...options }),
-    adminDelete: (endpoint, options = {}) => adminCall(endpoint, { method: 'DELETE', ...options }),
+    toggleDemoMode,
+    isDemoMode: readonly(isDemoMode),
   };
 };

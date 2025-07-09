@@ -1,6 +1,24 @@
 import { NuxtAuthHandler } from '#auth'
 import type { AuthOptions } from 'next-auth'
 
+// Initialize global mock users database untuk demo
+if (!(globalThis as any).__MOCK_USERS__) {
+  (globalThis as any).__MOCK_USERS__ = [
+    {
+      id: 'demo-user-001',
+      email: 'demo@risesocial.org',
+      password: 'password123',
+      first_name: 'Demo',
+      last_name: 'User',
+      role: 'USER',
+      avatar: null
+    }
+  ];
+}
+
+// Get mock users dari global storage
+const getMockUsers = () => (globalThis as any).__MOCK_USERS__ || [];
+
 const authOptions: AuthOptions = {
   secret: useRuntimeConfig().authSecret,
   
@@ -16,38 +34,39 @@ const authOptions: AuthOptions = {
       },
       async authorize(credentials: any) {
         try {
-          const config = useRuntimeConfig()
+          // Mock authentication - untuk demo frontend saja
+          console.log('🚀 DEMO MODE: Mock authentication in progress...')
           
-          // Call backend Fastify untuk login
-          const response: any = await $fetch('/api/auth/login', {
-            method: 'POST',
-            body: {
-              email: credentials?.email,
-              password: credentials?.password,
-              rememberMe: credentials?.rememberMe === 'true'
-            },
-            baseURL: config.public.backendUrl,
-          })
-
-          console.log("response login: " + JSON.stringify(response))
-
-          if (response.success && response.data) {
+          // Simulasi delay network
+          await new Promise(resolve => setTimeout(resolve, 800))
+          
+          // Cari user di mock database
+          const mockUsers = getMockUsers();
+          const mockUser = mockUsers.find((user: any) => 
+            user.email === credentials?.email && 
+            user.password === credentials?.password
+          );
+          
+          if (mockUser) {
+            console.log('✅ DEMO MODE: Login successful!')
+            
             // Return user object sesuai dengan NextAuth.js format
             return {
-              id: response.data.user.id,
-              email: response.data.user.email,
-              name: `${response.data.user.first_name} ${response.data.user.last_name}`.trim(),
-              firstName: response.data.user.first_name,
-              lastName: response.data.user.last_name,
-              role: response.data.user.role,
-              avatar: response.data.user.avatar,
-              accessToken: response.data.token
+              id: mockUser.id,
+              email: mockUser.email,
+              name: `${mockUser.first_name} ${mockUser.last_name}`.trim(),
+              firstName: mockUser.first_name,
+              lastName: mockUser.last_name,
+              role: mockUser.role,
+              avatar: mockUser.avatar,
+              accessToken: 'demo-jwt-token-' + Date.now() // Mock token
             }
           }
           
+          console.log('❌ DEMO MODE: Invalid credentials')
           return null
         } catch (error) {
-          console.error('Auth error:', error)
+          console.error('DEMO MODE Auth error:', error)
           return null
         }
       }
