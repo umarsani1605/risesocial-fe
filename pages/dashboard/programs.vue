@@ -1,25 +1,62 @@
 <template>
-  <div class="bg-slate-50 mt-10">
+  <div class="bg-slate-50 mt-16 md:mt-10">
     <div class="container-wrapper section-py-md">
       <!-- Programs Section -->
-      <Card class="border border-gray-50">
+      <Card class="border border-gray-50 min-h-[50rem]">
         <CardHeader>
-          <CardTitle class="heading-card">Programs</CardTitle>
+          <div class="flex flex-row items-center justify-between gap-3">
+            <CardTitle class="heading-card">Programs</CardTitle>
+          </div>
         </CardHeader>
 
         <CardContent class="space-y-4">
-          <!-- Program Cards -->
-          <div
-            v-for="program in programs"
-            :key="program.id"
-            class="flex space-x-3 sm:space-x-4 p-2 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
-          >
-            <div class="size-12 sm:size-32 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-              <img :src="program.image" :alt="program.title" class="w-full h-full object-cover" />
-            </div>
-            <div class="flex-1 min-w-0 space-y-2 py-3">
-              <h3 class="text-sm sm:text-xl font-semibold text-gray-900">{{ program.title }}</h3>
-              <p class="text-xs sm:text-sm text-gray-600 line-clamp-3 leading-relaxed">{{ program.description }}</p>
+          <!-- Grid Container for Program Cards -->
+          <div class="grid gap-4 lg:gap-6">
+            <!-- Program Cards -->
+            <div
+              v-for="program in programs"
+              :key="program.id"
+              @click="navigateTo(program.detailUrl)"
+              class="group border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300 hover:shadow-md bg-white overflow-hidden"
+            >
+              <!-- Mobile Layout: Stacked -->
+              <div class="block sm:hidden">
+                <div class="aspect-[4/3] w-full bg-gray-100 overflow-hidden">
+                  <img
+                    :src="program.image"
+                    :alt="program.title"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                </div>
+                <div class="p-4">
+                  <h3 class="text-base font-semibold text-gray-900 mb-3 leading-tight">{{ program.title }}</h3>
+
+                  <!-- Description - Mobile -->
+                  <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                    {{ program.description }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Tablet & Desktop Layout: Horizontal -->
+              <div class="hidden sm:flex items-start p-4">
+                <div class="size-24 md:size-32 lg:size-36 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden mr-4 lg:mr-6">
+                  <img
+                    :src="program.image"
+                    :alt="program.title"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-3 leading-tight">{{ program.title }}</h3>
+
+                  <!-- Description - Tablet/Desktop -->
+                  <p class="text-sm md:text-base text-gray-600 leading-relaxed line-clamp-3">
+                    {{ program.description }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -79,3 +116,13 @@ useSeoMeta({
   description: 'Kelola program yang diikuti dan temukan program-program baru Rise Social',
 });
 </script>
+
+<style scoped>
+/* Line clamp utility for text truncation */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

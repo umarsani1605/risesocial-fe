@@ -60,7 +60,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="bg-gray-50 mt-16">
+  <div class="bg-gray-50 mt-20 md:mt-16">
     <!-- Hero Section with Bootcamp Info -->
     <section class="container-wrapper section-py-sm flex flex-col gap-8">
       <div class="bg-[#0E5C59] rounded-3xl p-8 md:p-12">

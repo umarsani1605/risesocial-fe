@@ -28,8 +28,8 @@
           </NavigationMenu>
         </nav>
 
-        <!-- Mobile menu button & User Profile -->
-        <div class="flex items-center space-x-4 h-full py-4">
+        <!-- Desktop User Profile -->
+        <div class="hidden lg:flex items-center space-x-4 h-full py-4">
           <!-- User Profile Dropdown -->
           <DropdownMenu :modal="false">
             <DropdownMenuTrigger class="h-full" as-child>
@@ -60,32 +60,69 @@
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        <!-- Mobile menu button & User Profile -->
+        <div class="lg:hidden flex items-center space-x-2">
+          <!-- User Profile Dropdown (Mobile) -->
+          <div class="flex items-center">
+            <DropdownMenu :modal="false">
+              <DropdownMenuTrigger as-child>
+                <Button variant="ghost" size="icon" class="rounded-full p-1">
+                  <Avatar class="h-8 w-8">
+                    <AvatarImage :src="user?.avatar" />
+                    <AvatarFallback class="text-sm">{{ initials }}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" class="w-48 dropdown-right-aligned">
+                <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+                  <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="navigateTo('/')" class="cursor-pointer">
+                  <Icon name="lucide:home" class="mr-2 h-4 w-4" />
+                  Back to Home
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="handleLogout" class="cursor-pointer text-red-600">
+                  <Icon name="lucide:log-out" class="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <!-- Hamburger Menu Button -->
+          <Button variant="ghost" size="icon" @click="toggleMobileMenu">
+            <Icon name="lucide:menu" class="size-6" />
+          </Button>
+        </div>
       </div>
     </div>
 
     <!-- Mobile Navigation Menu -->
     <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      leave-active-class="transition-all duration-300 ease-in"
-      enter-from-class="opacity-0 max-h-0"
-      enter-to-class="opacity-100 max-h-96"
-      leave-from-class="opacity-100 max-h-96"
-      leave-to-class="opacity-0 max-h-0"
+      enter-active-class="transition-all duration-300"
+      leave-active-class="transition-all duration-300"
+      enter-from-class="opacity-0 -translate-y-4"
+      leave-to-class="opacity-0 -translate-y-4"
     >
-      <div v-if="mobileMenuOpen" class="md:hidden border-t border-gray-200 bg-white overflow-hidden">
-        <div class="px-4 py-2 space-y-1">
-          <NuxtLink
-            v-for="item in dashboardNavigation"
-            :key="item.name"
-            :to="item.path"
-            @click="mobileMenuOpen = false"
-            :class="[
-              'block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200',
-              item.isActive ? 'text-orange-600 bg-orange-50' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50',
-            ]"
-          >
-            {{ item.name }}
-          </NuxtLink>
+      <div v-if="mobileMenuOpen" class="lg:hidden absolute top-full left-0 right-0 bg-white backdrop-blur-sm shadow-lg z-40">
+        <div class="container-wrapper py-4">
+          <!-- Mobile Navigation Links -->
+          <nav class="space-y-1">
+            <NuxtLink
+              v-for="menu in dashboardNavigation"
+              :key="menu.id"
+              :to="menu.path"
+              class="flex items-center px-4 py-3 rounded-lg text-base font-medium transition-colors hover:bg-gray-50"
+              :class="menu.isActive ? 'text-primary bg-gray-100 font-bold' : 'text-gray-700'"
+              @click="mobileMenuOpen = false"
+            >
+              {{ menu.name }}
+            </NuxtLink>
+          </nav>
         </div>
       </div>
     </Transition>
@@ -135,11 +172,11 @@ const dashboardNavigation = computed(() => [
     isActive: route.path === '/dashboard',
   },
   {
-    id: 'course',
-    name: 'Course',
-    path: '/dashboard/course',
+    id: 'bootcamp',
+    name: 'Bootcamp',
+    path: '/dashboard/bootcamp',
     icon: 'lucide:book',
-    isActive: route.path.startsWith('/dashboard/course'),
+    isActive: route.path.startsWith('/dashboard/bootcamp'),
   },
   {
     id: 'jobs',
@@ -158,6 +195,9 @@ const dashboardNavigation = computed(() => [
 ]);
 
 // Helper functions
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+};
 
 const handleLogout = async () => {
   mobileMenuOpen.value = false;
@@ -188,3 +228,10 @@ onMounted(() => {
   });
 });
 </script>
+<style scoped>
+/* Custom dropdown positioning untuk profile menu */
+:deep(.dropdown-right-aligned) {
+  --reka-dropdown-menu-content-transform-origin: 90% 0px !important;
+  --reka-popper-transform-origin: 90% 0px !important;
+}
+</style>

@@ -1,71 +1,53 @@
 <template>
-  <div class="bg-slate-50 mt-10">
+  <div class="bg-slate-50 mt-16 md:mt-10">
     <div class="container-wrapper section-py-md relative">
       <!-- Welcome Section -->
-      <div class="bg-[#0E5C59] shadow rounded-xl p-4 sm:px-10 sm:pt-14 sm:pb-10 text-white mb-6 sm:mb-8 overflow-hidden z-10">
+      <div class="relative bg-[#0E5C59] shadow rounded-xl p-4 sm:px-10 sm:pt-14 sm:pb-10 text-white mb-6 sm:mb-8 overflow-hidden z-10">
         <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.firstName || 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4">
-          <Button @click="navigateTo('/dashboard/course')"> Continue Learning</Button>
-          <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/courses')">
-            Explore New Courses
+          <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>
+          <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/bootcamp')">
+            Explore Bootcamp
           </Button>
         </div>
-        <img src="/images/dashboard/graphic.png" alt="Hero Image" class="h-[32rem] absolute -right-24 -top-16 opacity-5 z-10" />
+        <img
+          src="/images/dashboard/graphic.png"
+          alt="Hero Image"
+          class="h-[16rem] md:h-[32rem] absolute -right-24 md:-right-24 -bottom-12 md:-top-16 opacity-5 z-10"
+        />
       </div>
       <!-- Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 z-30">
-        <!-- Kursus Saya -->
+        <!-- Bootcamp -->
         <Card class="border border-gray-50 gap-3">
           <CardHeader>
             <div class="flex items-center justify-between">
-              <CardTitle class="heading-card">My Courses</CardTitle>
-              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/dashboard/course')">
-                View All
-              </Button>
+              <CardTitle class="heading-card">Bootcamp</CardTitle>
+              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/bootcamp')"> View All </Button>
             </div>
           </CardHeader>
 
           <CardContent class="space-y-4">
-            <!-- Dynamic Course Cards -->
+            <!-- Dynamic Bootcamp Cards -->
             <div
-              v-for="course in userCourses"
-              :key="course.id"
-              @click="navigateTo(`/courses/${course.module_slug}`)"
-              class="flex items-center h-[6.25rem] space-x-3 sm:space-x-4 p-2 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
+              v-for="bootcamp in bootcampsData"
+              :key="bootcamp.id"
+              @click="navigateTo(`/bootcamp/${bootcamp.path_slug}`)"
+              class="flex items-start space-x-3 sm:space-x-4 p-4 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
             >
-              <div class="size-12 sm:size-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <img :src="getLatestModule(course).image" :alt="getLatestModule(course).title" class="w-full h-full object-cover" />
+              <div class="size-16 sm:size-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <img :src="bootcamp.image" :alt="bootcamp.title" class="w-full h-full object-cover" />
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="text-sm sm:text-base font-medium text-gray-900 truncate flex items-center justify-between">
-                  {{ getLatestModule(course).title }}
-                  <Badge
-                    :class="
-                      getCourseProgress(course) === 100
-                        ? 'bg-green-50 text-green-600 border border-green-200'
-                        : 'bg-yellow-50 text-yellow-600 border border-yellow-200'
-                    "
-                    class="text-xs"
-                  >
-                    {{ getCourseProgress(course) === 100 ? 'Completed' : 'Progress' }}
-                  </Badge>
-                </h3>
-                <div class="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 mt-2">
-                  <div
-                    :class="getCourseProgress(course) === 100 ? 'bg-green-500' : 'bg-yellow-400'"
-                    class="h-1.5 sm:h-2 rounded-full transition-all duration-500"
-                    :style="`width: ${getCourseProgress(course)}%`"
-                  ></div>
-                </div>
-                <!-- Progress Info -->
-                <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
-                  <span class="flex items-center gap-2">
-                    <Icon name="lucide:check-circle" class="h-4 w-4" />
-                    {{ getCourseModulesCount(course).completed }} / {{ getCourseModulesCount(course).total }} modules completed
-                  </span>
-                  <span class="font-medium">{{ getCourseModulesCount(course).percentage }}%</span>
-                </div>
+                <h3 class="text-sm sm:text-base font-medium text-gray-900 mb-2">{{ bootcamp.title }}</h3>
+                <!-- Description -->
+                <p
+                  class="text-xs sm:text-sm text-gray-600 leading-relaxed"
+                  style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden"
+                >
+                  {{ bootcamp.description }}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -194,6 +176,9 @@ const user = computed(() => session.value?.user || null);
 // Get courses data
 const { coursesData, getCourseProgress, getCourseModulesCount } = useCourses();
 
+// Get bootcamp data
+const { bootcampsData } = useBootcamps();
+
 // Get jobs data
 const { getLimitedFavoriteJobs, formatEmploymentType, getJobImage, getJobDetailUrl, toggleFavorite, isFavorite } = useJobs();
 
@@ -212,24 +197,13 @@ const dynamicGreeting = computed(() => {
 
 // Welcome message
 const welcomeMessage = computed(() => {
-  return 'Continue your learning or explore new courses!';
-});
-
-// User's enrolled courses (sample - first 3 courses)
-const userCourses = computed(() => {
-  return coursesData.slice(0, 3);
+  return 'Continue your learning journey or explore new bootcamp programs!';
 });
 
 // User's favorite jobs for dashboard
 const favoriteJobs = computed(() => {
   return getLimitedFavoriteJobs(2);
 });
-
-// Get latest/current module for user (updated for new structure)
-const getLatestModule = (course) => {
-  // In new structure, each course is a module itself
-  return course;
-};
 
 // Meta tags
 useSeoMeta({
