@@ -89,16 +89,6 @@ const programs = [
     registrationLabel: 'Daftar Sekarang',
   },
   {
-    id: 'educators-accelerator',
-    title: "Rise Educator's Skills Accelerator",
-    description:
-      "Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic. This program is for young professional, career switchers, sustainability and green workers to improve their knowledge and skills in this topic, equipped with JOB ACCELERATOR program with our hiring partners.",
-    duration: '6 minggu',
-    level: 'Intermediate',
-    image: '/images/rise_educator.png',
-    detailUrl: '/programs/educators-skills-accelerator',
-  },
-  {
     id: 'little-hero-camp',
     title: 'Little Hero Camp',
     description:

@@ -233,7 +233,7 @@ onUnmounted(() => {
         leave-to-class="opacity-0 -translate-y-4"
       >
         <div v-if="mobileMenuOpen" class="lg:hidden absolute top-full left-0 right-0 bg-secondary text-white backdrop-blur-sm shadow-lg z-40">
-          <div class="container-wrapper py-4">
+          <div class="container-wrapper pt-4 pb-6">
             <!-- Mobile Navigation Links -->
             <nav class="space-y-1">
               <NuxtLink
@@ -250,13 +250,10 @@ onUnmounted(() => {
 
             <!-- Login/Register Button for Non-Authenticated Users -->
             <div v-if="!isAuthenticated" class="mt-4 pt-4 border-t border-white/10">
-              <button
-                @click="openLoginDialog"
-                class="flex items-center justify-center w-full px-4 py-3 rounded-lg text-base font-medium text-white bg-orange-600 hover:bg-orange-700 transition-colors"
-              >
-                <Icon name="lucide:user" class="mr-3 h-5 w-5" />
+              <Button @click="openLoginDialog" class="bg-primary! hover:bg-primary/80! text-white w-full!">
+                <Icon name="lucide:user" class="size-4!" />
                 Login / Register
-              </button>
+              </Button>
             </div>
           </div>
         </div>

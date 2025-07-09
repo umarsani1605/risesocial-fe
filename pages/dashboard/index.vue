@@ -5,7 +5,7 @@
       <div class="relative bg-[#0E5C59] shadow rounded-xl p-4 sm:px-10 sm:pt-14 sm:pb-10 text-white mb-6 sm:mb-8 overflow-hidden z-10">
         <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.firstName || 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
-        <div class="flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4">
+        <div class="relative flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4 z-20">
           <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>
           <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/bootcamp')">
             Explore Bootcamp
