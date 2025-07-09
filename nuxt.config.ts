@@ -45,17 +45,12 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['@sidebase/nuxt-auth', 'shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt'],
+  modules: ['shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt'],
   
-  // Runtime config
+  // Runtime config - simplified untuk custom auth
   runtimeConfig: {
-    // Private keys (only available on server-side)
-    authSecret: process.env.NUXT_AUTH_SECRET || 'your-super-secret-key-change-in-production',
-    
-    // Public keys (exposed to client-side)
     public: {
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:3001',
-      authUrl: process.env.NUXT_AUTH_BASE_URL || process.env.AUTH_ORIGIN || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
     }
   },
   

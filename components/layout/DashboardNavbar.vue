@@ -144,7 +144,7 @@ import {
 } from '@/components/ui/navigation-menu';
 
 const route = useRoute();
-const { data: session, signOut } = useAuth();
+const { data: session, signOut } = useCustomAuth();
 
 // Reactive state
 const mobileMenuOpen = ref(false);

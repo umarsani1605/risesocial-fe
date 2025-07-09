@@ -1,12 +1,10 @@
 /**
- * Composable untuk API calls ke backend
- * Otomatis menambahkan authorization header jika user sudah login
- * Menggunakan @sidebase/nuxt-auth untuk session management
- *
- * DEMO MODE: Includes mock responses untuk frontend-only demo
+ * Composable untuk mengelola koneksi ke backend API
+ * Demo mode dengan mock responses
+ * Menggunakan custom auth untuk session management
  */
 export const useBackendApi = () => {
-  const { data: session, signOut } = useAuth();
+  const { data: session, signOut } = useCustomAuth();
   const config = useRuntimeConfig();
 
   // DEMO MODE: Check if we're in demo mode (no backend available)
@@ -75,13 +73,13 @@ export const useBackendApi = () => {
     }
 
     // PRODUCTION MODE: Real API calls
-    const token = session.value?.accessToken;
+    const authToken = session.value?.accessToken;
 
     const defaultOptions = {
       baseURL: config.public.backendUrl,
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(authToken && { Authorization: `Bearer ${authToken}` }),
         ...options.headers,
       },
       ...options,

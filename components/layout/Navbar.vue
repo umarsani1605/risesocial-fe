@@ -15,8 +15,8 @@ import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
 
 const route = useRoute();
 
-// @sidebase/nuxt-auth composables
-const { data: session, status, signOut } = useAuth();
+// Custom auth composables
+const { data: session, status, signOut } = useCustomAuth();
 
 // Computed properties dari session data
 const user = computed(() => session.value?.user || null);

@@ -1,98 +1,135 @@
 # 🚀 Deployment Guide - Rise Social Frontend
 
-## Netlify Deployment
+## ✅ Custom Auth System (Updated)
 
-### ❌ Error AUTH_NO_ORIGIN
+**Masalah dengan @sidebase/nuxt-auth telah diperbaiki** dengan implementasi custom auth system yang sederhana dan reliable.
 
-Jika Anda mendapatkan error ini saat deploy:
+### 🎯 Features
+
+- ✅ **No URL parsing errors** - menggunakan localStorage untuk session
+- ✅ **Frontend-only demo** - tidak memerlukan backend server
+- ✅ **Session persistence** - login state tersimpan di localStorage
+- ✅ **Multiple users support** - bisa register user baru
+- ✅ **Netlify compatible** - tidak ada masalah deployment
+
+## 🎭 Demo Credentials
+
+### Default User:
 ```
-AUTH_NO_ORIGIN: No `origin` - this is an error in production
+Email: demo@risesocial.org
+Password: password123
 ```
 
-### ✅ Solusi
+### Register New User:
+- Bisa daftar dengan email/password apapun
+- Otomatis login setelah register
+- Data tersimpan di localStorage browser
 
-#### 1. Set Environment Variables di Netlify
+## 🛠️ How It Works
 
-Buka **Netlify Dashboard** → **Site Settings** → **Environment Variables**:
+### Custom Auth System:
+1. **Login**: Check demo credentials atau registered users di localStorage
+2. **Register**: Simpan user baru ke localStorage
+3. **Session**: Menggunakan Nuxt's `useState` + localStorage persistence
+4. **Logout**: Clear user state + localStorage
 
+### No Server Dependencies:
+- Tidak perlu NextAuth.js endpoints
+- Tidak perlu environment variables untuk auth
+- Tidak perlu JWT tokens atau external auth services
+
+## 📝 Deployment Checklist (Simplified)
+
+### Netlify Deployment:
+- [ ] Push code ke GitHub
+- [ ] Connect repository di Netlify  
+- [ ] Deploy (automatic)
+- [ ] Test demo login functionality
+
+### ❌ No Longer Required:
+- ~~Set NEXTAUTH_URL environment variable~~
+- ~~Set AUTH_ORIGIN environment variable~~
+- ~~Generate NUXT_AUTH_SECRET~~
+- ~~Configure auth baseURL~~
+
+## 🔧 Development
+
+### Local Development:
 ```bash
-# Required untuk NextAuth.js
-NEXTAUTH_URL=https://your-site-name.netlify.app
-AUTH_ORIGIN=https://your-site-name.netlify.app
-NUXT_AUTH_SECRET=generate-random-secret-key-here
-
-# Optional - Backend URL (untuk production nanti)
-NUXT_PUBLIC_BACKEND_URL=https://your-backend-url.com
+npm run dev
 ```
 
-#### 2. Generate AUTH_SECRET
+### Test Features:
+1. **Login** dengan demo credentials
+2. **Register** user baru dengan email apapun
+3. **Logout** dan verify session cleared
+4. **Refresh browser** dan verify session persistence
 
-Untuk generate random secret key:
-```bash
-# Option 1: Node.js
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+## 🆘 Troubleshooting
 
-# Option 2: OpenSSL
-openssl rand -hex 32
+### Demo not working?
 
-# Option 3: Online generator
-# https://generate-secret.vercel.app/32
+**Login Issues:**
+1. Verify credentials: `demo@risesocial.org` / `password123`
+2. Check browser console untuk error messages
+3. Clear localStorage: `localStorage.clear()`
+
+**Register Issues:**
+1. Use unique email yang belum pernah didaftarkan
+2. Clear localStorage jika ada konflik data
+3. Check browser developer tools → Application → Local Storage
+
+**Session Issues:**
+1. Check localStorage ada key `demo-auth-user`
+2. Verify browser tidak dalam private/incognito mode
+3. Clear localStorage dan try login ulang
+
+### Browser Compatibility:
+- ✅ Chrome, Firefox, Safari, Edge (modern versions)  
+- ✅ Mobile browsers
+- ❌ Very old browsers tanpa localStorage support
+
+## 🎯 Production Notes
+
+### Security:
+- **Demo purposes only** - tidak untuk production use
+- Passwords disimpan plain text di localStorage
+- Tidak ada proper session management
+- Untuk production: gunakan proper auth service
+
+### Data Persistence:
+- Data hilang jika user clear browser data
+- Data tidak shared antar devices
+- Suitable untuk demo/prototyping
+
+## 📚 Technical Details
+
+### Files Structure:
+```
+frontend/
+├── composables/
+│   ├── useCustomAuth.js      # Custom auth system
+│   └── useBackendApi.js      # API calls dengan auth
+├── middleware/
+│   └── auth.js               # Route protection
+└── components/auth/
+    └── LoginRegisterDialog.vue # Login/register UI
 ```
 
-#### 3. Update Site URL
+### Custom Auth API:
+```javascript
+const { user, isLoggedIn, status, signIn, signUp, signOut } = useCustomAuth();
 
-Ganti `your-site-name` dengan nama site Netlify Anda:
-- Jika site name: `rise-social-demo`
-- Maka URL: `https://rise-social-demo.netlify.app`
+// Login
+await signIn({ email, password });
 
-#### 4. Deploy Ulang
+// Register
+await signUp({ firstName, lastName, email, password });
 
-Setelah set environment variables, trigger deploy ulang:
-- Push code baru, atau
-- Manual deploy dari Netlify dashboard
-
-### 🔧 Local Development
-
-Untuk development lokal, buat file `.env`:
-```bash
-# .env
-NEXTAUTH_URL=http://localhost:3000
-AUTH_ORIGIN=http://localhost:3000
-NUXT_AUTH_SECRET=your-local-secret-key
-NUXT_PUBLIC_BACKEND_URL=http://localhost:3001
+// Logout
+await signOut();
 ```
 
-### 🎭 Demo Mode
+## 🚀 Success!
 
-Aplikasi ini menggunakan demo mode untuk frontend-only demo:
-- **Login**: `demo@risesocial.org` / `password123`
-- **Register**: Email/password apapun
-- Tidak memerlukan backend untuk demo
-
-### 📝 Deployment Checklist
-
-- [ ] Set `NEXTAUTH_URL` environment variable
-- [ ] Set `AUTH_ORIGIN` environment variable  
-- [ ] Generate dan set `NUXT_AUTH_SECRET`
-- [ ] Verify site URL benar
-- [ ] Test login/logout functionality
-- [ ] Check console tidak ada error AUTH_NO_ORIGIN
-
-### 🆘 Troubleshooting
-
-**Still getting AUTH_NO_ORIGIN?**
-1. Double-check environment variables spelling
-2. Ensure URLs tidak ada trailing slash
-3. Verify site sudah fully deployed
-4. Check Netlify functions logs untuk error details
-
-**Demo not working?**
-1. Check browser console untuk JavaScript errors
-2. Verify demo credentials: `demo@risesocial.org` / `password123`
-3. Try register dengan email baru
-
-### 📚 Resources
-
-- [Sidebase Nuxt Auth Docs](https://sidebase.io/nuxt-auth/)
-- [NextAuth.js Deployment](https://next-auth.js.org/deployment)
-- [Netlify Environment Variables](https://docs.netlify.com/environment-variables/overview/) 
+Demo sekarang **fully functional** tanpa auth configuration complexity. Perfect untuk demo dan development tanpa backend dependencies! 🎉 

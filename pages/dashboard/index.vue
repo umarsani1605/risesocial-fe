@@ -170,8 +170,7 @@ definePageMeta({
 });
 
 // Get user data
-const { data: session } = useAuth();
-const user = computed(() => session.value?.user || null);
+const { user } = useCustomAuth();
 
 // Get courses data
 const { coursesData, getCourseProgress, getCourseModulesCount } = useCourses();

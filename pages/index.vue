@@ -23,8 +23,8 @@ onMounted(() => {
   }
 });
 
-// Watch for successful login and handle redirect using @sidebase/nuxt-auth
-const { status } = useAuth();
+// Watch for successful login and handle redirect using custom auth system
+const { status } = useCustomAuth();
 watch(status, (newStatus) => {
   if (newStatus === 'authenticated' && route.query.redirect) {
     // User just logged in and there's a redirect parameter

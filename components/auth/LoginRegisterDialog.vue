@@ -14,8 +14,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open']);
 
-// @sidebase/nuxt-auth composables
-const { signIn, data: session, status } = useAuth();
+// Custom auth composables (menggantikan @sidebase/nuxt-auth)
+const { signIn, signUp, data: session, status } = useCustomAuth();
 
 // Local state
 const isOpen = computed({
@@ -48,29 +48,24 @@ const registerForm = ref({
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle login menggunakan @sidebase/nuxt-auth
+// Handle login menggunakan custom auth
 const handleLogin = async () => {
   errorMessage.value = '';
   isLoading.value = true;
 
   try {
-    const result = await signIn('credentials', {
+    await signIn({
       email: loginForm.value.email,
       password: loginForm.value.password,
-      rememberMe: loginForm.value.keepSignedIn,
-      redirect: false,
     });
 
-    if (result?.error) {
-      errorMessage.value = 'Invalid email or password';
-    } else {
-      // Login successful
-      isOpen.value = false;
-      await navigateTo('/');
-    }
+    // Login successful
+    console.log('✅ Custom Auth: Login successful');
+    isOpen.value = false;
+    await navigateTo('/');
   } catch (error) {
     console.error('Login error:', error);
-    errorMessage.value = 'An error occurred during login';
+    errorMessage.value = 'Invalid email or password';
   } finally {
     isLoading.value = false;
   }
@@ -90,40 +85,32 @@ const handleRegister = async () => {
   isLoading.value = true;
 
   try {
-    // DEMO MODE: Call demo register endpoint
-    console.log('🎭 DEMO MODE: Mock registration in progress...');
+    // Custom auth register
+    console.log('🎭 Custom Auth: Registration in progress...');
 
     // Split name into firstName and lastName
     const nameParts = registerForm.value.name.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
 
-    // Call demo register endpoint untuk menambahkan user ke mock database
-    const response = await $fetch('/api/register-demo', {
-      method: 'POST',
-      body: {
-        firstName: firstName,
-        lastName: lastName,
-        email: registerForm.value.email,
-        password: registerForm.value.password,
-      },
+    // Register using custom auth
+    await signUp({
+      firstName: firstName,
+      lastName: lastName,
+      email: registerForm.value.email,
+      password: registerForm.value.password,
     });
 
-    if (response.success) {
-      console.log('✅ DEMO MODE: Registration successful!');
+    console.log('✅ Custom Auth: Registration successful!');
 
-      // After successful registration, auto-login dengan credentials yang baru didaftarkan
-      await signIn('credentials', {
-        email: registerForm.value.email,
-        password: registerForm.value.password,
-        redirect: false,
-      });
+    // After successful registration, auto-login
+    await signIn({
+      email: registerForm.value.email,
+      password: registerForm.value.password,
+    });
 
-      isOpen.value = false;
-      await navigateTo('/');
-    } else {
-      errorMessage.value = response.error || 'Registration failed';
-    }
+    isOpen.value = false;
+    await navigateTo('/');
   } catch (error) {
     console.error('DEMO MODE Register error:', error);
     errorMessage.value = 'Registration failed - Demo mode error';
