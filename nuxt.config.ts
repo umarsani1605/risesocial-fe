@@ -55,7 +55,7 @@ export default defineNuxtConfig({
     // Public keys (exposed to client-side)
     public: {
       backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:3001',
-      authUrl: process.env.NUXT_AUTH_BASE_URL || process.env.AUTH_ORIGIN || 'http://localhost:3000'
+      authUrl: process.env.NUXT_AUTH_BASE_URL || process.env.AUTH_ORIGIN || process.env.NEXTAUTH_URL || 'http://localhost:3000'
     }
   },
   
