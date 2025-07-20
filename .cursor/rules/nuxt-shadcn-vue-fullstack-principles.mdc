@@ -3,403 +3,71 @@ description:
 globs: 
 alwaysApply: true
 ---
-# Cursor Rules: Nuxt 3, Shadcn Vue, Tailwind CSS, Pinia, Framer Motion (JavaScript Edition)
+# Coding Rules: Nuxt 3, Shadcn, Tailwind (JavaScript Edition)
 
-You are a developer working on a modern web application using Nuxt 3, Shadcn Vue, Tailwind CSS, Pinia for state management, and Framer Motion for animations. All code MUST be written in JavaScript. These rules ensure consistency, maintainability, and performance.
+This guide is for a modern web project using Nuxt 3, Shadcn Vue, Tailwind CSS, Pinia, and Framer Motion. **All code MUST be written in JavaScript.** Keep the project simple (**KISS principle**) and **always ask for a review before making major changes.**
 
-## 1. General Principles & JavaScript Usage
+---
 
-### 1.1. Code Style & Structure
-    - Write concise, readable, and maintainable JavaScript (ES6+).
-    - Employ functional and declarative programming patterns where appropriate.
-    - Adhere to the DRY (Don't Repeat Yourself) principle. Create reusable composables and utility functions.
-    - Use descriptive names for variables, functions, and files.
-        - Variables: `camelCase` (e.g., `isLoading`, `userData`).
-        - Functions: `camelCase` (e.g., `fetchUserDetails`, `calculateTotalPrice`).
-        - Constants: `UPPER_SNAKE_CASE` (e.g., `MAX_ITEMS`, `API_BASE_URL`).
-    - Keep functions small and focused on a single task.
+## 1. General Principles & Naming
 
-### 1.2. JavaScript (ES6+ & JSDoc)
-    - Utilize modern JavaScript features (e.g., arrow functions, destructuring, template literals, async/await, optional chaining `?.`, nullish coalescing `??`).
-    - **JSDoc for Clarity**: Since this is a JavaScript-only project, use JSDoc extensively for:
-        - Function parameters and return types.
-        - Component props.
-        - Complex object structures.
-        - Pinia store state, getters, and action payloads.
-    - Example of JSDoc for a function:
-      ```javascript
-      /**
-       * Fetches user data from the API.
-       * @param {string} userId - The ID of the user to fetch.
-       * @returns {Promise<Object|null>} The user object or null if not found.
-       */
-      async function fetchUser(userId) {
-        // ...implementation
-      }
-      ```
-    - Avoid using `var`. Prefer `const` for variables that won't be reassigned, and `let` for variables that will.
+- **Code:** Write clean, concise, and readable ES6+ code. Use `const` and `let`; **avoid `var`**.
+- **Principles:** Apply **DRY** (Don't Repeat Yourself) by creating reusable composables and utilities.
+- **Typing:** Use **JSDoc** extensively for component props, function parameters, and Pinia state.
+- **Naming Conventions:**
+  - Variables & Functions: `camelCase`
+  - Constants: `UPPER_SNAKE_CASE`
+  - Vue Components: `PascalCase.vue`
+  - Other Files: `kebab-case.js` or `camelCase.js`
 
-## 2. Nuxt 3 Specifics
+---
 
-### 2.1. Directory Structure
-    - Adhere to Nuxt 3's directory-based conventions:
-        - `pages/`: For page components and routing.
-        - `components/`: For Vue components.
-            - `components/global/`: For globally registered components.
-            - `components/ui/`: For generic UI elements (often wrapping or extending Shadcn Vue).
-            - `components/[feature]/`: For feature-specific components.
-        - `composables/`: For Vue Composition API functions (auto-imported).
-        - `server/`: For API routes and server middleware.
-            - `server/api/`: For API endpoints.
-            - `server/middleware/`: For server-side middleware.
-        - `store/`: For Pinia store modules (auto-imported if structured correctly, e.g., `user.js` becomes `useUserStore`).
-        - `layouts/`: For layout components.
-        - `middleware/`: For route middleware.
-        - `plugins/`: For Nuxt plugins.
-        - `public/`: For static assets.
-        - `utils/`: For general utility functions (not auto-imported, import them explicitly).
-        - `assets/`: For uncompiled assets like SCSS files (if any beyond Tailwind), images not in `public/`.
+## 2. Nuxt 3 & Vue
 
-### 2.2. Composition API & `<script setup>`
-    - **Always** use `<script setup>` for Vue components for better readability and conciseness.
-    - Leverage Nuxt 3's auto-imports for composables, components, and utilities.
+- **Structure:** Follow the standard Nuxt 3 directory structure (`pages`, `components`, `composables`, `server`, etc.).
+- **Components:** **Always use `<script setup>`**. Leverage Nuxt's auto-imports.
+- **Data Fetching:** Use `useFetch` or `useAsyncData`. Gracefully handle `pending` and `error` states.
+- **Navigation:** Use `<NuxtLink>` for all internal links.
+- **Authentication (Sidebase):**
+  - **Client-side:** Use the `useAuth()` composable to manage sessions.
+  - **Server-side:** Protect API routes with `getServerSession(event)`.
+  - **Pages:** Protect private pages using route middleware.
 
-### 2.3. Data Fetching
-    - Use `useFetch` for simple API calls within components or pages.
-    - Use `useAsyncData` for more complex data fetching scenarios or when you need more control over caching and keys.
-    - Use base URL for all API calls.
-    - Handle loading states and errors gracefully.
-      ```vue
-      <script setup>
-      const { data: product, pending, error } = await useFetch('/api/products/1');
-      </script>
-      <template>
-        <div v-if="pending">Loading...</div>
-        <div v-else-if="error">Error loading product: {{ error.message }}</div>
-        <div v-else-if="product">{{ product.name }}</div>
-      </template>
-      ```
+---
 
-### 2.4. Routing
-    - Utilize Nuxt's file-system routing.
-    - Use `<NuxtLink>` for internal navigation.
+## 3. Components & Shadcn Vue
 
-### 2.5. Server Routes & Authentication (Sidebase Auth)
-    - Konfigurasi di `nuxt.config.ts`:
-      ```javascript
-      export default defineNuxtConfig({
-        modules: ['@sidebase/nuxt-auth'],
-        auth: {
-          baseURL: process.env.AUTH_ORIGIN,
-          provider: {
-            type: 'authjs' // atau 'local' untuk backend terpisah
-          }
-        }
-      });
-      ```
-    - Session Management: Gunakan `useAuth()` composable untuk mengakses session data.
-      ```vue
-      <script setup>
-      const { data: session, status, signIn, signOut } = useAuth();
-      </script>
-      <template>
-        <div v-if="status === 'loading'">Loading...</div>
-        <div v-else-if="status === 'authenticated'">
-          Welcome {{ session.user.name }}!
-          <button @click="signOut()">Sign Out</button>
-        </div>
-        <div v-else>
-          <button @click="signIn('google')">Sign In with Google</button>
-        </div>
-      </template>
-      ```
-    - Server-side Protection: Gunakan `getServerSession()` di API routes untuk validasi session.
-      ```javascript
-      // server/api/protected.js
-      export default defineEventHandler(async (event) => {
-        const session = await getServerSession(event);
-        if (!session) {
-          throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
-        }
-        return { message: 'Protected data', user: session.user };
-      });
-      ```
-    - Middleware Protection: Buat middleware untuk halaman yang memerlukan autentikasi.
-      ```javascript
-      // middleware/auth.js
-      export default defineNuxtRouteMiddleware((to, from) => {
-        const { status } = useAuth();
-        if (status.value === 'unauthenticated') {
-          return navigateTo('/login');
-        }
-      });
-      ```
+- **Props & Emits:** Define them with `defineProps` and `defineEmits`.
+- **Component Structure:** Build small, single-responsibility components. Use `slots` for content flexibility.
+- **Shadcn Vue:** Use as the UI foundation. Customize primarily through props. For deep modifications, copy the component into the `components/ui` directory.
 
-### 2.6. Plugins
-    - Create plugins in the `plugins/` directory to integrate third-party libraries or run setup code.
-    - Name plugins descriptively (e.g., `framer-motion.client.js` if it's client-side only).
-
-## 3. Component Development (Vue & Shadcn Vue)
-
-### 3.1. File Naming
-    - Vue Components: `PascalCase.vue` (e.g., `UserProfileCard.vue`, `BaseButton.vue`).
-
-### 3.2. Props & Emits
-    - Define props using `defineProps`.
-    - Use JSDoc for prop types and descriptions.
-      ```vue
-      <script setup>
-      /**
-       * @typedef {object} Props
-       * @property {string} title - The title of the card.
-       * @property {string} [description] - Optional description.
-       * @property {number} [priority=1] - Priority level.
-       */
-      const props = defineProps({
-        title: {
-          type: String,
-          required: true,
-        },
-        description: {
-          type: String,
-          default: '',
-        },
-        priority: {
-          type: Number,
-          default: 1,
-          validator: (value) => [1, 2, 3].includes(value),
-        }
-      });
-
-      const emit = defineEmits(['submit', 'cancel']);
-
-      function handleSubmit() {
-        emit('submit', { data: 'someValue' });
-      }
-      </script>
-      ```
-    - Define emits using `defineEmits`.
-
-### 3.3. Shadcn Vue
-    - Leverage Shadcn Vue components as foundational UI elements.
-    - Customize Shadcn Vue components primarily through their props. If deeper customization is needed, you might copy and modify the component into your local `components/ui/` directory.
-    - Maintain consistency with Shadcn Vue's styling and structure when building custom components inspired by it.
-
-### 3.4. Component Structure
-    - Keep components small and focused on a single responsibility.
-    - Prefer composition over inheritance.
-    - Use slots for content distribution.
+---
 
 ## 4. State Management (Pinia)
 
-### 4.1. Store Definition
-    - Define stores in the `store/` directory. File name becomes store ID (e.g., `user.js` -> `user` store, accessed via `useUserStore()`).
-    - Structure stores with `state`, `getters`, and `actions`.
-    - **JSDoc for Store Elements**:
-      ```javascript
-      // store/cart.js
-      import { defineStore } from 'pinia';
+- **Definition:** Create stores inside the `store/` directory (e.g., `user.js` becomes `useUserStore`).
+- **Structure:** Organize stores into `state`, `getters`, and `actions`. Document them with JSDoc.
 
-      /**
-       * @typedef {object} CartItem
-       * @property {string} id
-       * @property {string} name
-       * @property {number} price
-       * @property {number} quantity
-       */
+---
 
-      /**
-       * @typedef {object} CartState
-       * @property {CartItem[]} items
-       * @property {boolean} isLoading
-       */
+## 5. Styling & Animations
 
-      export const useCartStore = defineStore('cart', {
-        /**
-         * @returns {CartState}
-         */
-        state: () => ({
-          items: [],
-          isLoading: false,
-        }),
-        getters: {
-          /**
-           * Calculates the total price of items in the cart.
-           * @param {CartState} state
-           * @returns {number}
-           */
-          totalPrice: (state) => {
-            return state.items.reduce((total, item) => total + item.price * item.quantity, 0);
-          },
-          /**
-           * Returns the number of items in the cart.
-           * @param {CartState} state
-           * @returns {number}
-           */
-          itemCount: (state) => state.items.length,
-        },
-        actions: {
-          /**
-           * Adds an item to the cart.
-           * @param {Omit<CartItem, 'quantity'>} product - The product to add.
-           */
-          addItem(product) {
-            const existingItem = this.items.find(item => item.id === product.id);
-            if (existingItem) {
-              existingItem.quantity++;
-            } else {
-              this.items.push({ ...product, quantity: 1 });
-            }
-          },
-          /**
-           * Removes an item from the cart.
-           * @param {string} itemId - The ID of the item to remove.
-           */
-          removeItem(itemId) {
-            this.items = this.items.filter(item => item.id !== itemId);
-          },
-        },
-      });
-      ```
+- **Tailwind CSS:**
+  - Embrace the **utility-first** approach.
+  - Use responsive prefixes (`sm:`, `md:`, `lg:`) for mobile-first design.
+  - Use `@apply` sparingly.
+- **Framer Motion:**
+  - Wrap elements in `motion` components (e.g., `<motion.div>`).
+  - Control animations with `initial`, `animate`, `transition`, and `variants` props.
+  - Focus on animating `transform` and `opacity` for the best performance.
 
-### 4.2. Usage
-    - Access stores in components or composables:
-      ```vue
-      <script setup>
-      import { useCartStore } from '~/store/cart'; // Auto-import might also work
-      const cartStore = useCartStore();
-      cartStore.addItem({ id: 'prod1', name: 'Nuxt T-Shirt', price: 25 });
-      </script>
-      ```
+---
 
-## 5. Styling (Tailwind CSS)
+## 6. Quality & Performance
 
-### 5.1. Utility-First
-    - Embrace Tailwind's utility-first approach. Apply classes directly in your templates.
-    - Example: `<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Click Me</button>`
-
-### 5.2. Configuration (`main.css`)
-    - Customize your theme (colors, spacing, fonts) in `main.css`.
-    - Extend, don't overwrite, the default theme unless necessary.
-
-### 5.3. Responsive Design
-    - Use Tailwind's responsive prefixes (e.g., `sm:`, `md:`, `lg:`) for mobile-first design.
-    - Example: `<div class="w-full md:w-1/2 lg:w-1/3 p-2"></div>`
-
-### 5.4. `@apply`
-    - Use `@apply` sparingly, typically for repeated sets of utilities on similar custom components or to abstract complex utility combinations. Prefer component props or direct utility composition.
-    - If used, keep them in a dedicated CSS file (e.g., `assets/css/main.css`) imported into your Nuxt config or a global layout.
-
-### 5.5. Shadcn Vue Integration
-    - Shadcn Vue components are styled with Tailwind CSS.
-
-## 6. Animations (Framer Motion)
-
-### 6.1. Integration
-    - Install Framer Motion (`npm install framer-motion`).
-    - You might need a Nuxt plugin if global setup or configuration for Framer Motion is required, especially for Vue integration. (e.g., `plugins/framer-motion.client.js`)
-      ```javascript
-      // plugins/framer-motion.client.js
-      // (If using a Vue wrapper or directives from a Framer Motion Vue library)
-      // import { MotionPlugin } from '@vueuse/motion' // Example, if using @vueuse/motion
-      // export default defineNuxtPlugin((nuxtApp) => {
-      //   nuxtApp.vueApp.use(MotionPlugin)
-      // })
-
-      // If using framer-motion directly, often no specific plugin is needed beyond importing 'motion'
-      ```
-    - If using `framer-motion` directly (not a specific Vue wrapper like `@vueuse/motion`), import `motion` components or the `motion` factory as needed.
-
-### 6.2. `motion` Components
-    - Wrap elements you want to animate with `<motion.div>`, `<motion.button>`, etc.
-    - Example:
-      ```vue
-      <script setup>
-      import { motion } from 'framer-motion';
-      </script>
-      <template>
-        <motion.div
-          :initial="{ opacity: 0, y: 20 }"
-          :animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.5 }"
-          class="p-4 bg-gray-100 rounded-lg"
-        >
-          Animated Content
-        </motion.div>
-      </template>
-      ```
-
-### 6.3. Variants
-    - Use variants for more complex, reusable animation sequences.
-      ```vue
-      <script setup>
-      import { motion } from 'framer-motion';
-      const boxVariants = {
-        hidden: { opacity: 0, scale: 0.8 },
-        visible: {
-          opacity: 1,
-          scale: 1,
-          transition: { staggerChildren: 0.2 }
-        }
-      };
-      const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
-      };
-      </script>
-      <template>
-        <motion.ul :variants="boxVariants" initial="hidden" animate="visible">
-          <motion.li :variants="itemVariants">Item 1</motion.li>
-          <motion.li :variants="itemVariants">Item 2</motion.li>
-        </motion.ul>
-      </template>
-      ```
-
-### 6.4. Performance & Accessibility
-    - Be mindful of animation performance. Prefer animating `transform` and `opacity`.
-    - Use `will-change` CSS property sparingly.
-    - Provide reduced motion alternatives using `prefers-reduced-motion` media query if necessary, or ensure animations are not essential for understanding content.
-
-## 7. Performance Optimization
-
-### 7.1. Lazy Loading Components
-    - Nuxt 3 components inside the `components/` directory are auto-imported and code-split by default.
-    - For explicit lazy loading of components (e.g., for modal dialogs or off-screen content):
-      ```javascript
-      const MyLazyComponent = defineAsyncComponent(() => import('~/components/MyHeavyComponent.vue'));
-      ```
-    - Nuxt's file-based routing also provides automatic code-splitting per route.
-
-### 7.2. Image Optimization
-    - Use optimized image formats (e.g., WebP, AVIF where supported, with fallbacks).
-    - Consider using `<NuxtImg>` from `@nuxt/image` for optimized image delivery (requires installation and configuration).
-    - Implement lazy loading for images (`loading="lazy"` attribute).
-
-### 7.3. Minimize Re-renders
-    - Use `computed` properties effectively.
-    - Be cautious with reactive dependencies in `watch` and `watchEffect`.
-
-### 7.4. Debounce/Throttle
-    - For frequently triggered events (e.g., window resize, scroll, input), use debounce or throttle techniques to limit function calls. (Use a utility from Lodash/Underscore or write a simple helper).
-
-## 8. File & Naming Conventions (Recap)
-
-    - **Directories**: `lowercase-with-dashes` (e.g., `components/user-profile`, `server/api/auth-routes`).
-    - **Vue Components**: `PascalCase.vue` (e.g., `ModalDialog.vue`).
-    - **Composables**: `useCamelCase.js` (e.g., `useFormValidation.js`).
-    - **Pinia Stores**: `camelCase.js` or `featureName.js` in `store/` (e.g., `user.js`, `product.js`).
-    - **Utility JS Files**: `camelCase.js` or `descriptive-name.js` (e.g., `dateUtils.js`, `api-helpers.js`).
-    - **Server API Routes**: `kebab-case.js` or `resource.action.js` (e.g., `users.get.js`, `products/[id].put.js`).
-
-## 9. Linting and Formatting
-
-    - **Strongly Recommended**: Set up ESLint and Prettier.
-        - ESLint with a Vue plugin (e.g., `eslint-plugin-vue`) for JavaScript and Vue-specific rules.
-        - Prettier for automatic code formatting.
-    - Configure them to work together and enforce a consistent code style across the project. Add relevant scripts to `package.json`.
-
-## 10. Error Handling
-
-    - Use Nuxt's built-in error handling (`useError`, `showError`, custom error page `~/error.vue`).
-    - Use `try...catch` blocks for asynchronous operations (e.g., API calls).
-    - Provide user-friendly error messages.
+- **Linting:** Use **ESLint** and **Prettier** to maintain code consistency and quality.
+- **Error Handling:** Use `try...catch` for async operations and leverage Nuxt's `useError`/`showError`.
+- **Optimization:**
+  - **Lazy Loading:** Nuxt auto-splits code by route. Use `defineAsyncComponent` for manual component lazy loading if needed.
+  - **Images:** Use `<NuxtImg>` from `@nuxt/image` and the `loading="lazy"` attribute.
+  - **Events:** Use `debounce` or `throttle` for frequently triggered events (like scroll or resize).

@@ -1,3 +1,112 @@
+<script setup>
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import { useAuthStore } from '@/store/auth';
+
+const route = useRoute();
+const authStore = useAuthStore();
+
+// Reactive state
+const mobileMenuOpen = ref(false);
+
+// Track auth initialization state
+const isInitialized = ref(false);
+
+// Initialize auth state
+onMounted(async () => {
+  if (!authStore.isInitialized) {
+    await authStore.initAuth();
+  }
+  isInitialized.value = true;
+});
+
+// Computed properties with null checks
+const fullName = computed(() => {
+  if (!isInitialized.value) return 'Loading...';
+  return authStore.user?.fullName || 'User';
+});
+
+const initials = computed(() => {
+  if (!isInitialized.value || !authStore.user) return 'U';
+  return authStore.initials || 'U';
+});
+
+// Dashboard navigation
+const dashboardNavigation = computed(() => [
+  {
+    id: 'dashboard',
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: 'lucide:layout-dashboard',
+    isActive: route.path === '/dashboard',
+  },
+  {
+    id: 'bootcamp',
+    name: 'Bootcamp',
+    path: '/dashboard/bootcamp',
+    icon: 'lucide:book',
+    isActive: route.path.startsWith('/dashboard/bootcamp'),
+  },
+  {
+    id: 'jobs',
+    name: 'Jobs',
+    path: '/dashboard/jobs',
+    icon: 'lucide:briefcase',
+    isActive: route.path.startsWith('/dashboard/jobs'),
+  },
+  {
+    id: 'programs',
+    name: 'Programs',
+    path: '/dashboard/programs',
+    icon: 'lucide:school',
+    isActive: route.path.startsWith('/dashboard/programs'),
+  },
+]);
+
+// Helper functions
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+};
+
+const handleLogout = async () => {
+  mobileMenuOpen.value = false;
+  await authStore.signOut();
+  await navigateTo('/');
+};
+
+// Close mobile menu when route changes
+watch(
+  () => route.path,
+  () => {
+    mobileMenuOpen.value = false;
+  }
+);
+
+// Close mobile menu when clicking outside
+onMounted(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('header')) {
+      mobileMenuOpen.value = false;
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+
+  onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+  });
+});
+</script>
 <template>
   <header class="fixed w-full top-0 z-50 bg-white transition-shadow duration-300 shadow-sm">
     <div class="container-wrapper">
@@ -35,10 +144,10 @@
             <DropdownMenuTrigger class="h-full" as-child>
               <Button variant="ghost" class="flex items-center p-2">
                 <Avatar class="size-8">
-                  <AvatarImage :src="user?.avatar" />
-                  <AvatarFallback>{{ initials }}</AvatarFallback>
+                  <AvatarImage :src="authStore.user?.avatar" />
+                  <AvatarFallback>{{ authStore.initials || 'U' }}</AvatarFallback>
                 </Avatar>
-                <span class="hidden sm:block text-sm">{{ fullName }}</span>
+                <span class="hidden sm:block text-sm">{{ authStore.fullName || 'User' }}</span>
                 <Icon name="lucide:chevron-down" class="h-4 w-4 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
@@ -69,8 +178,8 @@
               <DropdownMenuTrigger as-child>
                 <Button variant="ghost" size="icon" class="rounded-full p-1">
                   <Avatar class="h-8 w-8">
-                    <AvatarImage :src="user?.avatar" />
-                    <AvatarFallback class="text-sm">{{ initials }}</AvatarFallback>
+                    <AvatarImage :src="authStore.user?.avatar" />
+                    <AvatarFallback class="text-sm">{{ authStore.initials }}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -129,105 +238,6 @@
   </header>
 </template>
 
-<script setup>
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
-
-const route = useRoute();
-const { data: session, signOut } = useCustomAuth();
-
-// Reactive state
-const mobileMenuOpen = ref(false);
-
-// Computed properties
-const user = computed(() => session.value?.user || null);
-const fullName = computed(() => {
-  if (!user.value) return 'User';
-  return `${user.value.firstName} ${user.value.lastName}`.trim();
-});
-const initials = computed(() => {
-  if (!user.value) return 'U';
-  const first = user.value.firstName?.[0] || '';
-  const last = user.value.lastName?.[0] || '';
-  return `${first}${last}`.toUpperCase() || 'U';
-});
-
-// Dashboard navigation
-const dashboardNavigation = computed(() => [
-  {
-    id: 'dashboard',
-    name: 'Dashboard',
-    path: '/dashboard',
-    icon: 'lucide:layout-dashboard',
-    isActive: route.path === '/dashboard',
-  },
-  {
-    id: 'bootcamp',
-    name: 'Bootcamp',
-    path: '/dashboard/bootcamp',
-    icon: 'lucide:book',
-    isActive: route.path.startsWith('/dashboard/bootcamp'),
-  },
-  {
-    id: 'jobs',
-    name: 'Jobs',
-    path: '/dashboard/jobs',
-    icon: 'lucide:briefcase',
-    isActive: route.path.startsWith('/dashboard/jobs'),
-  },
-  {
-    id: 'programs',
-    name: 'Programs',
-    path: '/dashboard/programs',
-    icon: 'lucide:school',
-    isActive: route.path.startsWith('/dashboard/programs'),
-  },
-]);
-
-// Helper functions
-const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value;
-};
-
-const handleLogout = async () => {
-  mobileMenuOpen.value = false;
-  await signOut();
-  await navigateTo('/');
-};
-
-// Close mobile menu when route changes
-watch(
-  () => route.path,
-  () => {
-    mobileMenuOpen.value = false;
-  }
-);
-
-// Close mobile menu when clicking outside
-onMounted(() => {
-  const handleClickOutside = (event) => {
-    if (!event.target.closest('header')) {
-      mobileMenuOpen.value = false;
-    }
-  };
-
-  document.addEventListener('click', handleClickOutside);
-
-  onUnmounted(() => {
-    document.removeEventListener('click', handleClickOutside);
-  });
-});
-</script>
 <style scoped>
 /* Custom dropdown positioning untuk profile menu */
 :deep(.dropdown-right-aligned) {

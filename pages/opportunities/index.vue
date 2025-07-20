@@ -18,7 +18,30 @@ useHead({
   meta: [{ name: 'description', content: 'Find your dream green job from thousands of opportunities available' }],
 });
 
-// Initialize jobs store
+// ✅ Hybrid Approach: Composable for local state + Store for global state
+const {
+  // Local state (search, filter, pagination)
+  filteredJobs,
+  paginatedJobs,
+  isLoading,
+  filters,
+  hasActiveFilters,
+  currentPage,
+  totalPages,
+
+  // Local methods
+  initializeJobs,
+  updateFilter,
+  clearAllFilters,
+  setCurrentPage,
+  nextPage,
+  prevPage,
+  getUniqueLocations,
+  getUniqueIndustries,
+  getUniqueJobTypes,
+} = useJobs();
+
+// Store for global state (favorites, user preferences)
 const jobsStore = useJobsStore();
 
 // Filter drawer state
@@ -26,12 +49,12 @@ const isFilterOpen = ref(false);
 
 // Initialize jobs data on mount
 onMounted(async () => {
-  await jobsStore.initializeJobs();
+  await initializeJobs();
 });
 
 // Helper functions for pagination
 const goToPage = (page) => {
-  jobsStore.setCurrentPage(page);
+  setCurrentPage(page);
   // Scroll to top when changing pages
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -41,12 +64,12 @@ const applyFilters = () => {
 };
 
 const clearFilters = () => {
-  jobsStore.clearAllFilters();
+  clearAllFilters();
 };
 
 // Watch for meta tag updates
 watch(
-  () => jobsStore.filteredJobs,
+  () => filteredJobs.value,
   (newJobs) => {
     useHead({
       meta: [
@@ -78,7 +101,7 @@ watch(
                 <Button variant="outline" class="w-full">
                   <Icon name="lucide:filter" class="h-4 w-4 mr-2" />
                   Show Filters
-                  <Badge v-if="jobsStore.hasActiveFilters" class="ml-2 bg-orange-500 text-white"> Active </Badge>
+                  <Badge v-if="hasActiveFilters" class="ml-2 bg-orange-500 text-white"> Active </Badge>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" class="w-80 overflow-y-auto px-5 py-6">
@@ -96,8 +119,8 @@ watch(
                         type="text"
                         placeholder="Search job title..."
                         class="pl-10"
-                        :model-value="jobsStore.filters.title"
-                        @update:model-value="(value) => jobsStore.updateFilter('title', value)"
+                        :model-value="filters.title"
+                        @update:model-value="(value) => updateFilter('title', value)"
                       />
                     </div>
                   </div>
@@ -111,8 +134,8 @@ watch(
                         type="text"
                         placeholder="Search organization..."
                         class="pl-10"
-                        :model-value="jobsStore.filters.organization"
-                        @update:model-value="(value) => jobsStore.updateFilter('organization', value)"
+                        :model-value="filters.company"
+                        @update:model-value="(value) => updateFilter('company', value)"
                       />
                     </div>
                   </div>
@@ -120,14 +143,14 @@ watch(
                   <!-- Location -->
                   <div>
                     <label class="form-label">Location</label>
-                    <Select :model-value="jobsStore.filters.location" @update:model-value="(value) => jobsStore.updateFilter('location', value)">
+                    <Select :model-value="filters.location" @update:model-value="(value) => updateFilter('location', value)">
                       <SelectTrigger class="w-full">
                         <SelectValue placeholder="All Locations" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Locations</SelectItem>
                         <SelectItem value="remote">Remote</SelectItem>
-                        <SelectItem v-for="location in jobsStore.uniqueLocations.slice(0, 15)" :key="location" :value="location">
+                        <SelectItem v-for="location in getUniqueLocations().slice(0, 15)" :key="location" :value="location">
                           {{ location }}
                         </SelectItem>
                       </SelectContent>
@@ -137,13 +160,13 @@ watch(
                   <!-- Industry -->
                   <div>
                     <label class="form-label">Industry</label>
-                    <Select :model-value="jobsStore.filters.industry" @update:model-value="(value) => jobsStore.updateFilter('industry', value)">
+                    <Select :model-value="filters.industry" @update:model-value="(value) => updateFilter('industry', value)">
                       <SelectTrigger class="w-full">
                         <SelectValue placeholder="All Industries" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Industries</SelectItem>
-                        <SelectItem v-for="industry in jobsStore.uniqueIndustries" :key="industry" :value="industry">
+                        <SelectItem v-for="industry in getUniqueIndustries()" :key="industry" :value="industry">
                           {{ industry }}
                         </SelectItem>
                       </SelectContent>
@@ -153,13 +176,13 @@ watch(
                   <!-- Job Type -->
                   <div>
                     <label class="form-label">Job Type</label>
-                    <Select :model-value="jobsStore.filters.jobType" @update:model-value="(value) => jobsStore.updateFilter('jobType', value)">
+                    <Select :model-value="filters.jobType" @update:model-value="(value) => updateFilter('jobType', value)">
                       <SelectTrigger class="w-full">
                         <SelectValue placeholder="All Job Types" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Job Types</SelectItem>
-                        <SelectItem v-for="jobType in jobsStore.uniqueJobTypes" :key="jobType" :value="jobType">
+                        <SelectItem v-for="jobType in getUniqueJobTypes()" :key="jobType" :value="jobType">
                           {{ jobType }}
                         </SelectItem>
                       </SelectContent>
@@ -170,7 +193,7 @@ watch(
                   <div class="space-y-3">
                     <Button class="w-full bg-green-600 hover:bg-green-700" @click="applyFilters">
                       <Icon name="lucide:search" class="mr-2 h-4 w-4" />
-                      Show Results ({{ jobsStore.filteredJobs.length }})
+                      Show Results ({{ filteredJobs.length }})
                     </Button>
                     <Button variant="outline" class="w-full" @click="clearFilters">
                       <Icon name="lucide:x" class="mr-2 h-4 w-4" />
@@ -195,8 +218,8 @@ watch(
                       type="text"
                       placeholder="Search job title..."
                       class="pl-10"
-                      :model-value="jobsStore.filters.title"
-                      @update:model-value="(value) => jobsStore.updateFilter('title', value)"
+                      :model-value="filters.title"
+                      @update:model-value="(value) => updateFilter('title', value)"
                     />
                   </div>
                 </div>
@@ -210,8 +233,8 @@ watch(
                       type="text"
                       placeholder="Search organization..."
                       class="pl-10"
-                      :model-value="jobsStore.filters.organization"
-                      @update:model-value="(value) => jobsStore.updateFilter('organization', value)"
+                      :model-value="filters.company"
+                      @update:model-value="(value) => updateFilter('company', value)"
                     />
                   </div>
                 </div>
@@ -219,14 +242,14 @@ watch(
                 <!-- Location -->
                 <div>
                   <label class="form-label">Location</label>
-                  <Select :model-value="jobsStore.filters.location" @update:model-value="(value) => jobsStore.updateFilter('location', value)">
+                  <Select :model-value="filters.location" @update:model-value="(value) => updateFilter('location', value)">
                     <SelectTrigger class="w-full">
                       <SelectValue placeholder="All Locations" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Locations</SelectItem>
                       <SelectItem value="remote">Remote</SelectItem>
-                      <SelectItem v-for="location in jobsStore.uniqueLocations.slice(0, 15)" :key="location" :value="location">
+                      <SelectItem v-for="location in getUniqueLocations().slice(0, 15)" :key="location" :value="location">
                         {{ location }}
                       </SelectItem>
                     </SelectContent>
@@ -236,13 +259,13 @@ watch(
                 <!-- Industry -->
                 <div>
                   <label class="form-label">Industry</label>
-                  <Select :model-value="jobsStore.filters.industry" @update:model-value="(value) => jobsStore.updateFilter('industry', value)">
+                  <Select :model-value="filters.industry" @update:model-value="(value) => updateFilter('industry', value)">
                     <SelectTrigger class="w-full">
                       <SelectValue placeholder="All Industries" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Industries</SelectItem>
-                      <SelectItem v-for="industry in jobsStore.uniqueIndustries" :key="industry" :value="industry">
+                      <SelectItem v-for="industry in getUniqueIndustries()" :key="industry" :value="industry">
                         {{ industry }}
                       </SelectItem>
                     </SelectContent>
@@ -252,13 +275,13 @@ watch(
                 <!-- Job Type -->
                 <div>
                   <label class="form-label">Job Type</label>
-                  <Select :model-value="jobsStore.filters.jobType" @update:model-value="(value) => jobsStore.updateFilter('jobType', value)">
+                  <Select :model-value="filters.jobType" @update:model-value="(value) => updateFilter('jobType', value)">
                     <SelectTrigger class="w-full">
                       <SelectValue placeholder="All Job Types" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Job Types</SelectItem>
-                      <SelectItem v-for="jobType in jobsStore.uniqueJobTypes" :key="jobType" :value="jobType">
+                      <SelectItem v-for="jobType in getUniqueJobTypes()" :key="jobType" :value="jobType">
                         {{ jobType }}
                       </SelectItem>
                     </SelectContent>
@@ -267,7 +290,7 @@ watch(
 
                 <!-- Action Buttons -->
                 <div class="space-y-3">
-                  <div class="text-sm text-gray-600 text-center">Showing {{ jobsStore.filteredJobs.length }} results</div>
+                  <div class="text-sm text-gray-600 text-center">Showing {{ filteredJobs.length }} results</div>
                   <Button variant="outline" class="w-full" @click="clearFilters">
                     <Icon name="lucide:x" class="mr-2 h-4 w-4" />
                     Clear All Filters
@@ -280,13 +303,13 @@ watch(
           <!-- Main Results -->
           <main class="col-span-1 lg:col-span-3">
             <!-- Loading State -->
-            <div v-if="jobsStore.isLoading" class="text-center py-12">
+            <div v-if="isLoading" class="text-center py-12">
               <Icon name="lucide:loader-2" class="w-8 h-8 text-gray-400 mx-auto mb-4 animate-spin" />
               <p class="text-gray-600">Loading job opportunities...</p>
             </div>
 
             <!-- No Results -->
-            <div v-else-if="jobsStore.filteredJobs.length === 0" class="text-center py-12">
+            <div v-else-if="filteredJobs.length === 0" class="text-center py-12">
               <Icon name="lucide:search-x" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 class="text-xl font-semibold text-gray-900 mb-2">No jobs found</h3>
               <p class="text-gray-600 mb-4">Try adjusting your search criteria or clear all filters</p>
@@ -300,10 +323,16 @@ watch(
             <div v-else>
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
                 <Card
-                  v-for="job in jobsStore.paginatedJobs"
+                  v-for="job in paginatedJobs"
                   :key="job.id"
                   class="py-0 hover:shadow! hover:-translate-y-1 cursor-pointer transition-all duration-300 min-h-[160px] flex flex-col"
-                  @click="$router.push(`/opportunities/${job.companySlug}/${job.jobSlug}`)"
+                  @click="
+                    $router.push(
+                      `/opportunities/${job.company?.slug || job.company?.name?.toLowerCase().replace(/\s+/g, '-')}/${
+                        job.slug || job.title?.toLowerCase().replace(/\s+/g, '-')
+                      }`
+                    )
+                  "
                 >
                   <CardContent class="px-3 flex-1 flex">
                     <div class="flex w-full relative">
@@ -311,12 +340,16 @@ watch(
                       <div class="h-full px-4 flex items-center justify-center flex-shrink-0 rounded-l-lg">
                         <div class="h-28 rounded-2xl overflow-hidden">
                           <img
-                            :src="job.organization_logo"
-                            :alt="`${job.organization} logo`"
+                            v-if="job.company?.logo_url"
+                            :src="job.company.logo_url"
+                            :alt="`${job.company?.name || 'Company'} logo`"
                             class="w-full h-full object-contain"
                             loading="lazy"
                             @error="$event.target.style.display = 'none'"
                           />
+                          <div v-else class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                            <Icon name="lucide:building-2" class="w-8 h-8 text-gray-400" />
+                          </div>
                         </div>
                       </div>
 
@@ -331,11 +364,11 @@ watch(
 
                           <!-- Company Name -->
                           <p class="text-gray-600 text-sm line-clamp-1">
-                            {{ job.organization }}
+                            {{ job.company?.name }}
                           </p>
 
-                          <Badge class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
-                            {{ job.linkedin_org_industry }}
+                          <Badge v-if="job.company?.industry" class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
+                            {{ job.company.industry }}
                           </Badge>
                         </div>
 
@@ -343,11 +376,16 @@ watch(
                         <div class="flex gap-2 text-gray-500 text-sm mt-auto">
                           <div class="flex items-center min-w-0 flex-shrink-0">
                             <Icon name="lucide:calendar" class="size-4 mr-2 flex-shrink-0" />
-                            <span class="text-xs whitespace-nowrap">{{ job.relativeTime }}</span>
+                            <span class="text-xs whitespace-nowrap">{{ job.relativePostedDate || 'N/A' }}</span>
                           </div>
                           <div class="flex items-center min-w-0 flex-1">
                             <Icon name="lucide:map-pin" class="size-4 mr-2 flex-shrink-0" />
-                            <span class="line-clamp-1 text-xs">{{ job.cleanLocation }}</span>
+                            <span class="line-clamp-1 text-xs">
+                              {{
+                                [job.location?.city, job.location?.region, job.location?.country].filter(Boolean).join(', ') ||
+                                'Location not specified'
+                              }}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -357,28 +395,28 @@ watch(
               </div>
 
               <!-- Pagination -->
-              <div v-if="jobsStore.totalPages > 1" class="flex justify-center">
+              <div v-if="totalPages > 1" class="flex justify-center">
                 <nav class="flex items-center space-x-2">
                   <!-- Previous Button -->
-                  <Button variant="outline" size="sm" :disabled="jobsStore.currentPage === 1" @click="jobsStore.prevPage()">
+                  <Button variant="outline" size="sm" :disabled="currentPage === 1" @click="prevPage()">
                     <Icon name="lucide:chevron-left" class="h-4 w-4" />
                     Previous
                   </Button>
 
                   <!-- Page Numbers -->
                   <Button
-                    v-for="page in jobsStore.visiblePages"
+                    v-for="page in Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + Math.max(1, currentPage - 2))"
                     :key="page"
-                    :variant="page === jobsStore.currentPage ? 'default' : 'outline'"
+                    :variant="page === currentPage ? 'default' : 'outline'"
                     size="sm"
-                    :class="page === jobsStore.currentPage ? 'bg-green-600 hover:bg-green-700 text-white' : ''"
+                    :class="page === currentPage ? 'bg-green-600 hover:bg-green-700 text-white' : ''"
                     @click="goToPage(page)"
                   >
                     {{ page }}
                   </Button>
 
                   <!-- Next Button -->
-                  <Button variant="outline" size="sm" :disabled="jobsStore.currentPage === jobsStore.totalPages" @click="jobsStore.nextPage()">
+                  <Button variant="outline" size="sm" :disabled="currentPage === totalPages" @click="nextPage()">
                     Next
                     <Icon name="lucide:chevron-right" class="h-4 w-4" />
                   </Button>

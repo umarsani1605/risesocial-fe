@@ -2,7 +2,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import jobsData from '@/data/jobs.json';
 
 // Use default layout
 definePageMeta({
@@ -13,98 +12,99 @@ definePageMeta({
 const route = useRoute();
 const companyName = route.params.company_name;
 
-// Function to normalize company name for URL
-const normalizeCompanyName = (name) => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with dashes
-    .trim();
+// Use jobs composable
+const { jobsData, getCompanyFromJobs, fetchJobs } = useJobs();
+
+// Reactive state
+const isLoading = ref(true);
+const company = ref(null);
+const companyJobs = ref([]);
+
+// Fetch data
+const loadData = async () => {
+  try {
+    isLoading.value = true;
+    // Make sure jobs are loaded
+    await fetchJobs();
+
+    // Now that jobs are loaded, get company and jobs
+    company.value = getCompanyFromJobs(companyName, jobsData.value);
+    companyJobs.value = jobsData.value.filter(
+      (job) => job.company && (job.company.slug === companyName || job.company.name?.toLowerCase() === companyName.toLowerCase())
+    );
+
+    // Debug logs
+    console.log('All jobs data:', jobsData.value);
+    console.log('Company data from getCompanyFromJobs:', company.value);
+    console.log('Company jobs:', companyJobs.value);
+    if (company.value) {
+      console.log('Company keys:', Object.keys(company.value));
+      console.log('Company location:', company.value.location);
+    }
+  } catch (error) {
+    console.error('Error loading company data:', error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-// Function to normalize job name for URL
-const normalizeJobName = (title) => {
-  return title
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with dashes
-    .trim();
-};
+// Load data when component mounts
+onMounted(loadData);
 
-// Find company jobs by matching normalized company name
-const companyJobs = computed(() => {
-  return jobsData.filter((job) => {
-    const normalizedOrgName = normalizeCompanyName(job.organization);
-    return normalizedOrgName === companyName;
-  });
+// Show 404 if no company found after data is loaded
+const show404 = computed(() => {
+  return !isLoading.value && jobsData.value.length > 0 && !company.value;
 });
 
-// Get company info from first job (since all jobs are from same company)
-const companyInfo = computed(() => {
-  return companyJobs.value[0] || null;
+watch(show404, (show) => {
+  if (show) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Company not found',
+    });
+  }
 });
-
-// If no company found, redirect to 404
-if (!companyInfo.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: 'Company not found',
-  });
-}
 
 // Meta tags
 useHead({
-  title: `${companyInfo.value.organization} - Jobs | Rise Social`,
+  title: computed(() => {
+    const name = companyJobs.value[0]?.company?.name || 'Company';
+    return `${name} - Jobs | Rise Social`;
+  }),
   meta: [
     {
       name: 'description',
-      content: `Explore career opportunities at ${companyInfo.value.organization}. Find jobs in ${companyInfo.value.linkedin_org_industry}.`,
+      content: computed(() => {
+        const name = companyJobs.value[0]?.company?.name || 'this company';
+        const industry = companyJobs.value[0]?.company?.industry || '';
+        return `Explore career opportunities at ${name}${industry ? ` in ${industry}` : ''}.`;
+      }),
     },
   ],
 });
 
-// Function to convert date to relative time
-const getRelativeTime = (dateString) => {
-  const now = new Date();
-  const postDate = new Date(dateString);
-  const diffInMs = now - postDate;
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+// Debug logs
+watchEffect(() => {
+  console.log('Jobs Data:', JSON.stringify(jobsData.value, null, 2));
+  console.log('Company Data:', JSON.stringify(company.value, null, 2));
+  console.log('Company Jobs:', JSON.stringify(companyJobs.value, null, 2));
 
-  if (diffInDays === 0) return 'Today';
-  if (diffInDays === 1) return '1d ago';
-  if (diffInDays < 7) return `${diffInDays}d ago`;
-  if (diffInDays < 14) return '1w ago';
-  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}w ago`;
-  if (diffInDays < 60) return '1mo ago';
-  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)}mo ago`;
-  return `${Math.floor(diffInDays / 365)}y ago`;
-};
-
-// Function to get clean location
-const getCleanLocation = (job) => {
-  if (job.cities_derived && job.cities_derived.length > 0 && job.countries_derived && job.countries_derived.length > 0) {
-    return `${job.cities_derived[0]}, ${job.countries_derived[0]}`;
+  // Log first job's company data if available
+  if (companyJobs.value.length > 0 && companyJobs.value[0].company) {
+    console.log('First job company data:', JSON.stringify(companyJobs.value[0].company, null, 2));
   }
-  if (job.countries_derived && job.countries_derived.length > 0) {
-    return job.countries_derived[0];
-  }
-  return 'Remote';
-};
-
-// Process jobs with additional data
-const processedJobs = computed(() => {
-  return companyJobs.value.map((job) => ({
-    ...job,
-    cleanLocation: getCleanLocation(job),
-    relativeTime: getRelativeTime(job.date_posted),
-    jobSlug: normalizeJobName(job.title),
-  }));
 });
 </script>
 
 <template>
-  <div class="bg-gray-50 mt-16">
-    <div class="container-wrapper py-6 lg:py-8">
+  <div class="bg-gray-50 min-h-screen mt-16">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex items-center justify-center min-h-[50vh]">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+    </div>
+
+    <!-- Content -->
+    <div v-else class="container-wrapper py-6 lg:py-8">
       <!-- Back Button -->
       <div class="mb-6">
         <Button variant="ghost" @click="$router.push('/opportunities')" class="text-gray-600 hover:text-gray-900">
@@ -114,82 +114,63 @@ const processedJobs = computed(() => {
       </div>
 
       <!-- Company Header -->
-      <Card class="mb-8">
+      <Card class="mb-4">
         <CardContent class="p-6 lg:p-8">
           <div class="flex flex-col lg:flex-row gap-8">
             <!-- Company Logo -->
             <div class="flex-shrink-0">
               <div class="flex items-center justify-center w-full size-24 rounded-lg overflow-hidden">
-                <div v-if="companyInfo.organization_logo" class="flex items-center w-full size-24 rounded-lg overflow-hidden">
-                  <NuxtImg
-                    :src="companyInfo.organization_logo"
-                    :alt="`${companyInfo.organization} logo`"
-                    class="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                <div v-if="company?.logo_url" class="flex items-center w-full size-24 rounded-lg overflow-hidden">
+                  <NuxtImg :src="company.logo_url" :alt="`${company.name} logo`" class="w-full h-full object-contain" loading="lazy" />
                 </div>
-                <Icon v-else name="lucide:building-2" class="size-8 text-orange-500" />
+                <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center rounded-lg">
+                  <Icon name="lucide:building-2" class="size-8 text-orange-500" />
+                </div>
               </div>
             </div>
 
             <!-- Company Info -->
             <div class="flex-1 min-w-0">
-              <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ companyInfo.organization }}</h1>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ company?.name || 'Company' }}</h1>
 
               <!-- Company Tags -->
-              <div class="flex flex-wrap gap-2 mb-4">
-                <Badge v-if="companyInfo.linkedin_org_industry" class="bg-green-100 text-green-800 font-medium px-3 py-1">
-                  {{ companyInfo.linkedin_org_industry }}
-                </Badge>
-                <Badge v-if="companyInfo.linkedin_org_size" class="bg-blue-100 text-blue-800 font-medium px-3 py-1">
-                  {{ companyInfo.linkedin_org_size }}
-                </Badge>
-                <Badge v-if="companyInfo.linkedin_org_foundeddate" class="bg-purple-100 text-purple-800 font-medium px-3 py-1">
-                  Founded {{ companyInfo.linkedin_org_foundeddate }}
-                </Badge>
+              <div class="flex flex-wrap gap-4 mb-4">
+                <div v-if="company?.industry" class="flex items-center text-gray-600">
+                  <Icon name="lucide:building" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span><span class="font-medium">Industry:</span> {{ company.industry }}</span>
+                </div>
+                <div v-if="company?.linkedin_size" class="flex items-center text-gray-600">
+                  <Icon name="lucide:users" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span><span class="font-medium">Size:</span> {{ company.linkedin_size }}</span>
+                </div>
+                <div v-if="company?.linkedin_locations" class="flex items-center text-gray-600">
+                  <Icon name="lucide:map-pin" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span><span class="font-medium">HQ:</span> {{ company.linkedin_locations[1] }}</span>
+                </div>
+                <div v-if="company?.linkedin_founded_date" class="flex items-center text-gray-600">
+                  <Icon name="lucide:calendar" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span><span class="font-medium">Founded:</span> {{ company.linkedin_founded_date }}</span>
+                </div>
+                <div v-if="company?.website_url" class="inline-flex items-center">
+                  <Icon name="lucide:globe" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span class="font-medium text-gray-600"
+                    >Website: <a :href="company.website_url" target="_blank" class="text-primary"> {{ company.website_url }}</a></span
+                  >
+                </div>
+                <div v-if="company?.linkedin_url" class="inline-flex items-center">
+                  <Icon name="lucide:linkedin" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
+                  <span class="font-medium text-gray-600"
+                    >LinkedIn: <a :href="company.linkedin_url" target="_blank" class="text-primary"> {{ company.linkedin_url }}</a></span
+                  >
+                </div>
               </div>
 
-              <!-- Company Details -->
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                <div class="flex items-center text-gray-600">
-                  <Icon name="lucide:map-pin" class="mr-3 h-4 w-4 flex-shrink-0" />
-                  <span class="text-sm">{{ getCleanLocation(companyInfo) }}</span>
-                </div>
-
-                <div v-if="companyInfo.linkedin_org_employees" class="flex items-center text-gray-600">
-                  <Icon name="lucide:users" class="mr-3 h-4 w-4 flex-shrink-0" />
-                  <span class="text-sm">{{ companyInfo.linkedin_org_size || `${companyInfo.linkedin_org_employees} Employees` }}</span>
-                </div>
-
-                <div v-if="companyInfo.linkedin_org_url" class="flex items-center text-gray-600">
-                  <Icon name="lucide:globe" class="mr-3 h-4 w-4 flex-shrink-0" />
-                  <a :href="companyInfo.linkedin_org_url" target="_blank" class="text-sm text-blue-600 hover:underline"> Website </a>
-                </div>
+              <!-- Company Description -->
+              <div v-if="company?.description" class="mt-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">About Us</h3>
+                <p class="text-gray-700 whitespace-pre-line">{{ company.description }}</p>
               </div>
-
-              <!-- Company Slogan -->
-              <!-- <p v-if="companyInfo.linkedin_org_slogan" class="text-gray-600 text-lg italic mb-4">"{{ companyInfo.linkedin_org_slogan }}"</p> -->
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <!-- About Section -->
-      <Card v-if="companyInfo.linkedin_org_description" class="mb-8">
-        <CardContent class="p-6 lg:p-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">About {{ companyInfo.organization }}</h2>
-          <p class="text-gray-700 leading-relaxed">{{ companyInfo.linkedin_org_description }}</p>
-        </CardContent>
-      </Card>
-
-      <!-- Specialties Section -->
-      <Card v-if="companyInfo.linkedin_org_specialties?.length && companyInfo.linkedin_org_specialties[0]" class="mb-8">
-        <CardContent class="p-6 lg:p-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">Specialties</h2>
-          <div class="flex flex-wrap gap-3">
-            <Badge v-for="specialty in companyInfo.linkedin_org_specialties" :key="specialty" variant="secondary" class="px-3 py-1">
-              {{ specialty }}
-            </Badge>
           </div>
         </CardContent>
       </Card>
@@ -198,57 +179,89 @@ const processedJobs = computed(() => {
       <Card>
         <CardContent class="p-6 lg:p-8">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-semibold text-gray-900">Available Positions ({{ processedJobs.length }})</h2>
+            <h2 class="text-2xl font-semibold text-gray-900">Available Positions ({{ companyJobs.length }})</h2>
           </div>
 
           <!-- Jobs Grid -->
-          <div v-if="processedJobs.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div v-if="companyJobs.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card
-              v-for="job in processedJobs"
+              v-for="job in companyJobs"
               :key="job.id"
-              class="hover:shadow-lg cursor-pointer transition-all duration-300"
-              @click="$router.push(`/opportunities/${companyName}/${job.jobSlug}`)"
+              class="py-0 hover:shadow! hover:-translate-y-1 cursor-pointer transition-all duration-300 min-h-[160px] flex flex-col"
+              @click="
+                $router.push(
+                  `/opportunities/${job.company?.slug || job.company?.name?.toLowerCase().replace(/\s+/g, '-')}/${
+                    job.slug || job.title?.toLowerCase().replace(/\s+/g, '-')
+                  }`
+                )
+              "
             >
-              <CardContent class="p-6">
-                <!-- Job Header -->
-                <div class="mb-4">
-                  <h3 class="font-bold text-gray-900 text-lg mb-2 line-clamp-2">
-                    {{ job.title }}
-                  </h3>
-
-                  <!-- Job Type Badge -->
-                  <Badge class="bg-blue-100 text-blue-800 font-medium px-3 py-1">
-                    {{ job.employment_type?.[0]?.replace('_', ' ') || 'Full Time' }}
-                  </Badge>
-                </div>
-
-                <!-- Job Meta Information -->
-                <div class="flex flex-col gap-3 text-gray-500 text-sm">
-                  <div class="flex items-center">
-                    <Icon name="lucide:calendar" class="mr-2 h-4 w-4 flex-shrink-0" />
-                    <span>{{ job.relativeTime }}</span>
+              <CardContent class="px-3 flex-1 flex">
+                <div class="flex w-full relative">
+                  <!-- Company Logo -->
+                  <div class="h-full px-4 flex items-center justify-center flex-shrink-0 rounded-l-lg">
+                    <div class="h-28 rounded-2xl overflow-hidden">
+                      <img
+                        v-if="job.company?.logo_url"
+                        :src="job.company.logo_url"
+                        :alt="`${job.company?.name || 'Company'} logo`"
+                        class="w-full h-full object-contain"
+                        loading="lazy"
+                        @error="$event.target.style.display = 'none'"
+                      />
+                      <div v-else class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <Icon name="lucide:building-2" class="w-8 h-8 text-gray-400" />
+                      </div>
+                    </div>
                   </div>
-                  <div class="flex items-center">
-                    <Icon name="lucide:map-pin" class="mr-2 h-4 w-4 flex-shrink-0" />
-                    <span class="line-clamp-1">{{ job.cleanLocation }}</span>
-                  </div>
-                </div>
 
-                <!-- Job Description Preview -->
-                <div class="mt-4">
-                  <p class="text-gray-600 text-sm line-clamp-3">
-                    {{ job.description_text?.slice(0, 150) + '...' }}
-                  </p>
+                  <!-- Content -->
+                  <div class="flex-1 p-4 pl-2 flex flex-col justify-between min-h-[120px] min-w-0 overflow-hidden">
+                    <!-- Top Section -->
+                    <div class="space-y-2 min-w-0">
+                      <!-- Job Title -->
+                      <h3 class="font-bold text-gray-900 line-clamp-2">
+                        {{ job.title }}
+                      </h3>
+
+                      <!-- Company Name -->
+                      <p class="text-gray-600 text-sm line-clamp-1">
+                        {{ job.company?.name }}
+                      </p>
+
+                      <Badge v-if="job.company?.industry" class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
+                        {{ job.company.industry }}
+                      </Badge>
+                    </div>
+
+                    <!-- Bottom Section - Meta Information -->
+                    <div class="flex gap-2 text-gray-500 text-sm mt-auto">
+                      <div class="flex items-center min-w-0 flex-shrink-0">
+                        <Icon name="lucide:calendar" class="size-4 mr-2 flex-shrink-0" />
+                        <span class="text-xs whitespace-nowrap">{{ job.relativePostedDate || 'N/A' }}</span>
+                      </div>
+                      <div class="flex items-center min-w-0 flex-1">
+                        <Icon name="lucide:map-pin" class="size-4 mr-2 flex-shrink-0" />
+                        <span class="line-clamp-1 text-xs">
+                          {{
+                            [job.location?.city, job.location?.region, job.location?.country].filter(Boolean).join(', ') || 'Location not specified'
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <!-- No Jobs State -->
+          <!-- No Jobs Found -->
           <div v-else class="text-center py-12">
-            <Icon name="lucide:briefcase" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">No jobs available</h3>
-            <p class="text-gray-600">Check back later for new opportunities at {{ companyInfo.organization }}</p>
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+              <Icon name="lucide:briefcase" class="h-6 w-6 text-gray-400" />
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">No open positions</h3>
+            <p class="mt-1 text-gray-500">There are currently no open positions at this company.</p>
           </div>
         </CardContent>
       </Card>

@@ -1,5 +1,6 @@
 <script setup>
 import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
+import { useAuthStore } from '@/store/auth';
 
 // Use default layout
 definePageMeta({
@@ -24,8 +25,8 @@ onMounted(() => {
 });
 
 // Watch for successful login and handle redirect using custom auth system
-const { status } = useCustomAuth();
-watch(status, (newStatus) => {
+const authStore = useAuthStore();
+watch(() => authStore.status, (newStatus) => {
   if (newStatus === 'authenticated' && route.query.redirect) {
     // User just logged in and there's a redirect parameter
     const redirectPath = decodeURIComponent(route.query.redirect);

@@ -1,9 +1,74 @@
+<script setup>
+import { computed, onMounted } from 'vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuthStore } from '@/store/auth';
+import { useJobsStore } from '@/store/jobs';
+
+// Set layout untuk halaman ini
+definePageMeta({
+  middleware: 'auth',
+  layout: 'dashboard',
+});
+
+// Get user data
+const authStore = useAuthStore();
+const user = computed(() => authStore.user);
+
+// Get bootcamp data
+const { bootcampsData, initializeBootcamps } = useBootcamps();
+
+// Get jobs store and data
+const jobsStore = useJobsStore();
+const { jobsData, formatEmploymentType, getJobImage, getJobDetailUrl } = useJobs();
+
+// Initialize favorites on client side
+onMounted(() => {
+  if (process.client) {
+    jobsStore.initializeFavorites();
+  }
+  initializeBootcamps();
+});
+
+// Dynamic greeting based on time
+const dynamicGreeting = computed(() => {
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return 'Good morning';
+  } else if (hour >= 12 && hour < 18) {
+    return 'Good afternoon';
+  } else {
+    return 'Good evening';
+  }
+});
+
+// Welcome message
+const welcomeMessage = computed(() => {
+  return 'Continue your learning journey or explore new bootcamp programs!';
+});
+
+// User's favorite jobs for dashboard
+const favoriteJobs = computed(() => {
+  if (!jobsData.value || !Array.isArray(jobsData.value)) return [];
+  // Get limited favorite jobs using the store's method
+  return jobsStore.getLimitedFavoriteJobs(jobsData.value, 2);
+});
+
+// Meta tags
+useSeoMeta({
+  title: 'Dashboard - Rise Social',
+  description: 'Dashboard pengguna Rise Social untuk mengelola kursus, pekerjaan, dan program',
+});
+</script>
+
 <template>
   <div class="bg-slate-50 mt-16 md:mt-10">
     <div class="container-wrapper section-py-md relative">
       <!-- Welcome Section -->
       <div class="relative bg-[#0E5C59] shadow rounded-xl p-4 sm:px-10 sm:pt-14 sm:pb-10 text-white mb-6 sm:mb-8 overflow-hidden z-10">
-        <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.firstName || 'User' }}!</h1>
+        <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user ? user.first_name || 'User' : 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="relative flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4 z-20">
           <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>
@@ -37,7 +102,7 @@
               class="flex items-start space-x-3 sm:space-x-4 p-4 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
             >
               <div class="size-16 sm:size-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <img :src="bootcamp.image" :alt="bootcamp.title" class="w-full h-full object-cover" />
+                <img :src="bootcamp.image_url" :alt="bootcamp.title" class="w-full h-full object-cover" />
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="text-sm sm:text-base font-medium text-gray-900 mb-2">{{ bootcamp.title }}</h3>
@@ -157,56 +222,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-// Set layout untuk halaman ini
-definePageMeta({
-  middleware: 'auth',
-  layout: 'dashboard',
-});
-
-// Get user data
-const { user } = useCustomAuth();
-
-// Get courses data
-const { coursesData, getCourseProgress, getCourseModulesCount } = useCourses();
-
-// Get bootcamp data
-const { bootcampsData } = useBootcamps();
-
-// Get jobs data
-const { getLimitedFavoriteJobs, formatEmploymentType, getJobImage, getJobDetailUrl, toggleFavorite, isFavorite } = useJobs();
-
-// Dynamic greeting based on time
-const dynamicGreeting = computed(() => {
-  const hour = new Date().getHours();
-
-  if (hour >= 5 && hour < 12) {
-    return 'Good morning';
-  } else if (hour >= 12 && hour < 18) {
-    return 'Good afternoon';
-  } else {
-    return 'Good evening';
-  }
-});
-
-// Welcome message
-const welcomeMessage = computed(() => {
-  return 'Continue your learning journey or explore new bootcamp programs!';
-});
-
-// User's favorite jobs for dashboard
-const favoriteJobs = computed(() => {
-  return getLimitedFavoriteJobs(2);
-});
-
-// Meta tags
-useSeoMeta({
-  title: 'Dashboard - Rise Social',
-  description: 'Dashboard pengguna Rise Social untuk mengelola kursus, pekerjaan, dan program',
-});
-</script>

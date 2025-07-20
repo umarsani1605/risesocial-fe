@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuthStore } from '@/store/auth';
 
 // Define component props and events
 const props = defineProps({
@@ -14,8 +15,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open']);
 
-// Custom auth composables (menggantikan @sidebase/nuxt-auth)
-const { signIn, signUp, data: session, status } = useCustomAuth();
+// Backend auth store
+const authStore = useAuthStore();
 
 // Local state
 const isOpen = computed({
@@ -38,7 +39,8 @@ const loginForm = ref({
 });
 
 const registerForm = ref({
-  name: '',
+  first_name: '',
+  last_name: '',
   email: '',
   password: '',
   confirmPassword: '',
@@ -48,33 +50,42 @@ const registerForm = ref({
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle login menggunakan custom auth
+// Handle login dengan backend auth
 const handleLogin = async () => {
   errorMessage.value = '';
   isLoading.value = true;
 
   try {
-    await signIn({
+    await authStore.signIn({
       email: loginForm.value.email,
       password: loginForm.value.password,
+      rememberMe: loginForm.value.keepSignedIn,
     });
 
     // Login successful
-    console.log('✅ Custom Auth: Login successful');
+    console.log('✅ Backend Auth: Login successful');
     isOpen.value = false;
-    await navigateTo('/');
+
+    // Check for redirect parameter
+    const route = useRoute();
+    const redirectTo = route.query.redirect;
+
+    if (redirectTo) {
+      await navigateTo(decodeURIComponent(redirectTo));
+    } else {
+      await navigateTo('/dashboard');
+    }
   } catch (error) {
     console.error('Login error:', error);
-    errorMessage.value = 'Invalid email or password';
+    errorMessage.value = error.message || 'Invalid email or password';
   } finally {
     isLoading.value = false;
   }
 };
 
-// Handle register - using mock system for demo
+// Handle register dengan backend auth
 const handleRegister = async () => {
   errorMessage.value = '';
-  isLoading.value = false;
 
   // Validate passwords match
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
@@ -82,38 +93,41 @@ const handleRegister = async () => {
     return;
   }
 
+  // Password validation
+  if (registerForm.value.password.length < 6) {
+    errorMessage.value = 'Password must be at least 6 characters long';
+    return;
+  }
+
   isLoading.value = true;
 
   try {
-    // Custom auth register
-    console.log('🎭 Custom Auth: Registration in progress...');
+    console.log('📝 Backend Auth: Registration in progress...');
 
-    // Split name into firstName and lastName
-    const nameParts = registerForm.value.name.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
-
-    // Register using custom auth
-    await signUp({
-      firstName: firstName,
-      lastName: lastName,
+    // Register using backend auth (automatically logs in user)
+    await authStore.signUp({
+      first_name: registerForm.value.first_name,
+      last_name: registerForm.value.last_name,
       email: registerForm.value.email,
       password: registerForm.value.password,
     });
 
-    console.log('✅ Custom Auth: Registration successful!');
-
-    // After successful registration, auto-login
-    await signIn({
-      email: registerForm.value.email,
-      password: registerForm.value.password,
-    });
+    console.log('✅ Backend Auth: Registration successful!');
 
     isOpen.value = false;
-    await navigateTo('/');
+
+    // Check for redirect parameter
+    const route = useRoute();
+    const redirectTo = route.query.redirect;
+
+    if (redirectTo) {
+      await navigateTo(decodeURIComponent(redirectTo));
+    } else {
+      await navigateTo('/dashboard');
+    }
   } catch (error) {
-    console.error('DEMO MODE Register error:', error);
-    errorMessage.value = 'Registration failed - Demo mode error';
+    console.error('Backend register error:', error);
+    errorMessage.value = error.message || 'Registration failed';
   } finally {
     isLoading.value = false;
   }
@@ -129,7 +143,7 @@ const toggleMode = () => {
 watch(isOpen, (newValue) => {
   if (!newValue) {
     loginForm.value = { email: '', password: '', keepSignedIn: false };
-    registerForm.value = { name: '', email: '', password: '', confirmPassword: '' };
+    registerForm.value = { first_name: '', last_name: '', email: '', password: '', confirmPassword: '' };
     isRegisterMode.value = false;
     showPassword.value = false;
     showConfirmPassword.value = false;
@@ -193,10 +207,16 @@ watch(isOpen, (newValue) => {
 
       <!-- Register Form -->
       <form v-else @submit.prevent="handleRegister" class="space-y-4">
-        <!-- Name Field -->
+        <!-- First Name Field -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm">Full Name</label>
-          <Input type="text" v-model="registerForm.name" class="bg-gray-50" required />
+          <label class="text-sm">First Name</label>
+          <Input type="text" v-model="registerForm.first_name" class="bg-gray-50" required />
+        </div>
+
+        <!-- Last Name Field -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm">Last Name</label>
+          <Input type="text" v-model="registerForm.last_name" class="bg-gray-50" required />
         </div>
 
         <!-- Email Field -->

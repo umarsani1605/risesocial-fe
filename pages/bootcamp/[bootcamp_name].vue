@@ -10,8 +10,13 @@ const { findBootcampBySlug, formatPrice, getBootcampFeatures, getBootcampTopics,
 const route = useRoute();
 const bootcampSlug = route.params.bootcamp_name;
 
-// Find bootcamp
-const bootcamp = findBootcampBySlug(bootcampSlug);
+// Validate slug parameter
+if (!bootcampSlug || bootcampSlug === 'undefined') {
+  throw createError({ statusCode: 404, statusMessage: 'Bootcamp slug is required' });
+}
+
+// Find bootcamp (await the async function)
+const bootcamp = await findBootcampBySlug(bootcampSlug);
 
 // Redirect to 404 if not found
 if (!bootcamp) {
@@ -56,6 +61,10 @@ watchEffect(() => {
   carouselApi.value.on('select', () => {
     currentAlumniSlide.value = carouselApi.value.selectedScrollSnap();
   });
+});
+
+onMounted(() => {
+  console.log(bootcamp);
 });
 </script>
 
@@ -158,7 +167,7 @@ watchEffect(() => {
             </Card>
 
             <!-- Curriculum -->
-            <Card>
+            <Card v-if="getBootcampTopics(bootcamp).length > 0">
               <CardContent class="p-8">
                 <h2 class="heading-section mb-6">Curriculum</h2>
                 <Accordion type="multiple" class="space-y-4">
@@ -209,19 +218,19 @@ watchEffect(() => {
                 <h2 class="heading-section mb-6">Instructors</h2>
                 <div class="space-y-8">
                   <div
-                    v-for="instructor in bootcamp.instructor"
-                    :key="instructor.name"
+                    v-for="instructor in bootcamp.instructors"
+                    :key="instructor.id"
                     class="flex flex-col lg:flex-row gap-4 lg:gap-12 items-start lg:items-center"
                   >
-                    <Avatar class="size-24 lg:size-28">
-                      <AvatarImage v-if="instructor.avatar" :src="instructor.avatar" :alt="instructor.name" />
+                    <Avatar class="size-20 lg:size-32">
+                      <AvatarImage v-if="instructor.avatar_url" :src="instructor.avatar_url" :alt="instructor.name" />
                       <AvatarFallback class="bg-primary/15 text-primary text-2xl lg:text-4xl">
                         {{ instructor.name.charAt(0) }}
                       </AvatarFallback>
                     </Avatar>
                     <div class="flex-1">
                       <h3 class="text-xl font-bold text-gray-900 mb-1">{{ instructor.name }}</h3>
-                      <p class="text-gray-600 font-medium mb-3">{{ instructor.job }}</p>
+                      <p class="text-gray-600 font-medium mb-3">{{ instructor.job_title }}</p>
                       <p v-if="instructor.description" class="text-gray-600 leading-relaxed">{{ instructor.description }}</p>
                     </div>
                   </div>
@@ -303,7 +312,7 @@ watchEffect(() => {
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">Frequently Asked Questions</h2>
                 <Accordion type="single" collapsible class="space-y-4">
-                  <AccordionItem v-for="faq in bootcamp.faq" :key="faq.id" :value="`item-${faq.id}`" class="rounded-lg px-4">
+                  <AccordionItem v-for="faq in bootcamp.faqs" :key="faq.id" :value="`item-${faq.id}`" class="rounded-lg px-4">
                     <AccordionTrigger class="text-left font-medium text-gray-600 hover:text-gray-900 cursor-pointer">{{
                       faq.question
                     }}</AccordionTrigger>
@@ -320,7 +329,7 @@ watchEffect(() => {
               <Card class="p-4 py-8 md:py-3">
                 <CardContent class="p-0 space-y-2!">
                   <h2 class="block md:hidden heading-section mb-6!">Apply Programs</h2>
-                  <img :src="bootcamp.image" :alt="bootcamp.title" class="w-full aspect-square object-cover rounded-lg mb-0" />
+                  <img :src="bootcamp.image || bootcamp.image_url" :alt="bootcamp.title" class="w-full aspect-square object-cover rounded-lg mb-0" />
 
                   <!-- Pricing Tabs -->
                   <Tabs default-value="pricing-1" class="w-full">
@@ -363,9 +372,13 @@ watchEffect(() => {
                       <!-- Price and Button -->
                       <div class="">
                         <!-- Original Price (Crossed Out) -->
-                        <div class="text-sm text-gray-500 line-through mb-1">Rp{{ formatPrice(tier.original_price) }}</div>
+                        <div class="text-sm text-gray-500 line-through mb-1">
+                          {{ tier.formatted_original_price || `Rp${formatPrice(tier.original_price)}` }}
+                        </div>
                         <!-- Discounted Price -->
-                        <div class="text-2xl font-bold text-gray-900 mb-4">Rp{{ formatPrice(tier.discount_price) }}</div>
+                        <div class="text-2xl font-bold text-gray-900 mb-4">
+                          {{ tier.formatted_discount_price || `Rp${formatPrice(tier.discount_price)}` }}
+                        </div>
                         <Button class="w-full cursor-pointer"> Enroll Now </Button>
                       </div>
                     </TabsContent>

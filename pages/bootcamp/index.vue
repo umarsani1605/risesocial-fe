@@ -17,10 +17,11 @@ useHead({
 });
 
 // Use bootcamp composable
-const { bootcampsData } = useBootcamps();
+const { bootcampsData, initializeBootcamps, isLoading } = useBootcamps();
 
-// Use bootcamp programs data from composable
-const bootcampPrograms = bootcampsData;
+onMounted(() => {
+  initializeBootcamps();
+});
 </script>
 
 <template>
@@ -69,12 +70,30 @@ const bootcampPrograms = bootcampsData;
           </p>
         </div>
 
+        <!-- Loading State -->
+        <div v-if="isLoading" class="space-y-4 lg:space-y-6">
+          <div v-for="i in 3" :key="i" class="animate-pulse">
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+              <div class="flex flex-col-reverse lg:flex-row gap-8">
+                <div class="flex-4 space-y-4">
+                  <div class="h-8 bg-gray-200 rounded w-3/4"></div>
+                  <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div class="h-20 bg-gray-200 rounded"></div>
+                </div>
+                <div class="flex-1">
+                  <div class="h-48 bg-gray-200 rounded-2xl"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Bootcamp Cards -->
-        <div class="space-y-4 lg:space-y-6">
-          <div v-for="bootcamp in bootcampPrograms" :key="bootcamp.id" class="group">
+        <div v-else class="space-y-4 lg:space-y-6">
+          <div v-for="bootcamp in bootcampsData" :key="bootcamp.id" class="group">
             <Card
               class="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden border-0"
-              @click="$router.push(`/bootcamp/${bootcamp.path_slug}`)"
+              @click="bootcamp.path_slug && $router.push(`/bootcamp/${bootcamp.path_slug}`)"
             >
               <CardContent>
                 <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-10 items-stretch">
@@ -111,7 +130,7 @@ const bootcampPrograms = bootcampsData;
                   <div class="flex-1 relative overflow-hidden items-end justify-end">
                     <!-- Content -->
                     <div class="w-full relative bg-primary rounded-2xl lg:h-50 aspect-square flex items-center justify-center">
-                      <NuxtImg :src="bootcamp.image" :alt="bootcamp.title" class="w-full h-full object-cover rounded-lg" format="webp" />
+                      <NuxtImg :src="bootcamp.image_url" :alt="bootcamp.title" class="w-full h-full object-cover rounded-lg" format="webp" />
                     </div>
                   </div>
                 </div>
