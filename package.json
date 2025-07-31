@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "start": "node .output/server/index.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -38,7 +39,8 @@
     "@nuxt/fonts": "^0.11.3",
     "@nuxt/icon": "^1.12.0",
     "@nuxt/image": "^1.10.0",
-    "@pinia/nuxt": "^0.11.1"
+    "@pinia/nuxt": "^0.11.1",
+    "nuxt-easy-lightbox": "^1.1.0"
   },
   "volta": {
     "node": "23.11.1"

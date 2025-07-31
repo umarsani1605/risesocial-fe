@@ -9,11 +9,6 @@ export default defineNuxtConfig({
   // SSR enabled for better SEO and performance
   ssr: true,
 
-  // Nitro configuration for Netlify deployment
-  nitro: {
-    preset: 'netlify'
-  },
-
   app: {
     head: {
       title: 'Rise Social - Green Jobs Platform',
@@ -45,12 +40,12 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt'],
+  modules: ['shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt', 'nuxt-easy-lightbox'],
   
   // Runtime config - simplified untuk custom auth
   runtimeConfig: {
     public: {
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://api.risesocial.org'
     }
   },
   
