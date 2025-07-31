@@ -150,7 +150,7 @@ onUnmounted(() => {
     <header
       :class="[
         'fixed w-full top-0 z-50 bg-white shadow-subtle lg:shadow-none lg:bg-transparent transition-all duration-300',
-        isScrolled ? 'bg-white shadow-subtle' : '',
+        isScrolled ? 'lg:bg-white lg:shadow-subtle' : '',
       ]"
     >
       <div class="container-wrapper">
