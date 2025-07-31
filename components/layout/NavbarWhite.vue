@@ -147,12 +147,7 @@ onUnmounted(() => {
 
 <template>
   <div class="relative">
-    <header
-      :class="[
-        'fixed w-full top-0 z-50 bg-white shadow-subtle lg:shadow-none lg:bg-transparent transition-all duration-300',
-        isScrolled ? 'lg:bg-white lg:shadow-subtle' : '',
-      ]"
-    >
+    <header class="fixed w-full top-0 z-50 bg-white shadow-subtle">
       <div class="container-wrapper">
         <div class="flex items-center justify-between h-20">
           <!-- Logo -->

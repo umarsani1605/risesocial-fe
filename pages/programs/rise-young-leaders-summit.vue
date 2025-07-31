@@ -1,6 +1,17 @@
 <script setup>
 import { ref, computed } from 'vue';
 
+// Smooth scroll function
+const scrollToSection = (id) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
+};
+
 // Use default layout
 definePageMeta({
   layout: 'white-navbar',
@@ -21,7 +32,6 @@ useHead({
 const galleryImages = [
   'DSCF0340.jpg',
   'DSCF0345.jpg',
-  'DSCF9137.jpg',
   'IMG_1042.jpg',
   'IMG_1747.jpg',
   'IMG_1971.jpg',
@@ -31,6 +41,7 @@ const galleryImages = [
   'IMG_5041.jpg',
   'IMG_5325.jpg',
   'IMG_5652.jpg',
+  'IMG_6069.jpg',
 ];
 
 // Lightbox state
@@ -196,20 +207,25 @@ const goToAlumniSlide = (index) => {
 <template>
   <div class="">
     <!-- Hero Section -->
-    <section class="bg-white py-12 lg:pt-48 lg:pb-12 overflow-x-clip overflow-y-visible">
+    <section class="bg-white py-12 lg:pt-48 lg:pb-4 overflow-x-clip overflow-y-visible">
       <div class="container-wrapper relative">
         <div class="flex flex-col-reverse lg:flex-row gap-12 items-stretch">
           <!-- Left Column - Content -->
-          <div class="flex-1 space-y-6 lg:space-y-8 px-4">
+          <div class="flex-1 space-y-6 lg:space-y-8 text-center lg:text-left">
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">Rise Young Leaders Summit Japan 2025</h1>
             <div class="space-y-4 leading-relaxed">
               <p>
-                Rise Young Leaders Summit Japan 2025 isn't just a summit—it's a launchpad for future climate leaders. Powered by Rise Social, this is
-                a movement of changemakers who believe that a better, greener future starts with youth action today.
+                Rise Young Leaders Summit Japan 2025 isn't just a summit—it's a launchpad for future climate leaders. Powered by
+                <span class="font-semibold">Rise Social</span>, this is a movement of changemakers who believe that a better, greener future starts
+                with youth action today.
               </p>
             </div>
             <div class="pt-4">
-              <Button size="lg" class="bg-primary text-white hover:bg-primary/90 px-8 py-3 text-base font-medium rounded-lg transition-colors">
+              <Button
+                @click="scrollToSection('how-to-apply')"
+                size="lg"
+                class="bg-primary text-white hover:bg-primary/90 px-8 py-3 text-base font-medium rounded-lg transition-colors cursor-pointer"
+              >
                 Register Now
               </Button>
             </div>
@@ -219,10 +235,11 @@ const goToAlumniSlide = (index) => {
           <div class="h-[320px] md:h-[475px] lg:flex-1 relative"></div>
         </div>
         <div
-          class="absolute w-[800px] top-[-13rem] left-[-16rem] md:w-[1200px] md:top-[-20rem] md:left-[-22rem] lg:top-[-26rem] lg:left-[24rem] pointer-events-none select-none"
+          class="absolute w-[800px] top-[-12rem] left-[-13rem] md:w-[1200px] md:top-[-20rem] md:left-[-22rem] lg:top-[-27rem] lg:left-[24rem] pointer-events-none select-none"
         >
           <img
             src="/images/rise-young-leaders/2025/decoration.png"
+            format="webp"
             alt="Rise Young Leaders Summit 2025"
             class="h-auto object-contain pointer-events-none select-none"
           />
@@ -284,7 +301,7 @@ const goToAlumniSlide = (index) => {
           <blockquote class="mb-8">
             <p class="text-base md:text-lg lg:text-xl font-medium text-gray-800 leading-relaxed">
               This is where <span class="text-primary font-semibold">climate action</span> meets
-              <span class="text-primary font-semibold">leadership</span>—and where your
+              <span class="text-primary font-semibold">leadership</span>, and where your
               <span class="relative">journey begins.</span>
             </p>
           </blockquote>
@@ -301,21 +318,33 @@ const goToAlumniSlide = (index) => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_landmark_4.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain"
           />
         </div>
         <div class="absolute -bottom-16 left-72 h-52 z-10">
-          <NuxtImg src="/images/rise-young-leaders/2025/japan_tree.png" alt="Rise Young Leaders Summit 2025" class="w-full h-full object-contain" />
+          <NuxtImg
+            src="/images/rise-young-leaders/2025/japan_tree.png"
+            alt="Rise Young Leaders Summit 2025"
+            format="webp"
+            class="w-full h-full object-contain"
+          />
         </div>
         <div class="absolute bottom-0 right-16 h-96 z-20 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_landmark_3.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain"
           />
         </div>
         <div class="absolute -bottom-16 right-48 h-52 z-10 hidden lg:block">
-          <NuxtImg src="/images/rise-young-leaders/2025/japan_tree.png" alt="Rise Young Leaders Summit 2025" class="w-full h-full object-contain" />
+          <NuxtImg
+            src="/images/rise-young-leaders/2025/japan_tree.png"
+            alt="Rise Young Leaders Summit 2025"
+            format="webp"
+            class="w-full h-full object-contain"
+          />
         </div>
         <div class="absolute top-0 left-0 w-full h-full">
           <div class="w-full h-full bg-white/5 rounded-full blur-3xl transform rotate-45"></div>
@@ -326,7 +355,7 @@ const goToAlumniSlide = (index) => {
         <!-- Section Title -->
         <div class="text-center max-w-3xl mx-auto mb-12 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Are You Eligible?</h2>
-          <p class="text-lg">We're looking for passionate individuals ready to drive real change in their communities—and beyond.</p>
+          <p class="text-lg">We're looking for passionate individuals ready to drive real change in their communities and beyond.</p>
         </div>
 
         <!-- Bento Grid -->
@@ -391,12 +420,9 @@ const goToAlumniSlide = (index) => {
 
     <!-- Program Highlights Section -->
     <section class="section-py-lg bg-white text-gray-800 relative z-20">
-      <div class="absolute top-0 left-0 right-0">
-        <img src="/images/rise-young-leaders/2025/bg-vector-white.png" alt="Rise Young Leaders Summit 2025" class="w-full h-auto object-contain" />
-      </div>
       <div class="relative z-10 container-wrapper">
         <!-- Section Title -->
-        <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Program Highlights</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
@@ -405,11 +431,11 @@ const goToAlumniSlide = (index) => {
         <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-2 gap-4">
           <!-- Competition (Top Left) -->
           <div
-            class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-4xl overflow-hidden transition-all duration-300 shadow-subtle p-4"
+            class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
-            <div class="w-full lg:flex-1 h-48 lg:h-full rounded-2xl lg:aspect-square overflow-hidden">
+            <div class="w-full lg:flex-1 h-48 lg:h-full rounded-lg lg:rounded-2xl lg:aspect-square overflow-hidden">
               <img
-                src="/images/rise-young-leaders/2025/gallery/IMG_8593.jpg"
+                src="/images/rise-young-leaders/2025/gallery/IMG_8583.jpg"
                 alt="Competition"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -418,16 +444,17 @@ const goToAlumniSlide = (index) => {
               <h3 class="text-xl font-bold">Competition</h3>
               <p class="text-sm">
                 Stand a chance to be one of three fully funded delegates, selected through a compelling climate-themed essay. In addition, 25
-                outstanding applicants will be granted partial and self-funded slots.
+                outstanding applicants will be granted partial and self-funded slots, offering them the opportunity to join this prestigious
+                international program in Japan.
               </p>
             </div>
           </div>
 
           <!-- Mini Lecture Series (Bottom Left) -->
           <div
-            class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-4xl lg:rounded-bl-[10rem] overflow-hidden transition-all duration-300 shadow-subtle p-4"
+            class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
-            <div class="w-full lg:flex-1 h-48 lg:h-full rounded-2xl lg:rounded-bl-[9rem] lg:aspect-square overflow-hidden">
+            <div class="w-full lg:flex-1 h-48 lg:h-full rounded-lg lg:rounded-bl-[9rem] lg:aspect-square overflow-hidden">
               <img
                 src="/images/rise-young-leaders/2025/gallery/DSCF0340.jpg"
                 alt="Mini Lecture Series"
@@ -445,9 +472,9 @@ const goToAlumniSlide = (index) => {
 
           <!-- Summit & International Forum (Right Side - Full Height) -->
           <div
-            class="group lg:col-start-2 lg:row-span-2 lg:row-start-1 flex flex-col bg-gradient-to-br from-primary to-orange-300 text-white rounded-4xl lg:rounded-br-[12rem] overflow-hidden transition-all duration-300 shadow-subtle p-4"
+            class="group lg:col-start-2 lg:row-span-2 lg:row-start-1 flex flex-col bg-gradient-to-br from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl lg:rounded-br-[12rem] overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
-            <div class="w-full rounded-2xl aspect-video overflow-hidden">
+            <div class="w-full rounded-lg lg:rounded-2xl aspect-video overflow-hidden">
               <img
                 src="/images/rise-young-leaders/benefit.jpg"
                 alt="Summit & International Forum"
@@ -468,12 +495,24 @@ const goToAlumniSlide = (index) => {
     </section>
 
     <!-- How to Apply Section -->
-    <section class="py-16 lg:pt-[22rem] lg:pb-32 bg-gradient-to-r from-[#F77044] to-[#F9B163] relative overflow-hidden z-10">
+    <section
+      id="how-to-apply"
+      class="py-16 pt-[6rem] lg:pt-[20rem] lg:pb-32 bg-gradient-to-r from-[#F77044] to-[#F9B163] relative overflow-hidden z-10"
+    >
+      <div class="absolute top-[-1px] left-0 right-0">
+        <img
+          src="/images/rise-young-leaders/2025/bg-vector-white.png"
+          alt="Rise Young Leaders Summit 2025"
+          format="webp"
+          class="w-full h-auto object-contain pointer-events-none select-none"
+        />
+      </div>
       <div class="absolute inset-0 opacity-20">
         <div class="absolute -top-12 lg:top-80 -left-24 lg:left-24 h-32 z-20 opacity-50">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_1.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
@@ -481,6 +520,7 @@ const goToAlumniSlide = (index) => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_2.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
@@ -488,6 +528,7 @@ const goToAlumniSlide = (index) => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_3.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
@@ -495,6 +536,7 @@ const goToAlumniSlide = (index) => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_4.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
@@ -502,6 +544,7 @@ const goToAlumniSlide = (index) => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_bamboo_2.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
@@ -509,13 +552,14 @@ const goToAlumniSlide = (index) => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_bamboo_1.png"
             alt="Rise Young Leaders Summit 2025"
+            format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
           />
         </div>
       </div>
       <div class="container-wrapper relative z-30">
         <div class="max-w-4xl mx-auto text-center">
-          <div class="text-center max-w-3xl mx-auto mb-16">
+          <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">How to Apply</h2>
             <div class="w-24 h-1 bg-white mx-auto rounded-full"></div>
           </div>
@@ -525,15 +569,16 @@ const goToAlumniSlide = (index) => {
             <div class="flex flex-col gap-6 max-w-3xl mx-auto">
               <p>
                 Write your essay and complete the online application form. Be sure to highlight your climate vision, community initiatives, and
-                leadership journey — these elements are essential in our selection process.
+                leadership journey. These elements are essential in our selection process.
               </p>
-              <p class="flex items-center justify-center gap-2 w-full font-semibold">
-                <span class="text-orange-500 flex items-center">
-                  <Icon name="heroicons:calendar-days-20-solid" class="size-6!" />
+              <p class="flex flex-col lg:flex-row items-center justify-center gap-2 w-full">
+                <span class="flex items-center gap-2">
+                  <Icon name="heroicons:calendar-days-20-solid" class="size-6! text-orange-500" />
+                  <span class="font-semibold">Application Deadline:</span>
                 </span>
-                Application Deadline: September 30, 2025
+                <span>September 30, 2025</span>
               </p>
-              <div class="flex flex-col sm:flex-row justify-center gap-4 py-4 w-full sm:w-auto">
+              <div class="flex flex-col sm:flex-row justify-center gap-4 py-2 w-full sm:w-auto">
                 <Button as="a" href="https://s.id/Uzwuz" target="_blank" variant="outline" size="lg" class="w-full sm:w-auto justify-center">
                   <Icon name="lucide:download" class="w-4 h-4" />
                   Guidebook
@@ -561,7 +606,7 @@ const goToAlumniSlide = (index) => {
     <section class="py-16 lg:py-24 bg-white">
       <div class="container-wrapper">
         <!-- Section Title -->
-        <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Scholarship Opportunity</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
@@ -573,7 +618,7 @@ const goToAlumniSlide = (index) => {
             <CardContent class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-primary to-orange-400 text-white rounded-xl w-12 h-12">
-                  <Icon name="lucide:rocket" class="size-6!" />
+                  <Icon name="lucide:sparkles" class="size-6!" />
                 </span>
                 <h3 class="text-2xl font-bold text-gray-900">Fully Funded ($15)</h3>
               </div>
@@ -646,7 +691,7 @@ const goToAlumniSlide = (index) => {
             <CardContent class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-primary to-orange-400 text-white rounded-xl w-12 h-12">
-                  <Icon name="lucide:sparkles" class="size-6!" />
+                  <Icon name="lucide:rocket" class="size-6!" />
                 </span>
                 <h3 class="text-2xl font-bold text-gray-900">Partial Funded</h3>
               </div>
@@ -789,7 +834,7 @@ const goToAlumniSlide = (index) => {
     <section class="section-py-lg bg-gray-50">
       <div class="container-wrapper">
         <!-- Section Title -->
-        <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Gallery</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           <p class="mt-6 text-gray-600">Glimpses from our previous events and activities. Click on any image to view it in full size.</p>
@@ -807,7 +852,6 @@ const goToAlumniSlide = (index) => {
               :src="`/images/rise-young-leaders/2025/gallery/${image}`"
               :alt="`Gallery image ${index + 1}`"
               class="w-full h-full object-cover"
-              loading="lazy"
               format="webp"
               quality="80"
               :modifiers="{ rotate: null }"
@@ -825,7 +869,7 @@ const goToAlumniSlide = (index) => {
     <!-- Hear from Our Alumni Section -->
     <section class="section-py-lg bg-white">
       <div class="container-wrapper">
-        <div class="section-title-wrapper-sm">
+        <div class="section-title-wrapper-sm mb-10 lg:mb-16">
           <h2 class="heading-section">Hear from Our Alumni</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
@@ -892,7 +936,7 @@ const goToAlumniSlide = (index) => {
     <!-- FAQ Section -->
     <section class="section-py-lg bg-white relative">
       <div class="container-wrapper relative z-30">
-        <div class="section-title-wrapper-sm">
+        <div class="section-title-wrapper-sm mb-10 lg:mb-16">
           <h2 class="heading-section">Frequently Asked Questions</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
