@@ -40,12 +40,24 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['shadcn-nuxt', '@nuxt/icon', '@nuxt/fonts', '@nuxt/image', '@pinia/nuxt', 'nuxt-easy-lightbox'],
+  modules: [
+    'shadcn-nuxt', 
+    '@nuxt/icon', 
+    '@nuxt/fonts', 
+    '@nuxt/image', 
+    '@pinia/nuxt', 
+    'nuxt-easy-lightbox', 
+  ],
   
   // Runtime config - simplified untuk custom auth
   runtimeConfig: {
     public: {
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://api.risesocial.org'
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
+      midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
+      midtransClientKey:
+        (process.env.MIDTRANS_MODE === 'PRODUCTION'
+          ? process.env.MIDTRANS_CLIENT_KEY
+          : process.env.MIDTRANS_SANDBOX_CLIENT_KEY) || ''
     }
   },
   

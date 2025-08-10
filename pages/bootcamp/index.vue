@@ -32,7 +32,7 @@ onMounted(() => {
         <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
           <!-- Left Content -->
           <div class="flex-1 space-y-6 lg:space-y-8">
-            <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-[#0E5C59] leading-tight">Rise Sustainability Bootcamp</h1>
+            <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-gray-800 leading-tight">Rise Sustainability Bootcamp</h1>
 
             <div class="space-y-3 lg:space-y-4">
               <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
@@ -64,7 +64,7 @@ onMounted(() => {
       <div class="container-wrapper">
         <!-- Section Title -->
         <div class="mb-8 lg:mb-12">
-          <h2 class="heading-section">Available Bootcamp Programs</h2>
+          <h2 class="heading-section text-gray-800">Available Bootcamp Programs</h2>
           <p class="text-sm sm:text-base lg:text-lg">
             Choose from our specialized bootcamp programs designed to accelerate your sustainability career
           </p>
@@ -100,7 +100,7 @@ onMounted(() => {
                   <!-- Left Content Section -->
                   <div class="flex-4 space-y-4 lg:space-y-6">
                     <!-- Bootcamp Title -->
-                    <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold">
+                    <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
                       {{ bootcamp.title }}
                     </h3>
 

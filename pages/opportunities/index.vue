@@ -409,7 +409,7 @@ watch(
                     :key="page"
                     :variant="page === currentPage ? 'default' : 'outline'"
                     size="sm"
-                    :class="page === currentPage ? 'bg-green-600 hover:bg-green-700 text-white' : ''"
+                    :class="['border-none', page === currentPage ? 'bg-[#0a5c5b] hover:bg-[#095351] text-white' : '']"
                     @click="goToPage(page)"
                   >
                     {{ page }}

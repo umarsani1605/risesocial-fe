@@ -144,7 +144,10 @@
   }
 }
 
-/* Custom animations and utilities */
+html.font-lg {
+  font-size: 18px;
+}
+
 @keyframes float {
   0%,
   100% {

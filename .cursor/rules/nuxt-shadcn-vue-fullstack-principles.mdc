@@ -1,7 +1,5 @@
 ---
-description: 
-globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # Coding Rules: Nuxt 3, Shadcn, Tailwind (JavaScript Edition)
 

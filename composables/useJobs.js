@@ -177,7 +177,7 @@ export const useJobs = () => {
     // Set loading state
     isLoading.value = true;
     error.value = null;
-    
+
     console.log('🔄 isLoading set to:', isLoading.value);
 
     try {

@@ -35,10 +35,10 @@
                   :href="social.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="size-7 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary hover:scale-105 transition-all duration-300"
+                  class="size-7 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300"
                   :aria-label="social.ariaLabel"
                 >
-                  <Icon :name="social.icon" class="size-4! text-white" />
+                  <Icon :name="social.icon" class="size-5! text-white" />
                 </a>
               </div>
             </div>

@@ -194,11 +194,13 @@ onMounted(() => {
                       <!-- Topic Sessions -->
                       <div class="md:ml-12 space-y-3 pt-2">
                         <div
-                          v-for="session in topic.session"
+                          v-for="session in topic.sessions"
                           :key="session.id"
                           class="flex gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                         >
-                          <div class="w-6 h-6 bg-gray-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                          <div
+                            class="w-6 h-6 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                          >
                             {{ session.id }}
                           </div>
                           <div class="flex-1">
@@ -242,13 +244,16 @@ onMounted(() => {
             <Card class="py-8">
               <CardContent class="px-8">
                 <div class="flex items-center justify-between mb-6">
-                  <h2 class="heading-section">Alumni Testimonials</h2>
+                  <h2 class="heading-section mb-0">Alumni Testimonials</h2>
                   <div class="hidden lg:flex gap-2">
-                    <button @click="scrollPrevTestimonial" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-                      <Icon name="lucide:chevron-left" class="w-4 h-4" />
+                    <button
+                      @click="scrollPrevTestimonial"
+                      class="size-8 flex items-center justify-center p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                    >
+                      <Icon name="lucide:chevron-left" class="size-4" />
                     </button>
-                    <button @click="scrollNextTestimonial" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-                      <Icon name="lucide:chevron-right" class="w-4 h-4" />
+                    <button @click="scrollNextTestimonial" class="size-8 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
+                      <Icon name="lucide:chevron-right" class="size-4" />
                     </button>
                   </div>
                 </div>
@@ -373,11 +378,11 @@ onMounted(() => {
                       <div class="">
                         <!-- Original Price (Crossed Out) -->
                         <div class="text-sm text-gray-500 line-through mb-1">
-                          {{ tier.formatted_original_price || `Rp${formatPrice(tier.original_price)}` }}
+                          {{ tier.formatted_original_price || `${formatPrice(tier.original_price)}` }}
                         </div>
                         <!-- Discounted Price -->
                         <div class="text-2xl font-bold text-gray-900 mb-4">
-                          {{ tier.formatted_discount_price || `Rp${formatPrice(tier.discount_price)}` }}
+                          {{ tier.formatted_discount_price || `${formatPrice(tier.discount_price)}` }}
                         </div>
                         <Button class="w-full cursor-pointer"> Enroll Now </Button>
                       </div>

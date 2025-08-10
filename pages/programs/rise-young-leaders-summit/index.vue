@@ -452,7 +452,7 @@ const goToAlumniSlide = (index) => {
 
           <!-- Mini Lecture Series (Bottom Left) -->
           <div
-            class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl overflow-hidden transition-all duration-300 shadow-subtle p-4"
+            class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl lg:rounded-bl-[10rem] overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
             <div class="w-full lg:flex-1 h-48 lg:h-full rounded-lg lg:rounded-bl-[9rem] lg:aspect-square overflow-hidden">
               <img
@@ -614,7 +614,7 @@ const goToAlumniSlide = (index) => {
         <!-- Pricing Cards -->
         <div class="grid md:grid-cols-3 gap-8">
           <!-- Fully Funded -->
-          <Card class="border border-gray-100 py-10 hover:-translate-y-1 transition-transform duration-300">
+          <Card class="border border-gray-100 py-10 hover:-translate-y-2 transition-transform duration-300">
             <CardContent class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-primary to-orange-400 text-white rounded-xl w-12 h-12">
@@ -837,7 +837,7 @@ const goToAlumniSlide = (index) => {
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Gallery</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
-          <p class="mt-6 text-gray-600">Glimpses from our previous events and activities. Click on any image to view it in full size.</p>
+          <p class="mt-6 text-gray-600">Glimpses from our previous events and activities.</p>
         </div>
 
         <!-- Gallery Grid -->

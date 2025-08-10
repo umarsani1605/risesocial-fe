@@ -1,5 +1,4 @@
 <script setup>
-import NavUser from '@/components/NavUser.vue';
 import {
   Sidebar,
   SidebarContent,
@@ -9,222 +8,76 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRoute } from 'vue-router';
+import { NuxtLink } from '#components';
 
-import {
-  Blocks,
-  AlertTriangle,
-  Square,
-  User,
-  Badge,
-  ChevronRight,
-  Square as ButtonIcon,
-  Calendar,
-  CreditCard,
-  CheckSquare,
-  Terminal,
-  MessageSquare,
-  FormInput,
-  Menu,
-  MessageCircle,
-  Sliders,
-  Table2,
-  Type,
-  ToggleLeft,
-  ChevronDown,
-} from 'lucide-vue-next';
+import { Home, Users, BriefcaseBusiness, UserCog, Users2 } from 'lucide-vue-next';
 
-const props = defineProps({
-  side: { type: String, required: false },
-  variant: { type: String, required: false },
-  collapsible: { type: String, required: false, default: 'icon' },
-  class: { type: null, required: false },
-});
+const route = useRoute();
 
-const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  teams: [
-    {
-      name: 'Components',
-      logo: Blocks,
-      plan: 'Free',
-    },
-  ],
-  navMain: [
-    {
-      title: 'Accordion',
-      href: '#accordion',
-      icon: ChevronDown,
-    },
-    {
-      title: 'Alert',
-      href: '#alert',
-      icon: AlertTriangle,
-    },
-    {
-      title: 'Alert Dialog',
-      href: '#alert-dialog',
-      icon: AlertTriangle,
-    },
-    {
-      title: 'Aspect Ratio',
-      href: '#aspect-ratio',
-      icon: Square,
-    },
-    {
-      title: 'Avatar',
-      href: '#avatar',
-      icon: User,
-    },
-    {
-      title: 'Badge',
-      href: '#badge',
-      icon: Badge,
-    },
-    {
-      title: 'Breadcrumb',
-      href: '#breadcrumb',
-      icon: ChevronRight,
-    },
-    {
-      title: 'Button',
-      href: '#button',
-      icon: ButtonIcon,
-    },
-    {
-      title: 'Calendar',
-      href: '#calendar',
-      icon: Calendar,
-    },
-    {
-      title: 'Card',
-      href: '#card',
-      icon: CreditCard,
-    },
-    {
-      title: 'Checkbox',
-      href: '#checkbox',
-      icon: CheckSquare,
-    },
-    {
-      title: 'Command',
-      href: '#command',
-      icon: Terminal,
-    },
-    {
-      title: 'Dialog',
-      href: '#dialog',
-      icon: MessageSquare,
-    },
-    {
-      title: 'Dropdown Menu',
-      href: '#dropdown-menu',
-      icon: Menu,
-    },
-    {
-      title: 'Input',
-      href: '#input',
-      icon: FormInput,
-    },
-    {
-      title: 'Navigation Menu',
-      href: '#navigation-menu',
-      icon: Menu,
-    },
-    {
-      title: 'Popover',
-      href: '#popover',
-      icon: MessageCircle,
-    },
-    {
-      title: 'Select',
-      href: '#select',
-      icon: ChevronRight,
-    },
-    {
-      title: 'Slider',
-      href: '#slider',
-      icon: Sliders,
-    },
-    {
-      title: 'Table',
-      href: '#table',
-      icon: Table2,
-    },
-    {
-      title: 'Tabs',
-      href: '#tabs',
-      icon: Square,
-    },
-    {
-      title: 'Textarea',
-      href: '#textarea',
-      icon: Type,
-    },
-    {
-      title: 'Toggle',
-      href: '#toggle',
-      icon: ToggleLeft,
-    },
-  ],
-  projects: [],
+const programItems = [{ title: 'Rise Young Leaders', to: '/admin/rise-young-leaders', icon: Users2 }];
+
+const managementItems = [
+  { title: 'Dashboard', to: '/admin', icon: Home },
+  { title: 'Jobs Management', to: '/admin/jobs', icon: BriefcaseBusiness },
+  { title: 'Users Management', to: '/admin/users', icon: Users },
+  { title: 'Administrators', to: '/admin/administrators', icon: UserCog },
+];
+
+const user = {
+  name: 'Admin',
+  email: 'admin@example.com',
 };
 </script>
 
-<style>
-:root {
-  --header-height: 60px;
-  --footer-height: 64px;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
-}
-</style>
-
 <template>
-  <Sidebar v-bind="props">
+  <Sidebar>
     <SidebarHeader>
-      <div class="flex h-[60px] items-center px-6">
-        <a href="/" class="flex items-center gap-2 font-semibold">
-          <img src="/logo.png" alt="Logo" class="h-10 w-auto" />
-        </a>
+      <div class="flex w-full h-14 items-center px-4">
+        <NuxtLink to="/admin" class="flex items-center gap-2 font-semibold mx-auto">
+          <NuxtImg src="/images/logo_admin.png" alt="Logo" class="h-8 w-auto" format="webp" />
+        </NuxtLink>
       </div>
     </SidebarHeader>
-    <SidebarContent class="hide-scrollbar">
-      <ScrollArea class="h-[calc(100vh-var(--header-height)-var(--footer-height))]">
-        <div class="px-4">
-          <SidebarGroup>
-            <SidebarGroupLabel>Components</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
-                  <SidebarMenuButton asChild>
-                    <a :href="item.href">
-                      <component :is="item.icon" class="h-4 w-4" />
-                      <span>{{ item.title }}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </div>
-      </ScrollArea>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel>Management</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem v-for="item in managementItems" :key="item.to">
+              <SidebarMenuButton asChild :class="{ 'data-[active=true]': route.path === item.to }">
+                <NuxtLink :to="item.to">
+                  <component :is="item.icon" class="h-4 w-4" />
+                  <span>{{ item.title }}</span>
+                </NuxtLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>Programs</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem v-for="item in programItems" :key="item.to">
+              <SidebarMenuButton asChild :class="{ 'data-[active=true]': route.path === item.to }">
+                <NuxtLink :to="item.to">
+                  <component :is="item.icon" class="h-4 w-4" />
+                  <span>{{ item.title }}</span>
+                </NuxtLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
-      <NavUser :user="data.user" />
+      <div class="text-center text-xs text-gray-500">Rise Social © 2025</div>
     </SidebarFooter>
     <SidebarRail />
   </Sidebar>

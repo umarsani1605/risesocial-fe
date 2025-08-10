@@ -122,7 +122,7 @@ const goToAlumniSlide = (index) => {
         <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
           <!-- Left Content -->
           <div class="flex-1 space-y-6 lg:space-y-8 px-4 lg:px-0">
-            <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-primary leading-tight">Little Hero Camp</h1>
+            <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-gray-800 leading-tight">Little Hero Camp</h1>
 
             <div class="space-y-3 lg:space-y-4">
               <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
@@ -132,7 +132,7 @@ const goToAlumniSlide = (index) => {
             </div>
 
             <div class="pt-2 lg:pt-4">
-              <Button size="lg"> Enroll Now! </Button>
+              <Button size="lg" class="bg-[#0a5c5b] hover:bg-[#095351]"> Enroll Now! </Button>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ const goToAlumniSlide = (index) => {
         <!-- Section Title -->
         <div class="section-title-wrapper">
           <h2 class="heading-section">How to Register</h2>
-          <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+          <div class="w-24 h-1 bg-[#0a5c5b] mx-auto rounded-full"></div>
         </div>
 
         <!-- Registration Steps -->
@@ -174,7 +174,7 @@ const goToAlumniSlide = (index) => {
           >
             <!-- Icon Circle -->
             <div
-              class="mx-auto w-16 h-16 lg:w-20 lg:h-20 bg-primary rounded-full flex items-center justify-center mb-4 lg:mb-6 group-hover:scale-105 transition-transform duration-300"
+              class="mx-auto w-16 h-16 lg:w-20 lg:h-20 bg-[#0a5c5b] rounded-full flex items-center justify-center mb-4 lg:mb-6 group-hover:scale-105 transition-transform duration-300"
             >
               <NuxtImg :src="step.icon" :alt="`Step ${step.id} icon`" class="w-8 h-8 lg:w-10 lg:h-10 filter brightness-0 invert" />
             </div>
@@ -197,7 +197,7 @@ const goToAlumniSlide = (index) => {
         <!-- Section Title -->
         <div class="section-title-wrapper">
           <h2 class="heading-section">Hear from Our Parents</h2>
-          <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+          <div class="w-24 h-1 bg-[#0a5c5b] mx-auto rounded-full"></div>
         </div>
 
         <!-- Parent Testimonials Carousel -->
@@ -234,9 +234,6 @@ const goToAlumniSlide = (index) => {
                     <h4 class="text-sm lg:text-base font-semibold text-gray-900">
                       {{ testimonial.name }}
                     </h4>
-
-                    <!-- Country -->
-                    <p class="text-sm text-primary font-medium">Parent from {{ testimonial.country }}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -254,23 +251,23 @@ const goToAlumniSlide = (index) => {
             @click="goToAlumniSlide(index)"
             :class="[
               'size-2 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer',
-              currentAlumniSlide === index ? 'bg-primary' : 'bg-gray-300 hover:bg-gray-400',
+              currentAlumniSlide === index ? 'bg-[#0a5c5b]' : 'bg-gray-300 hover:bg-gray-400',
             ]"
           ></button>
         </div>
-        <div class="mt-8 lg:mt-16 text-center bg-gradient-to-r from-primary/10 to-emerald-500/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12">
+        <div class="mt-8 lg:mt-16 text-center bg-gradient-to-r from-[#0a5c5b]/10 to-[#095351]/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12">
           <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">Ready to Accelerate Your Sustainability Career?</h3>
           <p class="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 lg:mb-6 max-w-2xl mx-auto">
             Join our comprehensive bootcamp programs and get direct access to job opportunities with our hiring partners
           </p>
           <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
-            <Button size="lg" class="bg-primary text-white hover:bg-primary/80 text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3">
+            <Button size="lg" class="bg-[#0a5c5b] text-white hover:bg-[#095351] text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3">
               View All Programs
             </Button>
             <Button
               size="lg"
               variant="outline"
-              class="border-primary text-primary hover:bg-primary hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
+              class="border-[#0a5c5b] text-[#0a5c5b] hover:bg-[#0a5c5b] hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
             >
               Contact Our Team
             </Button>

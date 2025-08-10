@@ -27,7 +27,7 @@ const programsData = [
     id: 2,
     title: 'Rise Sustainability Bootcamp',
     image: '/images/rise_educator.png',
-    link: '/programs/rise-sustainability-bootcamp',
+    link: '/bootcamp',
     description1:
       "Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic.",
     description2:
@@ -146,7 +146,7 @@ onMounted(() => {
         </p>
 
         <!-- CTA Button -->
-        <Button class="bg-emerald-600 hover:bg-emerald-700" size="lg"> Sign Up Now! </Button>
+        <Button class="bg-[#0a5c5b] hover:bg-[#095351]" size="lg"> Sign Up Now! </Button>
       </div>
     </section>
 
@@ -203,7 +203,7 @@ onMounted(() => {
               </p>
               <NuxtLink
                 :to="program.link"
-                class="flex items-center justify-center gap-2 text-white py-1.5 transition-all duration-300 rounded-lg bg-emerald-600 hover:bg-emerald-700"
+                class="flex items-center justify-center gap-2 text-white py-1.5 transition-all duration-300 rounded-lg bg-[#0a5c5b] hover:bg-[#095351]"
               >
                 <span>Start Now</span>
                 <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -274,7 +274,7 @@ onMounted(() => {
             @click="goToTestimonialSlide(index)"
             :class="[
               'size-2 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer',
-              currentTestimonialSlide === index ? 'bg-emerald-600' : 'bg-gray-300 hover:bg-gray-400',
+              currentTestimonialSlide === index ? 'bg-[#0a5c5b]' : 'bg-gray-300 hover:bg-gray-400',
             ]"
           ></button>
         </div>
@@ -302,10 +302,10 @@ onMounted(() => {
     </section>
 
     <!-- Find Opportunities CTA Section -->
-    <section class="section-py-sm bg-[#127355]">
+    <section class="section-py-sm bg-[#095351]">
       <div class="container-wrapper text-center">
         <h2 class="heading-section text-white mb-8">Find Others Opportunities</h2>
-        <Button size="lg" class="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold"> Search Job </Button>
+        <Button size="lg" class="bg-white text-[#095351] hover:bg-gray-100 px-8 py-3 text-lg font-semibold"> Search Job </Button>
       </div>
     </section>
   </div>
