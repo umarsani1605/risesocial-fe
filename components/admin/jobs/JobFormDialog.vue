@@ -212,7 +212,7 @@ const onSubmit = () => {
           </div>
           <div class="space-y-2">
             <Label for="contactEmail">Contact Email</Label>
-            <Input id="contactEmail" type="email" v-model="form.contactEmail" placeholder="[email protected]" />
+            <Input id="contactEmail" type="email" v-model="form.contactEmail" placeholder="Email" />
           </div>
 
           <div class="md:col-span-2 space-y-2">
@@ -260,7 +260,7 @@ const onSubmit = () => {
 
       <DialogFooter class="mt-2 px-6 pb-6">
         <Button variant="outline" @click="onClose" :disabled="pending">Cancel</Button>
-        <Button @click="onSubmit" :disabled="pending">{{ pending ? 'Saving...' : 'Save' }}</Button>
+        <Button @click="onSubmit" :disabled="true">{{ pending ? 'Saving...' : 'Save' }}</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

@@ -93,10 +93,8 @@ const onSubmit = () => emit('submit', { ...form.value });
       </div>
 
       <DialogFooter>
-        <button class="px-3 py-2 text-sm rounded border" @click="onClose" :disabled="pending">Cancel</button>
-        <button class="px-3 py-2 text-sm rounded bg-primary text-primary-foreground" @click="onSubmit" :disabled="pending">
-          {{ pending ? 'Saving...' : 'Save' }}
-        </button>
+        <Button variant="outline" @click="onClose" :disabled="pending">Cancel</Button>
+        <Button @click="onSubmit" :disabled="true">{{ pending ? 'Saving...' : 'Save' }}</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

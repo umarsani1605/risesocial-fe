@@ -6,7 +6,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/main.css'],
 
-  // SSR enabled for better SEO and performance
   ssr: true,
 
   app: {
@@ -24,12 +23,10 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }
       ]
     },
-    // Page transitions - simple fade only
     pageTransition: { 
       name: 'fade', 
       mode: 'out-in' 
     },
-    // Layout transitions - simple fade only
     layoutTransition: { 
       name: 'fade', 
       mode: 'out-in' 
@@ -49,11 +46,10 @@ export default defineNuxtConfig({
     'nuxt-easy-lightbox', 
   ],
   
-  // Runtime config - simplified untuk custom auth
   runtimeConfig: {
     public: {
       backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
-      midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
+      midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX', 
       midtransClientKey:
         (process.env.MIDTRANS_MODE === 'PRODUCTION'
           ? process.env.MIDTRANS_CLIENT_KEY
@@ -61,7 +57,6 @@ export default defineNuxtConfig({
     }
   },
   
-  // Image configuration - now using public folder
   image: {
     dir: 'public'
   },

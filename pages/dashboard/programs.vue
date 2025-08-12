@@ -16,7 +16,7 @@ const programs = [
     description:
       'Rise Young Leaders Summit is an annual program to improve youth capacity for young people aged 16-25 in various topics. The program encourages youth through competitions for fully and partially funded Leadership Trip Programs in 6 lot of countries.',
     date: '8 - 15 Juni 2025',
-    image: '/images/rise-young-leaders/banner.png',
+    image: '/images/ryls_banner.jpg',
     detailUrl: '/programs/rise-young-leaders-summit',
     registrationUrl: '/programs/rise-young-leaders-summit#registration',
     registrationLabel: 'Daftar Sekarang',

@@ -8,7 +8,7 @@ export const useFileUpload = () => {
   const uploadProgress = ref(0);
   const uploadError = ref(null);
 
-  const { uploadEssayFile, uploadHeadshotFile } = useRylsApi();
+  const { uploadEssayFile, uploadHeadshotFile, uploadPaymentProofFile } = useRylsSubmission();
 
   /**
    * Validate file before upload
@@ -57,7 +57,6 @@ export const useFileUpload = () => {
     uploadProgress.value = 0;
 
     try {
-      // Simulate progress (since $fetch doesn't provide real progress)
       const progressInterval = setInterval(() => {
         if (uploadProgress.value < 90) {
           uploadProgress.value += 10;
@@ -107,7 +106,6 @@ export const useFileUpload = () => {
     uploadProgress.value = 0;
 
     try {
-      // Simulate progress
       const progressInterval = setInterval(() => {
         if (uploadProgress.value < 90) {
           uploadProgress.value += 10;
@@ -137,6 +135,54 @@ export const useFileUpload = () => {
   };
 
   /**
+   * Upload payment proof file (Image or PDF)
+   * @param {File} file
+   * @returns {Promise<string|null>} fileId or null if failed
+   */
+  const uploadPaymentProof = async (file) => {
+    if (
+      !validateFile(file, {
+        maxSize: 10 * 1024 * 1024, // 10MB
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
+      })
+    ) {
+      return null;
+    }
+
+    isUploading.value = true;
+    uploadError.value = null;
+    uploadProgress.value = 10;
+
+    try {
+      const progressInterval = setInterval(() => {
+        if (uploadProgress.value < 90) {
+          uploadProgress.value += 10;
+        }
+      }, 200);
+
+      const response = await uploadPaymentProofFile(file);
+
+      clearInterval(progressInterval);
+      uploadProgress.value = 100;
+
+      if (response.success) {
+        return response.data;
+      } else {
+        uploadError.value = response.message || 'Payment proof upload failed';
+        return null;
+      }
+    } catch (error) {
+      uploadError.value = error.data?.message || 'Payment proof upload failed';
+      return null;
+    } finally {
+      isUploading.value = false;
+      setTimeout(() => {
+        uploadProgress.value = 0;
+      }, 1000);
+    }
+  };
+
+  /**
    * Reset upload state
    */
   const resetUploadState = () => {
@@ -151,6 +197,7 @@ export const useFileUpload = () => {
     uploadError: readonly(uploadError),
     uploadEssay,
     uploadHeadshot,
+    uploadPaymentProof,
     resetUploadState,
   };
 };

@@ -21,7 +21,7 @@ export const useRylsAdmin = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.get('/api/registrations', {
+      const response = await api.get('/api/ryls/registrations', {
         query: {
           ...(params.page ? { page: String(params.page) } : {}),
           ...(params.limit ? { limit: String(params.limit) } : {}),
@@ -32,7 +32,13 @@ export const useRylsAdmin = () => {
           ...(params.sortOrder ? { sortOrder: params.sortOrder } : {}),
         },
       });
-      registrations.value = response?.data?.registrations || [];
+      registrations.value = (response?.data?.registrations || []).map((reg) => ({
+        ...reg,
+        applicationInfo: {
+          ...reg.applicationInfo,
+          status: reg.applicationInfo?.status,
+        },
+      }));
       return {
         registrations: registrations.value,
         pagination: response?.data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 },
@@ -160,11 +166,11 @@ export const useRylsAdmin = () => {
    */
   const downloadFile = async (fileId) => {
     try {
-      // Use api utils without invalid headers parameter
+      console.log('Downloading file with ID:', fileId);
+
       const response = await api.get(`/api/uploads/${fileId}`);
-      // Handle response as blob
       const blob = response instanceof Blob ? response : new Blob([response]);
-      const filename = `file-${fileId}`; // Simple filename generation
+      const filename = `file-${fileId}`;
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');

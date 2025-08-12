@@ -13,6 +13,12 @@ export const useMidtransSnap = async () => {
   const clientKey = config.public.midtransClientKey || '';
   const src = isProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js';
 
+  console.log('Loading Midtrans Snap.js...');
+  console.log('Is production:', config.public.midtransMode);
+  console.log('Is production:', isProduction);
+  console.log('Client key:', clientKey);
+  console.log('Source URL:', src);
+
   await new Promise((resolve, reject) => {
     const existing = document.querySelector('script[data-midtrans]');
     if (existing) {

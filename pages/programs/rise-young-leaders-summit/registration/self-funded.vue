@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useRylsRegistrationStore } from '@/store/rylsRegistration';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -17,12 +17,11 @@ const router = useRouter();
 
 // Composables
 const { uploadHeadshot, isUploading: isUploadingFile, uploadError, uploadProgress } = useFileUpload();
-const { submitSelfFunded, isSubmitting, submissionError, submissionSuccess, submissionId } = useRylsSubmission();
 
 onMounted(() => {
-  // if (store.step1.scholarshipType !== 'self_funded') {
-  //   return router.push('/programs/rise-young-leaders-summit/registration');
-  // }
+  if (store.step1.scholarshipType !== 'SELF_FUNDED') {
+    return router.push('/programs/rise-young-leaders-summit/registration');
+  }
 });
 
 const headshotFile = ref(/** @type {File|null} */ (null));
@@ -33,7 +32,7 @@ const formSchema = toTypedSchema(
     passportNumber: z.string().min(1, 'Required field'),
     needVisa: z.enum(['YES', 'NO'], { message: 'Please select Yes/No' }),
     headshotFile: z.string().min(1, 'Headshot file is required'),
-    readPolicies: z.enum(['YES', 'NO']).refine((val) => val === 'YES', {
+    readPolicies: z.enum(['YES', 'NO', '']).refine((val) => val === 'YES', {
       message: 'You must agree (Yes)',
     }),
   })
@@ -51,33 +50,21 @@ const form = useForm({
 
 const onBack = () => router.push('/programs/rise-young-leaders-summit/registration');
 const onNext = form.handleSubmit(async (values) => {
-  // Manual validation for file upload
-  if (!headshotFile.value || !headshotFileId.value) {
+  if (!headshotFileId.value) {
     alert('Please upload headshot photo first');
     return;
   }
 
-  // Save to store first
-  store.setSelfFundedData({
-    passportNumber: values.passportNumber,
-    needVisa: values.needVisa,
-    headshotFile: headshotFileId.value, // Store file ID instead of file object
-    readPolicies: values.readPolicies,
-  });
-
-  console.log('Self funded form data saved:', {
-    passportNumber: values.passportNumber,
-    needVisa: values.needVisa,
-    headshotFileId: headshotFileId.value,
-    readPolicies: values.readPolicies,
-  });
-
-  // Submit to API
-  const success = await submitSelfFunded();
-
-  if (success) {
-    // Redirect to success page or show success message
-    router.push(`/programs/rise-young-leaders-summit/registration/success?id=${submissionId.value}`);
+  try {
+    store.setSelfFundedData({
+      passportNumber: values.passportNumber,
+      needVisa: values.needVisa,
+      headshotFile: headshotFileId.value,
+      readPolicies: values.readPolicies,
+    });
+    router.push('/programs/rise-young-leaders-summit/registration/payment');
+  } catch (error) {
+    alert('Failed to save your information. Please try again.');
   }
 });
 
@@ -89,7 +76,6 @@ const onHeadshotChange = async (e, componentField) => {
     componentField['onUpdate:modelValue']('');
     return;
   }
-  // Update to accept image formats as per user's change
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   if (!allowedTypes.includes(file.type)) {
     alert('File must be JPG, JPEG, or PNG');
@@ -111,23 +97,28 @@ const onHeadshotChange = async (e, componentField) => {
   headshotFile.value = file;
   componentField['onUpdate:modelValue'](file.name);
 
-  // Upload file immediately
-  const fileId = await uploadHeadshot(file);
-  if (fileId) {
-    headshotFileId.value = fileId;
-    console.log('Headshot file uploaded successfully:', fileId);
+  try {
+    const fileId = await uploadHeadshot(file);
+    if (fileId) {
+      headshotFileId.value = fileId;
+    }
+  } catch (error) {
+    alert('Failed to upload headshot file. Please try again.');
+    e.target.value = '';
+    headshotFile.value = null;
+    headshotFileId.value = null;
+    componentField['onUpdate:modelValue']('');
   }
 };
 </script>
 
 <template>
-  <section class="mx-auto max-w-xl px-4 py-10 md:py-12">
+  <section class="mx-auto max-w-xl px-6 py-10 md:py-12">
     <div class="mb-6">
-      <img
+      <NuxtImg
         src="/images/ryls_banner.jpg"
         alt="Rise Young Leaders Summit Japan 2025 banner"
         class="w-full rounded-xl object-cover max-h-64 md:max-h-80"
-        loading="lazy"
       />
     </div>
     <header class="space-y-3 my-8">
@@ -212,17 +203,9 @@ const onHeadshotChange = async (e, componentField) => {
 
       <hr class="my-6 border-gray-200" />
 
-      <div class="space-y-2">
-        <div class="font-semibold">See you in Japan! 🇯🇵</div>
-        <div class="text-sm text-muted-foreground">Thank you, our team will contact you less than 2x24 hours! 😉</div>
-        <div class="text-sm text-muted-foreground">
-          If you have questions or concerns, contact us at
-          <a href="mailto:risesocial.official@gmail.com" class="underline">risesocial.official@gmail.com.</a>
-        </div>
-      </div>
       <!-- Error Messages -->
-      <div v-if="submissionError || uploadError" class="p-4 bg-red-50 border border-red-200 rounded-md">
-        <p class="text-sm text-red-600">{{ submissionError || uploadError }}</p>
+      <div v-if="uploadError" class="p-4 bg-red-50 border border-red-200 rounded-md">
+        <p class="text-sm text-red-600">{{ uploadError }}</p>
       </div>
 
       <!-- Upload Progress -->
@@ -234,9 +217,9 @@ const onHeadshotChange = async (e, componentField) => {
       </div>
 
       <div class="flex justify-end gap-3 pt-2">
-        <Button type="button" variant="outline" @click="onBack" class="px-6" :disabled="isSubmitting">Back</Button>
-        <Button type="submit" class="px-6" :disabled="isSubmitting || isUploadingFile">
-          {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+        <Button type="button" variant="outline" @click="onBack" class="px-6" :disabled="isUploadingFile">Back</Button>
+        <Button type="submit" class="px-6" :disabled="isUploadingFile">
+          {{ isUploadingFile ? 'Uploading...' : 'Next' }}
         </Button>
       </div>
     </form>

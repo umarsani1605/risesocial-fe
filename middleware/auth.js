@@ -11,16 +11,11 @@ import { useAuthStore } from '@/store/auth';
 export default defineNuxtRouteMiddleware((to, from) => {
   const authStore = useAuthStore();
 
-  // Check if user is authenticated
   if (authStore.status === 'unauthenticated') {
-    return navigateTo('/?login=true&redirect=' + encodeURIComponent(to.fullPath));
+    return navigateTo('/');
   }
 
-  // Check admin requirement from route meta
-  if (to.meta.requireAdmin && authStore.user?.role !== 'ADMIN') {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Access forbidden: Admin privileges required',
-    });
+  if (authStore.user?.role !== 'ADMIN') {
+    return navigateTo('/');
   }
 });

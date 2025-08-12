@@ -56,22 +56,23 @@ const handleLogin = async () => {
   isLoading.value = true;
 
   try {
-    await authStore.signIn({
+    const response = await authStore.signIn({
       email: loginForm.value.email,
       password: loginForm.value.password,
       rememberMe: loginForm.value.keepSignedIn,
     });
 
-    // Login successful
-    console.log('✅ Backend Auth: Login successful');
+    console.log('✅ Backend Auth: Login successful' + JSON.stringify(response));
     isOpen.value = false;
 
-    // Check for redirect parameter
     const route = useRoute();
     const redirectTo = route.query.redirect;
 
+    // Redirect based on user role
     if (redirectTo) {
       await navigateTo(decodeURIComponent(redirectTo));
+    } else if (authStore.user?.role === 'ADMIN') {
+      await navigateTo('/admin');
     } else {
       await navigateTo('/dashboard');
     }

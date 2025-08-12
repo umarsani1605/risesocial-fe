@@ -8,17 +8,17 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { CalendarDays } from 'lucide-vue-next';
-
 import { useRylsRegistrationStore } from '@/store/rylsRegistration';
-
-console.log('🚀 Script setup executed');
+import { GENDER_OPTIONS, DISCOVER_SOURCES, SCHOLARSHIP_TYPES } from '@/constants/ryls';
 
 definePageMeta({ layout: 'blank' });
 
 const store = useRylsRegistrationStore();
 const router = useRouter();
 
-console.log('📦 Store and router initialized');
+const genderValueCodes = GENDER_OPTIONS.map((option) => option.value);
+const discoverSourceValueCodes = DISCOVER_SOURCES.map((option) => option.value);
+const scholarshipTypeValueCodes = SCHOLARSHIP_TYPES.map((option) => option.value);
 
 const formSchema = toTypedSchema(
   z
@@ -31,15 +31,14 @@ const formSchema = toTypedSchema(
       whatsapp: z.string().min(1, 'Required field'),
       institution: z.string().min(1, 'Required field'),
       dateOfBirth: z.string().min(1, 'Required field'),
-      gender: z.enum(['MALE', 'FEMALE', 'PREFER_NOT_TO_SAY'], { message: 'Please select one option' }),
-      discoverSource: z.enum(['RISE_INSTAGRAM', 'OTHER_INSTAGRAM', 'FRIENDS_COLLEAGUES', 'OTHER'], { message: 'Please select one option' }),
+      gender: z.enum(genderValueCodes, { message: 'Please select one option' }),
+      discoverSource: z.enum(discoverSourceValueCodes, { message: 'Please select one option' }),
       discoverOtherText: z.string().optional(),
-      scholarshipType: z.enum(['FULLY_FUNDED', 'SELF_FUNDED'], { message: 'Please select one option' }),
+      scholarshipType: z.enum(scholarshipTypeValueCodes, { message: 'Please select one option' }),
     })
     .refine(
       (data) => {
-        // Jika pilih "other" tapi discoverOtherText kosong
-        if (data.discoverSource === 'other' && (!data.discoverOtherText || !data.discoverOtherText.trim())) {
+        if (data.discoverSource === 'OTHER' && (!data.discoverOtherText || !data.discoverOtherText.trim())) {
           return false;
         }
         return true;
@@ -69,12 +68,8 @@ const form = useForm({
   },
 });
 
-console.log('📝 Form initialized:', form);
-
 const onNext = form.handleSubmit(
   (values) => {
-    console.log('✅ Form validation SUCCESS, values:', values);
-
     const dataToStore = values;
 
     store.setStep1(dataToStore);
@@ -87,24 +82,18 @@ const onNext = form.handleSubmit(
     }
   },
   (errors) => {
-    console.log('❌ Form validation FAILED, errors:', errors);
-    console.log('❌ Error details:', {
-      values: errors.values,
-      errorMessages: errors.errors,
-      results: errors.results,
-    });
+    alert('Please try again later.');
   }
 );
 </script>
 
 <template>
-  <section class="mx-auto max-w-xl px-4 py-10 md:py-12" data-layout="blank">
+  <section class="mx-auto max-w-xl px-6 py-10 md:py-12" data-layout="blank">
     <div class="mb-6">
-      <img
+      <NuxtImg
         src="/images/ryls_banner.jpg"
         alt="Rise Young Leaders Summit Japan 2025 banner"
         class="w-full rounded-xl object-cover max-h-64 md:max-h-80"
-        loading="lazy"
       />
     </div>
     <header class="space-y-3 my-8">
@@ -257,21 +246,9 @@ const onNext = form.handleSubmit(
               <FormLabel>Where did you find out about the Rise Young Leaders Summit 2025 program? <span class="text-red-500">*</span></FormLabel>
               <FormControl>
                 <RadioGroup v-bind="componentField" class="flex flex-col gap-2">
-                  <Label for="discover-rise">
-                    <RadioGroupItem id="discover-rise" value="RISE_INSTAGRAM" />
-                    <span class="flex-1 font-medium">Rise Social Instagram</span>
-                  </Label>
-                  <Label for="discover-other-ig">
-                    <RadioGroupItem id="discover-other-ig" value="OTHER_INSTAGRAM" />
-                    <span class="flex-1 font-medium">Others Instagram account</span>
-                  </Label>
-                  <Label for="discover-friends">
-                    <RadioGroupItem id="discover-friends" value="FRIENDS_COLLEAGUES" />
-                    <span class="flex-1 font-medium">Friends/colleagues</span>
-                  </Label>
-                  <Label for="discover-other">
-                    <RadioGroupItem id="discover-other" value="OTHER" />
-                    <span class="flex-1 font-medium">Other</span>
+                  <Label v-for="option in DISCOVER_SOURCES" :key="option.value" :for="`discover-${option.value}`">
+                    <RadioGroupItem :id="`discover-${option.value}`" :value="option.value" />
+                    <span class="flex-1 font-medium">{{ option.label }}</span>
                   </Label>
                 </RadioGroup>
               </FormControl>
@@ -294,15 +271,9 @@ const onNext = form.handleSubmit(
             <FormLabel>Which type of scholarship/invitation you choose<span class="text-red-500">*</span></FormLabel>
             <FormControl>
               <RadioGroup v-bind="componentField" class="grid grid-cols-1 gap-3">
-                <Label for="scholarship-full">
-                  <RadioGroupItem id="scholarship-full" value="FULLY_FUNDED" />
-                  <span class="flex-1 font-medium leading-normal"
-                    >Fully Funded (participants who are not selected will directly become partially funded participants)</span
-                  >
-                </Label>
-                <Label for="scholarship-self">
-                  <RadioGroupItem id="scholarship-self" value="SELF_FUNDED" />
-                  <span class="flex-1 font-medium">Self Funded</span>
+                <Label v-for="option in SCHOLARSHIP_TYPES" :key="option.value" :for="`scholarship-${option.value}`">
+                  <RadioGroupItem :id="`scholarship-${option.value}`" :value="option.value" />
+                  <span class="flex-1 font-medium leading-normal">{{ option.label }}</span>
                 </Label>
               </RadioGroup>
             </FormControl>

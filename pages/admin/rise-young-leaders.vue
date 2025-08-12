@@ -4,57 +4,81 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell, TableEmp
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import StatusBadge from '@/components/admin/ryls/StatusBadge.vue';
-import ScholarshipBadge from '@/components/admin/ryls/ScholarshipBadge.vue';
+import { Badge } from '@/components/ui/badge';
 import RegistrationDetailModal from '@/components/admin/ryls/RegistrationDetailModal.vue';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import { Toaster } from '@/components/ui/sonner';
-import { ArrowUp, ArrowDown, Eye, Download, Trash2 } from 'lucide-vue-next';
+import { ArrowUp, ArrowDown, Eye, Download, Trash2, Loader2, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import { useRylsAdmin } from '@/composables/useRylsAdmin';
 
-definePageMeta({ layout: 'admin-dashboard' });
+definePageMeta({ layout: 'admin-dashboard', middleware: 'auth' });
 
-// Server-side params
-const page = ref(1);
-const limit = ref(10);
+// Client-side state
 const search = ref('');
-const status = ref('ALL'); // 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'
+const status = ref('ALL'); // 'ALL' | 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED'
 const scholarshipType = ref('ALL'); // 'ALL' | 'FULLY_FUNDED' | 'SELF_FUNDED'
 
 // Computed filters
 const statusFilter = computed(() => (status.value === 'ALL' ? '' : status.value));
 const scholarshipFilter = computed(() => (scholarshipType.value === 'ALL' ? '' : scholarshipType.value));
 
-// Use RYLS admin composable (pattern mirip useAdminJobs)
-const { registrations, isLoading, error, fetchRegistrations, getRegistrationById, deleteRegistration, exportRegistrations, downloadFile } =
-  useRylsAdmin();
+// Use RYLS admin composable
+const {
+  registrations: allRegistrations,
+  isLoading,
+  error,
+  fetchRegistrations,
+  deleteRegistration,
+  exportRegistrations,
+  downloadFile,
+} = useRylsAdmin();
 
-const meta = ref({ page: 1, limit: 10, total: 0, totalPages: 1 });
-
-const fetchData = async () => {
+// Fetch all data once
+const fetchAllData = async () => {
   try {
-    const result = await fetchRegistrations({
-      page: page.value,
-      limit: limit.value,
-      search: search.value || undefined,
-      status: statusFilter.value || undefined,
-      scholarshipType: scholarshipFilter.value || undefined,
+    await fetchRegistrations({
+      page: 1,
+      limit: 1000, // Fetch all data at once
       sortBy: 'created_at',
       sortOrder: 'desc',
     });
-
-    meta.value = result.pagination;
   } catch (e) {
     toast.error('Failed to fetch registrations');
   }
 };
 
-watch([page, limit, search, status, scholarshipType], fetchData, { immediate: true });
+// Initial data fetch
+fetchAllData();
 
-// Client-side sorting (on current page data)
-const sortBy = ref('personalInfo.fullName');
-const sortDir = ref('asc'); // 'asc' | 'desc'
+// Client-side filtered data
+const filteredRegistrations = computed(() => {
+  if (!Array.isArray(allRegistrations.value)) return [];
+
+  return allRegistrations.value.filter((registration) => {
+    // Search filter
+    const matchesSearch =
+      !search.value ||
+      registration.full_name?.toLowerCase().includes(search.value.toLowerCase()) ||
+      registration.email?.toLowerCase().includes(search.value.toLowerCase()) ||
+      registration.whatsapp?.includes(search.value) ||
+      registration.institution?.toLowerCase().includes(search.value.toLowerCase());
+
+    // Status filter
+    const matchesStatus = status.value === 'ALL' || registration.payments?.some((p) => p.status === status.value);
+
+    // Scholarship type filter
+    const matchesScholarshipType = scholarshipType.value === 'ALL' || registration.scholarship_type === scholarshipType.value;
+
+    return matchesSearch && matchesStatus && matchesScholarshipType;
+  });
+});
+
+// Client-side sorting state
+const sortBy = ref('created_at');
+const sortDir = ref('desc'); // 'asc' | 'desc'
+
+// Toggle sort direction or change sort column
 const toggleSort = (key) => {
   if (sortBy.value === key) {
     sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc';
@@ -64,29 +88,72 @@ const toggleSort = (key) => {
   }
 };
 
-const sortedRegistrations = computed(() => {
-  const arr = Array.isArray(registrations.value) ? [...registrations.value] : [];
-  const dir = sortDir.value === 'asc' ? 1 : -1;
-  return arr.sort((a, b) => {
-    let va, vb;
+// Deep get nested property helper with array support
+const getNestedValue = (obj, path) => {
+  if (!obj) return '';
+  return path.split('.').reduce((o, p) => {
+    if (o === null || o === undefined) return '';
+    if (Array.isArray(o) && !isNaN(p)) {
+      return o[parseInt(p)] || '';
+    }
+    return o[p] !== undefined ? o[p] : '';
+  }, obj);
+};
 
-    // Handle nested properties
-    if (sortBy.value.includes('.')) {
-      const keys = sortBy.value.split('.');
-      va = keys.reduce((obj, key) => obj?.[key], a);
-      vb = keys.reduce((obj, key) => obj?.[key], b);
-    } else {
-      va = a[sortBy.value];
-      vb = b[sortBy.value];
+// Apply sorting to filtered registrations
+const sortedRegistrations = computed(() => {
+  if (!filteredRegistrations.value.length) return [];
+
+  const dir = sortDir.value === 'asc' ? 1 : -1;
+  const sortKey = sortBy.value;
+
+  return [...filteredRegistrations.value].sort((a, b) => {
+    let aVal = getNestedValue(a, sortKey);
+    let bVal = getNestedValue(b, sortKey);
+
+    // Handle null/undefined values
+    if (aVal == null && bVal == null) return 0;
+    if (aVal == null) return -1 * dir;
+    if (bVal == null) return 1 * dir;
+
+    // Special handling for dates
+    if (sortKey.includes('date') || sortKey.includes('created') || sortKey.includes('updated')) {
+      const dateA = new Date(aVal);
+      const dateB = new Date(bVal);
+      const timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
+      const timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
+      return (timeA - timeB) * dir;
     }
 
-    if (va == null && vb == null) return 0;
-    if (va == null) return -1 * dir;
-    if (vb == null) return 1 * dir;
-    if (sortBy.value === 'timestamps.createdAt') return (new Date(va) - new Date(vb)) * dir;
-    return String(va).localeCompare(String(vb)) * dir;
+    // Numeric comparison for numeric fields
+    if (['amount', 'id'].some((prefix) => sortKey.includes(prefix))) {
+      const numA = Number(aVal);
+      const numB = Number(bVal);
+      return (isNaN(numA) ? 0 : numA - (isNaN(numB) ? 0 : numB)) * dir;
+    }
+
+    // Default to case-insensitive string comparison
+    return (
+      String(aVal || '')
+        .toLowerCase()
+        .localeCompare(String(bVal || '').toLowerCase()) * dir
+    );
   });
 });
+
+// Pagination
+const page = ref(1);
+const pageSize = ref(10);
+
+// Compute paginated data from sorted results
+const paginatedRegistrations = computed(() => {
+  const start = (page.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return sortedRegistrations.value.slice(start, end);
+});
+
+// Total pages for pagination
+const pageCount = computed(() => Math.ceil(filteredRegistrations.value.length / pageSize.value));
 
 // Delete confirmation dialog
 const deleteDialogOpen = ref(false);
@@ -98,16 +165,9 @@ const detailModalOpen = ref(false);
 const selectedRegistration = ref(null);
 const loadingDetail = ref(false);
 
-const openView = async (registration) => {
-  try {
-    loadingDetail.value = true;
-    selectedRegistration.value = await getRegistrationById(registration.id);
-    detailModalOpen.value = true;
-  } catch (e) {
-    toast.error('Failed to load registration details');
-  } finally {
-    loadingDetail.value = false;
-  }
+const openView = (registration) => {
+  selectedRegistration.value = registration;
+  detailModalOpen.value = true;
 };
 
 const openDelete = (registration) => {
@@ -123,7 +183,7 @@ const confirmDelete = async () => {
     toast.success('Registration deleted successfully');
     deleteDialogOpen.value = false;
     registrationToDelete.value = null;
-    fetchData();
+    fetchAllData();
   } catch (e) {
     toast.error(e.message || 'Failed to delete registration');
   } finally {
@@ -131,9 +191,9 @@ const confirmDelete = async () => {
   }
 };
 
-const handleFileDownload = async (file) => {
+const handleFileDownload = async (fileId) => {
   try {
-    await downloadFile(file.id);
+    await downloadFile(fileId);
     toast.success('File download started');
   } catch (e) {
     toast.error(e.message || 'Failed to download file');
@@ -167,37 +227,70 @@ const handleExport = async () => {
 
 // Utility functions
 const formatDate = (dateString) => {
-  return dateString ? new Date(dateString).toLocaleString() : '-';
+  if (!dateString) return '-';
+  try {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch (e) {
+    return dateString;
+  }
 };
 
-const pageSizes = [10, 20, 30, 50];
+const formatPaymentStatus = (status) => {
+  if (!status) return 'PENDING';
+  return status
+    .toLowerCase()
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const getPaymentStatusVariant = (status) => {
+  if (!status) return 'outline';
+
+  switch (status.toLowerCase()) {
+    case 'paid':
+      return 'success';
+    case 'pending':
+      return 'warning';
+    case 'failed':
+    case 'expired':
+      return 'destructive';
+    default:
+      return 'outline';
+  }
+};
+
+// Format scholarship type for display
+const formatScholarshipType = (type) => {
+  if (!type) return 'N/A';
+  return type === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded';
+};
+
+// Clear all filters
+const clearFilters = () => {
+  search.value = '';
+  status.value = 'ALL';
+  scholarshipType.value = 'ALL';
+  page.value = 1; // Reset to first page when clearing filters
+};
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h1 class="text-xl font-semibold">RYLS Registrations</h1>
-      <Button @click="handleExport" :disabled="isLoading" class="flex items-center gap-2">
-        <Download class="w-4 h-4" />
-        {{ isLoading ? 'Exporting...' : 'Export CSV' }}
-      </Button>
+      <h1 class="text-xl font-semibold">Rise Young Leaders Scholarship Registrations</h1>
     </div>
 
     <!-- Toolbar -->
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex gap-2 w-full sm:w-auto flex-wrap">
-        <Input class="w-full sm:w-64" placeholder="Search name/email/submission ID" v-model="search" />
-        <Select v-model="status">
-          <SelectTrigger class="w-36">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Status</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="APPROVED">Approved</SelectItem>
-            <SelectItem value="REJECTED">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
+        <Input class="w-full sm:w-64" placeholder="Search name or email..." v-model="search" />
         <Select v-model="scholarshipType">
           <SelectTrigger class="w-36">
             <SelectValue placeholder="Type" />
@@ -216,108 +309,185 @@ const pageSizes = [10, 20, 30, 50];
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead @click="toggleSort('submissionId')" class="cursor-pointer">
-              Submission ID
-              <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'submissionId'">
-                <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                <ArrowUp v-else class="w-3 h-3" />
-              </span>
+            <TableHead class="w-16">No</TableHead>
+            <TableHead @click="toggleSort('full_name')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Name</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'full_name'">
+                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
+                  <ArrowUp v-else class="w-3 h-3" />
+                </span>
+              </div>
             </TableHead>
-            <TableHead @click="toggleSort('personalInfo.fullName')" class="cursor-pointer">
-              Full Name
-              <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'personalInfo.fullName'">
-                <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                <ArrowUp v-else class="w-3 h-3" />
-              </span>
+            <TableHead class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Email</span>
+              </div>
             </TableHead>
-            <TableHead @click="toggleSort('personalInfo.email')" class="cursor-pointer">
-              Email
-              <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'personalInfo.email'">
-                <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                <ArrowUp v-else class="w-3 h-3" />
-              </span>
+            <TableHead class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Whatsapp</span>
+              </div>
             </TableHead>
-            <TableHead>Nationality</TableHead>
-            <TableHead>Scholarship Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead @click="toggleSort('timestamps.createdAt')" class="cursor-pointer">
-              Created
-              <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'timestamps.createdAt'">
-                <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                <ArrowUp v-else class="w-3 h-3" />
-              </span>
+            <TableHead @click="toggleSort('nationality')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Nationality</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'nationality'">
+                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
+                  <ArrowUp v-else class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('institution')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Institution</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'institution'">
+                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
+                  <ArrowUp v-else class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('scholarship_type')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Type</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'scholarship_type'">
+                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
+                  <ArrowUp v-else class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('scholarship_type')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Payment</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'scholarship_type'">
+                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
+                  <ArrowUp v-else class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('created_at')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Registration Date</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'created_at'">
+                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
+                  <ArrowUp v-else class="w-3 h-3" />
+                </span>
+              </div>
             </TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <template v-if="!isLoading && sortedRegistrations.length">
-            <TableRow v-for="registration in sortedRegistrations" :key="registration.id">
-              <TableCell class="font-mono text-sm">
-                {{ registration.submissionId }}
+          <template v-if="!isLoading && sortedRegistrations.length > 0">
+            <TableRow v-for="(registration, index) in paginatedRegistrations" :key="registration.id" class="hover:bg-muted/50">
+              <TableCell class="text-center text-sm">
+                {{ (page - 1) * pageSize + index + 1 }}
               </TableCell>
               <TableCell class="font-medium">
-                {{ registration.personalInfo?.fullName || '-' }}
+                {{ registration.full_name || 'N/A' }}
               </TableCell>
               <TableCell>
-                {{ registration.personalInfo?.email || '-' }}
-              </TableCell>
-              <TableCell class="text-muted-foreground">
-                {{ registration.personalInfo?.nationality || '-' }}
+                {{ registration.email }}
               </TableCell>
               <TableCell>
-                <ScholarshipBadge :type="registration.applicationInfo?.scholarshipType" />
+                {{ registration.whatsapp }}
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ registration.nationality || 'N/A' }}
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ registration.institution || 'N/A' }}
               </TableCell>
               <TableCell>
-                <StatusBadge :status="registration.applicationInfo?.status" />
-              </TableCell>
-              <TableCell class="text-muted-foreground">
-                {{ formatDate(registration.timestamps?.createdAt) }}
+                <Badge
+                  variant="outline"
+                  :class="[
+                    'whitespace-nowrap',
+                    registration.scholarship_type === 'FULLY_FUNDED' ? 'bg-primary text-white' : 'bg-primary/5 text-primary border border-primary',
+                  ]"
+                >
+                  {{ formatScholarshipType(registration.scholarship_type) }}
+                </Badge>
               </TableCell>
               <TableCell>
+                <NuxtImg v-if="registration.payments[0].type === 'PAYPAL'" src="/images/payment-logo/paypal_small.png" alt="paypal" class="h-4" />
+                <NuxtImg v-if="registration.payments[0].type === 'MIDTRANS'" src="/images/payment-logo/midtrans.png" alt="midtrans" class="h-3" />
+              </TableCell>
+              <TableCell class="text-sm text-muted-foreground whitespace-nowrap">
+                {{ formatDate(registration.created_at) }}
+              </TableCell>
+              <TableCell class="w-24">
                 <div class="flex items-center gap-2">
-                  <Button variant="outline" size="sm" class="flex items-center gap-1" @click="openView(registration)" :disabled="loadingDetail">
-                    <Eye class="w-3 h-3" />
-                    View
+                  <Button variant="outline" size="sm" @click="openView(registration)">
+                    <span>View</span>
                   </Button>
                 </div>
               </TableCell>
             </TableRow>
           </template>
-          <TableEmpty v-else-if="!isLoading" :colspan="8">
-            {{ error ? 'Failed to load data' : 'No registrations found' }}
-          </TableEmpty>
+
+          <TableRow v-else-if="isLoading">
+            <TableCell :colspan="8" class="text-center py-8">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <Loader2 class="h-6 w-6 animate-spin text-muted-foreground" />
+                <span class="text-sm text-muted-foreground">Loading registrations...</span>
+              </div>
+            </TableCell>
+          </TableRow>
+
           <TableRow v-else>
-            <TableCell :colspan="8" class="text-center py-6"> Loading registrations... </TableCell>
+            <TableCell :colspan="8" class="text-center py-8">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <span class="text-muted-foreground">
+                  {{ search || status !== 'ALL' || scholarshipType !== 'ALL' ? 'No matching registrations found' : 'No registrations yet' }}
+                </span>
+                <Button v-if="search || status !== 'ALL' || scholarshipType !== 'ALL'" variant="ghost" size="sm" @click="clearFilters" class="mt-2">
+                  Clear filters
+                </Button>
+              </div>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
     </div>
 
     <!-- Pagination -->
-    <div class="flex items-center justify-between px-2">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
       <div class="flex items-center gap-2">
-        <span class="text-sm">Rows per page</span>
-        <Select :model-value="String(meta.limit)" @update:model-value="(v) => (limit = Number(v))">
-          <SelectTrigger class="h-8 w-[80px]">
-            <SelectValue :placeholder="String(meta.limit)" />
-          </SelectTrigger>
-          <SelectContent side="top">
-            <SelectItem v-for="s in pageSizes" :key="s" :value="String(s)">{{ s }}</SelectItem>
-          </SelectContent>
-        </Select>
+        <span class="text-sm text-muted-foreground">
+          Showing {{ Math.min((page - 1) * pageSize + 1, filteredRegistrations.length) }} to
+          {{ Math.min(page * pageSize, filteredRegistrations.length) }} of {{ filteredRegistrations.length }} entries
+        </span>
       </div>
+
       <div class="flex items-center gap-2">
-        <Button variant="outline" class="h-8 px-2" :disabled="meta.page <= 1" @click="page = Math.max(1, meta.page - 1)"> Prev </Button>
-        <span class="text-sm">Page {{ meta.page }} of {{ meta.totalPages || 1 }}</span>
-        <Button
-          variant="outline"
-          class="h-8 px-2"
-          :disabled="meta.page >= (meta.totalPages || 1)"
-          @click="page = Math.min(meta.totalPages || 1, meta.page + 1)"
-        >
-          Next
-        </Button>
+        <div class="flex items-center gap-2">
+          <span class="whitespace-nowrap text-sm">Rows per page:</span>
+          <Select v-model="pageSize" :disabled="isLoading">
+            <SelectTrigger class="h-8 w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="size in [10, 20, 50, 100]" :key="size" :value="size">
+                {{ size }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <Button variant="outline" size="sm" :disabled="page <= 1 || isLoading" @click="page--" class="h-8 w-8 p-0">
+            <ChevronLeft class="h-4 w-4" />
+            <span class="sr-only">Previous page</span>
+          </Button>
+          <div class="flex items-center justify-center w-8 h-8 text-sm">
+            {{ page }}
+          </div>
+          <Button variant="outline" size="sm" :disabled="page >= pageCount || isLoading" @click="page++" class="h-8 w-8 p-0">
+            <ChevronRight class="h-4 w-4" />
+            <span class="sr-only">Next page</span>
+          </Button>
+        </div>
       </div>
     </div>
 

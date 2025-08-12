@@ -41,10 +41,47 @@ export const useRylsRegistrationStore = defineStore('rylsRegistration', {
 
     // Self funded branch
     passportNumber: '',
-    needVisa: /** @type {('yes'|'no'|'')} */ (''),
+    needVisa: /** @type {('YES'|'NO'|'')} */ (''),
     headshotFile: /** @type {File|null} */ (null),
-    readPolicies: /** @type {('yes'|'no'|'')} */ (''),
+    readPolicies: /** @type {('YES'|'NO'|'')} */ (''),
+
+    payment: {
+      id: null,
+      type: null, // 'PAYPAL' | 'MIDTRANS'
+      status: 'PENDING', // 'PENDING' | 'EXPIRED' | 'PAID' | 'FAILED'
+      paymentProof: null, // for PayPal
+      midtransData: null, // for Midtrans
+    },
   }),
+
+  getters: {
+    getAllRegistrationData: (state) => ({
+      step1: state.step1,
+      essayTopic: state.essayTopic,
+      essayFile: state.essayFile,
+      essayDescription: state.essayDescription,
+      passportNumber: state.passportNumber,
+      needVisa: state.needVisa,
+      headshotFile: state.headshotFile,
+      readPolicies: state.readPolicies,
+      payment: state.payment,
+    }),
+    getStep1Data: (state) => ({
+      ...state.step1,
+    }),
+    getStep2Data: (state) => ({
+      essayTopic: state.essayTopic,
+      essayFile: state.essayFile,
+      essayDescription: state.essayDescription,
+      passportNumber: state.passportNumber,
+      needVisa: state.needVisa,
+      headshotFile: state.headshotFile,
+      readPolicies: state.readPolicies,
+    }),
+    getPaymentData: (state) => ({
+      payment: state.payment,
+    }),
+  },
 
   actions: {
     /**
@@ -62,9 +99,9 @@ export const useRylsRegistrationStore = defineStore('rylsRegistration', {
      * @param {string} payload.essayDescription
      */
     setFullyFundedData(payload) {
-      if (payload.essayTopic !== undefined) this.essayTopic = payload.essayTopic;
-      if (payload.essayFile !== undefined) this.essayFile = payload.essayFile;
-      if (payload.essayDescription !== undefined) this.essayDescription = payload.essayDescription;
+      this.essayTopic = payload.essayTopic;
+      this.essayFile = payload.essayFile;
+      this.essayDescription = payload.essayDescription;
     },
 
     /**
@@ -76,10 +113,45 @@ export const useRylsRegistrationStore = defineStore('rylsRegistration', {
      * @param {('yes'|'no')} payload.readPolicies
      */
     setSelfFundedData(payload) {
-      if (payload.passportNumber !== undefined) this.passportNumber = payload.passportNumber;
-      if (payload.needVisa !== undefined) this.needVisa = payload.needVisa;
-      if (payload.headshotFile !== undefined) this.headshotFile = payload.headshotFile;
-      if (payload.readPolicies !== undefined) this.readPolicies = payload.readPolicies;
+      this.passportNumber = payload.passportNumber;
+      this.needVisa = payload.needVisa;
+      this.headshotFile = payload.headshotFile;
+      this.readPolicies = payload.readPolicies;
+    },
+    setPaymentStatus(status) {
+      this.payment.status = status;
+    },
+
+    /**
+     * Set the payment type
+     * @param {'midtrans'|'paypal'} type - The payment type
+     */
+    setPaymentType(type) {
+      this.payment.type = type;
+    },
+
+    /**
+     * Set the payment proof file (for PayPal)
+     * @param {File} file - The payment proof file
+     */
+    setPaymentProof(file) {
+      this.payment.paymentProof = file;
+    },
+
+    setPaymentId(id) {
+      this.payment.id = id;
+    },
+
+    setMidtransData(data) {
+      this.payment.midtransData = data;
+    },
+
+    resetPayment() {
+      this.payment.id = null;
+      this.payment.status = null;
+      this.payment.type = null;
+      this.payment.paymentProof = null;
+      this.payment.midtransData = null;
     },
 
     resetAll() {
@@ -104,6 +176,10 @@ export const useRylsRegistrationStore = defineStore('rylsRegistration', {
       this.needVisa = '';
       this.headshotFile = null;
       this.readPolicies = '';
+      this.payment.status = null;
+      this.payment.type = null;
+      this.payment.paymentProof = null;
+      this.payment.midtransData = null;
     },
   },
 });

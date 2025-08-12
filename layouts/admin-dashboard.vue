@@ -10,7 +10,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
       <header class="flex h-14 shrink-0 items-center gap-2 border-b px-4">
         <div class="text-sm font-semibold">Admin</div>
       </header>
-      <main class="p-4">
+      <main class="p-4 h-full">
         <slot />
       </main>
     </SidebarInset>

@@ -172,23 +172,18 @@ useSeoMeta({
             class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 p-4 border rounded-lg transition-all duration-200 hover:border-gray-300"
           >
             <div class="size-20 sm:size-36 rounded-md flex-shrink-0 flex items-center justify-center">
-              <img src="/images/rise-young-leaders/banner.png" alt="Rise Young Leaders Summit" class="w-full h-full object-cover rounded-md" />
+              <NuxtImg src="/images/ryls_banner.jpg" alt="Rise Young Leaders Summit" class="w-full h-full object-cover rounded-md" />
             </div>
             <div class="flex-1 min-w-0 w-full">
               <h3 class="heading-card-sm mb-2">Rise Young Leaders Summit</h3>
               <p class="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
-                Program pengembangan kepemimpinan berkelanjutan untuk generasi muda yang ingin menciptakan dampak positif bagi lingkungan dan
-                masyarakat.
+                Rise Young Leaders Summit is an annual program to improve youth capacity for young people aged 16-25 in various topics. The program
+                encourages youth through competitions for fully and partially funded Leadership Trip Programs in 6 lot of countries.
               </p>
 
-              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
-                <div class="flex items-center text-xs sm:text-sm text-gray-500">
-                  <Icon name="lucide:calendar" class="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>8 - 15 Juni 2025</span>
-                </div>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-2 sm:gap-3">
                 <div class="flex items-center gap-2">
                   <Button variant="outline" size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> More Detail </Button>
-                  <Button size="sm" @click="navigateTo('/programs/rise-young-leaders-summit')"> Register Now </Button>
                 </div>
               </div>
             </div>
@@ -199,7 +194,7 @@ useSeoMeta({
             class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 p-4 border rounded-lg transition-all duration-200 hover:border-gray-300"
           >
             <div class="size-20 sm:size-36 rounded-md flex-shrink-0 flex items-center justify-center">
-              <img
+              <NuxtImg
                 src="/images/rise-young-leaders/gallery-4.png"
                 alt="Rise Educator's Skills Accelerator"
                 class="w-full h-full object-cover rounded-md"
@@ -208,7 +203,8 @@ useSeoMeta({
             <div class="flex-1 min-w-0 w-full">
               <h3 class="heading-card-sm mb-2">Rise Educator's Skills Accelerator</h3>
               <p class="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
-                Program pelatihan untuk pendidik yang ingin mengintegrasikan pendidikan berkelanjutan dalam kurikulum pembelajaran mereka.
+                Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to
+                student get comprehensive understanding in various sustainability topic.
               </p>
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-2 sm:gap-3">
                 <div class="flex items-center gap-2">
