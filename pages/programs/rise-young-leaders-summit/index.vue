@@ -585,7 +585,7 @@ const goToAlumniSlide = (index) => {
                 </Button>
                 <Button
                   as="a"
-                  href="https://s.id/RegistrationRYLS25"
+                  href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
                   target="_blank"
                   variant="default"
                   size="lg"
@@ -675,7 +675,7 @@ const goToAlumniSlide = (index) => {
               </ul>
               <Button
                 as="a"
-                href="https://s.id/RegistrationRYLS25"
+                href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
                 target="_blank"
                 variant="default"
                 size="lg"
@@ -747,7 +747,7 @@ const goToAlumniSlide = (index) => {
               </ul>
               <Button
                 as="a"
-                href="https://s.id/RegistrationRYLS25"
+                href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
                 target="_blank"
                 variant="default"
                 size="lg"
@@ -816,7 +816,7 @@ const goToAlumniSlide = (index) => {
               </ul>
               <Button
                 as="a"
-                href="https://s.id/RegistrationRYLS25"
+                href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
                 target="_blank"
                 variant="default"
                 size="lg"
