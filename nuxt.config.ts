@@ -1,6 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -38,12 +37,13 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    'shadcn-nuxt', 
-    '@nuxt/icon', 
-    '@nuxt/fonts', 
-    '@nuxt/image', 
-    '@pinia/nuxt', 
-    'nuxt-easy-lightbox', 
+    'shadcn-nuxt',
+    '@nuxt/icon',
+    '@nuxt/fonts',
+    '@nuxt/image',
+    '@pinia/nuxt',
+    'nuxt-easy-lightbox',
+    '@nuxt/scripts'
   ],
   
   runtimeConfig: {
@@ -53,7 +53,18 @@ export default defineNuxtConfig({
       midtransClientKey:
         (process.env.MIDTRANS_MODE === 'PRODUCTION'
           ? process.env.MIDTRANS_CLIENT_KEY
-          : process.env.MIDTRANS_SANDBOX_CLIENT_KEY) || ''
+          : process.env.MIDTRANS_SANDBOX_CLIENT_KEY),
+      scripts: {
+        metaPixel: {
+          id: process.env.NUXT_PUBLIC_SCRIPTS_META_PIXEL_ID, 
+        },
+      },
+    }
+  },
+
+  scripts: {
+    registry: {
+      metaPixel: true,
     }
   },
   

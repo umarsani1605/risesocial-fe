@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue';
+const { proxy } = useScriptMetaPixel();
 
-// Smooth scroll function
 const scrollToSection = (id) => {
   const element = document.getElementById(id);
   if (element) {
@@ -12,12 +12,10 @@ const scrollToSection = (id) => {
   }
 };
 
-// Use default layout
 definePageMeta({
   layout: 'white-navbar',
 });
 
-// Meta tags
 useHead({
   title: 'Rise Young Leaders Summit - Rise Social',
   meta: [
@@ -28,7 +26,6 @@ useHead({
   ],
 });
 
-// Gallery images
 const galleryImages = [
   'DSCF0340.jpg',
   'DSCF0345.jpg',
@@ -44,7 +41,6 @@ const galleryImages = [
   'IMG_6069.jpg',
 ];
 
-// Lightbox state
 const lightboxVisible = ref(false);
 const lightboxIndex = ref(0);
 const lightboxImages = computed(() =>
@@ -54,21 +50,18 @@ const lightboxImages = computed(() =>
   }))
 );
 
-// Carousel refs - these are used by the carousel component
 const previousEventsApi = ref(null);
 const currentPreviousSlide = ref(0);
-const totalPreviousSlides = ref(3); // Adjust based on your actual number of slides
+const totalPreviousSlides = ref(3);
 
-// Set carousel API reference
 const setPreviousEventsApi = (api) => {
   previousEventsApi.value = api;
   if (!api) return;
 
-  totalPreviousSlides.value = 3; // Update with actual slide count if available
-  currentPreviousSlide.value = 0; // Reset to first slide
+  totalPreviousSlides.value = 3;
+  currentPreviousSlide.value = 0;
 };
 
-// Navigate to specific slide
 const goToPreviousSlide = (index) => {
   currentPreviousSlide.value = index;
   if (previousEventsApi.value) {
@@ -76,13 +69,11 @@ const goToPreviousSlide = (index) => {
   }
 };
 
-// Show lightbox with selected image
 const showLightbox = (index) => {
   lightboxIndex.value = index;
   lightboxVisible.value = true;
 };
 
-// Alumni testimonials data
 const alumniTestimonials = [
   {
     id: 1,
@@ -149,7 +140,6 @@ const alumniTestimonials = [
   },
 ];
 
-// FAQ data
 const faqs = [
   {
     id: 1,
@@ -178,9 +168,6 @@ const faqs = [
   },
 ];
 
-// These are now defined at the top of the script section
-
-// Alumni testimonials carousel API functionality
 const alumniApi = ref(null);
 const currentAlumniSlide = ref(0);
 const totalAlumniSlides = ref(0);
@@ -202,15 +189,42 @@ const goToAlumniSlide = (index) => {
     alumniApi.value.scrollTo(index);
   }
 };
+
+const handleRegisterButton = async (packageType) => {
+  if (proxy) {
+    proxy.fbq('track', 'RegisterButtonClick', {
+      content_name: 'Rise Young Leaders Summit Registration',
+      content_category: packageType,
+    });
+  }
+
+  await navigateTo('https://risesocial.org/programs/rise-young-leaders-summit/registration', {
+    open: {
+      target: '_blank',
+    },
+  });
+};
+
+const handleGuidebookButton = async (packageType) => {
+  if (proxy) {
+    proxy.fbq('track', 'GuidebookButtonClick', {
+      content_name: 'Rise Young Leaders Summit Guide Book',
+    });
+  }
+
+  await navigateTo('https://risesocial.org/programs/rise-young-leaders-summit/registration', {
+    open: {
+      target: '_blank',
+    },
+  });
+};
 </script>
 
 <template>
   <div class="">
-    <!-- Hero Section -->
     <section class="bg-white py-12 lg:pt-48 lg:pb-4 overflow-x-clip overflow-y-visible">
       <div class="container-wrapper relative">
         <div class="flex flex-col-reverse lg:flex-row gap-12 items-stretch">
-          <!-- Left Column - Content -->
           <div class="flex-1 space-y-6 lg:space-y-8 text-center lg:text-left">
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">Rise Young Leaders Summit Japan 2025</h1>
             <div class="space-y-4 leading-relaxed">
@@ -579,18 +593,11 @@ const goToAlumniSlide = (index) => {
                 <span>September 30, 2025</span>
               </p>
               <div class="flex flex-col sm:flex-row justify-center gap-4 py-2 w-full sm:w-auto">
-                <Button as="a" href="https://drive.google.com/file/d/1M-EAldRWILWcWL0TKNYd-v-e-CtA9ZLX/view?usp=sharing" target="_blank" variant="outline" size="lg" class="w-full sm:w-auto justify-center">
+                <Button variant="outline" size="lg" class="w-full sm:w-auto justify-center" @click="handleGuidebookButton()">
                   <Icon name="lucide:download" class="w-4 h-4" />
                   Guidebook
                 </Button>
-                <Button
-                  as="a"
-                  href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
-                  target="_blank"
-                  variant="default"
-                  size="lg"
-                  class="w-full sm:w-auto justify-center"
-                >
+                <Button variant="default" size="lg" class="w-full sm:w-auto justify-center" @click="handleRegisterButton('how-to-apply')">
                   Apply Now
                   <Icon name="lucide:arrow-right" class="w-4 h-4" />
                 </Button>
@@ -673,14 +680,7 @@ const goToAlumniSlide = (index) => {
                   <span class="ml-4">Cultural Experience in Japan</span>
                 </li>
               </ul>
-              <Button
-                as="a"
-                href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
-                target="_blank"
-                variant="default"
-                size="lg"
-                class="mt-auto w-full sm:w-auto justify-center"
-              >
+              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('fully-funded')">
                 Apply Now
               </Button>
             </CardContent>
@@ -745,14 +745,7 @@ const goToAlumniSlide = (index) => {
                   <span class="ml-4">Cultural Experience in Japan</span>
                 </li>
               </ul>
-              <Button
-                as="a"
-                href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
-                target="_blank"
-                variant="default"
-                size="lg"
-                class="mt-auto w-full sm:w-auto justify-center"
-              >
+              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('partial-funded')">
                 Apply Now
               </Button>
             </CardContent>
@@ -814,14 +807,7 @@ const goToAlumniSlide = (index) => {
                   <span class="ml-4">Cultural Experience in Japan</span>
                 </li>
               </ul>
-              <Button
-                as="a"
-                href="https://risesocial.org/programs/rise-young-leaders-summit/registration"
-                target="_blank"
-                variant="default"
-                size="lg"
-                class="mt-auto w-full sm:w-auto justify-center"
-              >
+              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('self-funded')">
                 Apply Now
               </Button>
             </CardContent>
