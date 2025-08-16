@@ -82,7 +82,7 @@ const onNext = form.handleSubmit(
     }
   },
   (errors) => {
-    alert('Please try again later.');
+    console.log('Please try again later.');
   }
 );
 </script>

@@ -579,7 +579,7 @@ const goToAlumniSlide = (index) => {
                 <span>September 30, 2025</span>
               </p>
               <div class="flex flex-col sm:flex-row justify-center gap-4 py-2 w-full sm:w-auto">
-                <Button as="a" href="https://s.id/Uzwuz" target="_blank" variant="outline" size="lg" class="w-full sm:w-auto justify-center">
+                <Button as="a" href="https://drive.google.com/file/d/1M-EAldRWILWcWL0TKNYd-v-e-CtA9ZLX/view?usp=sharing" target="_blank" variant="outline" size="lg" class="w-full sm:w-auto justify-center">
                   <Icon name="lucide:download" class="w-4 h-4" />
                   Guidebook
                 </Button>

@@ -48,7 +48,7 @@ export default defineNuxtConfig({
   
   runtimeConfig: {
     public: {
-      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
+      backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://api.risesocial.org',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX', 
       midtransClientKey:
         (process.env.MIDTRANS_MODE === 'PRODUCTION'
