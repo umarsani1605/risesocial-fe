@@ -76,7 +76,7 @@ const onNext = form.handleSubmit(
 
     const base = '/programs/rise-young-leaders-summit/registration';
     if (values.scholarshipType === 'FULLY_FUNDED') {
-      router.push(`${base}/fully-funded`);
+      router.push(`${base}/payment`);
     } else if (values.scholarshipType === 'SELF_FUNDED') {
       router.push(`${base}/self-funded`);
     }

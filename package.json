@@ -25,6 +25,7 @@
     "lucide-vue-next": "^0.510.0",
     "next-auth": "~4.21.1",
     "nuxt": "^3.17.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
     "reka-ui": "^2.2.1",
     "shadcn-nuxt": "^2.1.0",
     "tailwind-merge": "^3.3.0",

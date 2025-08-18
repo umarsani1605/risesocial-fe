@@ -15,8 +15,8 @@ onMounted(() => {
   }
 });
 
-const onBack = () => router.push('/programs/rise-young-leaders-summit/registration');
-const onNext = () => router.push('/programs/rise-young-leaders-summit/registration/payment');
+const onBack = () => router.back();
+const onNext = () => router.push('/programs/rise-young-leaders-summit/registration/success');
 </script>
 
 <template>
@@ -40,11 +40,11 @@ const onNext = () => router.push('/programs/rise-young-leaders-summit/registrati
     <div class="space-y-2">
       <div class="font-semibold">
         Please submit your essay here:
-        <a href="https://s.id/EssaySubmissionRYLS25" class="underline text-primary">https://s.id/EssaySubmissionRYLS25</a>
+        <a href="https://s.id/EssaySubmissionRYLS25" class="underline text-primary" target="_blank">https://s.id/EssaySubmissionRYLS25</a>
       </div>
       <div class="text-sm text-muted-foreground">
         If you have questions or concerns, contact us at
-        <a href="mailto:risesocial.official@gmail.com">risesocial.official@gmail.com.</a>
+        <a href="mailto:risesocial.official@gmail.com" class="underline text-primary" target="_blank">risesocial.official@gmail.com.</a>
       </div>
     </div>
 
@@ -52,7 +52,7 @@ const onNext = () => router.push('/programs/rise-young-leaders-summit/registrati
 
     <div class="flex justify-end gap-3 pt-8">
       <Button type="button" variant="outline" @click="onBack" class="px-6">Back</Button>
-      <Button type="button" @click="onNext" class="px-6">Next</Button>
+      <Button type="button" @click="onNext" class="px-6">Submit</Button>
     </div>
   </section>
 </template>

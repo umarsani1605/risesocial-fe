@@ -150,7 +150,11 @@ const onSubmit = form.handleSubmit(async () => {
     const submission = await useRylsSubmission().submitRegistration(store.getAllRegistrationData);
 
     if (submission) {
-      router.push('/programs/rise-young-leaders-summit/registration/success');
+      if (store.step1.scholarshipType === 'FULLY_FUNDED') {
+        router.push('/programs/rise-young-leaders-summit/registration/fully-funded');
+      } else {
+        router.push('/programs/rise-young-leaders-summit/registration/success');
+      }
     }
   } catch (error) {
     alert(error.message || 'Failed to submit registration');
@@ -194,7 +198,7 @@ onMounted(() => {
     </div>
 
     <header class="space-y-3 my-8">
-      <h1 class="text-2xl md:text-3xl font-semibold mb-4">Final Step, Complete Your Registration Payment</h1>
+      <h1 class="text-2xl md:text-3xl font-semibold mb-4">Complete Your Registration Payment</h1>
       <p class="text-sm text-gray-700">
         To complete your registration, please proceed with the payment using one of the following methods. International participants are recommended
         to use PayPal or Credit Card.
@@ -284,7 +288,7 @@ onMounted(() => {
 
       <div class="flex justify-end gap-4 pt-4">
         <Button type="button" variant="outline" @click="onBack"> Back </Button>
-        <Button type="submit"> Submit </Button>
+        <Button type="submit"> {{ store.step1.scholarshipType === 'FULLY_FUNDED' ? 'Next' : 'Submit' }} </Button>
       </div>
     </form>
   </section>

@@ -42,6 +42,7 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/image',
     '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     'nuxt-easy-lightbox',
     '@nuxt/scripts'
   ],
