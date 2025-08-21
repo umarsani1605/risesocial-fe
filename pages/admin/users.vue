@@ -11,7 +11,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { ArrowUp, ArrowDown } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
-definePageMeta({ layout: 'admin-dashboard', middleware: 'auth' });
+definePageMeta({ layout: 'admin-dashboard' });
 
 // Server-side params
 const page = ref(1);

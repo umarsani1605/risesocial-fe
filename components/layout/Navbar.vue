@@ -43,6 +43,12 @@ const initials = computed(() => {
   return authStore.initials || 'U';
 });
 
+// Computed property for dynamic dashboard route based on user role
+const dashboardRoute = computed(() => {
+  if (!isInitialized.value || !authStore.user) return '/dashboard';
+  return authStore.isAdmin ? '/admin' : '/dashboard';
+});
+
 // Watch for auth changes for debugging
 watch(
   () => authStore.user,
@@ -184,7 +190,7 @@ onUnmounted(() => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-48">
-                  <DropdownMenuItem @click="navigateTo('/dashboard')" class="cursor-pointer">
+                  <DropdownMenuItem @click="navigateTo(dashboardRoute)" class="cursor-pointer">
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
@@ -222,7 +228,7 @@ onUnmounted(() => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-48">
-                  <DropdownMenuItem @click="navigateTo('/dashboard')" class="cursor-pointer">
+                  <DropdownMenuItem @click="navigateTo(dashboardRoute)" class="cursor-pointer">
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>

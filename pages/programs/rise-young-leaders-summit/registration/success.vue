@@ -6,9 +6,25 @@ definePageMeta({
 });
 
 const router = useRouter();
+const { proxy } = useScriptMetaPixel();
+const store = useRylsRegistrationStore();
 
 if (useRylsRegistrationStore().payment.status !== 'PAID') {
   router.push('/programs/rise-young-leaders-summit/registration');
+}
+
+if (store.step1.scholarshipType === 'FULLY_FUNDED') {
+  proxy.fbq('track', 'Lead', {
+    content_name: 'Fully Funded',
+    value: 15.0,
+    currency: 'USD',
+  });
+} else {
+  proxy.fbq('track', 'Lead', {
+    content_name: 'Self Funded',
+    value: 750,
+    currency: 'USD',
+  });
 }
 
 const onBack = () => router.push('/');

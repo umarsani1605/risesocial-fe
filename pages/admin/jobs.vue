@@ -10,7 +10,7 @@ import JobFormDialog from '@/components/admin/jobs/JobFormDialog.vue';
 import { useAdminJobs } from '@/composables/useAdminJobs';
 import { toast } from 'vue-sonner';
 
-definePageMeta({ layout: 'admin-dashboard', middleware: 'auth' });
+definePageMeta({ layout: 'admin-dashboard' });
 
 // Data & API
 const { jobs, isLoading, error, fetchJobs, deleteJob } = useAdminJobs();

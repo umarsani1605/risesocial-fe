@@ -8,6 +8,7 @@ definePageMeta({ layout: 'blank' });
 
 const store = useRylsRegistrationStore();
 const router = useRouter();
+const { proxy } = useScriptMetaPixel();
 
 onMounted(() => {
   if (store.step1.scholarshipType !== 'FULLY_FUNDED') {
@@ -16,7 +17,12 @@ onMounted(() => {
 });
 
 const onBack = () => router.back();
-const onNext = () => router.push('/programs/rise-young-leaders-summit/registration/success');
+const onNext = () => {
+  proxy.fbq('track', 'CompleteRegistrationStep3', {
+    content_name: 'Fully Funded',
+  });
+  router.push('/programs/rise-young-leaders-summit/registration/success');
+};
 </script>
 
 <template>

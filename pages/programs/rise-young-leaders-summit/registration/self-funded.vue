@@ -14,7 +14,7 @@ definePageMeta({ layout: 'blank' });
 
 const store = useRylsRegistrationStore();
 const router = useRouter();
-
+const { proxy } = useScriptMetaPixel();
 // Composables
 const { uploadHeadshot, isUploading: isUploadingFile, uploadError, uploadProgress } = useFileUpload();
 
@@ -62,6 +62,11 @@ const onNext = form.handleSubmit(async (values) => {
       headshotFile: headshotFileId.value,
       readPolicies: values.readPolicies,
     });
+
+    proxy.fbq('track', 'CompleteRegistrationStep2', {
+      content_name: 'Self Funded',
+    });
+
     router.push('/programs/rise-young-leaders-summit/registration/payment');
   } catch (error) {
     alert('Failed to save your information. Please try again.');

@@ -29,19 +29,19 @@ export const useAuthStore = defineStore(
        * Check if user is admin
        * @returns {boolean}
        */
-      isAdmin: (state) => state.user?.role === 'admin',
+      isAdmin: (state) => state.user?.role === 'ADMIN',
 
       /**
        * Check if user is instructor
        * @returns {boolean}
        */
-      isInstructor: (state) => state.user?.role === 'instructor',
+      isInstructor: (state) => state.user?.role === 'INSTRUCTOR',
 
       /**
        * Check if user is student
        * @returns {boolean}
        */
-      isStudent: (state) => state.user?.role === 'student',
+      isStudent: (state) => state.user?.role === 'STUDENT',
 
       /**
        * Get authentication status

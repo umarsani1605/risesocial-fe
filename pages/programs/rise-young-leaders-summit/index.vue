@@ -192,9 +192,9 @@ const goToAlumniSlide = (index) => {
 
 const handleRegisterButton = async (packageType) => {
   if (proxy) {
-    proxy.fbq('track', 'RegisterButtonClick', {
-      content_name: 'Rise Young Leaders Summit Registration',
-      content_category: packageType,
+    proxy.fbq('track', 'ViewContent', {
+      content_name: packageType,
+      content_category: 'RYLS Registration',
     });
   }
 
@@ -205,10 +205,11 @@ const handleRegisterButton = async (packageType) => {
   });
 };
 
-const handleGuidebookButton = async (packageType) => {
+const handleGuidebookButton = async () => {
   if (proxy) {
-    proxy.fbq('track', 'GuidebookButtonClick', {
-      content_name: 'Rise Young Leaders Summit Guide Book',
+    proxy.fbq('track', 'ViewContent', {
+      content_name: 'Guidebook',
+      content_category: 'RYLS Guidebook',
     });
   }
 
@@ -249,13 +250,16 @@ const handleGuidebookButton = async (packageType) => {
           <div class="h-[320px] md:h-[475px] lg:flex-1 relative"></div>
         </div>
         <div
-          class="absolute w-[800px] top-[-12rem] left-[-13rem] md:w-[1200px] md:top-[-20rem] md:left-[-22rem] lg:top-[-27rem] lg:left-[24rem] pointer-events-none select-none"
+          class="absolute w-[800px] top-[-12rem] left-[-13rem] md:w-[1200px] md:top-[-13rem] md:left-[-2rem] lg:top-[-21rem] lg:left-[32rem] pointer-events-none select-none"
         >
-          <img
+          <NuxtImg
             src="/images/rise-young-leaders/2025/decoration.png"
-            format="webp"
             alt="Rise Young Leaders Summit 2025"
             class="h-auto object-contain pointer-events-none select-none"
+            format="webp"
+            quality="80"
+            priority
+            preload
           />
         </div>
       </div>
@@ -276,23 +280,37 @@ const handleGuidebookButton = async (packageType) => {
         <!-- Middle Section: 3-Column Image Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="flex flex-col items-center gap-6">
-            <img
+            <NuxtImg
               src="/images/rise-young-leaders/2025/gallery/IMG_6069.jpg"
               alt="Climate workshop"
               class="h-52 aspect-[4/3] object-cover rounded-xl"
+              format="webp"
+              quality="80"
+              preload
             />
             <span class="text-center">Engage in climate dialogues with experts from top universities like Waseda, Kyoto, & Tokyo University.</span>
           </div>
           <div class="flex flex-col items-center gap-6">
-            <img
+            <NuxtImg
               src="/images/rise-young-leaders/2025/gallery/IMG_2075.jpg"
               alt="Group discussion"
               class="h-52 aspect-[4/3] object-cover rounded-xl"
+              format="webp"
+              quality="80"
+              :modifiers="{ rotate: null }"
+              preload
             />
             <span class="text-center">Gain hands-on knowledge from field visits, disaster resilience workshops, and leadership labs.</span>
           </div>
           <div class="flex flex-col items-center gap-6">
-            <img src="/images/rise-young-leaders/gallery-8.png" alt="Field visit" class="h-52 aspect-[4/3] object-cover rounded-xl" />
+            <NuxtImg
+              src="/images/rise-young-leaders/gallery-8.png"
+              alt="Field visit"
+              class="h-52 aspect-[4/3] object-cover rounded-xl"
+              format="webp"
+              quality="80"
+              preload
+            />
             <span class="text-center">Amplify your mission through global collaborations and cultural exchange.</span>
           </div>
         </div>
@@ -448,10 +466,13 @@ const handleGuidebookButton = async (packageType) => {
             class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
             <div class="w-full lg:flex-1 h-48 lg:h-full rounded-lg lg:rounded-2xl lg:aspect-square overflow-hidden">
-              <img
+              <NuxtImg
                 src="/images/rise-young-leaders/2025/gallery/IMG_8583.jpg"
                 alt="Competition"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                format="webp"
+                quality="80"
+                loading="lazy"
               />
             </div>
             <div class="flex-1 flex flex-col items-center text-center p-4 lg:p-6 gap-3">
@@ -469,10 +490,13 @@ const handleGuidebookButton = async (packageType) => {
             class="group flex flex-col lg:flex-row items-center justify-center bg-gradient-to-tr from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl lg:rounded-bl-[10rem] overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
             <div class="w-full lg:flex-1 h-48 lg:h-full rounded-lg lg:rounded-bl-[9rem] lg:aspect-square overflow-hidden">
-              <img
+              <NuxtImg
                 src="/images/rise-young-leaders/2025/gallery/DSCF0340.jpg"
                 alt="Mini Lecture Series"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                format="webp"
+                quality="80"
+                loading="lazy"
               />
             </div>
             <div class="flex-1 flex flex-col items-center text-center p-4 lg:p-6 gap-3">
@@ -489,10 +513,13 @@ const handleGuidebookButton = async (packageType) => {
             class="group lg:col-start-2 lg:row-span-2 lg:row-start-1 flex flex-col bg-gradient-to-br from-primary to-orange-300 text-white rounded-xl lg:rounded-4xl lg:rounded-br-[12rem] overflow-hidden transition-all duration-300 shadow-subtle p-4"
           >
             <div class="w-full rounded-lg lg:rounded-2xl aspect-video overflow-hidden">
-              <img
+              <NuxtImg
                 src="/images/rise-young-leaders/benefit.jpg"
                 alt="Summit & International Forum"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                format="webp"
+                quality="80"
+                loading="lazy"
               />
             </div>
             <div class="p-4 lg:p-8 flex-1 flex flex-col items-center text-center gap-4">
@@ -514,11 +541,12 @@ const handleGuidebookButton = async (packageType) => {
       class="py-16 pt-[6rem] lg:pt-[20rem] lg:pb-32 bg-gradient-to-r from-[#F77044] to-[#F9B163] relative overflow-hidden z-10"
     >
       <div class="absolute top-[-1px] left-0 right-0">
-        <img
+        <NuxtImg
           src="/images/rise-young-leaders/2025/bg-vector-white.png"
           alt="Rise Young Leaders Summit 2025"
-          format="webp"
           class="w-full h-auto object-contain pointer-events-none select-none"
+          format="webp"
+          quality="80"
         />
       </div>
       <div class="absolute inset-0 opacity-20">
@@ -597,7 +625,7 @@ const handleGuidebookButton = async (packageType) => {
                   <Icon name="lucide:download" class="w-4 h-4" />
                   Guidebook
                 </Button>
-                <Button variant="default" size="lg" class="w-full sm:w-auto justify-center" @click="handleRegisterButton('how-to-apply')">
+                <Button variant="default" size="lg" class="w-full sm:w-auto justify-center" @click="handleRegisterButton('How to Apply')">
                   Apply Now
                   <Icon name="lucide:arrow-right" class="w-4 h-4" />
                 </Button>
@@ -680,7 +708,7 @@ const handleGuidebookButton = async (packageType) => {
                   <span class="ml-4">Cultural Experience in Japan</span>
                 </li>
               </ul>
-              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('fully-funded')">
+              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('Fully Funded')">
                 Apply Now
               </Button>
             </CardContent>
@@ -745,7 +773,7 @@ const handleGuidebookButton = async (packageType) => {
                   <span class="ml-4">Cultural Experience in Japan</span>
                 </li>
               </ul>
-              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('partial-funded')">
+              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('Partial Funded')">
                 Apply Now
               </Button>
             </CardContent>
@@ -807,7 +835,7 @@ const handleGuidebookButton = async (packageType) => {
                   <span class="ml-4">Cultural Experience in Japan</span>
                 </li>
               </ul>
-              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('self-funded')">
+              <Button variant="default" size="lg" class="mt-auto w-full sm:w-auto justify-center" @click="handleRegisterButton('Self Funded')">
                 Apply Now
               </Button>
             </CardContent>
@@ -840,7 +868,7 @@ const handleGuidebookButton = async (packageType) => {
               class="w-full h-full object-cover"
               format="webp"
               quality="80"
-              :modifiers="{ rotate: null }"
+              loading="lazy"
             />
           </div>
         </div>

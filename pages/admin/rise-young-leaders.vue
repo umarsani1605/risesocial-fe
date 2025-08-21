@@ -12,7 +12,7 @@ import { ArrowUp, ArrowDown, Eye, Download, Trash2, Loader2, ChevronLeft, Chevro
 import { toast } from 'vue-sonner';
 import { useRylsAdmin } from '@/composables/useRylsAdmin';
 
-definePageMeta({ layout: 'admin-dashboard', middleware: 'auth' });
+definePageMeta({ layout: 'admin-dashboard' });
 
 // Client-side state
 const search = ref('');

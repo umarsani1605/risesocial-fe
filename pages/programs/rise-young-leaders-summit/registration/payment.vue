@@ -14,6 +14,7 @@ definePageMeta({ layout: 'blank' });
 const store = useRylsRegistrationStore();
 const router = useRouter();
 const route = useRoute();
+const { proxy } = useScriptMetaPixel();
 const { createTransaction, openSnapEmbed, isLoading: isProcessingPayment, error: paymentError } = useRylsPayment();
 const { uploadPaymentProof, isUploading, uploadError, uploadProgress } = useFileUpload();
 
@@ -49,7 +50,6 @@ const createPaypalTransaction = async (e, componentField) => {
       },
     });
 
-    // Update store
     store.setPaymentId(transaction.payment_id);
     store.setPaymentType('PAYPAL');
     store.setPaymentStatus('PAID');
@@ -141,6 +141,16 @@ const resetFileInput = (componentField) => {
 };
 
 const onSubmit = form.handleSubmit(async () => {
+  if (store.step1.scholarshipType === 'FULLY_FUNDED') {
+    proxy.fbq('track', 'CompleteRegistrationStep2', {
+      content_name: 'Fully Funded',
+    });
+  } else {
+    proxy.fbq('track', 'CompleteRegistrationStep3', {
+      content_name: 'Self Funded',
+    });
+  }
+
   try {
     if (!store.payment.type || store.payment.status !== 'PAID') {
       validationError.value = true;

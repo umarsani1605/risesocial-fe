@@ -15,6 +15,7 @@ definePageMeta({ layout: 'blank' });
 
 const store = useRylsRegistrationStore();
 const router = useRouter();
+const { proxy } = useScriptMetaPixel();
 
 const genderValueCodes = GENDER_OPTIONS.map((option) => option.value);
 const discoverSourceValueCodes = DISCOVER_SOURCES.map((option) => option.value);
@@ -70,6 +71,10 @@ const form = useForm({
 
 const onNext = form.handleSubmit(
   (values) => {
+    proxy.fbq('track', 'CompleteRegistrationStep1', {
+      content_name: values.scholarshipType === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded',
+    });
+
     const dataToStore = values;
 
     store.setStep1(dataToStore);
@@ -107,7 +112,6 @@ const onNext = form.handleSubmit(
 
     <form @submit="onNext" class="space-y-8 text-gray-700">
       <div class="grid grid-cols-1 gap-6">
-        <!-- Full Name -->
         <FormField v-slot="{ componentField }" name="fullName">
           <FormItem>
             <FormLabel>Full Name<span class="text-red-500">*</span></FormLabel>
@@ -117,8 +121,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Email -->
         <FormField v-slot="{ componentField }" name="email">
           <FormItem>
             <FormLabel>Email<span class="text-red-500">*</span></FormLabel>
@@ -128,8 +130,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- City and Country of Residence -->
         <FormField v-slot="{ componentField }" name="residence">
           <FormItem>
             <FormLabel>City and Country of Residence<span class="text-red-500">*</span></FormLabel>
@@ -139,8 +139,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Nationality -->
         <FormField v-slot="{ componentField }" name="nationality">
           <FormItem>
             <FormLabel>Nationality<span class="text-red-500">*</span></FormLabel>
@@ -150,8 +148,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Second Nationality -->
         <FormField v-slot="{ componentField }" name="secondNationality">
           <FormItem>
             <FormLabel>Second Nationality (if there's any)</FormLabel>
@@ -161,8 +157,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- WhatsApp Number -->
         <FormField v-slot="{ componentField }" name="whatsapp">
           <FormItem>
             <FormLabel>WhatsApp Number<span class="text-red-500">*</span></FormLabel>
@@ -185,8 +179,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Institution -->
         <FormField v-slot="{ componentField }" name="institution">
           <FormItem>
             <FormLabel>Institution (work place/university)<span class="text-red-500">*</span></FormLabel>
@@ -196,8 +188,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Date of Birth -->
         <FormField v-slot="{ componentField }" name="dateOfBirth">
           <FormItem>
             <FormLabel>Date of Birth<span class="text-red-500">*</span></FormLabel>
@@ -214,8 +204,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Gender -->
         <FormField v-slot="{ componentField }" name="gender">
           <FormItem class="gap-3">
             <FormLabel>Gender<span class="text-red-500">*</span></FormLabel>
@@ -238,8 +226,6 @@ const onNext = form.handleSubmit(
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Discover (Radio) -->
         <div class="space-y-3">
           <FormField v-slot="{ componentField }" name="discoverSource">
             <FormItem class="gap-3">
@@ -264,8 +250,6 @@ const onNext = form.handleSubmit(
             </FormItem>
           </FormField>
         </div>
-
-        <!-- Scholarship Type -->
         <FormField v-slot="{ componentField }" name="scholarshipType">
           <FormItem class="gap-3">
             <FormLabel>Which type of scholarship/invitation you choose<span class="text-red-500">*</span></FormLabel>
