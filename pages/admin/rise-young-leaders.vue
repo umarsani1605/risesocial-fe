@@ -31,6 +31,7 @@ const {
   fetchRegistrations,
   deleteRegistration,
   exportRegistrations,
+  exportRegistrationsExcel,
   downloadFile,
 } = useRylsAdmin();
 
@@ -201,27 +202,24 @@ const handleFileDownload = async (fileId) => {
 };
 
 // Export functionality
-const handleExport = async () => {
+const handleExportExcel = async () => {
   try {
-    const blob = await exportRegistrations({
-      status: statusFilter.value || undefined,
-      scholarshipType: scholarshipFilter.value || undefined,
-    });
+    const blob = await exportRegistrationsExcel();
 
     // Create download link
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
-    a.download = `ryls-registrations-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `ryls-registrations-${new Date().toISOString().split('T')[0]}.xlsx`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
 
-    toast.success('Export completed successfully');
+    toast.success('Excel export completed successfully');
   } catch (e) {
-    toast.error('Failed to export data');
+    toast.error('Failed to export Excel data');
   }
 };
 
@@ -301,6 +299,20 @@ const clearFilters = () => {
             <SelectItem value="SELF_FUNDED">Self Funded</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <!-- Export Button -->
+      <div class="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          @click="handleExportExcel"
+          :disabled="isLoading || sortedRegistrations.length === 0"
+          class="flex items-center gap-2"
+        >
+          <Download class="w-4 h-4" />
+          Export Excel
+        </Button>
       </div>
     </div>
 

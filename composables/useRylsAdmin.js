@@ -146,13 +146,38 @@ export const useRylsAdmin = () => {
         ...(filters.endDate && { endDate: filters.endDate }),
       };
 
-      const response = await api.get('/api/registrations/export', {
+      const response = await api.get('/api/ryls/registrations/export', {
         query: queryParams,
       });
 
       return response;
     } catch (e) {
       error.value = e?.message || 'Export failed';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  /**
+   * Export registrations to Excel with multiple sheets
+   * @returns {Promise<Blob>} Excel file blob
+   */
+  const exportRegistrationsExcel = async () => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      console.log('🔵 [useRylsAdmin] Exporting to Excel...');
+
+      const response = await api.get('/api/ryls/registrations/export-excel', {
+        responseType: 'blob',
+      });
+
+      console.log('✅ [useRylsAdmin] Excel export successful');
+      return response;
+    } catch (e) {
+      console.error('❌ [useRylsAdmin] Excel export failed:', e);
+      error.value = e?.message || 'Excel export failed';
       throw e;
     } finally {
       isLoading.value = false;
@@ -199,6 +224,7 @@ export const useRylsAdmin = () => {
     updateRegistrationStatus,
     deleteRegistration,
     exportRegistrations,
+    exportRegistrationsExcel,
     downloadFile,
   };
 };
