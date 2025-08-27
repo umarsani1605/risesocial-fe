@@ -32,6 +32,18 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    compressPublicAssets: {
+      brotli: true
+    },
+  },
+
+  routeRules: {
+    '/programs/rise-young-leaders-summit': { 
+      prerender: true 
+    },
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

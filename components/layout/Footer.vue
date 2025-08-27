@@ -8,7 +8,7 @@
           <div class="flex gap-8 lg:gap-6 lg:flex-col items-end lg:items-start">
             <!-- Logo -->
             <div class="flex-2 lg:flex-1 flex items-end lg:items-center justify-center lg:justify-start h-12 sm:h-20 lg:h-22">
-              <NuxtImg src="/images/logo.png" alt="Rise Social" class="w-auto lg:w-56" loading="lazy" format="webp" />
+              <NuxtImg src="/images/logo.png" width="224" height="93" alt="Rise Social" format="webp" />
             </div>
             <!-- Tagline -->
             <div class="text-left lg:text-center flex-3 lg:flex-1">

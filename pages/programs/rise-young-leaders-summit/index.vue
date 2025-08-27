@@ -1,6 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, defineAsyncComponent } from 'vue';
 const { proxy } = useScriptMetaPixel();
+
+const VueEasyLightbox = defineAsyncComponent(() => import('vue-easy-lightbox'));
 
 const scrollToSection = (id) => {
   const element = document.getElementById(id);
@@ -49,25 +51,6 @@ const lightboxImages = computed(() =>
     title: 'Rise Young Leaders Summit',
   }))
 );
-
-const previousEventsApi = ref(null);
-const currentPreviousSlide = ref(0);
-const totalPreviousSlides = ref(3);
-
-const setPreviousEventsApi = (api) => {
-  previousEventsApi.value = api;
-  if (!api) return;
-
-  totalPreviousSlides.value = 3;
-  currentPreviousSlide.value = 0;
-};
-
-const goToPreviousSlide = (index) => {
-  currentPreviousSlide.value = index;
-  if (previousEventsApi.value) {
-    previousEventsApi.value.scrollTo(index);
-  }
-};
 
 const showLightbox = (index) => {
   lightboxIndex.value = index;
@@ -223,10 +206,10 @@ const handleGuidebookButton = async () => {
 
 <template>
   <div class="">
-    <section class="bg-white py-12 lg:pt-48 lg:pb-4 overflow-x-clip overflow-y-visible">
+    <section class="bg-white py-12 lg:pt-48 overflow-x-clip overflow-y-visible">
       <div class="container-wrapper relative">
         <div class="flex flex-col-reverse lg:flex-row gap-12 items-stretch">
-          <div class="flex-1 space-y-6 lg:space-y-8 text-center lg:text-left">
+          <div class="flex-1 pt-10 space-y-6 lg:space-y-8 text-center lg:text-left">
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">Rise Young Leaders Summit Japan 2025</h1>
             <div class="space-y-4 leading-relaxed">
               <p>
@@ -235,7 +218,7 @@ const handleGuidebookButton = async () => {
                 with youth action today.
               </p>
             </div>
-            <div class="pt-4">
+            <div>
               <Button
                 @click="scrollToSection('how-to-apply')"
                 size="lg"
@@ -245,22 +228,32 @@ const handleGuidebookButton = async () => {
               </Button>
             </div>
           </div>
-
-          <!-- Right Column - Graphic -->
-          <div class="h-[320px] md:h-[475px] lg:flex-1 relative"></div>
-        </div>
-        <div
-          class="absolute w-[800px] top-[-12rem] left-[-13rem] md:w-[1200px] md:top-[-13rem] md:left-[-2rem] lg:top-[-21rem] lg:left-[32rem] pointer-events-none select-none"
-        >
-          <NuxtImg
-            src="/images/rise-young-leaders/2025/decoration.png"
-            alt="Rise Young Leaders Summit 2025"
-            class="h-auto object-contain pointer-events-none select-none"
-            format="webp"
-            quality="80"
-            priority
-            preload
-          />
+          <div class="h-[300px] lg:h-auto lg:flex-1 relative">
+            <div
+              class="absolute flex items-center justify-center inset-0 translate-y-1/5 lg:translate-0 pointer-events-none select-none"
+              aria-hidden="true"
+              role="presentation"
+            >
+              <div
+                class="pointer-events-none select-none bg-no-repeat bg-contain bg-center"
+                style="width: 392px; height: 368px; background-image: url('/images/rise-young-leaders/2025/decoration-main.png')"
+              ></div>
+            </div>
+            <div
+              class="absolute flex items-center justify-center w-[200%] h-[275%] -translate-x-1/4 -translate-y-1/4 lg:w-[300%] lg:h-[300%] lg:-translate-x-1/3 lg:-translate-y-1/3 pointer-events-none select-none"
+            >
+              <img
+                src="/images/rise-young-leaders/2025/decoration-bg.webp"
+                width="945"
+                height="945"
+                alt="Rise Young Leaders Summit 2025"
+                aria-hidden="true"
+                role="presentation"
+                class="h-full object-contain pointer-events-none select-none"
+                fetchpriority="high"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -283,10 +276,10 @@ const handleGuidebookButton = async () => {
             <NuxtImg
               src="/images/rise-young-leaders/2025/gallery/IMG_6069.jpg"
               alt="Climate workshop"
-              class="h-52 aspect-[4/3] object-cover rounded-xl"
+              class="w-[280px] h-[208px] object-cover rounded-xl"
               format="webp"
-              quality="80"
-              preload
+              loading="lazy"
+              densities="1x"
             />
             <span class="text-center">Engage in climate dialogues with experts from top universities like Waseda, Kyoto, & Tokyo University.</span>
           </div>
@@ -294,11 +287,11 @@ const handleGuidebookButton = async () => {
             <NuxtImg
               src="/images/rise-young-leaders/2025/gallery/IMG_2075.jpg"
               alt="Group discussion"
-              class="h-52 aspect-[4/3] object-cover rounded-xl"
+              class="w-[280px] h-[208px] object-cover rounded-xl"
               format="webp"
-              quality="80"
+              loading="lazy"
+              densities="1x"
               :modifiers="{ rotate: null }"
-              preload
             />
             <span class="text-center">Gain hands-on knowledge from field visits, disaster resilience workshops, and leadership labs.</span>
           </div>
@@ -306,10 +299,10 @@ const handleGuidebookButton = async () => {
             <NuxtImg
               src="/images/rise-young-leaders/gallery-8.png"
               alt="Field visit"
-              class="h-52 aspect-[4/3] object-cover rounded-xl"
+              class="w-[280px] h-[208px] object-cover rounded-xl"
               format="webp"
-              quality="80"
-              preload
+              loading="lazy"
+              densities="1x"
             />
             <span class="text-center">Amplify your mission through global collaborations and cultural exchange.</span>
           </div>
@@ -350,32 +343,48 @@ const handleGuidebookButton = async () => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_landmark_4.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute -bottom-16 left-72 h-52 z-10">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_tree.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute bottom-0 right-16 h-96 z-20 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_landmark_3.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute -bottom-16 right-48 h-52 z-10 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_tree.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute top-0 left-0 w-full h-full">
@@ -473,6 +482,7 @@ const handleGuidebookButton = async () => {
                 format="webp"
                 quality="80"
                 loading="lazy"
+                densities="1x"
               />
             </div>
             <div class="flex-1 flex flex-col items-center text-center p-4 lg:p-6 gap-3">
@@ -497,6 +507,7 @@ const handleGuidebookButton = async () => {
                 format="webp"
                 quality="80"
                 loading="lazy"
+                densities="1x"
               />
             </div>
             <div class="flex-1 flex flex-col items-center text-center p-4 lg:p-6 gap-3">
@@ -520,6 +531,7 @@ const handleGuidebookButton = async () => {
                 format="webp"
                 quality="80"
                 loading="lazy"
+                densities="1x"
               />
             </div>
             <div class="p-4 lg:p-8 flex-1 flex flex-col items-center text-center gap-4">
@@ -547,6 +559,8 @@ const handleGuidebookButton = async () => {
           class="w-full h-auto object-contain pointer-events-none select-none"
           format="webp"
           quality="80"
+          loading="lazy"
+          densities="1x"
         />
       </div>
       <div class="absolute inset-0 opacity-20">
@@ -554,48 +568,71 @@ const handleGuidebookButton = async () => {
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_1.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute top-64 -right-20 h-32 z-20 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_2.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute bottom-12 left-0 lg:left-2/5 h-10 lg:h-16 z-20">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_3.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute top-28 left-3/5 h-32 z-20">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_cloud_4.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
+            densities="1x"
           />
         </div>
         <div class="absolute bottom-0 left-0 h-80 z-20 opacity-50 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_bamboo_2.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute bottom-0 right-0 h-80 z-20">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_bamboo_1.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             format="webp"
             class="w-full h-full object-contain pointer-events-none select-none"
+            loading="lazy"
+            densities="1x"
           />
         </div>
       </div>
@@ -869,6 +906,7 @@ const handleGuidebookButton = async () => {
               format="webp"
               quality="80"
               loading="lazy"
+              densities="1x"
             />
           </div>
         </div>
@@ -876,7 +914,13 @@ const handleGuidebookButton = async () => {
 
       <!-- Lightbox Component -->
       <ClientOnly>
-        <VueEasyLightbox :visible="lightboxVisible" :imgs="lightboxImages" :index="lightboxIndex" @hide="lightboxVisible = false" />
+        <VueEasyLightbox
+          v-if="lightboxVisible"
+          :visible="lightboxVisible"
+          :imgs="lightboxImages"
+          :index="lightboxIndex"
+          @hide="lightboxVisible = false"
+        />
       </ClientOnly>
     </section>
 
@@ -887,52 +931,48 @@ const handleGuidebookButton = async () => {
           <h2 class="heading-section">Hear from Our Alumni</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
-        <Carousel
-          :opts="{
-            align: 'start',
-            loop: true,
-          }"
-          class="w-full"
-          @init-api="setAlumniApi"
-        >
-          <CarouselContent class="-ml-2 md:-ml-4 py-4 cursor-pointer">
-            <CarouselItem v-for="testimonial in alumniTestimonials" :key="testimonial.id" class="pl-2 md:pl-4 lg:basis-1/3">
-              <Card class="p-4 sm:p-6 lg:p-8 text-center h-full border border-gray-100">
-                <CardContent class="flex flex-col justify-between p-0 h-full">
-                  <div class="space-y-3 lg:space-y-4">
-                    <p class="text-sm lg:text-base text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
-                  </div>
-
-                  <!-- Author Info -->
-                  <div class="mt-4 lg:mt-6 space-y-2">
-                    <!-- Rating Stars -->
-                    <div class="flex justify-center space-x-1">
-                      <Icon
-                        v-for="i in 5"
-                        :key="i"
-                        name="heroicons:star-solid"
-                        class="h-3 w-3 lg:h-4 lg:w-4 text-yellow-400"
-                        style="fill: currentColor"
-                      />
+        <ClientOnly>
+          <Carousel
+            :opts="{
+              align: 'start',
+              loop: true,
+            }"
+            class="w-full"
+            @init-api="setAlumniApi"
+          >
+            <CarouselContent class="-ml-2 md:-ml-4 py-4 cursor-pointer">
+              <CarouselItem v-for="testimonial in alumniTestimonials" :key="testimonial.id" class="pl-2 md:pl-4 lg:basis-1/3">
+                <Card class="p-4 sm:p-6 lg:p-8 text-center h-full border border-gray-100">
+                  <CardContent class="flex flex-col justify-between p-0 h-full">
+                    <div class="space-y-3 lg:space-y-4">
+                      <p class="text-sm lg:text-base text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
                     </div>
+                    <div class="mt-4 lg:mt-6 space-y-2">
+                      <div class="flex justify-center space-x-1">
+                        <Icon
+                          v-for="i in 5"
+                          :key="i"
+                          name="heroicons:star-solid"
+                          class="h-3 w-3 lg:h-4 lg:w-4 text-yellow-400"
+                          style="fill: currentColor"
+                        />
+                      </div>
+                      <h4 class="text-sm lg:text-base font-semibold text-gray-900">
+                        {{ testimonial.name }}
+                      </h4>
+                      <p class="text-sm lg:text-base text-primary font-medium">
+                        {{ testimonial.country }}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious class="hidden shadow-none sm:flex" />
+            <CarouselNext class="hidden shadow-none sm:flex" />
+          </Carousel>
+        </ClientOnly>
 
-                    <!-- Name -->
-                    <h4 class="text-sm lg:text-base font-semibold text-gray-900">
-                      {{ testimonial.name }}
-                    </h4>
-
-                    <!-- Country -->
-                    <p class="text-sm lg:text-base text-primary font-medium">
-                      {{ testimonial.country }}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          </CarouselContent>
-          <CarouselPrevious class="hidden shadow-none sm:flex" />
-          <CarouselNext class="hidden shadow-none sm:flex" />
-        </Carousel>
         <div class="flex justify-center mt-4 space-x-2">
           <button
             v-for="(dot, index) in totalAlumniSlides"
@@ -954,44 +994,66 @@ const handleGuidebookButton = async () => {
           <h2 class="heading-section">Frequently Asked Questions</h2>
           <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
-        <Accordion type="single" collapsible class="space-y-4">
-          <AccordionItem v-for="faq in faqs" :key="faq.id" :value="`item-${faq.id}`" class="rounded-lg px-4 bg-white border border-gray-100">
-            <AccordionTrigger class="text-left text-base font-medium text-gray-700 hover:text-gray-900 cursor-pointer py-4">
-              {{ faq.question }}
-            </AccordionTrigger>
-            <AccordionContent class="text-gray-600 text-base pb-4">
-              {{ faq.answer }}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <ClientOnly>
+          <Accordion type="single" collapsible class="space-y-4">
+            <AccordionItem v-for="faq in faqs" :key="faq.id" :value="`item-${faq.id}`" class="rounded-lg px-4 bg-white border border-gray-100">
+              <AccordionTrigger class="text-left text-base font-medium text-gray-700 hover:text-gray-900 cursor-pointer py-4">
+                {{ faq.question }}
+              </AccordionTrigger>
+              <AccordionContent class="text-gray-600 text-base pb-4">
+                {{ faq.answer }}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </ClientOnly>
       </div>
       <div class="absolute inset-0 opacity-5 z-10">
         <div class="absolute -bottom-4 left-4 h-96 z-20">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_landmark_4_dark.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             class="w-full h-full object-contain"
+            format="webp"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute -bottom-16 left-72 h-52 z-10">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_tree_dark.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             class="w-full h-full object-contain"
+            format="webp"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute bottom-0 right-16 h-96 z-20 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_landmark_3_dark.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             class="w-full h-full object-contain"
+            format="webp"
+            loading="lazy"
+            densities="1x"
           />
         </div>
         <div class="absolute -bottom-16 right-48 h-52 z-10 hidden lg:block">
           <NuxtImg
             src="/images/rise-young-leaders/2025/japan_tree_dark.png"
             alt="Rise Young Leaders Summit 2025"
+            role="presentation"
+            aria-hidden="true"
             class="w-full h-full object-contain"
+            format="webp"
+            loading="lazy"
+            densities="1x"
           />
         </div>
       </div>

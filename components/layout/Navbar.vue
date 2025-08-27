@@ -159,7 +159,7 @@ onUnmounted(() => {
           <!-- Logo -->
           <div class="flex-shrink-0">
             <NuxtLink to="/" class="flex items-center">
-              <NuxtImg src="/images/logo.png" alt="Rise Social" class="h-8 w-auto" loading="eager" format="webp" />
+              <NuxtImg src="/images/logo.png" width="78" height="32" alt="Rise Social" format="webp" />
             </NuxtLink>
           </div>
 
