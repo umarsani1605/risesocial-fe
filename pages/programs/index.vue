@@ -35,12 +35,13 @@ const programsData = [
   },
   {
     id: 3,
-    title: 'Little Hero Camp',
+    title: 'Rise & Thrive: Youth Empowerment Program',
     image: '/images/rise_little_hero.png',
     link: '/programs/little-hero-camp',
-    description1: 'Little Hero Camp is an offline summer training for children aged 7-15 years old.',
+    description1:
+      'Our program is designed to empower youth by equipping them with the skills, mindset, and opportunities to transform local resources into sustainable economic ventures. ',
     description2:
-      'Equipped with various topics in sustainability, to enhance their skills and interests and become more empowered during their summer vacation.',
+      'By fostering innovation, entrepreneurship, and community leadership, the initiative not only boosts income and productivity among young people but also cultivates a generation of changemakers who create lasting impact through locally driven businesses.',
   },
 ];
 

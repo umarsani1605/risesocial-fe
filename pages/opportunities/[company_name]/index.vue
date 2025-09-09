@@ -2,6 +2,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useJobsStore } from '@/store/jobs';
+import { storeToRefs } from 'pinia';
 
 // Use default layout
 definePageMeta({
@@ -12,8 +14,11 @@ definePageMeta({
 const route = useRoute();
 const companyName = route.params.company_name;
 
-// Use jobs composable
-const { jobsData, getCompanyFromJobs, fetchJobs } = useJobs();
+// Use jobs store
+const jobsStore = useJobsStore();
+const {
+  /* expose refs if needed */
+} = storeToRefs(jobsStore);
 
 // Reactive state
 const isLoading = ref(true);
@@ -24,12 +29,9 @@ const companyJobs = ref([]);
 const loadData = async () => {
   try {
     isLoading.value = true;
-    // Make sure jobs are loaded
-    await fetchJobs();
-
-    // Now that jobs are loaded, get company and jobs
-    company.value = getCompanyFromJobs(companyName, jobsData.value);
-    companyJobs.value = jobsData.value.filter(
+    // Get company and jobs from store data
+    company.value = jobsStore.getCompanyFromJobs(companyName, jobsStore.jobsData);
+    companyJobs.value = (jobsStore.jobsData || []).filter(
       (job) => job.company && (job.company.slug === companyName || job.company.name?.toLowerCase() === companyName.toLowerCase())
     );
 
@@ -53,7 +55,7 @@ onMounted(loadData);
 
 // Show 404 if no company found after data is loaded
 const show404 = computed(() => {
-  return !isLoading.value && jobsData.value.length > 0 && !company.value;
+  return !isLoading.value && jobsStore.jobsData.length > 0 && !company.value;
 });
 
 watch(show404, (show) => {

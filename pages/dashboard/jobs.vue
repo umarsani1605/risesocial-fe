@@ -7,10 +7,12 @@ definePageMeta({
 
 // Import store
 import { useJobsStore } from '~/store/jobs';
+import { storeToRefs } from 'pinia';
 
-// Initialize stores
+// Jobs store
 const jobsStore = useJobsStore();
-const { jobsData, getJobDetailUrl, initializeJobs, isLoading } = useJobs();
+const { jobsData, isLoading } = storeToRefs(jobsStore);
+const { getJobDetailUrl } = jobsStore;
 
 // Get favorite jobs (saved jobs)
 const favoriteJobs = computed(() => {
@@ -25,7 +27,7 @@ const latestJobs = computed(() => {
 });
 
 onMounted(async () => {
-  await initializeJobs();
+  // no-op for jobs; expect jobsData to be prefilled elsewhere or future SSR on this page
 });
 
 // Meta tags

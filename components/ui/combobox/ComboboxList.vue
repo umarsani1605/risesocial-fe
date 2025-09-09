@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import type { ComboboxContentEmits, ComboboxContentProps } from 'reka-ui'
-import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
-import { reactiveOmit } from '@vueuse/core'
-import { ComboboxContent, ComboboxPortal, useForwardPropsEmits } from 'reka-ui'
+import type { ComboboxContentEmits, ComboboxContentProps } from 'reka-ui';
+import type { HTMLAttributes } from 'vue';
+import { cn } from '@/lib/utils';
+import { reactiveOmit } from '@vueuse/core';
+import { ComboboxContent, ComboboxPortal, useForwardPropsEmits } from 'reka-ui';
+import { ComboboxViewport } from '.';
 
-const props = withDefaults(defineProps<ComboboxContentProps & { class?: HTMLAttributes['class'], viewportClass?: HTMLAttributes['class'] }>(), {
+const props = withDefaults(defineProps<ComboboxContentProps & { class?: HTMLAttributes['class']; viewportClass?: HTMLAttributes['class'] }>(), {
+  avoidCollisions: false,
   position: 'popper',
-  align: 'center',
+  align: 'start',
+  side: 'bottom',
   sideOffset: 4,
-})
-const emits = defineEmits<ComboboxContentEmits>()
+});
+const emits = defineEmits<ComboboxContentEmits>();
 
-const delegatedProps = reactiveOmit(props, 'class', 'viewportClass')
-const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const delegatedProps = reactiveOmit(props, 'class', 'viewportClass');
+const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
@@ -21,9 +24,16 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     <ComboboxContent
       data-slot="combobox-list"
       v-bind="forwarded"
-      :class="cn('z-50 w-[200px] rounded-md border bg-popover text-popover-foreground origin-(--reka-combobox-content-transform-origin) overflow-hidden shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2', props.class)"
+      :class="
+        cn(
+          'z-50 min-w-[200px] rounded-md border bg-popover text-popover-foreground origin-(--reka-combobox-content-transform-origin) overflow-hidden shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          props.class
+        )
+      "
     >
-      <slot />
+      <ComboboxViewport>
+        <slot />
+      </ComboboxViewport>
     </ComboboxContent>
   </ComboboxPortal>
 </template>

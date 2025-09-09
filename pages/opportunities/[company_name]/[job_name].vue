@@ -2,6 +2,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useJobsStore } from '~/store/jobs';
+import { storeToRefs } from 'pinia';
 
 // Use default layout
 definePageMeta({
@@ -13,30 +15,43 @@ const route = useRoute();
 const companyName = route.params.company_name;
 const jobName = route.params.job_name;
 
-const { getJobBySlug, initializeJobs, getSimilarJobs } = useJobs();
+// Jobs store
+const jobsStore = useJobsStore();
+const {
+  /* expose refs if needed */
+} = storeToRefs(jobsStore);
 
 const job = ref(null);
 const isLoading = ref(true);
 
-// Load job data
 onMounted(async () => {
   try {
-    if (useJobs().jobsData.value.length === 0) {
-      await initializeJobs();
-    }
-
-    const foundJob = getJobBySlug(companyName, jobName);
-
-    if (!foundJob) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Job not found',
+    // 1) Try find from store by slug (fast path)
+    const fromStore = jobsStore.getJobBySlug(companyName, jobName);
+    if (fromStore) {
+      job.value = fromStore;
+    } else {
+      // 2) Fallback: fetch by search + company filter (server provides only id/featured/search endpoints)
+      const nuxtApp = useNuxtApp();
+      const res = await nuxtApp.$api('/api/jobs', {
+        query: {
+          search: jobName.replace(/-/g, ' '),
+          companyName,
+          limit: 20,
+        },
       });
+      const list = Array.isArray(res?.data) ? res.data : [];
+      const exact = list.find((j) => j.company?.slug === companyName && j.slug === jobName);
+      if (exact) {
+        job.value = exact;
+        // Populate store so similarJobs can be derived on refresh
+        if (list.length) {
+          jobsStore.setJobsData(list);
+        }
+      } else {
+        throw createError({ statusCode: 404, statusMessage: 'Job not found' });
+      }
     }
-
-    console.log('Found Job: ', foundJob);
-
-    job.value = foundJob;
   } catch (err) {
     console.error('Error:', err);
     throw err;
@@ -53,7 +68,7 @@ useHead({
 // Get similar jobs (same industry, different job)
 const similarJobs = computed(() => {
   if (!job.value) return [];
-  return getSimilarJobs(job.value.id, job.value.company?.industry, 4);
+  return jobsStore.getSimilarJobs(job.value.id, job.value.company?.industry, 4);
 });
 
 // Simple location display
@@ -66,9 +81,9 @@ const locationString = computed(() => {
 
 // Parse job description for structured sections
 const parsedDescription = computed(() => {
-  if (!job.value.description_text) return { sections: [] };
+  if (!job.value?.description) return { sections: [] };
 
-  const text = job.value.description_text;
+  const text = job.value.description;
   const sections = [];
 
   // Split by common section headers
@@ -130,14 +145,10 @@ const requirementsSections = computed(() => {
 
 // Function to handle apply button click
 const handleApply = () => {
-  if (job.value.url) {
-    window.open(job.value.url, '_blank');
+  if (job.value?.external_url) {
+    window.open(job.value.external_url, '_blank');
   }
 };
-
-onMounted(() => {
-  console.log('Job: ', job.value);
-});
 </script>
 
 <template>
@@ -321,7 +332,10 @@ onMounted(() => {
                         <h3 class="font-semibold text-gray-900 text-sm line-clamp-1">{{ similarJob.title }}</h3>
                         <p class="text-gray-600 text-xs line-clamp-1">{{ similarJob.company.name }}</p>
                         <p class="text-gray-500 text-xs mt-1">
-                          {{ [similarJob.location?.city, similarJob.location?.region, similarJob.location?.country].filter(Boolean).join(', ') || 'Location not specified' }}
+                          {{
+                            [similarJob.location?.city, similarJob.location?.region, similarJob.location?.country].filter(Boolean).join(', ') ||
+                            'Location not specified'
+                          }}
                         </p>
                       </div>
                     </div>

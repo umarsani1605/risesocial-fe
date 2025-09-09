@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/store/auth';
 import { useJobsStore } from '@/store/jobs';
+import { storeToRefs } from 'pinia';
 
 // Set layout untuk halaman ini
 definePageMeta({
@@ -19,9 +20,10 @@ const user = computed(() => authStore.user);
 // Get bootcamp data
 const { bootcampsData, initializeBootcamps } = useBootcamps();
 
-// Get jobs store and data
+// Get jobs store and helpers
 const jobsStore = useJobsStore();
-const { jobsData, formatEmploymentType, getJobImage, getJobDetailUrl } = useJobs();
+const { jobsData } = storeToRefs(jobsStore);
+const { formatEmploymentType, getJobImage, getJobDetailUrl } = jobsStore;
 
 // Initialize favorites on client side
 onMounted(() => {

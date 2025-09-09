@@ -2,7 +2,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+
+    timeline: {
+      enabled: true
+    }
+  },
   css: ['~/assets/main.css'],
 
   ssr: true,
@@ -58,6 +64,11 @@ export default defineNuxtConfig({
     'nuxt-easy-lightbox',
     '@nuxt/scripts'
   ],
+
+  piniaPluginPersistedstate: {
+    storage: 'cookies',
+    debug: true,
+  },
   
   runtimeConfig: {
     public: {

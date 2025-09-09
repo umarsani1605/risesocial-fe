@@ -196,7 +196,7 @@ const handleGuidebookButton = async () => {
     });
   }
 
-  await navigateTo('https://risesocial.org/programs/rise-young-leaders-summit/registration', {
+  await navigateTo('https://drive.google.com/file/d/1M-EAldRWILWcWL0TKNYd-v-e-CtA9ZLX/view?usp=sharing', {
     open: {
       target: '_blank',
     },
