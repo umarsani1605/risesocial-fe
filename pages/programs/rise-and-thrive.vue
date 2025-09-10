@@ -176,10 +176,17 @@ const goToAlumniSlide = (index) => {
             Join our comprehensive bootcamp programs and get direct access to job opportunities with our hiring partners
           </p>
           <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
-            <Button size="lg" class="bg-[#0a5c5b] text-white hover:bg-[#095351] text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3">
+            <Button
+              as="a"
+              href="/programs"
+              size="lg"
+              class="bg-[#0a5c5b] text-white hover:bg-[#095351] text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
+            >
               View All Programs
             </Button>
             <Button
+              as="a"
+              href="/contact"
               size="lg"
               variant="outline"
               class="border-[#0a5c5b] text-[#0a5c5b] hover:bg-[#0a5c5b] hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
