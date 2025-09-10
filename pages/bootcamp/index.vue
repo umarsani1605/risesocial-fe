@@ -129,7 +129,7 @@ onMounted(() => {
                   <!-- Right Visual Section -->
                   <div class="flex-1 relative overflow-hidden items-end justify-end">
                     <!-- Content -->
-                    <div class="w-full relative bg-primary rounded-2xl lg:h-50 aspect-square flex items-center justify-center">
+                    <div class="w-full relative rounded-2xl lg:h-50 aspect-square flex items-center justify-center">
                       <NuxtImg :src="bootcamp.image_url" :alt="bootcamp.title" class="w-full h-full object-cover rounded-lg" format="webp" />
                     </div>
                   </div>

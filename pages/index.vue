@@ -230,6 +230,11 @@ const partnersData = [
     alt: 'GoTo Impact',
   },
   {
+    name: 'Pandawara',
+    src: '/images/pandawara.png',
+    alt: 'Pandawara',
+  },
+  {
     name: 'Kyoto University',
     src: '/images/kyoto_univ.png',
     alt: 'Kyoto University',
