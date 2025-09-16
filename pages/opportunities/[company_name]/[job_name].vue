@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useJobsStore } from '~/store/jobs';
 import { storeToRefs } from 'pinia';
+import { useAPI } from '@/composables/useAPI';
 
 // Use default layout
 definePageMeta({
@@ -21,55 +22,54 @@ const {
   /* expose refs if needed */
 } = storeToRefs(jobsStore);
 
-const job = ref(null);
-const isLoading = ref(true);
-
-onMounted(async () => {
-  try {
-    // 1) Try find from store by slug (fast path)
-    const fromStore = jobsStore.getJobBySlug(companyName, jobName);
-    if (fromStore) {
-      job.value = fromStore;
-    } else {
-      // 2) Fallback: fetch by search + company filter (server provides only id/featured/search endpoints)
-      const nuxtApp = useNuxtApp();
-      const res = await nuxtApp.$api('/api/jobs', {
-        query: {
-          search: jobName.replace(/-/g, ' '),
-          companyName,
-          limit: 20,
-        },
-      });
-      const list = Array.isArray(res?.data) ? res.data : [];
-      const exact = list.find((j) => j.company?.slug === companyName && j.slug === jobName);
-      if (exact) {
-        job.value = exact;
-        // Populate store so similarJobs can be derived on refresh
-        if (list.length) {
-          jobsStore.setJobsData(list);
-        }
-      } else {
-        throw createError({ statusCode: 404, statusMessage: 'Job not found' });
-      }
-    }
-  } catch (err) {
-    console.error('Error:', err);
-    throw err;
-  } finally {
-    isLoading.value = false;
-  }
+// Fetch job data using useAPI composable
+const {
+  data: jobData,
+  pending: isLoading,
+  error: jobError,
+} = await useAPI('/jobs', {
+  key: `job-${companyName}-${jobName}`,
+  query: {
+    companySlug: companyName,
+    jobSlug: jobName,
+    limit: 1,
+  },
+  transform: (response) => {
+    return response.data?.[0] || null;
+  },
 });
+
+// Handle 404 if job not found
+if (jobError.value || !jobData.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Job not found',
+  });
+}
+
+// Use job data directly
+const job = jobData;
 
 // Meta tags - Updated for rich data structure
 useHead({
   title: computed(() => `${job.value?.title || 'Job'} - ${job.value?.company?.name || 'Company'} | Rise Social`),
 });
 
-// Get similar jobs (same industry, different job)
-const similarJobs = computed(() => {
-  if (!job.value) return [];
-  return jobsStore.getSimilarJobs(job.value.id, job.value.company?.industry, 4);
+// Fetch similar jobs using useAPI
+const { data: similarJobsData, pending: similarJobsLoading } = await useAPI('/jobs', {
+  key: `similar-jobs-${companyName}-${jobName}`,
+  query: {
+    companySlug: companyName,
+    limit: 4,
+  },
+  transform: (response) => {
+    // Filter out current job from similar jobs
+    return response.data?.filter((j) => j.slug !== jobName) || [];
+  },
 });
+
+// Use similar jobs data directly
+const similarJobs = similarJobsData;
 
 // Simple location display
 const locationString = computed(() => {
@@ -306,7 +306,10 @@ const handleApply = () => {
 
           <!-- Similar Jobs - Order 3 on mobile, spans full width on mobile -->
           <div class="lg:col-span-2 order-3">
-            <div v-if="similarJobs.length > 0">
+            <div v-if="similarJobsLoading" class="flex items-center justify-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+            </div>
+            <div v-else-if="similarJobs && similarJobs.length > 0">
               <h2 class="text-xl font-semibold text-gray-900 mb-6">Similar Jobs</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <Card

@@ -14,6 +14,7 @@
 
 <script setup>
 definePageMeta({
+  auth: true,
   layout: 'admin-dashboard',
 });
 </script>

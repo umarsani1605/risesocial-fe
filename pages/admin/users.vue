@@ -6,49 +6,55 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import UserFormDialog from '@/components/admin/users/UserFormDialog.vue';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
-import { api } from '@/utils/api';
 import { Toaster } from '@/components/ui/sonner';
 import { ArrowUp, ArrowDown } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
-definePageMeta({ layout: 'admin-dashboard' });
+definePageMeta({
+  auth: true,
+  layout: 'admin-dashboard',
+});
 
-// Server-side params
+const { $api } = useNuxtApp();
+
 const page = ref(1);
 const limit = ref(10);
 const search = ref('');
 const role = ref('ALL'); // 'ALL' | 'USER' | 'ADMIN'
 const roleFilter = computed(() => (role.value === 'ALL' ? '' : role.value));
 
-const users = ref([]);
-const meta = ref({ page: 1, limit: 10, total: 0, totalPages: 1 });
-const pending = ref(false);
-const error = ref(null);
+// Initial data fetching with useAPI
+const {
+  data: usersResponse,
+  pending,
+  error,
+  refresh: refreshUsers,
+} = await useAPI('/admin/users', {
+  key: 'admin-users-data',
+  query: {
+    page: String(page.value),
+    limit: String(limit.value),
+    ...(search.value ? { search: search.value } : {}),
+    ...(roleFilter.value ? { role: roleFilter.value } : {}),
+  },
+  transform: (response) => ({
+    users: response?.data || [],
+    meta: response?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 },
+  }),
+});
 
-const fetchUsers = async () => {
-  pending.value = true;
-  error.value = null;
-  try {
-    const resp = await api.get('/api/users', {
-      query: {
-        page: String(page.value),
-        limit: String(limit.value),
-        ...(search.value ? { search: search.value } : {}),
-        ...(roleFilter.value ? { role: roleFilter.value } : {}),
-      },
-    });
-    users.value = resp?.data || [];
-    meta.value = resp?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 };
-  } catch (e) {
-    error.value = e;
-  } finally {
-    pending.value = false;
-  }
-};
+const users = computed(() => usersResponse.value?.users || []);
+const meta = computed(() => usersResponse.value?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 });
 
-watch([page, limit, search, role], fetchUsers, { immediate: true });
+// Watch for changes and refresh data
+watch(
+  [page, limit, search, role],
+  () => {
+    refreshUsers();
+  },
+  { immediate: false }
+);
 
-// Client-side sorting (on current page data)
 const sortBy = ref('first_name');
 const sortDir = ref('asc'); // 'asc' | 'desc'
 const toggleSort = (key) => {
@@ -104,11 +110,13 @@ const confirmDelete = async () => {
   if (!userToDelete.value) return;
   try {
     deleting.value = true;
-    await api.delete(`/api/users/${userToDelete.value.id}`);
+    await $api(`/api/admin/users/${userToDelete.value.id}`, {
+      method: 'DELETE',
+    });
     toast.success('User deleted');
     deleteDialogOpen.value = false;
     userToDelete.value = null;
-    fetchUsers();
+    refreshUsers();
   } catch (e) {
     toast.error(e.message || 'Failed to delete user');
   } finally {
@@ -119,16 +127,22 @@ const onSubmit = async (payload) => {
   try {
     saving.value = true;
     if (dialogMode.value === 'create') {
-      await api.post('/api/users', payload);
+      await $api('/admin/users', {
+        method: 'POST',
+        body: payload,
+      });
       toast.success('User created');
     } else {
       const updateBody = { ...payload };
       if (!updateBody.password) delete updateBody.password;
-      await api.put(`/api/users/${selectedUser.value.id}`, updateBody);
+      await $api(`/api/admin/users/${selectedUser.value.id}`, {
+        method: 'PUT',
+        body: updateBody,
+      });
       toast.success('User updated');
     }
     dialogOpen.value = false;
-    fetchUsers();
+    refreshUsers();
   } catch (e) {
     toast.error(e.message || 'Failed to save user');
   } finally {

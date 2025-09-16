@@ -3,19 +3,23 @@ import { computed, onMounted } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuthStore } from '@/store/auth';
 import { useJobsStore } from '@/store/jobs';
 import { storeToRefs } from 'pinia';
 
 // Set layout untuk halaman ini
 definePageMeta({
-  middleware: 'auth',
+  auth: true,
   layout: 'dashboard',
 });
 
-// Get user data
-const authStore = useAuthStore();
-const user = computed(() => authStore.user);
+// Get user data from Sidebase Auth
+const { data: user, status } = useAuth();
+
+// Debug user data
+watchEffect(() => {
+  console.log('Dashboard - Auth Status:', status.value);
+  console.log('Dashboard - User Data:', user.value);
+});
 
 // Get bootcamp data
 const { bootcampsData, initializeBootcamps } = useBootcamps();
@@ -70,7 +74,7 @@ useSeoMeta({
     <div class="container-wrapper section-py-md relative">
       <!-- Welcome Section -->
       <div class="relative bg-[#0E5C59] shadow rounded-xl p-4 sm:px-10 sm:pt-14 sm:pb-10 text-white mb-6 sm:mb-8 overflow-hidden z-10">
-        <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user ? user.first_name || 'User' : 'User' }}!</h1>
+        <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.first_name || 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="relative flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4 z-20">
           <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>

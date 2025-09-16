@@ -21,7 +21,7 @@ export const useAdminJobs = () => {
     error.value = null;
     try {
       const nuxtApp = useNuxtApp();
-      const response = await nuxtApp.$api('/api/jobs', {
+      const response = await nuxtApp.$api('/jobs', {
         query: {
           ...(params.search ? { search: params.search } : {}),
           ...(params.location ? { location: params.location } : {}),
@@ -57,7 +57,7 @@ export const useAdminJobs = () => {
     error.value = null;
     try {
       const nuxtApp = useNuxtApp();
-      const response = await nuxtApp.$api('/api/jobs', { method: 'POST', body: payload });
+      const response = await nuxtApp.$api('/jobs', { method: 'POST', body: payload });
       return response?.data || response;
     } catch (e) {
       error.value = e?.message || 'Gagal membuat job';

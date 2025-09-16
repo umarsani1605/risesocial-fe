@@ -22,14 +22,13 @@ const {
   data: jobsData,
   pending: jobsPending,
   error: jobsError,
-} = await useAPI('/api/jobs', {
+} = await useAPI('/jobs', {
   key: 'jobs-data',
   transform: (response) => {
     return response.data;
   },
 });
 
-// Jobs store
 const jobsStore = useJobsStore();
 const { filteredJobs, paginatedJobs, isLoading, filters, hasActiveFilters, currentPage, totalPages } = storeToRefs(jobsStore);
 
@@ -61,7 +60,6 @@ const clearFilters = () => {
   clearAllFilters();
 };
 
-// Method untuk select job dan navigate
 const selectAndNavigate = (job) => {
   console.log('🎯 selectAndNavigate called with job:', job);
   console.log('🎯 Job company slug:', job.company?.slug);

@@ -1,10 +1,10 @@
 <script setup>
-// Use default layout
+import { useAPI } from '@/composables/useAPI';
+
 definePageMeta({
   layout: 'default',
 });
 
-// Meta tags
 useHead({
   title: 'Rise Sustainability Bootcamp - Rise Social',
   meta: [
@@ -16,21 +16,34 @@ useHead({
   ],
 });
 
-// Use bootcamp composable
-const { bootcampsData, initializeBootcamps, isLoading } = useBootcamps();
-
-onMounted(() => {
-  initializeBootcamps();
+const {
+  data: bootcampsData,
+  pending: isLoading,
+  error: bootcampsError,
+} = await useAPI('/bootcamps', {
+  key: 'bootcamps-data',
+  query: {
+    limit: 20,
+    status: 'ACTIVE',
+  },
+  transform: (response) => {
+    return response.data || [];
+  },
 });
+
+if (bootcampsError.value) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: 'Failed to load bootcamps',
+  });
+}
 </script>
 
 <template>
   <div class="bg-gray-50 mt-20">
-    <!-- Hero Section -->
     <section class="section-py-sm md:section-py-lg">
       <div class="container-wrapper">
         <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
-          <!-- Left Content -->
           <div class="flex-1 space-y-6 lg:space-y-8">
             <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-gray-800 leading-tight">Rise Sustainability Bootcamp</h1>
 
@@ -45,8 +58,6 @@ onMounted(() => {
               </p>
             </div>
           </div>
-
-          <!-- Right Image -->
           <div class="relative flex-1 flex items-end justify-end">
             <NuxtImg
               src="/images/rise-young-leaders/gallery-4.png"
@@ -58,19 +69,14 @@ onMounted(() => {
         </div>
       </div>
     </section>
-
-    <!-- Bootcamp Programs Section -->
     <section class="section-py-sm md:section-py-md">
       <div class="container-wrapper">
-        <!-- Section Title -->
         <div class="mb-8 lg:mb-12">
           <h2 class="heading-section text-gray-800">Available Bootcamp Programs</h2>
           <p class="text-sm sm:text-base lg:text-lg">
             Choose from our specialized bootcamp programs designed to accelerate your sustainability career
           </p>
         </div>
-
-        <!-- Loading State -->
         <div v-if="isLoading" class="space-y-4 lg:space-y-6">
           <div v-for="i in 3" :key="i" class="animate-pulse">
             <div class="bg-white rounded-lg p-6 shadow-sm">
@@ -87,8 +93,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-
-        <!-- Bootcamp Cards -->
         <div v-else class="space-y-4 lg:space-y-6">
           <div v-for="bootcamp in bootcampsData" :key="bootcamp.id" class="group">
             <Card
@@ -97,14 +101,10 @@ onMounted(() => {
             >
               <CardContent>
                 <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-10 items-stretch">
-                  <!-- Left Content Section -->
                   <div class="flex-4 space-y-4 lg:space-y-6">
-                    <!-- Bootcamp Title -->
                     <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
                       {{ bootcamp.title }}
                     </h3>
-
-                    <!-- Bootcamp Meta Info -->
                     <div class="flex flex-wrap items-center gap-2 lg:gap-4 text-xs sm:text-sm text-gray-600">
                       <div class="flex items-center gap-1 lg:gap-2 bg-gray-100 px-2 lg:px-3 py-1 rounded-md">
                         <Icon name="heroicons:tag" class="w-3 h-3 lg:w-4 lg:h-4" />
@@ -119,17 +119,12 @@ onMounted(() => {
                         <span>{{ bootcamp.format }}</span>
                       </div>
                     </div>
-
-                    <!-- Bootcamp Description -->
                     <p class="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-3">
                       {{ bootcamp.description }}
                     </p>
                   </div>
-
-                  <!-- Right Visual Section -->
                   <div class="flex-1 relative overflow-hidden items-end justify-end">
-                    <!-- Content -->
-                    <div class="w-full relative bg-primary rounded-2xl lg:h-50 aspect-square flex items-center justify-center">
+                    <div class="w-full relative rounded-2xl lg:h-50 aspect-square flex items-center justify-center">
                       <NuxtImg :src="bootcamp.image_url" :alt="bootcamp.title" class="w-full h-full object-cover rounded-lg" format="webp" />
                     </div>
                   </div>

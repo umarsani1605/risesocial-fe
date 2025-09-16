@@ -18,7 +18,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
             <span>Back to Home</span>
           </Button>
         </header>
-        <main class="p-4 h-full">
+        <main class="pl-10 pr-16 py-6 h-full overflow-hidden">
           <slot />
         </main>
       </SidebarInset>

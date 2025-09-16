@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Set layout untuk halaman ini
 definePageMeta({
-  middleware: 'auth',
+  auth: true,
   layout: 'dashboard',
 });
 

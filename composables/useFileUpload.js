@@ -183,6 +183,60 @@ export const useFileUpload = () => {
   };
 
   /**
+   * Upload bootcamp image (Image only)
+   * @param {File} file
+   * @returns {Promise<string|null>} fileUrl or null if failed
+   */
+  const uploadBootcampImage = async (file) => {
+    if (
+      !validateFile(file, {
+        maxSize: 5 * 1024 * 1024, // 5MB
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+      })
+    ) {
+      return null;
+    }
+
+    isUploading.value = true;
+    uploadProgress.value = 0;
+
+    try {
+      const progressInterval = setInterval(() => {
+        if (uploadProgress.value < 90) {
+          uploadProgress.value += 10;
+        }
+      }, 200);
+
+      // Upload ke endpoint admin
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await $api('/admin/uploads/bootcamp-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+      uploadProgress.value = 100;
+
+      if (response.success) {
+        return response.data?.fileUrl;
+      } else {
+        uploadError.value = response.message || 'Upload gagal';
+        return null;
+      }
+    } catch (error) {
+      uploadError.value = error.data?.message || 'Upload gagal';
+      return null;
+    } finally {
+      isUploading.value = false;
+      setTimeout(() => {
+        uploadProgress.value = 0;
+      }, 1000);
+    }
+  };
+
+  /**
    * Reset upload state
    */
   const resetUploadState = () => {
@@ -198,6 +252,7 @@ export const useFileUpload = () => {
     uploadEssay,
     uploadHeadshot,
     uploadPaymentProof,
+    uploadBootcampImage,
     resetUploadState,
   };
 };

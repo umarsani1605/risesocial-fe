@@ -12,44 +12,44 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
-import { useAuthStore } from '@/store/auth';
 
 const route = useRoute();
 
-// Auth store
-const authStore = useAuthStore();
-const isInitialized = ref(false);
+// Sidebase Auth
+const { data: user, status, signOut } = useAuth();
 
-// Initialize auth state
-onMounted(async () => {
-  if (!authStore.isInitialized) {
-    await authStore.initAuth();
-  }
-  isInitialized.value = true;
-  // sleep 5 sec
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-  console.log('Auth initialized:', authStore.user);
-});
-
-// Computed properties for user data with null checks
-const isAuthenticated = computed(() => authStore.isLoggedIn);
+// Computed properties for user data
+const isAuthenticated = computed(() => status.value === 'authenticated');
 const fullName = computed(() => {
-  if (!isInitialized.value) return 'Loading...';
-  return authStore.user?.fullName || 'User';
+  if (!user.value) return 'User';
+  return `${user.value.first_name || ''} ${user.value.last_name || ''}`.trim() || 'User';
 });
 
 const initials = computed(() => {
-  if (!isInitialized.value || !authStore.user) return 'U';
-  return authStore.initials || 'U';
+  if (!user.value) return 'U';
+  const first = user.value.first_name?.[0] || '';
+  const last = user.value.last_name?.[0] || '';
+  return `${first}${last}`.toUpperCase() || 'U';
 });
 
 // Watch for auth changes for debugging
 watch(
-  () => authStore.user,
+  () => user.value,
   (newVal) => {
-    console.log('Auth user changed:', newVal);
+    console.log('NavbarWhite - Auth user changed:', newVal);
+    console.log('NavbarWhite - User first_name:', newVal?.first_name);
+    console.log('NavbarWhite - User role:', newVal?.role);
   },
   { immediate: true, deep: true }
+);
+
+// Debug status
+watch(
+  () => status.value,
+  (newStatus) => {
+    console.log('NavbarWhite - Auth status changed:', newStatus);
+  },
+  { immediate: true }
 );
 
 const mobileMenuOpen = ref(false);
@@ -105,7 +105,7 @@ const openLoginDialog = () => {
 };
 
 const handleLogout = async () => {
-  await authStore.signOut();
+  await signOut();
   mobileMenuOpen.value = false;
   await navigateTo('/');
 };
@@ -136,7 +136,7 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll);
   handleScroll(); // Initial check
   console.log('Navbar mounted');
-  console.log('User: ' + authStore.user);
+  console.log('User: ' + user.value);
 });
 
 // Clean up scroll listener
@@ -183,15 +183,15 @@ onUnmounted(() => {
                 <DropdownMenuTrigger class="h-full" as-child>
                   <Button variant="ghost" class="text-gray-700 hover:bg-gray-100">
                     <Avatar class="size-8">
-                      <AvatarImage :src="authStore.user?.avatar" />
-                      <AvatarFallback>{{ authStore.initials || 'U' }}</AvatarFallback>
+                      <AvatarImage :src="user?.avatar" />
+                      <AvatarFallback>{{ initials || 'U' }}</AvatarFallback>
                     </Avatar>
-                    <span class="hidden sm:block text-sm">{{ authStore.fullName || 'User' }}</span>
+                    <span class="hidden sm:block text-sm">{{ fullName || 'User' }}</span>
                     <Icon name="lucide:chevron-down" class="size-4 hidden sm:block" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-48 bg-white">
-                  <DropdownMenuItem @click="navigateTo('/dashboard')" class="cursor-pointer">
+                  <DropdownMenuItem @click="navigateTo(user?.role === 'ADMIN' ? '/admin' : '/dashboard')" class="cursor-pointer">
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
@@ -223,13 +223,13 @@ onUnmounted(() => {
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="icon" class="rounded-full p-1">
                     <Avatar class="h-8 w-8">
-                      <AvatarImage :src="authStore.user?.avatar" />
+                      <AvatarImage :src="user?.avatar" />
                       <AvatarFallback class="text-white text-sm">{{ initials }}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-48 bg-white">
-                  <DropdownMenuItem @click="navigateTo('/dashboard')" class="cursor-pointer">
+                  <DropdownMenuItem @click="navigateTo(user?.role === 'ADMIN' ? '/admin' : '/dashboard')" class="cursor-pointer">
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>

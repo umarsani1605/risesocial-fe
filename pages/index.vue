@@ -1,6 +1,5 @@
 <script setup>
 import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
-import { useAuthStore } from '@/store/auth';
 
 // Use default layout
 definePageMeta({
@@ -24,10 +23,10 @@ onMounted(() => {
   }
 });
 
-// Watch for successful login and handle redirect using custom auth system
-const authStore = useAuthStore();
+// Watch for successful login and handle redirect using Sidebase Auth
+const { status } = useAuth();
 watch(
-  () => authStore.status,
+  () => status.value,
   (newStatus) => {
     if (newStatus === 'authenticated' && route.query.redirect) {
       // User just logged in and there's a redirect parameter

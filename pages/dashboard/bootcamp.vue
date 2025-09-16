@@ -6,7 +6,7 @@ import { onMounted } from 'vue';
 
 // Set layout untuk halaman ini
 definePageMeta({
-  middleware: 'auth',
+  auth: true,
   layout: 'dashboard',
 });
 

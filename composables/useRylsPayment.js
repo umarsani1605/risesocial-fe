@@ -25,7 +25,7 @@ export const useRylsPayment = () => {
         },
       };
 
-      const res = await api.post('/api/payments/ryls/transactions', payload);
+      const res = await api.post('/payments/ryls/transactions', payload);
 
       if (!res?.data) {
         throw new Error('Invalid response from server');

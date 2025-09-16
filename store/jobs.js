@@ -280,7 +280,7 @@ export const useJobsStore = defineStore(
         try {
           const nuxtApp = useNuxtApp();
           const params = { search: searchTerm, ...searchFilters };
-          const response = await nuxtApp.$api('/api/jobs/search', { query: params });
+          const response = await nuxtApp.$api('/jobs/search', { query: params });
           const data = Array.isArray(response?.data) ? response.data : [];
           this.jobsData = this.transformJobsData(data);
           this.filteredJobs = [...this.jobsData];

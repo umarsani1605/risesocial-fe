@@ -5,10 +5,11 @@ import { formatPrice } from '~/utils/formatting';
  * @returns {object} Object berisi data dan methods bootcamp
  */
 export const useBootcamps = () => {
-  // Reactive state untuk bootcamps data
   const bootcampsData = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
+
+  const { $api } = useNuxtApp();
 
   /**
    * Fetch bootcamps data dari backend API
@@ -21,10 +22,7 @@ export const useBootcamps = () => {
     error.value = null;
 
     try {
-      const config = useRuntimeConfig();
-      const response = await $fetch('/api/bootcamps', {
-        baseURL: config.public.backendUrl,
-      });
+      const response = await $api('/bootcamps');
       const transformedData = response.data || response;
       bootcampsData.value = transformedData;
       return bootcampsData.value;
@@ -58,10 +56,7 @@ export const useBootcamps = () => {
     if (!pathSlug) return null;
 
     try {
-      const config = useRuntimeConfig();
-      const response = await $fetch(`/api/bootcamps/${pathSlug}`, {
-        baseURL: config.public.backendUrl,
-      });
+      const response = await $api(`/api/bootcamps/${pathSlug}`);
       return response.data || response;
     } catch (err) {
       console.error('Error finding bootcamp by slug:', err);

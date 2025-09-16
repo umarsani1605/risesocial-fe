@@ -1,16 +1,16 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useFilter } from 'reka-ui';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell, TableEmpty } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import JobFormDialog from '@/components/admin/jobs/JobFormDialog.vue';
 import { useAdminJobs } from '@/composables/useAdminJobs';
 import { toast } from 'vue-sonner';
-import { useAuthStore } from '~/store/auth';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { TagsInput, TagsInputItem, TagsInputInput, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input';
@@ -19,9 +19,10 @@ import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, 
 import { JOB_TYPES, JOB_SENIORITIES } from '@/constants/jobs';
 import { $api } from '@/composables/useAPI';
 
-const authStore = useAuthStore();
-
-definePageMeta({ layout: 'admin-dashboard' });
+definePageMeta({
+  auth: true,
+  layout: 'admin-dashboard',
+});
 
 const { deleteJob } = useAdminJobs();
 
@@ -30,7 +31,7 @@ const {
   pending: isLoading,
   error,
   refresh: refreshJobs,
-} = await useAPI('/api/jobs', {
+} = await useAPI('/jobs', {
   key: 'admin-jobs-data',
   query: {
     limit: 100,
@@ -44,9 +45,8 @@ const {
   data: rateLimitData,
   pending: rateLimitPending,
   refresh: refreshRateLimit,
-} = await useFetch('/api/system/settings/linkedin/rate-limit', {
-  server: true,
-  baseURL: useRuntimeConfig().public.backendUrl,
+} = await useAPI('/admin/system/settings/linkedin/rate-limit', {
+  key: 'admin-rate-limit-data',
   transform: (data) => data?.data || null,
 });
 
@@ -54,9 +54,8 @@ const {
   data: savedSyncFilters,
   pending: syncFiltersPending,
   refresh: refreshSavedSyncFilters,
-} = await useFetch('/api/system/settings/linkedin_sync_filters', {
-  server: true,
-  baseURL: useRuntimeConfig().public.backendUrl,
+} = await useAPI('/admin/system/settings/linkedin_sync_filters', {
+  key: 'admin-sync-filters-data',
   transform: (response) => response?.data?.value || null,
 });
 
@@ -65,9 +64,7 @@ const savingSettings = ref(false);
 const confirmOpen = ref(false);
 const settingsOpen = ref(false);
 
-const TYPE_OPTIONS = JOB_TYPES.map((o) => o.value);
 const INDUSTRY_OPTIONS = ref(industriesJson);
-const SENIORITY_OPTIONS = JOB_SENIORITIES.map((o) => o.value);
 
 const syncFilters = ref({
   title_filter: [],
@@ -80,27 +77,27 @@ const syncFilters = ref({
   seniority_filter: [],
 });
 
-const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-const toTypeLabels = (values) => {
-  const list = toArray(values);
-  return list.map((val) => {
-    const match = JOB_TYPES.find((opt) => opt.value === val || opt.label === val);
-    return match ? match.label : String(val);
+const toArray = (inputValue) => (Array.isArray(inputValue) ? inputValue : inputValue ? [inputValue] : []);
+const toTypeLabels = (inputValues) => {
+  const valueList = toArray(inputValues);
+  return valueList.map((value) => {
+    const matchedOption = JOB_TYPES.find((option) => option.value === value || option.label === value);
+    return matchedOption ? matchedOption.label : String(value);
   });
 };
 
 if (savedSyncFilters.value) {
-  const defaults = savedSyncFilters.value;
+  const defaultFilters = savedSyncFilters.value;
   syncFilters.value = {
     ...syncFilters.value,
-    title_filter: toArray(defaults.title_filter),
-    location_filter: toArray(defaults.location_filter),
-    description_filter: toArray(defaults.description_filter),
-    organization_description_filter: toArray(defaults.organization_description_filter),
-    organization_specialties_filter: toArray(defaults.organization_specialties_filter),
-    type_filter: toTypeLabels(defaults.type_filter),
-    industry_filter: toArray(defaults.industry_filter),
-    seniority_filter: toArray(defaults.seniority_filter),
+    title_filter: toArray(defaultFilters.title_filter),
+    location_filter: toArray(defaultFilters.location_filter),
+    description_filter: toArray(defaultFilters.description_filter),
+    organization_description_filter: toArray(defaultFilters.organization_description_filter),
+    organization_specialties_filter: toArray(defaultFilters.organization_specialties_filter),
+    type_filter: toTypeLabels(defaultFilters.type_filter),
+    industry_filter: toArray(defaultFilters.industry_filter),
+    seniority_filter: toArray(defaultFilters.seniority_filter),
   };
 }
 
@@ -113,81 +110,128 @@ const searchSeniority = ref('');
 const { contains } = useFilter({ sensitivity: 'base' });
 
 const filteredType = computed(() => {
-  const remaining = JOB_TYPES.filter((jobTypeOption) => !syncFilters.value.type_filter.includes(jobTypeOption.label));
-  return searchType.value ? remaining.filter((jobTypeOption) => contains(jobTypeOption.label, searchType.value)) : remaining;
+  const remainingOptions = JOB_TYPES.filter((jobTypeOption) => !syncFilters.value.type_filter.includes(jobTypeOption.label));
+  return searchType.value ? remainingOptions.filter((jobTypeOption) => contains(jobTypeOption.label, searchType.value)) : remainingOptions;
 });
 
 const filteredIndustry = computed(() => {
-  const base = Array.isArray(INDUSTRY_OPTIONS.value) ? INDUSTRY_OPTIONS.value : [];
-  const options = base.filter((industryValue) => !syncFilters.value.industry_filter.includes(industryValue));
-  return searchIndustry.value ? options.filter((industryValue) => contains(industryValue, searchIndustry.value)) : options;
+  const baseIndustries = Array.isArray(INDUSTRY_OPTIONS.value) ? INDUSTRY_OPTIONS.value : [];
+  const availableOptions = baseIndustries.filter((industryValue) => !syncFilters.value.industry_filter.includes(industryValue));
+  return searchIndustry.value ? availableOptions.filter((industryValue) => contains(industryValue, searchIndustry.value)) : availableOptions;
 });
 
 const filteredSeniority = computed(() => {
-  const options = SENIORITY_OPTIONS.filter((seniorityValue) => !syncFilters.value.seniority_filter.includes(seniorityValue));
-  return searchSeniority.value ? options.filter((seniorityValue) => contains(seniorityValue, searchSeniority.value)) : options;
-});
-
-const rateLimitText = computed(() => {
-  if (rateLimitPending.value) {
-    return 'Loading rate limit...';
-  }
-  if (!rateLimitData.value) {
-    return 'Rate Limit: N/A';
-  }
-  const req = rateLimitData.value?.requests || {};
-  const jobs = rateLimitData.value?.jobs || {};
-  const reqRemain = typeof req.remaining === 'number' ? req.remaining : 0;
-  const reqLimit = typeof req.limit === 'number' ? req.limit : 0;
-  const jobRemain = typeof jobs.remaining === 'number' ? jobs.remaining : 0;
-  const jobLimit = typeof jobs.limit === 'number' ? jobs.limit : 0;
-  return `Request Limit: ${reqRemain}/${reqLimit}. Job Limit: ${jobRemain}/${jobLimit}`;
+  const availableOptions = JOB_SENIORITIES.map((option) => option.value).filter(
+    (seniorityValue) => !syncFilters.value.seniority_filter.includes(seniorityValue)
+  );
+  return searchSeniority.value ? availableOptions.filter((seniorityValue) => contains(seniorityValue, searchSeniority.value)) : availableOptions;
 });
 
 const search = ref('');
 const jobType = ref('ALL');
 const experienceLevel = ref('ALL');
 const remote = ref('ALL');
+const location = ref('ALL');
+
+// Applied filters (yang benar-benar diterapkan)
+const appliedSearch = ref('');
+const appliedJobType = ref('ALL');
+const appliedExperienceLevel = ref('ALL');
+const appliedRemote = ref('ALL');
+const appliedLocation = ref('ALL');
+
+// Popover state
+const filterPopoverOpen = ref(false);
+
+const clearFilters = () => {
+  search.value = '';
+  jobType.value = 'ALL';
+  experienceLevel.value = 'ALL';
+  remote.value = 'ALL';
+  location.value = 'ALL';
+  appliedSearch.value = '';
+  appliedJobType.value = 'ALL';
+  appliedExperienceLevel.value = 'ALL';
+  appliedRemote.value = 'ALL';
+  appliedLocation.value = 'ALL';
+  filterPopoverOpen.value = false;
+};
+
+const applyFilters = () => {
+  appliedSearch.value = search.value;
+  appliedJobType.value = jobType.value;
+  appliedExperienceLevel.value = experienceLevel.value;
+  appliedRemote.value = remote.value;
+  appliedLocation.value = location.value;
+  filterPopoverOpen.value = false;
+};
 
 const page = ref(1);
 const pageSize = ref(10);
 
-const sortBy = ref('posted');
+const sortBy = ref('created_at');
 const sortDir = ref('desc');
 
+// Unique countries computed - simplified
+const uniqueCountries = computed(() => {
+  if (!Array.isArray(jobs.value)) return [];
+
+  const countries = jobs.value
+    .map((job) => job.location?.country)
+    .filter(Boolean)
+    .filter((country, index, array) => array.indexOf(country) === index)
+    .sort();
+
+  return countries;
+});
+
 const filtered = computed(() => {
-  let arr = Array.isArray(jobs.value) ? [...jobs.value] : [];
+  let filteredJobs = Array.isArray(jobs.value) ? [...jobs.value] : [];
 
-  const term = search.value.trim().toLowerCase();
-  if (term) {
-    arr = arr.filter((j) => (j.title || '').toLowerCase().includes(term) || (j.company?.name || j.company || '').toLowerCase().includes(term));
+  const searchTerm = appliedSearch.value.trim().toLowerCase();
+  if (searchTerm) {
+    filteredJobs = filteredJobs.filter(
+      (job) => (job.title || '').toLowerCase().includes(searchTerm) || (job.company?.name || '').toLowerCase().includes(searchTerm)
+    );
   }
 
-  if (jobType.value !== 'ALL') {
-    arr = arr.filter((j) => (j.jobType || j.employment_type || '').toString().toUpperCase() === jobType.value);
+  if (appliedJobType.value !== 'ALL') {
+    filteredJobs = filteredJobs.filter((job) => (job.employment_type || '').toString().toUpperCase() === appliedJobType.value);
   }
 
-  if (experienceLevel.value !== 'ALL') {
-    arr = arr.filter((j) => (j.experienceLevel || j.seniority_level || j.experience || '').toString().toUpperCase() === experienceLevel.value);
+  if (appliedExperienceLevel.value !== 'ALL') {
+    filteredJobs = filteredJobs.filter((job) => (job.seniority_level || '').toString().toUpperCase() === appliedExperienceLevel.value);
   }
 
-  if (remote.value !== 'ALL') {
-    const wantRemote = remote.value === 'YES';
-    arr = arr.filter((j) => Boolean(j.isRemote ?? j.is_remote ?? j.location?.is_remote) === wantRemote);
+  if (appliedRemote.value !== 'ALL') {
+    const wantsRemote = appliedRemote.value === 'YES';
+    filteredJobs = filteredJobs.filter((job) => Boolean(job.location?.is_remote) === wantsRemote);
   }
 
-  const dir = sortDir.value === 'asc' ? 1 : -1;
-  arr.sort((a, b) => {
-    const val = (k, obj) => obj?.[k] ?? obj?.company?.[k] ?? obj?.location?.[k] ?? null;
-    if (sortBy.value === 'title') return String(a.title || '').localeCompare(String(b.title || '')) * dir;
-    if (sortBy.value === 'company') return String(a.company?.name || a.company || '').localeCompare(String(b.company?.name || b.company || '')) * dir;
-    if (sortBy.value === 'salary') return ((a.maxSalary || a.salary_max || 0) - (b.maxSalary || b.salary_max || 0)) * dir;
-    const da = new Date(a.posted_date || a.datePosted || a.created_at || 0);
-    const db = new Date(b.posted_date || b.datePosted || b.created_at || 0);
-    return (da - db) * dir;
+  if (appliedLocation.value !== 'ALL') {
+    filteredJobs = filteredJobs.filter((job) => job.location?.country === appliedLocation.value);
+  }
+
+  const sortDirection = sortDir.value === 'asc' ? 1 : -1;
+  filteredJobs.sort((jobA, jobB) => {
+    const getValue = (key, object) => object?.[key] ?? object?.company?.[key] ?? object?.location?.[key] ?? null;
+
+    if (sortBy.value === 'title') {
+      return String(jobA.title || '').localeCompare(String(jobB.title || '')) * sortDirection;
+    }
+    if (sortBy.value === 'company') {
+      return String(jobA.company?.name || jobA.company || '').localeCompare(String(jobB.company?.name || jobB.company || '')) * sortDirection;
+    }
+    if (sortBy.value === 'salary') {
+      return ((jobA.maxSalary || jobA.salary_max || 0) - (jobB.maxSalary || jobB.salary_max || 0)) * sortDirection;
+    }
+
+    const dateA = new Date(jobA.posted_date || jobA.datePosted || jobA.created_at || 0);
+    const dateB = new Date(jobB.posted_date || jobB.datePosted || jobB.created_at || 0);
+    return (dateA - dateB) * sortDirection;
   });
 
-  return arr;
+  return filteredJobs;
 });
 
 const paginated = computed(() => {
@@ -197,11 +241,11 @@ const paginated = computed(() => {
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / pageSize.value)));
 
-const toggleSort = (key) => {
-  if (sortBy.value === key) {
+const toggleSort = (sortKey) => {
+  if (sortBy.value === sortKey) {
     sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc';
   } else {
-    sortBy.value = key;
+    sortBy.value = sortKey;
     sortDir.value = 'asc';
   }
 };
@@ -209,8 +253,8 @@ const toggleSort = (key) => {
 // Delete dialog
 const deleteDialogOpen = ref(false);
 const selected = ref(null);
-const onOpenDelete = (row) => {
-  selected.value = row;
+const onOpenDelete = (jobRow) => {
+  selected.value = jobRow;
   deleteDialogOpen.value = true;
 };
 const onConfirmDelete = async () => {
@@ -220,8 +264,8 @@ const onConfirmDelete = async () => {
     deleteDialogOpen.value = false;
     selected.value = null;
     await refreshJobs();
-  } catch (e) {
-    toast.error(e?.message || 'Gagal menghapus job');
+  } catch (error) {
+    toast.error(error?.message || 'Gagal menghapus job');
   }
 };
 
@@ -229,11 +273,13 @@ const syncJobs = async () => {
   if (isSyncing.value) return;
   isSyncing.value = true;
 
-  console.log('Auth store: ' + authStore.user);
-  console.log('Auth store: ' + authStore.token);
+  const { data: user, token } = useAuth();
+  console.log('Auth user: ' + user.value);
+  console.log('Auth token: ' + token.value);
 
   try {
-    const toEnumValues = (filters) => filters.map((filterVal) => JOB_TYPES.find((label) => label.label === filterVal)?.value || filterVal);
+    const toEnumValues = (filterValues) =>
+      filterValues.map((filterValue) => JOB_TYPES.find((option) => option.label === filterValue)?.value || filterValue);
 
     const filterPayload = {
       ...syncFilters.value,
@@ -242,22 +288,23 @@ const syncJobs = async () => {
 
     console.log('filterPayload: ' + filterPayload);
 
-    const response = await $api('/api/jobs/sync-linkedin', {
-      query: { filter: filterPayload, limit: 1 },
+    const response = await $api('/admin/jobs/sync-linkedin', {
+      method: 'POST',
+      body: { filter: filterPayload, limit: 1 },
     });
 
     if (response?.success) {
-      const saved = response?.data?.saved ?? 0;
-      const skipped = response?.data?.skipped ?? 0;
-      toast.success(`Sync selesai. Saved: ${saved}`);
+      const savedCount = response?.data?.saved ?? 0;
+      const skippedCount = response?.data?.skipped ?? 0;
+      toast.success(`Sync selesai. Saved: ${savedCount}`);
       await refreshJobs();
       await refreshRateLimit();
     } else {
       toast.error(response?.message || 'Gagal melakukan sync jobs');
     }
-  } catch (err) {
-    console.error('[admin/jobs] Sync error:', err);
-    toast.error(err?.message || 'Terjadi kesalahan saat sync');
+  } catch (error) {
+    console.error('[admin/jobs] Sync error:', error);
+    toast.error(error?.message || 'Terjadi kesalahan saat sync');
   } finally {
     isSyncing.value = false;
   }
@@ -271,34 +318,29 @@ const onConfirmSync = async () => {
 const onSaveSyncSettings = async () => {
   try {
     savingSettings.value = true;
-    const payload = {
+    const settingsPayload = {
       value: { ...syncFilters.value },
       description: 'Default filters for manual LinkedIn sync',
     };
-    const res = await $api('/api/system/settings/linkedin_sync_filters', {
+    const response = await $api('/admin/system/settings/linkedin_sync_filters', {
       method: 'PUT',
-      body: payload,
+      body: settingsPayload,
     });
-    if (res?.success) {
+    if (response?.success) {
       toast.success('Sync settings saved');
       settingsOpen.value = false;
     } else {
-      toast.error(res?.message || 'Failed to save settings');
+      toast.error(response?.message || 'Failed to save settings');
     }
-  } catch (e) {
-    toast.error(e?.message || 'Failed to save settings');
+  } catch (error) {
+    toast.error(error?.message || 'Failed to save settings');
   } finally {
     savingSettings.value = false;
   }
 };
 
-onMounted(async () => {
-  // Rate limit data sudah di-fetch di server-side, tidak perlu fetch lagi
-});
-
 const pageSizes = [10, 20, 30, 50];
 
-// Create/Edit dialog
 const formOpen = ref(false);
 const formMode = ref('create');
 const editing = ref(null);
@@ -310,27 +352,27 @@ const onOpenCreate = () => {
   formOpen.value = true;
 };
 
-const onOpenEdit = (row) => {
+const onOpenEdit = (jobRow) => {
   formMode.value = 'edit';
-  editing.value = row;
+  editing.value = jobRow;
   formOpen.value = true;
 };
 
 const { createJob, updateJob } = useAdminJobs();
-const onSubmitForm = async (payload) => {
+const onSubmitForm = async (formPayload) => {
   try {
     saving.value = true;
     if (formMode.value === 'create') {
-      await createJob(payload);
+      await createJob(formPayload);
       toast.success('Job created');
     } else if (editing.value) {
-      await updateJob(editing.value.id, payload);
+      await updateJob(editing.value.id, formPayload);
       toast.success('Job updated');
     }
     formOpen.value = false;
     await refreshJobs();
-  } catch (e) {
-    toast.error(e?.message || 'Gagal menyimpan job');
+  } catch (error) {
+    toast.error(error?.message || 'Gagal menyimpan job');
   } finally {
     saving.value = false;
   }
@@ -340,48 +382,89 @@ const onSubmitForm = async (payload) => {
 <template>
   <div class="space-y-4">
     <h1 class="text-xl font-semibold">Jobs Management</h1>
-
-    <!-- Toolbar -->
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex gap-2 w-full sm:w-auto">
-        <Input v-model="search" placeholder="Search title/company" class="w-full sm:w-72" />
-        <Select v-model="jobType">
-          <SelectTrigger class="w-40"><SelectValue placeholder="Job Type" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Types</SelectItem>
-            <SelectItem value="FULL_TIME">FULL_TIME</SelectItem>
-            <SelectItem value="PART_TIME">PART_TIME</SelectItem>
-            <SelectItem value="CONTRACT">CONTRACT</SelectItem>
-            <SelectItem value="INTERNSHIP">INTERNSHIP</SelectItem>
-            <SelectItem value="FREELANCE">FREELANCE</SelectItem>
-            <SelectItem value="REMOTE">REMOTE</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select v-model="experienceLevel">
-          <SelectTrigger class="w-44"><SelectValue placeholder="Experience" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Levels</SelectItem>
-            <SelectItem value="ENTRY_LEVEL">ENTRY_LEVEL</SelectItem>
-            <SelectItem value="JUNIOR">JUNIOR</SelectItem>
-            <SelectItem value="MID_LEVEL">MID_LEVEL</SelectItem>
-            <SelectItem value="SENIOR">SENIOR</SelectItem>
-            <SelectItem value="LEAD">LEAD</SelectItem>
-            <SelectItem value="MANAGER">MANAGER</SelectItem>
-            <SelectItem value="DIRECTOR">DIRECTOR</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select v-model="remote">
-          <SelectTrigger class="w-32"><SelectValue placeholder="Remote" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All</SelectItem>
-            <SelectItem value="YES">Yes</SelectItem>
-            <SelectItem value="NO">No</SelectItem>
-          </SelectContent>
-        </Select>
+        <Input v-model="search" placeholder="Search title or company..." class="w-full sm:w-64" />
+        <Popover :open="filterPopoverOpen" @update:open="(isOpen) => (filterPopoverOpen = isOpen)">
+          <PopoverTrigger as-child>
+            <Button variant="outline" size="sm" class="flex items-center gap-2">
+              <Icon name="lucide:sliders-horizontal" class="w-4 h-4" />
+              Filters
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-80 p-4" side="bottom" align="start">
+            <div class="space-y-4">
+              <h4 class="font-medium text-sm">Filter Jobs</h4>
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-muted-foreground">Job Type</label>
+                <Select v-model="jobType">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select job type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Types</SelectItem>
+                    <SelectItem value="FULL_TIME">FULL_TIME</SelectItem>
+                    <SelectItem value="PART_TIME">PART_TIME</SelectItem>
+                    <SelectItem value="CONTRACT">CONTRACT</SelectItem>
+                    <SelectItem value="INTERNSHIP">INTERNSHIP</SelectItem>
+                    <SelectItem value="FREELANCE">FREELANCE</SelectItem>
+                    <SelectItem value="REMOTE">REMOTE</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-muted-foreground">Experience Level</label>
+                <Select v-model="experienceLevel">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select experience level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Levels</SelectItem>
+                    <SelectItem value="ENTRY_LEVEL">ENTRY_LEVEL</SelectItem>
+                    <SelectItem value="JUNIOR">JUNIOR</SelectItem>
+                    <SelectItem value="MID_LEVEL">MID_LEVEL</SelectItem>
+                    <SelectItem value="SENIOR">SENIOR</SelectItem>
+                    <SelectItem value="LEAD">LEAD</SelectItem>
+                    <SelectItem value="MANAGER">MANAGER</SelectItem>
+                    <SelectItem value="DIRECTOR">DIRECTOR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-muted-foreground">Remote Work</label>
+                <Select v-model="remote">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select remote option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All</SelectItem>
+                    <SelectItem value="YES">Yes</SelectItem>
+                    <SelectItem value="NO">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-muted-foreground">Country</label>
+                <Select v-model="location">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Countries</SelectItem>
+                    <SelectItem v-for="country in uniqueCountries" :key="country" :value="country">
+                      {{ country }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div class="flex gap-2 pt-2">
+                <Button size="sm" @click="applyFilters" class="flex-1"> Apply </Button>
+                <Button size="sm" variant="outline" @click="clearFilters" class="flex-1"> Clear </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
-
       <div class="flex items-center justify-end gap-5">
         <TooltipProvider>
           <Tooltip>
@@ -392,7 +475,8 @@ const onSubmitForm = async (payload) => {
               </div>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>{{ rateLimitText }}</p>
+              <p>Request Limit: {{ rateLimitData?.requests?.remaining || 0 }}/{{ rateLimitData?.requests?.limit || 0 }}</p>
+              <p>Job Limit: {{ rateLimitData?.jobs?.remaining || 0 }}/{{ rateLimitData?.jobs?.limit || 0 }}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -412,7 +496,7 @@ const onSubmitForm = async (payload) => {
         </TooltipProvider>
         <Separator orientation="vertical" class="h-[24px]!" />
         <div class="inline-flex items-stretch rounded-md overflow-hidden border">
-          <Popover :open="confirmOpen" @update:open="(v) => (confirmOpen = v)">
+          <Popover :open="confirmOpen" @update:open="(isOpen) => (confirmOpen = isOpen)">
             <PopoverTrigger as-child>
               <Button class="rounded-none" :disabled="isSyncing">
                 <Icon name="lucide:refresh-ccw" class="mr-2 h-4 w-4" />
@@ -427,7 +511,7 @@ const onSubmitForm = async (payload) => {
               </div>
             </PopoverContent>
           </Popover>
-          <Dialog :open="settingsOpen" @update:open="(v) => (settingsOpen = v)">
+          <Dialog :open="settingsOpen" @update:open="(isOpen) => (settingsOpen = isOpen)">
             <DialogTrigger as-child>
               <Button class="rounded-none">
                 <Icon name="lucide:settings" class="h-4 w-4" />
@@ -656,86 +740,136 @@ const onSubmitForm = async (payload) => {
       </div>
     </div>
 
-    <!-- Table -->
     <div class="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead @click="toggleSort('title')" class="cursor-pointer"
+            <TableHead @click="toggleSort('title')" class="cursor-pointer max-w-xs"
               >Title
               <span v-if="sortBy === 'title'" class="ml-1 inline-flex items-center text-muted-foreground">
                 <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
                 <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
               </span>
             </TableHead>
-            <TableHead @click="toggleSort('company')" class="cursor-pointer"
+            <TableHead @click="toggleSort('company')" class="cursor-pointer max-w-48"
               >Company
               <span v-if="sortBy === 'company'" class="ml-1 inline-flex items-center text-muted-foreground">
                 <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
                 <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
               </span>
             </TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Job Type</TableHead>
-            <TableHead>Experience</TableHead>
-            <TableHead @click="toggleSort('salary')" class="cursor-pointer"
+            <TableHead class="max-w-32">Location</TableHead>
+            <TableHead class="max-w-24">Job Type</TableHead>
+            <TableHead class="max-w-28">Experience</TableHead>
+            <TableHead class="max-w-20">Remote</TableHead>
+            <TableHead @click="toggleSort('salary')" class="cursor-pointer max-w-32"
               >Salary
               <span v-if="sortBy === 'salary'" class="ml-1 inline-flex items-center text-muted-foreground">
                 <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
                 <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
               </span>
             </TableHead>
-            <TableHead @click="toggleSort('posted')" class="cursor-pointer"
-              >Posted
-              <span v-if="sortBy === 'posted'" class="ml-1 inline-flex items-center text-muted-foreground">
+            <TableHead class="max-w-40">Skills</TableHead>
+            <TableHead class="max-w-40">Requirements</TableHead>
+            <TableHead class="max-w-40">Benefits</TableHead>
+            <TableHead class="max-w-32">External URL</TableHead>
+            <TableHead class="max-w-32">Recruiter</TableHead>
+            <TableHead class="max-w-32">Company Website</TableHead>
+            <TableHead class="max-w-24">Company Size</TableHead>
+            <TableHead class="max-w-36">Valid Until</TableHead>
+            <TableHead @click="toggleSort('created_at')" class="cursor-pointer max-w-36"
+              >Created At
+              <span v-if="sortBy === 'created_at'" class="ml-1 inline-flex items-center text-muted-foreground">
                 <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
                 <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
               </span>
             </TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead class="px-4 sticky right-0 bg-white">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <template v-if="paginated.length">
-            <TableRow v-for="j in paginated" :key="j.id">
-              <TableCell class="font-medium">{{ j.title }}</TableCell>
-              <TableCell>{{ j.company?.name || j.company }}</TableCell>
-              <TableCell class="text-muted-foreground">
-                {{ j.location?.city || j.location?.region || j.location?.country || '—' }}
+            <TableRow v-for="job in paginated" :key="job.id">
+              <TableCell class="font-medium max-w-xs truncate" :title="job.title">{{ job.title }}</TableCell>
+              <TableCell class="max-w-48 truncate" :title="job.company?.name">{{ job.company?.name || '-' }}</TableCell>
+              <TableCell
+                class="text-muted-foreground max-w-32 truncate"
+                :title="job.location?.city || job.location?.region || job.location?.country || '—'"
+              >
+                {{ job.location?.city || job.location?.region || job.location?.country || '—' }}
               </TableCell>
-              <TableCell>{{ j.jobType || j.employment_type || '-' }}</TableCell>
-              <TableCell>{{ j.experienceLevel || j.seniority_level || j.experience || '-' }}</TableCell>
-              <TableCell class="text-muted-foreground">
-                <span v-if="j.salary_min || j.minSalary || j.salary_max || j.maxSalary">
-                  {{ j.minSalary || j.salary_min ? j.minSalary || j.salary_min : '' }}
-                  <span v-if="j.maxSalary || j.salary_max"> - {{ j.maxSalary || j.salary_max }}</span>
+              <TableCell class="max-w-24 truncate" :title="job.employment_type || '-'">{{ job.employment_type || '-' }}</TableCell>
+              <TableCell class="max-w-28 truncate" :title="job.seniority_level || '-'">{{ job.seniority_level || '-' }}</TableCell>
+              <TableCell class="max-w-20 text-center">
+                <Badge v-if="job.location?.is_remote" variant="outline" class="text-xs"> Remote </Badge>
+                <span v-else class="text-muted-foreground">-</span>
+              </TableCell>
+              <TableCell class="text-muted-foreground max-w-32 truncate">
+                <span v-if="job.formattedSalary?.min || job.formattedSalary?.max">
+                  {{ job.formattedSalary?.min ? `$${job.formattedSalary.min.toLocaleString()}` : '' }}
+                  <span v-if="job.formattedSalary?.max"> - ${{ job.formattedSalary.max.toLocaleString() }}</span>
                 </span>
-                <span v-else>-</span>
+                <span v-else>{{ job.salaryRange || '-' }}</span>
               </TableCell>
-              <TableCell class="text-muted-foreground">
-                {{ j.posted_date ? new Date(j.posted_date).toLocaleString() : j.created_at ? new Date(j.created_at).toLocaleString() : '-' }}
+              <TableCell class="max-w-40 truncate" :title="Array.isArray(job.skills) ? job.skills.join(', ') : job.skills || '-'">
+                {{ Array.isArray(job.skills) ? job.skills.slice(0, 2).join(', ') + (job.skills.length > 2 ? '...' : '') : job.skills || '-' }}
               </TableCell>
-              <TableCell>
+              <TableCell class="max-w-40 truncate" :title="Array.isArray(job.requirements) ? job.requirements.join(', ') : job.requirements || '-'">
+                {{
+                  Array.isArray(job.requirements)
+                    ? job.requirements.slice(0, 2).join(', ') + (job.requirements.length > 2 ? '...' : '')
+                    : job.requirements || '-'
+                }}
+              </TableCell>
+              <TableCell class="max-w-40 truncate" :title="Array.isArray(job.benefits) ? job.benefits.join(', ') : job.benefits || '-'">
+                {{ Array.isArray(job.benefits) ? job.benefits.slice(0, 2).join(', ') + (job.benefits.length > 2 ? '...' : '') : job.benefits || '-' }}
+              </TableCell>
+              <TableCell class="max-w-32 truncate">
+                <a v-if="job.external_url" :href="job.external_url" target="_blank" class="text-primary hover:underline">
+                  <Icon name="lucide:external-link" class="w-3 h-3 inline mr-1" />
+                  Link
+                </a>
+                <span v-else class="text-muted-foreground">-</span>
+              </TableCell>
+              <TableCell class="max-w-32 truncate" :title="job.recruiter_name || '-'">
+                {{ job.recruiter_name || '-' }}
+              </TableCell>
+              <TableCell class="max-w-32 truncate">
+                <a v-if="job.company?.website_url" :href="job.company.website_url" target="_blank" class="text-primary hover:underline">
+                  <Icon name="lucide:external-link" class="w-3 h-3 inline mr-1" />
+                  Website
+                </a>
+                <span v-else class="text-muted-foreground">-</span>
+              </TableCell>
+              <TableCell class="max-w-24 truncate" :title="job.company?.linkedin_size || '-'">
+                {{ job.company?.linkedin_size || '-' }}
+              </TableCell>
+              <TableCell class="max-w-36 truncate" :title="job.valid_until ? new Date(job.valid_until).toLocaleDateString() : '-'">
+                {{ job.valid_until ? new Date(job.valid_until).toLocaleDateString() : '-' }}
+              </TableCell>
+              <TableCell class="text-muted-foreground max-w-36 truncate" :title="job.created_at ? new Date(job.created_at).toLocaleString() : '-'">
+                {{ job.created_at ? new Date(job.created_at).toLocaleString() : '-' }}
+              </TableCell>
+              <TableCell class="px-4 sticky right-0 bg-white">
                 <div class="flex items-center gap-2">
-                  <Button size="sm" variant="outline" @click="onOpenEdit(j)">Edit</Button>
-                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onOpenDelete(j)">Delete</Button>
+                  <Button size="sm" variant="outline" @click="onOpenEdit(job)">Edit</Button>
+                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onOpenDelete(job)">Delete</Button>
                 </div>
               </TableCell>
             </TableRow>
           </template>
-          <TableEmpty v-else :colspan="8">No data</TableEmpty>
+          <TableEmpty v-else :colspan="16">No data</TableEmpty>
         </TableBody>
       </Table>
     </div>
 
-    <!-- Pagination -->
     <div class="flex items-center justify-between px-2">
       <div class="flex items-center gap-2">
         <span class="text-sm">Rows per page</span>
-        <Select :model-value="String(pageSize)" @update:model-value="(v) => (pageSize = Number(v))">
+        <Select :model-value="String(pageSize)" @update:model-value="(newValue) => (pageSize = Number(newValue))">
           <SelectTrigger class="h-8 w-[80px]"><SelectValue :placeholder="String(pageSize)" /></SelectTrigger>
           <SelectContent side="top">
-            <SelectItem v-for="s in pageSizes" :key="s" :value="String(s)">{{ s }}</SelectItem>
+            <SelectItem v-for="pageSizeOption in pageSizes" :key="pageSizeOption" :value="String(pageSizeOption)">{{ pageSizeOption }}</SelectItem>
           </SelectContent>
         </Select>
       </div>

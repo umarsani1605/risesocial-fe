@@ -8,49 +8,99 @@ import { Badge } from '@/components/ui/badge';
 import RegistrationDetailModal from '@/components/admin/ryls/RegistrationDetailModal.vue';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import { Toaster } from '@/components/ui/sonner';
-import { ArrowUp, ArrowDown, Eye, Download, Trash2, Loader2, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import { useRylsAdmin } from '@/composables/useRylsAdmin';
+import { DISCOVER_SOURCES, SCHOLARSHIP_TYPES, GENDER_OPTIONS } from '~/constants/ryls';
 
-definePageMeta({ layout: 'admin-dashboard' });
+definePageMeta({
+  auth: true,
+  layout: 'admin-dashboard',
+});
 
-// Client-side state
 const search = ref('');
 const status = ref('ALL'); // 'ALL' | 'PENDING' | 'PAID' | 'FAILED' | 'EXPIRED'
 const scholarshipType = ref('ALL'); // 'ALL' | 'FULLY_FUNDED' | 'SELF_FUNDED'
+const gender = ref('ALL'); // 'ALL' | 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY'
+const nationality = ref('ALL'); // 'ALL' | specific nationality values
+const paymentType = ref('ALL'); // 'ALL' | 'PAYPAL' | 'MIDTRANS'
 
-// Computed filters
 const statusFilter = computed(() => (status.value === 'ALL' ? '' : status.value));
 const scholarshipFilter = computed(() => (scholarshipType.value === 'ALL' ? '' : scholarshipType.value));
+const genderFilter = computed(() => (gender.value === 'ALL' ? '' : gender.value));
+const nationalityFilter = computed(() => (nationality.value === 'ALL' ? '' : nationality.value));
+const paymentTypeFilter = computed(() => (paymentType.value === 'ALL' ? '' : paymentType.value));
 
-// Use RYLS admin composable
+// Get unique nationalities for filter options
+const nationalityOptions = computed(() => {
+  if (!Array.isArray(allRegistrations.value)) return [];
+
+  // Get all nationalities, filter out null/undefined/empty values
+  const allNationalities = allRegistrations.value
+    .map((r) => r.nationality)
+    .filter(Boolean) // Remove null, undefined, empty string
+    .map((nat) => nat.trim()) // Remove leading/trailing whitespace
+    .filter((nat) => nat.length > 0); // Remove empty strings after trim
+
+  // Create a map to store original case versions
+  const nationalityMap = new Map();
+
+  allNationalities.forEach((nat) => {
+    const lowerCase = nat.toLowerCase();
+    // Keep the first occurrence with proper case, or update if current has better case (Title Case)
+    if (!nationalityMap.has(lowerCase) || (nat.charAt(0) === nat.charAt(0).toUpperCase() && nat.slice(1) === nat.slice(1).toLowerCase())) {
+      nationalityMap.set(lowerCase, nat);
+    }
+  });
+
+  // Get unique nationalities with preserved case
+  const uniqueNationalities = Array.from(nationalityMap.values());
+
+  // Sort alphabetically
+  return uniqueNationalities.sort((a, b) => a.localeCompare(b));
+});
+
+const { $api } = useNuxtApp();
+
 const {
-  registrations: allRegistrations,
-  isLoading,
+  data: allRegistrations,
+  pending: isLoading,
   error,
-  fetchRegistrations,
-  deleteRegistration,
-  exportRegistrations,
-  exportRegistrationsExcel,
-  downloadFile,
-} = useRylsAdmin();
+  refresh: refreshRegistrations,
+} = await useAPI('/admin/ryls/registrations', {
+  key: 'admin-ryls-registrations-data',
+  query: {
+    page: 1,
+    limit: 100,
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+  },
+  transform: (response) => response?.data?.registrations || [],
+});
 
-// Fetch all data once
-const fetchAllData = async () => {
-  try {
-    await fetchRegistrations({
-      page: 1,
-      limit: 1000, // Fetch all data at once
-      sortBy: 'created_at',
-      sortOrder: 'desc',
-    });
-  } catch (e) {
-    toast.error('Failed to fetch registrations');
-  }
+// Action-based API calls using $api
+const deleteRegistration = async (id) => {
+  await $api(`/api/admin/ryls/registrations/${id}`, {
+    method: 'DELETE',
+  });
 };
 
-// Initial data fetch
-fetchAllData();
+const exportRegistrationsExcel = async () => {
+  const response = await $api('/admin/ryls/registrations/export-excel', {
+    responseType: 'blob',
+  });
+  return response;
+};
+
+const downloadFile = async (fileId) => {
+  const response = await $api(`/api/admin/uploads/${fileId}`);
+  return response;
+};
+
+// Generate public file URL
+const getFileUrl = (fileId) => {
+  const baseUrl = process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+  return `${baseUrl}/api/uploads/${fileId}`;
+};
 
 // Client-side filtered data
 const filteredRegistrations = computed(() => {
@@ -71,7 +121,16 @@ const filteredRegistrations = computed(() => {
     // Scholarship type filter
     const matchesScholarshipType = scholarshipType.value === 'ALL' || registration.scholarship_type === scholarshipType.value;
 
-    return matchesSearch && matchesStatus && matchesScholarshipType;
+    // Gender filter
+    const matchesGender = gender.value === 'ALL' || registration.gender === gender.value;
+
+    // Nationality filter
+    const matchesNationality = nationality.value === 'ALL' || registration.nationality === nationality.value;
+
+    // Payment type filter
+    const matchesPaymentType = paymentType.value === 'ALL' || registration.payments?.some((p) => p.type === paymentType.value);
+
+    return matchesSearch && matchesStatus && matchesScholarshipType && matchesGender && matchesNationality && matchesPaymentType;
   });
 });
 
@@ -184,7 +243,7 @@ const confirmDelete = async () => {
     toast.success('Registration deleted successfully');
     deleteDialogOpen.value = false;
     registrationToDelete.value = null;
-    fetchAllData();
+    refreshRegistrations();
   } catch (e) {
     toast.error(e.message || 'Failed to delete registration');
   } finally {
@@ -192,13 +251,30 @@ const confirmDelete = async () => {
   }
 };
 
-const handleFileDownload = async (fileId) => {
-  try {
-    await downloadFile(fileId);
-    toast.success('File download started');
-  } catch (e) {
-    toast.error(e.message || 'Failed to download file');
+const formatGender = (gender) => {
+  if (!gender) return '-';
+  const option = GENDER_OPTIONS.find((g) => g.value === gender);
+  return option.label;
+};
+
+const formatDateOfBirth = (date_of_birth) => {
+  if (!date_of_birth) return '-';
+  return new Date(date_of_birth).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+const formatDiscoverSource = (discover_source, discover_other_text) => {
+  if (!discover_source) return '-';
+
+  if (discover_source === 'OTHER' && discover_other_text) {
+    return `Other: ${discover_other_text}`;
   }
+
+  const source = DISCOVER_SOURCES.find((s) => s.value === discover_source);
+  return source ? source.label : discover_source;
 };
 
 // Export functionality
@@ -266,7 +342,7 @@ const getPaymentStatusVariant = (status) => {
 
 // Format scholarship type for display
 const formatScholarshipType = (type) => {
-  if (!type) return 'N/A';
+  if (!type) return '-';
   return type === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded';
 };
 
@@ -275,6 +351,9 @@ const clearFilters = () => {
   search.value = '';
   status.value = 'ALL';
   scholarshipType.value = 'ALL';
+  gender.value = 'ALL';
+  nationality.value = 'ALL';
+  paymentType.value = 'ALL';
   page.value = 1; // Reset to first page when clearing filters
 };
 </script>
@@ -299,25 +378,50 @@ const clearFilters = () => {
             <SelectItem value="SELF_FUNDED">Self Funded</SelectItem>
           </SelectContent>
         </Select>
+        <Select v-model="gender">
+          <SelectTrigger class="w-36">
+            <SelectValue placeholder="Gender" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Genders</SelectItem>
+            <SelectItem v-for="option in GENDER_OPTIONS" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <Select v-model="nationality">
+          <SelectTrigger class="w-40">
+            <SelectValue placeholder="Nationality" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Nationalities</SelectItem>
+            <SelectItem v-for="nat in nationalityOptions" :key="nat" :value="nat">
+              {{ nat }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <Select v-model="paymentType">
+          <SelectTrigger class="w-36">
+            <SelectValue placeholder="Payment" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Payments</SelectItem>
+            <SelectItem value="PAYPAL">PayPal</SelectItem>
+            <SelectItem value="MIDTRANS">Midtrans</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <!-- Export Button -->
       <div class="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          @click="handleExportExcel"
-          :disabled="isLoading || sortedRegistrations.length === 0"
-          class="flex items-center gap-2"
-        >
-          <Download class="w-4 h-4" />
+        <Button size="sm" @click="handleExportExcel" :disabled="isLoading || sortedRegistrations.length === 0" class="flex items-center gap-2">
+          <Icon name="lucide:download" class="w-4 h-4" />
           Export Excel
         </Button>
       </div>
     </div>
 
-    <!-- Table -->
-    <div class="rounded-md border">
+    <div class="rounded-md border w-full">
       <Table>
         <TableHeader>
           <TableRow>
@@ -326,8 +430,8 @@ const clearFilters = () => {
               <div class="flex items-center">
                 <span>Name</span>
                 <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'full_name'">
-                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                  <ArrowUp v-else class="w-3 h-3" />
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
                 </span>
               </div>
             </TableHead>
@@ -341,21 +445,58 @@ const clearFilters = () => {
                 <span>Whatsapp</span>
               </div>
             </TableHead>
+            <TableHead class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Gender</span>
+              </div>
+            </TableHead>
+            <TableHead class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Date of Birth</span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('nationality')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Residence</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'residence'">
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
             <TableHead @click="toggleSort('nationality')" class="cursor-pointer">
               <div class="flex items-center">
                 <span>Nationality</span>
                 <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'nationality'">
-                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                  <ArrowUp v-else class="w-3 h-3" />
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
                 </span>
               </div>
             </TableHead>
-            <TableHead @click="toggleSort('institution')" class="cursor-pointer">
+            <TableHead @click="toggleSort('nationality')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Second Nationality</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'nationality'">
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('institution')" class="cursor-pointer max-w-sm">
               <div class="flex items-center">
                 <span>Institution</span>
                 <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'institution'">
-                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                  <ArrowUp v-else class="w-3 h-3" />
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
+                </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('discover_source')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Discover Source</span>
+                <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'discover_source'">
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
                 </span>
               </div>
             </TableHead>
@@ -363,8 +504,8 @@ const clearFilters = () => {
               <div class="flex items-center">
                 <span>Type</span>
                 <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'scholarship_type'">
-                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                  <ArrowUp v-else class="w-3 h-3" />
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
                 </span>
               </div>
             </TableHead>
@@ -372,21 +513,31 @@ const clearFilters = () => {
               <div class="flex items-center">
                 <span>Payment</span>
                 <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'scholarship_type'">
-                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                  <ArrowUp v-else class="w-3 h-3" />
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
                 </span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('scholarship_type')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Proof / Order ID</span>
+              </div>
+            </TableHead>
+            <TableHead @click="toggleSort('scholarship_type')" class="cursor-pointer">
+              <div class="flex items-center">
+                <span>Amount</span>
               </div>
             </TableHead>
             <TableHead @click="toggleSort('created_at')" class="cursor-pointer">
               <div class="flex items-center">
                 <span>Registration Date</span>
                 <span class="ml-1 text-muted-foreground inline-flex items-center" v-if="sortBy === 'created_at'">
-                  <ArrowDown v-if="sortDir === 'asc'" class="w-3 h-3" />
-                  <ArrowUp v-else class="w-3 h-3" />
+                  <Icon v-if="sortDir === 'asc'" name="lucide:arrow-down" class="w-3 h-3" />
+                  <Icon v-else name="lucide:arrow-up" class="w-3 h-3" />
                 </span>
               </div>
             </TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead class="px-4 sticky right-0 bg-white">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -396,7 +547,7 @@ const clearFilters = () => {
                 {{ (page - 1) * pageSize + index + 1 }}
               </TableCell>
               <TableCell class="font-medium">
-                {{ registration.full_name || 'N/A' }}
+                {{ registration.full_name || '-' }}
               </TableCell>
               <TableCell>
                 {{ registration.email }}
@@ -404,11 +555,26 @@ const clearFilters = () => {
               <TableCell>
                 {{ registration.whatsapp }}
               </TableCell>
-              <TableCell class="text-sm">
-                {{ registration.nationality || 'N/A' }}
+              <TableCell class="text-sm capitalize">
+                {{ formatGender(registration.gender) }}
               </TableCell>
               <TableCell class="text-sm">
-                {{ registration.institution || 'N/A' }}
+                {{ formatDateOfBirth(registration.date_of_birth) }}
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ registration.residence || '-' }}
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ registration.nationality || '-' }}
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ registration.second_nationality || '-' }}
+              </TableCell>
+              <TableCell class="text-sm max-w-sm overflow-hidden overflow-ellipsis">
+                {{ registration.institution || '-' }}
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ formatDiscoverSource(registration.discover_source, registration.discover_other_text) }}
               </TableCell>
               <TableCell>
                 <Badge
@@ -422,13 +588,50 @@ const clearFilters = () => {
                 </Badge>
               </TableCell>
               <TableCell>
-                <NuxtImg v-if="registration.payments[0].type === 'PAYPAL'" src="/images/payment-logo/paypal_small.png" alt="paypal" class="h-4" />
-                <NuxtImg v-if="registration.payments[0].type === 'MIDTRANS'" src="/images/payment-logo/midtrans.png" alt="midtrans" class="h-3" />
+                <NuxtImg
+                  v-if="registration.payments[0].type === 'PAYPAL'"
+                  src="/images/payment-logo/paypal_small.png"
+                  alt="paypal"
+                  class="h-4 w-auto object-contain"
+                />
+                <NuxtImg
+                  v-if="registration.payments[0].type === 'MIDTRANS'"
+                  src="/images/payment-logo/midtrans.png"
+                  alt="midtrans"
+                  class="h-5 w-auto object-contain"
+                />
               </TableCell>
-              <TableCell class="text-sm text-muted-foreground whitespace-nowrap">
+              <TableCell class="text-sm whitespace-nowrap max-w-52 overflow-hidden">
+                <span v-if="registration.payments[0].type === 'PAYPAL'">
+                  <a
+                    as="a"
+                    :href="getFileUrl(registration.payments[0].payment_proof_id)"
+                    target="_blank"
+                    class="flex items-center gap-2 overflow-hidden overflow-ellipsis justify-start hover:underline hover:text-primary"
+                  >
+                    <Icon name="lucide:square-arrow-out-up-right" class="size-3!" />
+                    Payment Proof File
+                  </a>
+                </span>
+                <span v-if="registration.payments[0].type === 'MIDTRANS'">
+                  <a
+                    as="a"
+                    :href="`https://dashboard.midtrans.com/beta/transactions?type=order_id&query=${registration.payments[0].midtrans?.order_id}`"
+                    target="_blank"
+                    class="flex items-center gap-2 overflow-hidden overflow-ellipsis justify-start hover:underline hover:text-primary"
+                  >
+                    <Icon name="lucide:square-arrow-out-up-right" class="size-3!" />
+                    {{ registration.payments[0].midtrans?.order_id }}
+                  </a>
+                </span>
+              </TableCell>
+              <TableCell class="text-sm">
+                {{ `Rp${registration.payments[0].amount.toLocaleString('id-ID')}` || '-' }}
+              </TableCell>
+              <TableCell class="text-sm whitespace-nowrap">
                 {{ formatDate(registration.created_at) }}
               </TableCell>
-              <TableCell class="w-24">
+              <TableCell class="px-4 sticky right-0 bg-white">
                 <div class="flex items-center gap-2">
                   <Button variant="outline" size="sm" @click="openView(registration)">
                     <span>View</span>
@@ -441,19 +644,29 @@ const clearFilters = () => {
           <TableRow v-else-if="isLoading">
             <TableCell :colspan="8" class="text-center py-8">
               <div class="flex flex-col items-center justify-center gap-2">
-                <Loader2 class="h-6 w-6 animate-spin text-muted-foreground" />
+                <Icon name="lucide:loader-2" class="h-6 w-6 animate-spin text-muted-foreground" />
                 <span class="text-sm text-muted-foreground">Loading registrations...</span>
               </div>
             </TableCell>
           </TableRow>
 
           <TableRow v-else>
-            <TableCell :colspan="8" class="text-center py-8">
+            <TableCell :colspan="17" class="text-center py-8">
               <div class="flex flex-col items-center justify-center gap-2">
                 <span class="text-muted-foreground">
-                  {{ search || status !== 'ALL' || scholarshipType !== 'ALL' ? 'No matching registrations found' : 'No registrations yet' }}
+                  {{
+                    search || status !== 'ALL' || scholarshipType !== 'ALL' || gender !== 'ALL' || nationality !== 'ALL' || paymentType !== 'ALL'
+                      ? 'No matching registrations found'
+                      : 'No registrations yet'
+                  }}
                 </span>
-                <Button v-if="search || status !== 'ALL' || scholarshipType !== 'ALL'" variant="ghost" size="sm" @click="clearFilters" class="mt-2">
+                <Button
+                  v-if="search || status !== 'ALL' || scholarshipType !== 'ALL' || gender !== 'ALL' || nationality !== 'ALL' || paymentType !== 'ALL'"
+                  variant="outline"
+                  size="sm"
+                  @click="clearFilters"
+                  class="mt-2"
+                >
                   Clear filters
                 </Button>
               </div>
@@ -489,14 +702,14 @@ const clearFilters = () => {
 
         <div class="flex items-center gap-1">
           <Button variant="outline" size="sm" :disabled="page <= 1 || isLoading" @click="page--" class="h-8 w-8 p-0">
-            <ChevronLeft class="h-4 w-4" />
+            <Icon name="lucide:chevron-left" class="h-4 w-4" />
             <span class="sr-only">Previous page</span>
           </Button>
           <div class="flex items-center justify-center w-8 h-8 text-sm">
             {{ page }}
           </div>
           <Button variant="outline" size="sm" :disabled="page >= pageCount || isLoading" @click="page++" class="h-8 w-8 p-0">
-            <ChevronRight class="h-4 w-4" />
+            <Icon name="lucide:chevron-right" class="h-4 w-4" />
             <span class="sr-only">Next page</span>
           </Button>
         </div>
@@ -509,7 +722,7 @@ const clearFilters = () => {
       @update:open="(value) => (detailModalOpen = value)"
       :registration="selectedRegistration"
       :loading="loadingDetail"
-      @download-file="handleFileDownload"
+      @download-file="getFileUrl"
     />
   </div>
 </template>

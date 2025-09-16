@@ -1,4 +1,3 @@
-
 import { formatPrice, formatDate } from '~/utils/formatting';
 
 /**
@@ -6,8 +5,8 @@ import { formatPrice, formatDate } from '~/utils/formatting';
  * @returns {object} Object berisi data dan methods programs
  */
 export const usePrograms = () => {
-  const { $fetch } = useNuxtApp()
-  
+  const { $fetch } = useNuxtApp();
+
   // Reactive state untuk programs data
   const programsData = ref([]);
   const isLoading = ref(false);
@@ -25,8 +24,8 @@ export const usePrograms = () => {
 
     try {
       const config = useRuntimeConfig();
-      const response = await $fetch('/api/programs', {
-        baseURL: config.public.backendUrl
+      const response = await $fetch('/programs', {
+        baseURL: config.public.backendUrl,
       });
       const transformedData = response.data || response;
       programsData.value = transformedData;
@@ -52,7 +51,7 @@ export const usePrograms = () => {
     try {
       const config = useRuntimeConfig();
       const response = await $fetch(`/api/programs/${slug}`, {
-        baseURL: config.public.backendUrl
+        baseURL: config.public.backendUrl,
       });
       return response.data || response;
     } catch (err) {
@@ -95,7 +94,7 @@ export const usePrograms = () => {
         search: searchTerm,
         ...filters,
       };
-      const response = await $fetch('/api/programs/search', { params });
+      const response = await $fetch('/programs/search', { params });
       return response.data || response;
     } catch (err) {
       console.error('Error searching programs:', err);
@@ -116,7 +115,7 @@ export const usePrograms = () => {
     try {
       const response = await $fetch(`/api/programs/${programId}/enroll`, {
         method: 'POST',
-        body: enrollmentData
+        body: enrollmentData,
       });
       return response.data || response;
     } catch (err) {
@@ -132,7 +131,7 @@ export const usePrograms = () => {
    */
   const getUserPrograms = async () => {
     try {
-      const response = await $fetch('/api/programs/user');
+      const response = await $fetch('/programs/user');
       return response.data || response;
     } catch (err) {
       console.error('Error fetching user programs:', err);
@@ -169,7 +168,7 @@ export const usePrograms = () => {
       const response = await $fetch(`/api/programs/${programId}/progress`, {
         method: 'PUT',
         body: progressData,
-        baseURL: config.public.backendUrl
+        baseURL: config.public.backendUrl,
       });
       return response.data || response;
     } catch (err) {
@@ -186,30 +185,26 @@ export const usePrograms = () => {
    */
   const filterPrograms = (filters) => {
     if (!Array.isArray(programsData.value)) return [];
-    
+
     let filtered = [...programsData.value];
-    
+
     // Add basic filtering logic here
     if (filters.category && filters.category !== 'all') {
-      filtered = filtered.filter(program => 
-        program.category?.toLowerCase().includes(filters.category.toLowerCase())
-      );
+      filtered = filtered.filter((program) => program.category?.toLowerCase().includes(filters.category.toLowerCase()));
     }
-    
+
     if (filters.level && filters.level !== 'all') {
-      filtered = filtered.filter(program => 
-        program.level?.toLowerCase().includes(filters.level.toLowerCase())
-      );
+      filtered = filtered.filter((program) => program.level?.toLowerCase().includes(filters.level.toLowerCase()));
     }
-    
+
     if (filters.price && filters.price !== 'all') {
       if (filters.price === 'free') {
-        filtered = filtered.filter(program => !program.price || program.price === 0);
+        filtered = filtered.filter((program) => !program.price || program.price === 0);
       } else if (filters.price === 'paid') {
-        filtered = filtered.filter(program => program.price && program.price > 0);
+        filtered = filtered.filter((program) => program.price && program.price > 0);
       }
     }
-    
+
     return filtered;
   };
 

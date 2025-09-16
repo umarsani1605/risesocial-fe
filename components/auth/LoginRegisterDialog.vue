@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuthStore } from '@/store/auth';
 
 // Define component props and events
 const props = defineProps({
@@ -15,8 +14,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open']);
 
-// Backend auth store
-const authStore = useAuthStore();
+// Sidebase Auth
+const { signIn, signUp, data: user, status, isLoading } = useAuth();
 
 // Local state
 const isOpen = computed({
@@ -29,7 +28,6 @@ const isRegisterMode = ref(false);
 
 // Error state
 const errorMessage = ref('');
-const isLoading = ref(false);
 
 // Form states
 const loginForm = ref({
@@ -50,41 +48,40 @@ const registerForm = ref({
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle login dengan backend auth
+// Handle login dengan Sidebase Auth
 const handleLogin = async () => {
   errorMessage.value = '';
-  isLoading.value = true;
 
   try {
-    const response = await authStore.signIn({
+    const credential = {
       email: loginForm.value.email,
       password: loginForm.value.password,
       rememberMe: loginForm.value.keepSignedIn,
-    });
+    };
+    const response = await signIn(credential, { redirect: false });
 
-    console.log('✅ Backend Auth: Login successful' + JSON.stringify(response));
+    console.log('✅ Sidebase Auth: Login successful', response);
+
     isOpen.value = false;
 
-    const route = useRoute();
-    const redirectTo = route.query.redirect;
+    // Simple role-based redirect
+    await nextTick(); // Wait for user data to be available
+    const currentUser = user.value;
 
-    // Redirect based on user role
-    if (redirectTo) {
-      await navigateTo(decodeURIComponent(redirectTo));
-    } else if (authStore.user?.role === 'ADMIN') {
-      await navigateTo('/admin');
-    } else {
-      await navigateTo('/dashboard');
+    const targetRoute = currentUser?.role === 'ADMIN' ? '/admin' : '/dashboard';
+    const currentRoute = useRoute().path;
+
+    // Only navigate if we're not already on the target route
+    if (currentRoute !== targetRoute) {
+      await navigateTo(targetRoute, { replace: true });
     }
   } catch (error) {
     console.error('Login error:', error);
-    errorMessage.value = error.message || 'Invalid email or password';
-  } finally {
-    isLoading.value = false;
+    errorMessage.value = error.data?.message || error.message || 'Invalid email or password';
   }
 };
 
-// Handle register dengan backend auth
+// Handle register dengan Sidebase Auth
 const handleRegister = async () => {
   errorMessage.value = '';
 
@@ -100,37 +97,37 @@ const handleRegister = async () => {
     return;
   }
 
-  isLoading.value = true;
-
   try {
-    console.log('📝 Backend Auth: Registration in progress...');
+    console.log('📝 Sidebase Auth: Registration in progress...');
 
-    // Register using backend auth (automatically logs in user)
-    await authStore.signUp({
-      first_name: registerForm.value.first_name,
-      last_name: registerForm.value.last_name,
-      email: registerForm.value.email,
-      password: registerForm.value.password,
-    });
+    const response = await signUp(
+      {
+        first_name: registerForm.value.first_name,
+        last_name: registerForm.value.last_name,
+        email: registerForm.value.email,
+        password: registerForm.value.password,
+      },
+      { redirect: false }
+    );
 
-    console.log('✅ Backend Auth: Registration successful!');
+    console.log('✅ Sidebase Auth: Registration successful!', response);
 
     isOpen.value = false;
 
-    // Check for redirect parameter
-    const route = useRoute();
-    const redirectTo = route.query.redirect;
+    // Simple role-based redirect after registration
+    await nextTick(); // Wait for user data to be available
+    const currentUser = user.value;
 
-    if (redirectTo) {
-      await navigateTo(decodeURIComponent(redirectTo));
-    } else {
-      await navigateTo('/dashboard');
+    const targetRoute = currentUser?.role === 'ADMIN' ? '/admin' : '/dashboard';
+    const currentRoute = useRoute().path;
+
+    // Only navigate if we're not already on the target route
+    if (currentRoute !== targetRoute) {
+      await navigateTo(targetRoute, { replace: true });
     }
   } catch (error) {
-    console.error('Backend register error:', error);
-    errorMessage.value = error.message || 'Registration failed';
-  } finally {
-    isLoading.value = false;
+    console.error('Sidebase Auth register error:', error);
+    errorMessage.value = error.data?.message || error.message || 'Registration failed';
   }
 };
 
@@ -149,7 +146,6 @@ watch(isOpen, (newValue) => {
     showPassword.value = false;
     showConfirmPassword.value = false;
     errorMessage.value = '';
-    isLoading.value = false;
   }
 });
 </script>

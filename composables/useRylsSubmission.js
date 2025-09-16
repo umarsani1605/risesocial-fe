@@ -4,12 +4,10 @@
  */
 
 import { ref } from 'vue';
-import { useRuntimeConfig } from 'nuxt/app';
 import { useRylsRegistrationStore } from '@/store/rylsRegistration';
-import { api } from '@/utils/api';
 
 export const useRylsSubmission = () => {
-  const config = useRuntimeConfig();
+  const { $api } = useNuxtApp();
   const isSubmitting = ref(false);
   const submissionError = ref(null);
   const submissionSuccess = ref(false);
@@ -36,7 +34,10 @@ export const useRylsSubmission = () => {
 
       console.log('Registration data:', registrationData);
 
-      const response = await api.post('/api/ryls/registrations', registrationData);
+      const response = await $api('/ryls/registrations', {
+        method: 'POST',
+        body: registrationData,
+      });
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to submit registration');
@@ -65,7 +66,7 @@ export const useRylsSubmission = () => {
     }
 
     try {
-      const response = await api.get(`/api/ryls/registrations/${submissionId}/status`);
+      const response = await $api(`/api/ryls/registrations/${submissionId}/status`);
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to get submission status');
@@ -92,7 +93,10 @@ export const useRylsSubmission = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await api.post('/api/uploads/essay', formData);
+      const response = await $api('/uploads/essay', {
+        method: 'POST',
+        body: formData,
+      });
       return response;
     } catch (error) {
       console.error('Error uploading essay file:', error);
@@ -110,10 +114,9 @@ export const useRylsSubmission = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await $fetch('/api/uploads/headshot', {
+      const response = await $api('/uploads/headshot', {
         method: 'POST',
         body: formData,
-        baseURL: config.public.backendUrl,
       });
       return response;
     } catch (error) {
@@ -132,10 +135,9 @@ export const useRylsSubmission = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await $fetch('/api/uploads/payment-proof', {
+      const response = await $api('/uploads/payment-proof', {
         method: 'POST',
         body: formData,
-        baseURL: config.public.backendUrl,
       });
       return response;
     } catch (error) {
@@ -223,10 +225,9 @@ export const useRylsSubmission = () => {
         throw new Error('Essay file belum diupload');
       }
 
-      const response = await $fetch('/api/registrations/fully-funded', {
+      const response = await $api('/ryls/registrations/fully-funded', {
         method: 'POST',
         body: registrationData,
-        baseURL: config.public.backendUrl,
       });
 
       if (response.success) {
@@ -262,10 +263,9 @@ export const useRylsSubmission = () => {
         throw new Error('Headshot file belum diupload');
       }
 
-      const response = await $fetch('/api/registrations/self-funded', {
+      const response = await $api('/ryls/registrations/self-funded', {
         method: 'POST',
         body: registrationData,
-        baseURL: config.public.backendUrl,
       });
 
       if (response.success) {
@@ -296,9 +296,7 @@ export const useRylsSubmission = () => {
    */
   const getRegistration = async (submissionId) => {
     try {
-      const response = await $fetch(`/api/registrations/${submissionId}`, {
-        baseURL: config.public.backendUrl,
-      });
+      const response = await $api(`/api/ryls/registrations/submission/${submissionId}`);
       return response;
     } catch (error) {
       console.error('Error getting registration:', error);
@@ -312,9 +310,7 @@ export const useRylsSubmission = () => {
    */
   const healthCheck = async () => {
     try {
-      const response = await $fetch('/api/registrations/health', {
-        baseURL: config.public.backendUrl,
-      });
+      const response = await $api('/ryls/registrations/health');
       return response;
     } catch (error) {
       console.error('Error checking service health:', error);

@@ -1,5 +1,4 @@
 import { ref, readonly } from 'vue';
-import { api } from '@/utils/api';
 
 /**
  * RYLS Admin Composable
@@ -7,6 +6,8 @@ import { api } from '@/utils/api';
  * Pattern: mirip useAdminJobs.js dengan api utils
  */
 export const useRylsAdmin = () => {
+  const { $api } = useNuxtApp();
+
   // Reactive state
   const registrations = ref([]);
   const isLoading = ref(false);
@@ -21,7 +22,7 @@ export const useRylsAdmin = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.get('/api/ryls/registrations', {
+      const response = await $api('/admin/ryls/registrations', {
         query: {
           ...(params.page ? { page: String(params.page) } : {}),
           ...(params.limit ? { limit: String(params.limit) } : {}),
@@ -64,7 +65,7 @@ export const useRylsAdmin = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.get(`/api/registrations/${id}`);
+      const response = await $api(`/api/admin/ryls/registrations/${id}`);
       return response?.data || response;
     } catch (e) {
       error.value = e?.message || 'Failed to fetch registration';
@@ -82,7 +83,7 @@ export const useRylsAdmin = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.get('/api/registrations/stats');
+      const response = await $api('/admin/ryls/registrations/stats');
       return response?.data || response;
     } catch (e) {
       error.value = e?.message || 'Failed to fetch statistics';
@@ -102,7 +103,10 @@ export const useRylsAdmin = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.patch(`/api/registrations/${id}/status`, { status });
+      const response = await $api(`/api/admin/ryls/registrations/${id}/status`, {
+        method: 'PATCH',
+        body: { status },
+      });
       return response?.data || response;
     } catch (e) {
       error.value = e?.message || 'Failed to update status';
@@ -121,7 +125,9 @@ export const useRylsAdmin = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      await api.delete(`/api/registrations/${id}`);
+      await $api(`/api/admin/ryls/registrations/${id}`, {
+        method: 'DELETE',
+      });
     } catch (e) {
       error.value = e?.message || 'Failed to delete registration';
       throw e;
@@ -146,7 +152,7 @@ export const useRylsAdmin = () => {
         ...(filters.endDate && { endDate: filters.endDate }),
       };
 
-      const response = await api.get('/api/ryls/registrations/export', {
+      const response = await $api('/admin/ryls/registrations/export', {
         query: queryParams,
       });
 
@@ -169,7 +175,7 @@ export const useRylsAdmin = () => {
     try {
       console.log('🔵 [useRylsAdmin] Exporting to Excel...');
 
-      const response = await api.get('/api/ryls/registrations/export-excel', {
+      const response = await $api('/admin/ryls/registrations/export-excel', {
         responseType: 'blob',
       });
 
@@ -193,7 +199,7 @@ export const useRylsAdmin = () => {
     try {
       console.log('Downloading file with ID:', fileId);
 
-      const response = await api.get(`/api/uploads/${fileId}`);
+      const response = await $api(`/api/uploads/${fileId}`);
       const blob = response instanceof Blob ? response : new Blob([response]);
       const filename = `file-${fileId}`;
 

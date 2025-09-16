@@ -2,8 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useJobsStore } from '@/store/jobs';
-import { storeToRefs } from 'pinia';
+import { useAPI } from '@/composables/useAPI';
 
 // Use default layout
 definePageMeta({
@@ -14,87 +13,71 @@ definePageMeta({
 const route = useRoute();
 const companyName = route.params.company_name;
 
-// Use jobs store
-const jobsStore = useJobsStore();
+// Fetch company data using useAPI composable
 const {
-  /* expose refs if needed */
-} = storeToRefs(jobsStore);
-
-// Reactive state
-const isLoading = ref(true);
-const company = ref(null);
-const companyJobs = ref([]);
-
-// Fetch data
-const loadData = async () => {
-  try {
-    isLoading.value = true;
-    // Get company and jobs from store data
-    company.value = jobsStore.getCompanyFromJobs(companyName, jobsStore.jobsData);
-    companyJobs.value = (jobsStore.jobsData || []).filter(
-      (job) => job.company && (job.company.slug === companyName || job.company.name?.toLowerCase() === companyName.toLowerCase())
-    );
-
-    // Debug logs
-    console.log('All jobs data:', jobsData.value);
-    console.log('Company data from getCompanyFromJobs:', company.value);
-    console.log('Company jobs:', companyJobs.value);
-    if (company.value) {
-      console.log('Company keys:', Object.keys(company.value));
-      console.log('Company location:', company.value.location);
-    }
-  } catch (error) {
-    console.error('Error loading company data:', error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Load data when component mounts
-onMounted(loadData);
-
-// Show 404 if no company found after data is loaded
-const show404 = computed(() => {
-  return !isLoading.value && jobsStore.jobsData.length > 0 && !company.value;
+  data: companyData,
+  pending: companyLoading,
+  error: companyError,
+} = await useAPI('/jobs/company', {
+  key: `company-${companyName}`,
+  query: {
+    slug: companyName,
+    limit: 1,
+  },
+  transform: (response) => {
+    return response.data?.[0] || null;
+  },
 });
 
-watch(show404, (show) => {
-  if (show) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Company not found',
-    });
-  }
+// Handle 404 if company not found
+if (companyError.value || !companyData.value) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Company not found',
+  });
+}
+
+// Use company data directly
+const company = companyData;
+
+// Fetch company jobs using useAPI composable
+const {
+  data: jobsData,
+  pending: jobsLoading,
+  error: jobsError,
+} = await useAPI('/jobs', {
+  key: `company-jobs-${companyName}`,
+  query: {
+    companySlug: companyName,
+    limit: 50,
+  },
+  transform: (response) => {
+    return response.data || [];
+  },
 });
+
+// Use jobs data directly
+const companyJobs = jobsData;
+
+// Combined loading state
+const isLoading = computed(() => companyLoading.value || jobsLoading.value);
 
 // Meta tags
 useHead({
   title: computed(() => {
-    const name = companyJobs.value[0]?.company?.name || 'Company';
+    const name = company.value?.name || 'Company';
     return `${name} - Jobs | Rise Social`;
   }),
   meta: [
     {
       name: 'description',
       content: computed(() => {
-        const name = companyJobs.value[0]?.company?.name || 'this company';
-        const industry = companyJobs.value[0]?.company?.industry || '';
+        const name = company.value?.name || 'this company';
+        const industry = company.value?.industry || '';
         return `Explore career opportunities at ${name}${industry ? ` in ${industry}` : ''}.`;
       }),
     },
   ],
-});
-
-// Debug logs
-watchEffect(() => {
-  console.log('Jobs Data:', JSON.stringify(jobsData.value, null, 2));
-  console.log('Company Data:', JSON.stringify(company.value, null, 2));
-  console.log('Company Jobs:', JSON.stringify(companyJobs.value, null, 2));
-
-  // Log first job's company data if available
-  if (companyJobs.value.length > 0 && companyJobs.value[0].company) {
-    console.log('First job company data:', JSON.stringify(companyJobs.value[0].company, null, 2));
-  }
 });
 </script>
 
@@ -145,9 +128,9 @@ watchEffect(() => {
                   <Icon name="lucide:users" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
                   <span><span class="font-medium">Size:</span> {{ company.linkedin_size }}</span>
                 </div>
-                <div v-if="company?.linkedin_locations" class="flex items-center text-gray-600">
+                <div v-if="company?.headquarters" class="flex items-center text-gray-600">
                   <Icon name="lucide:map-pin" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
-                  <span><span class="font-medium">HQ:</span> {{ company.linkedin_locations[1] }}</span>
+                  <span><span class="font-medium">HQ:</span> {{ company.headquarters }}</span>
                 </div>
                 <div v-if="company?.linkedin_founded_date" class="flex items-center text-gray-600">
                   <Icon name="lucide:calendar" class="mr-2 h-4 w-4 flex-shrink-0 text-gray-400" />
@@ -231,8 +214,8 @@ watchEffect(() => {
                         {{ job.company?.name }}
                       </p>
 
-                      <Badge v-if="job.company?.industry" class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
-                        {{ job.company.industry }}
+                      <Badge v-if="job.employment_type" class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 w-fit mb-2">
+                        {{ job.employment_type.replace('_', ' ') }}
                       </Badge>
                     </div>
 

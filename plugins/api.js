@@ -1,27 +1,27 @@
 /**
+ * API Plugin with Sidebase Auth integration
  * Based on: https://nuxt.com/docs/4.x/guide/recipes/custom-usefetch
  */
 
-import { useAuthStore } from '~/store/auth';
-
 export default defineNuxtPlugin((nuxtApp) => {
-  const authStore = useAuthStore();
-
   const api = $fetch.create({
     baseURL: useRuntimeConfig().public.backendUrl,
     onRequest({ request, options, error }) {
-      console.log('onRequest', request, options, error);
-      console.log('authStore token', authStore.token);
+      // Get token from Sidebase Auth
+      const { token } = useAuth();
 
-      if (authStore.token) {
-        options.headers = options.headers || {};
-        options.headers.set('Authorization', `Bearer ${authStore.token}`);
+      if (token.value) {
+        // Add Authorization header
+        options.headers = {
+          ...options.headers,
+          Authorization: token.value,
+        };
       }
     },
     async onResponseError({ response }) {
       // 401 Unauthorized
       if (response.status === 401) {
-        // authStore.clearAuth();
+        // Sidebase Auth will handle logout automatically
         await nuxtApp.runWithContext(() => navigateTo('/'));
       }
     },
