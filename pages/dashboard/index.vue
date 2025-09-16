@@ -72,7 +72,7 @@ useSeoMeta({
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="relative flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4 z-20">
           <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>
-          <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/bootcamp')">
+          <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/academy')">
             Explore Bootcamp
           </Button>
         </div>
@@ -89,7 +89,7 @@ useSeoMeta({
           <CardHeader>
             <div class="flex items-center justify-between">
               <CardTitle class="heading-card">Bootcamp</CardTitle>
-              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/bootcamp')"> View All </Button>
+              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/academy')"> View All </Button>
             </div>
           </CardHeader>
 
@@ -98,7 +98,7 @@ useSeoMeta({
             <div
               v-for="bootcamp in bootcampsData"
               :key="bootcamp.id"
-              @click="navigateTo(`/bootcamp/${bootcamp.path_slug}`)"
+              @click="navigateTo(`/academy/${bootcamp.path_slug}`)"
               class="flex items-start space-x-3 sm:space-x-4 p-4 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
             >
               <div class="size-16 sm:size-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">

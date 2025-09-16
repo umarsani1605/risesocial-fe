@@ -32,7 +32,7 @@ onMounted(() => {
           <!-- Header Section -->
           <div class="flex flex-row items-center justify-between gap-3">
             <CardTitle class="heading-card">Bootcamp</CardTitle>
-            <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/bootcamp')"> View All Bootcamp </Button>
+            <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/academy')"> View All Academy </Button>
           </div>
         </CardHeader>
 
@@ -43,7 +43,7 @@ onMounted(() => {
             <div
               v-for="bootcamp in bootcampsData"
               :key="bootcamp.id"
-              @click="navigateTo(`/bootcamp/${bootcamp.path_slug}`)"
+              @click="navigateTo(`/academy/${bootcamp.path_slug}`)"
               class="border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300 hover:shadow-subtle bg-white overflow-hidden"
             >
               <!-- Mobile Layout: Stacked -->
@@ -115,7 +115,7 @@ onMounted(() => {
                     {{ bootcamp.description }}
                   </p>
                   <div class="flex justify-end items-center gap-2">
-                    <Button variant="outline" size="sm" @click="navigateTo(`/bootcamp/${bootcamp.path_slug}`)"> More Detail </Button>
+                    <Button variant="outline" size="sm" @click="navigateTo(`/academy/${bootcamp.path_slug}`)"> More Detail </Button>
                   </div>
                 </div>
               </div>

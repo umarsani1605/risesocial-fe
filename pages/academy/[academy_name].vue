@@ -8,24 +8,26 @@ const { findBootcampBySlug, formatPrice, getBootcampFeatures, getBootcampTopics,
 
 // Get route parameters
 const route = useRoute();
-const bootcampSlug = route.params.bootcamp_name;
+const bootcampSlug = route.params.academy_name;
 
 // Validate slug parameter
 if (!bootcampSlug || bootcampSlug === 'undefined') {
-  throw createError({ statusCode: 404, statusMessage: 'Bootcamp slug is required' });
+  throw createError({ statusCode: 404, statusMessage: 'Academy slug is required' });
 }
 
 // Find bootcamp (await the async function)
 const bootcamp = await findBootcampBySlug(bootcampSlug);
 
+console.log(bootcamp);
+
 // Redirect to 404 if not found
 if (!bootcamp) {
-  throw createError({ statusCode: 404, statusMessage: 'Bootcamp not found' });
+  throw createError({ statusCode: 404, statusMessage: 'Academy not found' });
 }
 
 // Meta tags
 useHead({
-  title: `${bootcamp.title} - Rise Sustainability Bootcamp - Rise Social`,
+  title: `${bootcamp.title} - Rise Sustainability Academy - Rise Social`,
   meta: [{ name: 'description', content: bootcamp.description }],
 });
 
@@ -87,9 +89,7 @@ onMounted(() => {
                 <Icon name="lucide:chevron-right" class="w-4 h-4" />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/programs/rise-sustainability-bootcamp" class="text-white/80 hover:text-white"
-                  >Rise Sustainability Bootcamp</BreadcrumbLink
-                >
+                <BreadcrumbLink href="/academy" class="text-white/80 hover:text-white">Rise Sustainability Academy</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator class="text-white/60">
                 <Icon name="lucide:chevron-right" class="w-4 h-4" />
@@ -101,7 +101,7 @@ onMounted(() => {
           </Breadcrumb>
         </nav>
 
-        <!-- Bootcamp Hero Content -->
+        <!-- Academy Hero Content -->
         <div class="w-full md:w-3/4 text-white">
           <h1 class="heading-section-hero mb-4">{{ bootcamp.title }}</h1>
           <p class="text-white/90 text-lg mb-6">{{ bootcamp.name }}</p>
@@ -330,14 +330,59 @@ onMounted(() => {
 
           <!-- Sidebar -->
           <div class="lg:col-span-1 relative">
-            <div :class="['w-full transition-all duration-300 md:sticky md:top-24 md:-mt-[19.5rem]']">
-              <Card class="p-4 py-8 md:py-3">
+            <div :class="['w-full transition-all duration-300 md:sticky md:top-24 md:-mt-[16.5rem]']">
+              <Card class="p-4 py-8 md:py-4">
                 <CardContent class="p-0 space-y-2!">
                   <h2 class="block md:hidden heading-section mb-6!">Apply Programs</h2>
                   <img :src="bootcamp.image || bootcamp.image_url" :alt="bootcamp.title" class="w-full aspect-square object-cover rounded-lg mb-0" />
 
-                  <!-- Pricing Tabs -->
-                  <Tabs default-value="pricing-1" class="w-full">
+                  <!-- Pricing Content -->
+                  <div v-if="bootcamp.pricing && bootcamp.pricing.length === 1" class="p-4">
+                    <!-- Single Pricing Layout -->
+                    <div class="space-y-3 mb-6">
+                      <div class="flex items-center gap-2 text-gray-600">
+                        <Icon name="lucide:calendar" class="w-4 h-4" />
+                        <span class="text-sm">{{ bootcamp.pricing[0].name === '1 Tema' ? '1 month' : '3 months' }}</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-gray-600">
+                        <Icon name="lucide:video" class="w-4 h-4" />
+                        <span class="text-sm">{{ bootcamp.pricing[0].name === '1 Tema' ? '5 sessions' : '15 sessions' }}</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-gray-600" v-if="bootcamp.certificate">
+                        <Icon name="lucide:award" class="w-4 h-4" />
+                        <span class="text-sm">Certificate</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-gray-600">
+                        <Icon name="lucide:briefcase" class="w-4 h-4" />
+                        <span class="text-sm">Portfolio</span>
+                      </div>
+                    </div>
+
+                    <!-- Price and Button -->
+                    <div class="">
+                      <!-- Original Price (Crossed Out) -->
+                      <div class="text-sm text-gray-500 line-through mb-1">
+                        {{ bootcamp.pricing[0].formatted_original_price || `${formatPrice(bootcamp.pricing[0].original_price)}` }}
+                      </div>
+                      <!-- Discounted Price -->
+                      <div class="text-2xl font-bold text-gray-900 mb-4">
+                        {{ bootcamp.pricing[0].formatted_discount_price || `${formatPrice(bootcamp.pricing[0].discount_price)}` }}
+                      </div>
+                      <Button
+                        as="a"
+                        :href="`https://api.whatsapp.com/send?phone=6285162571299&text=${encodeURIComponent(
+                          `Halo Kak, saya tertarik mengikuti Rise Academy yang bertema ${bootcamp.title}`
+                        )}`"
+                        target="_blank"
+                        class="w-full cursor-pointer"
+                      >
+                        Enroll Now
+                      </Button>
+                    </div>
+                  </div>
+
+                  <!-- Multiple Pricing Tabs -->
+                  <Tabs v-else-if="bootcamp.pricing && bootcamp.pricing.length > 1" default-value="pricing-1" class="w-full">
                     <TabsList class="grid w-full grid-cols-2 bg-transparent h-auto p-0 border-none">
                       <TabsTrigger
                         v-for="tier in bootcamp.pricing"
@@ -384,7 +429,16 @@ onMounted(() => {
                         <div class="text-2xl font-bold text-gray-900 mb-4">
                           {{ tier.formatted_discount_price || `${formatPrice(tier.discount_price)}` }}
                         </div>
-                        <Button class="w-full cursor-pointer"> Enroll Now </Button>
+                        <Button
+                          as="a"
+                          :href="`https://api.whatsapp.com/send?phone=6285162571299&text=${encodeURIComponent(
+                            `Halo Kak, saya tertarik mengikuti Rise Academy yang bertema ${bootcamp.title}`
+                          )}`"
+                          target="_blank"
+                          class="w-full cursor-pointer"
+                        >
+                          Enroll Now
+                        </Button>
                       </div>
                     </TabsContent>
                   </Tabs>

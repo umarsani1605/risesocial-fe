@@ -1,5 +1,3 @@
-
-
 /**
  * Composable untuk mengelola detail bootcamp dengan API terintegrasi
  * Digunakan untuk halaman detail bootcamp
@@ -7,8 +5,8 @@
  * @returns {object} Object berisi data dan methods bootcamp detail
  */
 export const useBootcampDetails = (slug) => {
-  const { $fetch } = useNuxtApp()
-  
+  const { $fetch } = useNuxtApp();
+
   // Reactive state
   const bootcamp = ref(null);
   const isLoading = ref(false);
@@ -34,7 +32,7 @@ export const useBootcampDetails = (slug) => {
     try {
       const config = useRuntimeConfig();
       const response = await $fetch(`/api/bootcamps/${slug}`, {
-        baseURL: config.public.backendUrl
+        baseURL: config.public.backendUrl,
       });
       bootcamp.value = response.data || response;
       return bootcamp.value;
@@ -176,13 +174,13 @@ export const useBootcampDetails = (slug) => {
 
     // Convert number to readable format
     const weeks = parseInt(bootcamp.value.duration);
-    if (weeks === 1) return '1 minggu';
-    if (weeks < 4) return `${weeks} minggu`;
+    if (weeks === 1) return '1 week';
+    if (weeks < 4) return `${weeks} weeks`;
 
     const months = Math.round(weeks / 4);
-    if (months === 1) return '1 bulan';
+    if (months === 1) return '1 month';
 
-    return `${months} bulan`;
+    return `${months} months`;
   };
 
   // Auto-fetch when slug changes

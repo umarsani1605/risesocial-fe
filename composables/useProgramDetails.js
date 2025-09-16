@@ -1,4 +1,3 @@
-
 import { formatPrice, formatDate } from '~/utils/formatting';
 
 /**
@@ -8,8 +7,8 @@ import { formatPrice, formatDate } from '~/utils/formatting';
  * @returns {object} Object berisi data dan methods program detail
  */
 export const useProgramDetails = (slug) => {
-  const { $fetch } = useNuxtApp()
-  
+  const { $fetch } = useNuxtApp();
+
   // Reactive state
   const program = ref(null);
   const isLoading = ref(false);
@@ -36,7 +35,7 @@ export const useProgramDetails = (slug) => {
     try {
       const config = useRuntimeConfig();
       const response = await $fetch(`/api/programs/${slug}`, {
-        baseURL: config.public.backendUrl
+        baseURL: config.public.backendUrl,
       });
       program.value = response.data || response;
       return program.value;
@@ -60,7 +59,7 @@ export const useProgramDetails = (slug) => {
     try {
       const config = useRuntimeConfig();
       const response = await $fetch(`/api/programs/${program.value.id}/progress`, {
-        baseURL: config.public.backendUrl
+        baseURL: config.public.backendUrl,
       });
       const progress = response.data || response;
       userProgress.value = progress;
@@ -85,7 +84,7 @@ export const useProgramDetails = (slug) => {
     try {
       const response = await $fetch(`/api/programs/${program.value.id}/enroll`, {
         method: 'POST',
-        body: enrollmentData
+        body: enrollmentData,
       });
       const result = response.data || response;
       return result;
@@ -110,7 +109,7 @@ export const useProgramDetails = (slug) => {
     try {
       const response = await $fetch(`/api/programs/${program.value.id}/progress`, {
         method: 'PUT',
-        body: progressData
+        body: progressData,
       });
       const result = response.data || response;
       userProgress.value = result;
@@ -210,13 +209,13 @@ export const useProgramDetails = (slug) => {
 
     // Convert number to readable format
     const weeks = parseInt(program.value.duration);
-    if (weeks === 1) return '1 minggu';
-    if (weeks < 4) return `${weeks} minggu`;
+    if (weeks === 1) return '1 week';
+    if (weeks < 4) return `${weeks} weeks`;
 
     const months = Math.round(weeks / 4);
-    if (months === 1) return '1 bulan';
+    if (months === 1) return '1 month';
 
-    return `${months} bulan`;
+    return `${months} months`;
   };
 
   /**

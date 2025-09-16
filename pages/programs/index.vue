@@ -25,13 +25,13 @@ const programsData = [
   },
   {
     id: 2,
-    title: 'Rise Sustainability Bootcamp',
+    title: 'Rise Sustainability Academy',
     image: '/images/rise_educator.png',
-    link: '/bootcamp',
+    link: '/academy',
     description1:
-      "Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic.",
+      'Rise Sustainability Academy is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic.',
     description2:
-      'This program is for young professional, career switchers, sustainability and green workers to improve their knowledge and skills in this topic, equipped with JOB ACCELERATOR program with our hiring partners.',
+      'This program is for young professional, career switchers, sustainability and green workers to improve their knowledge and skills in this topic, equipped with Portfolio program with our hiring partners.',
   },
   {
     id: 3,
