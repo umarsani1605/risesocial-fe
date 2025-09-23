@@ -107,6 +107,34 @@ export const useAdminJobs = () => {
     }
   };
 
+  /**
+   * Sync jobs dari LinkedIn API via backend
+   * @param {Object} options
+   * @returns {Promise<Object>} response backend
+   */
+  const syncJobsFromLinkedIn = async (options = {}) => {
+    try {
+      const { query = 'software engineer', location = 'Indonesia', limit = 10 } = options;
+
+      const params = {
+        query,
+        location,
+        limit: String(limit),
+      };
+
+      const nuxtApp = useNuxtApp();
+      const response = await nuxtApp.$api('/api/jobs/sync-linkedin', { query: params });
+
+      return response;
+    } catch (err) {
+      console.error('[useAdminJobs] Sync error:', err);
+      return {
+        success: false,
+        message: err?.data?.message || err?.message || 'Failed to sync jobs',
+      };
+    }
+  };
+
   return {
     // state
     jobs: readonly(jobs),
@@ -118,5 +146,6 @@ export const useAdminJobs = () => {
     createJob,
     updateJob,
     deleteJob,
+    syncJobsFromLinkedIn,
   };
 };

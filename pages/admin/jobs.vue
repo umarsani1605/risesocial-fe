@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import JobFormDialog from '@/components/admin/jobs/JobFormDialog.vue';
 import { useAdminJobs } from '@/composables/useAdminJobs';
+import { useAuthStore } from '@/store/auth';
 import { toast } from 'vue-sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';

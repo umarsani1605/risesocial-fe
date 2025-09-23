@@ -65,6 +65,11 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@sidebase/nuxt-auth'
   ],
+
+  piniaPluginPersistedstate: {
+    storage: 'cookies',
+    debug: true,
+  },
   
   runtimeConfig: {
     public: {

@@ -172,7 +172,7 @@
     @apply bg-background text-foreground pr-0!;
   }
   html {
-    scrollbar-gutter: stable;
+    @apply overflow-x-hidden;
   }
 }
 
