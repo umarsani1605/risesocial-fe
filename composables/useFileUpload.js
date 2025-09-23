@@ -183,11 +183,11 @@ export const useFileUpload = () => {
   };
 
   /**
-   * Upload bootcamp image (Image only)
+   * Upload academy image (Image only)
    * @param {File} file
    * @returns {Promise<string|null>} fileUrl or null if failed
    */
-  const uploadBootcampImage = async (file) => {
+  const uploadAcademyImage = async (file) => {
     if (
       !validateFile(file, {
         maxSize: 5 * 1024 * 1024, // 5MB
@@ -211,7 +211,7 @@ export const useFileUpload = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await $api('/admin/uploads/bootcamp-image', {
+      const response = await $api('/admin/academies/cover', {
         method: 'POST',
         body: formData,
       });
@@ -252,7 +252,7 @@ export const useFileUpload = () => {
     uploadEssay,
     uploadHeadshot,
     uploadPaymentProof,
-    uploadBootcampImage,
+    uploadAcademyImage,
     resetUploadState,
   };
 };

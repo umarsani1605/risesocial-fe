@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>Add Pricing</DialogTitle>
-        <DialogDescription> Add a new pricing tier for this bootcamp. </DialogDescription>
+        <DialogDescription> Add a new pricing tier for this academy. </DialogDescription>
       </DialogHeader>
 
       <form @submit.prevent="onSubmit" class="space-y-4">
@@ -24,8 +24,8 @@
         </div>
 
         <div class="space-y-2">
-          <Label for="tier_order">Tier Order</Label>
-          <Input id="tier_order" v-model="form.tier_order" type="number" placeholder="1" min="1" required />
+          <Label for="order">Tier Order</Label>
+          <Input id="order" v-model="form.order" type="number" placeholder="1" min="1" required />
           <p class="text-xs text-muted-foreground">Lower numbers appear first</p>
         </div>
 
@@ -54,7 +54,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  bootcampId: {
+  academyId: {
     type: Number,
     required: true,
   },
@@ -68,7 +68,7 @@ const form = ref({
   name: '',
   original_price: '',
   discount_price: '',
-  tier_order: 1,
+  order: 1,
 });
 
 // Reset form when dialog opens
@@ -80,7 +80,7 @@ watch(
         name: '',
         original_price: '',
         discount_price: '',
-        tier_order: 1,
+        order: 1,
       };
     }
   }
@@ -96,7 +96,7 @@ const onSubmit = async () => {
 
     // TODO: Implement API call to create pricing
     console.log('Creating pricing:', {
-      bootcamp_id: props.bootcampId,
+      academy_id: props.academyId,
       ...form.value,
     });
 

@@ -21,8 +21,8 @@ watchEffect(() => {
   console.log('Dashboard - User Data:', user.value);
 });
 
-// Get bootcamp data
-const { bootcampsData, initializeBootcamps } = useBootcamps();
+// Get academy data
+const { academiesData, initializeAcademies } = useAcademies();
 
 // Get jobs store and helpers
 const jobsStore = useJobsStore();
@@ -34,7 +34,7 @@ onMounted(() => {
   if (process.client) {
     jobsStore.initializeFavorites();
   }
-  initializeBootcamps();
+  initializeAcademies();
 });
 
 // Dynamic greeting based on time
@@ -52,7 +52,7 @@ const dynamicGreeting = computed(() => {
 
 // Welcome message
 const welcomeMessage = computed(() => {
-  return 'Continue your learning journey or explore new bootcamp programs!';
+  return 'Continue your learning journey or explore new academy programs!';
 });
 
 // User's favorite jobs for dashboard
@@ -77,9 +77,9 @@ useSeoMeta({
         <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.first_name || 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="relative flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4 z-20">
-          <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>
-          <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/bootcamp')">
-            Explore Bootcamp
+          <Button @click="navigateTo('/dashboard/academy')"> Continue Learning</Button>
+          <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/academy')">
+            Explore Academy
           </Button>
         </div>
         <img
@@ -90,34 +90,34 @@ useSeoMeta({
       </div>
       <!-- Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 z-30">
-        <!-- Bootcamp -->
+        <!-- Academy -->
         <Card class="border border-gray-50 gap-3">
           <CardHeader>
             <div class="flex items-center justify-between">
-              <CardTitle class="heading-card">Bootcamp</CardTitle>
-              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/bootcamp')"> View All </Button>
+              <CardTitle class="heading-card">Academy</CardTitle>
+              <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/academy')"> View All </Button>
             </div>
           </CardHeader>
 
           <CardContent class="space-y-4">
-            <!-- Dynamic Bootcamp Cards -->
+            <!-- Dynamic Academy Cards -->
             <div
-              v-for="bootcamp in bootcampsData"
-              :key="bootcamp.id"
-              @click="navigateTo(`/bootcamp/${bootcamp.path_slug}`)"
+              v-for="academy in academiesData"
+              :key="academy.id"
+              @click="navigateTo(`/academy/${academy.path_slug}`)"
               class="flex items-start space-x-3 sm:space-x-4 p-4 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
             >
               <div class="size-16 sm:size-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <img :src="bootcamp.image_url" :alt="bootcamp.title" class="w-full h-full object-cover" />
+                <img :src="academy.image_url" :alt="academy.title" class="w-full h-full object-cover" />
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="text-sm sm:text-base font-medium text-gray-900 mb-2">{{ bootcamp.title }}</h3>
+                <h3 class="text-sm sm:text-base font-medium text-gray-900 mb-2">{{ academy.title }}</h3>
                 <!-- Description -->
                 <p
                   class="text-xs sm:text-sm text-gray-600 leading-relaxed"
                   style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden"
                 >
-                  {{ bootcamp.description }}
+                  {{ academy.description }}
                 </p>
               </div>
             </div>

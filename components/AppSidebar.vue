@@ -38,10 +38,10 @@ const managementItems = computed(() => [
     isActive: route.path === '/admin',
   },
   {
-    title: 'Bootcamp Management',
-    to: '/admin/bootcamp',
+    title: 'Academy Management',
+    to: '/admin/academy',
     icon: 'lucide:graduation-cap',
-    isActive: route.path === '/admin/bootcamp',
+    isActive: route.path === '/admin/academy',
   },
   {
     title: 'Jobs Management',

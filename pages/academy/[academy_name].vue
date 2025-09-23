@@ -6,70 +6,46 @@ definePageMeta({
 });
 
 const route = useRoute();
-const bootcampSlug = route.params.bootcamp_name;
+const academySlug = route.params.academy_name;
 
-if (!bootcampSlug || bootcampSlug === 'undefined') {
-  throw createError({ statusCode: 404, statusMessage: 'Bootcamp slug is required' });
+if (!academySlug || academySlug === 'undefined') {
+  throw createError({ statusCode: 404, statusMessage: 'Academy slug is required' });
 }
 
-// Fetch bootcamp data using useAPI composable
 const {
-  data: bootcampData,
+  data: academy,
   pending: isLoading,
-  error: bootcampError,
-} = await useAPI(`/api/bootcamps/${bootcampSlug}`, {
-  key: `bootcamp-${bootcampSlug}`,
+  error: academyError,
+} = await useAPI(`/academies/${academySlug}`, {
+  key: `academy-${academySlug}`,
   transform: (response) => {
     return response.data || null;
   },
 });
 
-// Handle 404 if bootcamp not found
-if (bootcampError.value || !bootcampData.value) {
+if (academyError.value || !academy.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: 'Bootcamp not found',
+    statusMessage: 'Academy not found',
   });
 }
 
-// Use bootcamp data directly
-const bootcamp = bootcampData;
-
 useHead({
-  title: computed(() => `${bootcamp.value?.title || 'Bootcamp'} - Rise Sustainability Bootcamp - Rise Social`),
+  title: computed(() => `${academy.value?.title || 'Academy'} - Rise Sustainability Academy - Rise Social`),
   meta: [
     {
       name: 'description',
-      content: computed(() => bootcamp.value?.description || ''),
+      content: computed(() => academy.value?.description || ''),
     },
   ],
 });
 
-// Helper functions (previously from useBootcamps)
 const formatPrice = (price) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
   }).format(price);
-};
-
-const getBootcampFeatures = (bootcamp) => {
-  return bootcamp?.features || [];
-};
-
-const getBootcampTopics = (bootcamp) => {
-  return bootcamp?.topics || [];
-};
-
-const getCheapestTier = (bootcamp) => {
-  if (!bootcamp?.pricing || bootcamp.pricing.length === 0) return null;
-  return bootcamp.pricing.reduce((cheapest, tier) => (tier.discount_price < cheapest.discount_price ? tier : cheapest));
-};
-
-const getTotalSessionCount = (bootcamp) => {
-  if (!bootcamp?.topics) return 0;
-  return bootcamp.topics.reduce((total, topic) => total + (topic.sessions?.length || 0), 0);
 };
 
 const currentAlumniSlide = ref(0);
@@ -103,7 +79,7 @@ watchEffect(() => {
 });
 
 onMounted(() => {
-  console.log(bootcamp);
+  console.log(academy);
 });
 </script>
 
@@ -124,34 +100,34 @@ onMounted(() => {
                 <Icon name="lucide:chevron-right" class="w-4 h-4" />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/bootcamp" class="text-white/80 hover:text-white">Rise Sustainability Bootcamp</BreadcrumbLink>
+                <BreadcrumbLink href="/academy" class="text-white/80 hover:text-white">Rise Sustainability Academy</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator class="text-white/60">
                 <Icon name="lucide:chevron-right" class="w-4 h-4" />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbPage class="text-white">{{ bootcamp?.title }}</BreadcrumbPage>
+                <BreadcrumbPage class="text-white">{{ academy.title }}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </nav>
         <div class="w-full md:w-3/4 text-white">
-          <h1 class="heading-section-hero mb-4">{{ bootcamp?.title }}</h1>
-          <p class="text-white/90 text-lg mb-6">{{ bootcamp?.name }}</p>
+          <h1 class="heading-section-hero mb-4">{{ academy.title }}</h1>
+          <p class="text-white/90 text-lg mb-6">{{ academy.name }}</p>
           <div class="flex flex-wrap items-center gap-4 md:gap-6 text-white/90 text-sm">
             <div class="flex items-center gap-2">
               <Icon name="lucide:clock" class="w-4 h-4" />
-              <span>{{ bootcamp?.duration }}</span>
+              <span>{{ academy.duration }}</span>
             </div>
             <div class="flex items-center gap-2">
               <Icon name="lucide:book-open" class="w-4 h-4" />
-              <span>{{ bootcamp?.format }}</span>
+              <span>{{ academy.format }}</span>
             </div>
             <div class="flex items-center gap-2">
               <Icon name="lucide:tag" class="w-4 h-4" />
-              <span>{{ bootcamp?.category }}</span>
+              <span>{{ academy.category }}</span>
             </div>
-            <div class="flex items-center gap-2" v-if="bootcamp?.certificate">
+            <div class="flex items-center gap-2" v-if="academy.certificate">
               <Icon name="lucide:award" class="w-4 h-4" />
               <span>Sertifikat</span>
             </div>
@@ -165,18 +141,18 @@ onMounted(() => {
       <div class="relative">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 md:pr-6">
           <div class="lg:col-span-3 space-y-8">
-            <Card class="py-8">
+            <Card v-if="academy.description" class="py-8">
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">About Program</h2>
-                <p class="text-gray-700 leading-relaxed">{{ bootcamp?.description }}</p>
+                <p class="text-gray-700 leading-relaxed">{{ academy.description }}</p>
               </CardContent>
             </Card>
-            <Card class="py-8">
+            <Card v-if="academy.features" class="py-8">
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">What You'll Get</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                   <div
-                    v-for="feature in getBootcampFeatures(bootcamp)"
+                    v-for="feature in academy.features"
                     :key="feature.id"
                     class="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
@@ -191,16 +167,11 @@ onMounted(() => {
                 </div>
               </CardContent>
             </Card>
-            <Card v-if="getBootcampTopics(bootcamp).length > 0">
+            <Card v-if="academy.topics.length > 0">
               <CardContent class="p-8">
                 <h2 class="heading-section mb-6">Curriculum</h2>
                 <Accordion type="multiple" class="space-y-4">
-                  <AccordionItem
-                    v-for="topic in getBootcampTopics(bootcamp)"
-                    :key="topic.id"
-                    :value="`topic-${topic.id}`"
-                    class="border-none rounded-lg px-0"
-                  >
+                  <AccordionItem v-for="topic in academy.topics" :key="topic.id" :value="`topic-${topic.id}`" class="border-none rounded-lg px-0">
                     <AccordionTrigger class="px-6 py-4 hover:no-underline hover:bg-gray-50 rounded-t-lg data-[state=open]:rounded-b-none">
                       <div class="flex flex-col md:flex-row items-start gap-4 text-left w-full">
                         <div
@@ -237,12 +208,12 @@ onMounted(() => {
                 </Accordion>
               </CardContent>
             </Card>
-            <Card class="py-8">
+            <Card v-if="academy.instructors" class="py-8">
               <CardContent class="px-8 gap-4">
                 <h2 class="heading-section mb-6">Instructors</h2>
                 <div class="space-y-8">
                   <div
-                    v-for="instructor in bootcamp?.instructors"
+                    v-for="instructor in academy.instructors"
                     :key="instructor.id"
                     class="flex flex-col lg:flex-row gap-4 lg:gap-12 items-start lg:items-center"
                   >
@@ -266,7 +237,7 @@ onMounted(() => {
                 </div>
               </CardContent>
             </Card>
-            <Card class="py-8">
+            <Card v-if="academy.testimonials" class="py-8">
               <CardContent class="px-8">
                 <div class="flex items-center justify-between mb-6">
                   <h2 class="heading-section mb-0">Alumni Testimonials</h2>
@@ -293,7 +264,7 @@ onMounted(() => {
                 >
                   <CarouselContent>
                     <CarouselItem
-                      v-for="testimonial in bootcamp?.testimonials"
+                      v-for="testimonial in academy.testimonials"
                       :key="testimonial.id"
                       class="md:basis-1/2 lg:basis-1/2 pl-4 cursor-pointer"
                     >
@@ -321,7 +292,7 @@ onMounted(() => {
                 </Carousel>
                 <div class="flex lg:hidden justify-center mt-6 space-x-3">
                   <button
-                    v-for="(dot, index) in bootcamp?.testimonials"
+                    v-for="(dot, index) in academy.testimonials"
                     :key="index"
                     @click="goToTestimonialSlide(index)"
                     :class="[
@@ -334,11 +305,11 @@ onMounted(() => {
                 </div>
               </CardContent>
             </Card>
-            <Card class="py-8">
+            <Card v-if="academy.faqs" class="py-8">
               <CardContent class="px-8">
                 <h2 class="heading-section mb-6">Frequently Asked Questions</h2>
                 <Accordion type="single" collapsible class="space-y-4">
-                  <AccordionItem v-for="faq in bootcamp?.faqs" :key="faq.id" :value="`item-${faq.id}`" class="rounded-lg px-4">
+                  <AccordionItem v-for="faq in academy.faqs" :key="faq.id" :value="`item-${faq.id}`" class="rounded-lg px-4">
                     <AccordionTrigger class="text-left font-medium text-gray-600 hover:text-gray-900 cursor-pointer">{{
                       faq.question
                     }}</AccordionTrigger>
@@ -355,9 +326,9 @@ onMounted(() => {
                   <h2 class="block md:hidden heading-section mb-6!">Apply Programs</h2>
                   <div class="w-full aspect-square rounded-lg mb-0 overflow-hidden bg-gray-100 flex items-center justify-center">
                     <img
-                      v-if="bootcamp?.image || bootcamp?.image_url"
-                      :src="bootcamp?.image || bootcamp?.image_url"
-                      :alt="bootcamp?.title"
+                      v-if="academy.image || academy.image_url"
+                      :src="academy.image || academy.image_url"
+                      :alt="academy.title"
                       class="w-full h-full object-cover"
                     />
                     <div v-else class="flex flex-col items-center justify-center text-gray-400">
@@ -370,7 +341,7 @@ onMounted(() => {
                   <Tabs default-value="pricing-1" class="w-full">
                     <TabsList class="grid w-full grid-cols-2 bg-transparent h-auto p-0 border-none">
                       <TabsTrigger
-                        v-for="tier in bootcamp?.pricing"
+                        v-for="tier in academy.pricing"
                         :key="tier.id"
                         :value="`pricing-${tier.id}`"
                         class="relative cursor-pointer text-gray-400 bg-transparent hover:text-gray-500 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none rounded-none border-none data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-1/10 data-[state=active]:after:w-4/5 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-primary data-[state=active]:after:rounded-full data-[state=active]:font-semibold px-4 py-3 font-medium transition-colors"
@@ -379,7 +350,7 @@ onMounted(() => {
                       </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent v-for="tier in bootcamp?.pricing" :key="tier.id" :value="`pricing-${tier.id}`" class="p-4 mt-0">
+                    <TabsContent v-for="tier in academy.pricing" :key="tier.id" :value="`pricing-${tier.id}`" class="p-4 mt-0">
                       <!-- Meta Info -->
                       <div class="space-y-3 mb-6">
                         <div class="flex items-center gap-2 text-gray-600">
@@ -394,7 +365,7 @@ onMounted(() => {
                           <Icon name="lucide:video" class="w-4 h-4" />
                           <span class="text-sm">{{ tier.name === '1 Tema' ? '5 sessions' : '15 sessions' }}</span>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-600" v-if="bootcamp?.certificate">
+                        <div class="flex items-center gap-2 text-gray-600" v-if="academy.certificate">
                           <Icon name="lucide:award" class="w-4 h-4" />
                           <span class="text-sm">Certificate</span>
                         </div>

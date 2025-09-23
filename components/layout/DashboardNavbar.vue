@@ -42,11 +42,11 @@ const dashboardNavigation = computed(() => [
     isActive: route.path === '/dashboard',
   },
   {
-    id: 'bootcamp',
-    name: 'Bootcamp',
-    path: '/dashboard/bootcamp',
+    id: 'academy',
+    name: 'Academy',
+    path: '/dashboard/academy',
     icon: 'lucide:book',
-    isActive: route.path.startsWith('/dashboard/bootcamp'),
+    isActive: route.path.startsWith('/dashboard/academy'),
   },
   {
     id: 'jobs',

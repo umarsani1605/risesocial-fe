@@ -1,28 +1,26 @@
-
-
 /**
- * Composable untuk mengelola detail bootcamp dengan API terintegrasi
- * Digunakan untuk halaman detail bootcamp
- * @param {string} slug - Bootcamp slug
- * @returns {object} Object berisi data dan methods bootcamp detail
+ * Composable untuk mengelola detail academy dengan API terintegrasi
+ * Digunakan untuk halaman detail academy
+ * @param {string} slug - Academy slug
+ * @returns {object} Object berisi data dan methods academy detail
  */
-export const useBootcampDetails = (slug) => {
-  const { $fetch } = useNuxtApp()
-  
+export const useAcademyDetails = (slug) => {
+  const { $fetch } = useNuxtApp();
+
   // Reactive state
-  const bootcamp = ref(null);
+  const academy = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
 
   // Computed properties
-  const isLoaded = computed(() => !!bootcamp.value);
+  const isLoaded = computed(() => !!academy.value);
   const hasError = computed(() => !!error.value);
 
   /**
-   * Fetch bootcamp detail by slug
-   * @returns {Promise<object|null>} Bootcamp data
+   * Fetch academy detail by slug
+   * @returns {Promise<object|null>} Academy data
    */
-  const fetchBootcamp = async () => {
+  const fetchAcademy = async () => {
     if (!slug) {
       error.value = 'Slug is required';
       return null;
@@ -33,15 +31,15 @@ export const useBootcampDetails = (slug) => {
 
     try {
       const config = useRuntimeConfig();
-      const response = await $fetch(`/api/bootcamps/${slug}`, {
-        baseURL: config.public.backendUrl
+      const response = await $fetch(`/academies/${slug}`, {
+        baseURL: config.public.backendUrl,
       });
-      bootcamp.value = response.data || response;
-      return bootcamp.value;
+      academy.value = response.data || response;
+      return academy.value;
     } catch (err) {
-      console.error('Error fetching bootcamp details:', err);
-      error.value = err.data?.message || 'Gagal memuat detail bootcamp';
-      bootcamp.value = null;
+      console.error('Error fetching academy details:', err);
+      error.value = err.data?.message || 'Gagal memuat detail academy';
+      academy.value = null;
       return null;
     } finally {
       isLoading.value = false;
@@ -49,19 +47,19 @@ export const useBootcampDetails = (slug) => {
   };
 
   /**
-   * Refresh bootcamp data
-   * @returns {Promise<object|null>} Fresh bootcamp data
+   * Refresh academy data
+   * @returns {Promise<object|null>} Fresh academy data
    */
-  const refreshBootcamp = async () => {
-    return await fetchBootcamp();
+  const refreshAcademy = async () => {
+    return await fetchAcademy();
   };
 
   /**
-   * Get bootcamp pricing tiers
+   * Get academy pricing tiers
    * @returns {Array} Pricing tiers
    */
   const getPricingTiers = () => {
-    return bootcamp.value?.pricing || [];
+    return academy.value?.pricing || [];
   };
 
   /**
@@ -80,43 +78,43 @@ export const useBootcampDetails = (slug) => {
   };
 
   /**
-   * Get bootcamp features
+   * Get academy features
    * @returns {Array} Features array
    */
   const getFeatures = () => {
-    return bootcamp.value?.features || [];
+    return academy.value?.features || [];
   };
 
   /**
-   * Get bootcamp topics/curriculum
+   * Get academy topics/curriculum
    * @returns {Array} Topics array
    */
   const getTopics = () => {
-    return bootcamp.value?.topic || bootcamp.value?.topics || [];
+    return academy.value?.topic || academy.value?.topics || [];
   };
 
   /**
-   * Get bootcamp instructors
+   * Get academy instructors
    * @returns {Array} Instructors array
    */
   const getInstructors = () => {
-    return bootcamp.value?.instructors || bootcamp.value?.instructor || [];
+    return academy.value?.instructors || academy.value?.instructor || [];
   };
 
   /**
-   * Get bootcamp testimonials
+   * Get academy testimonials
    * @returns {Array} Testimonials array
    */
   const getTestimonials = () => {
-    return bootcamp.value?.testimonials || [];
+    return academy.value?.testimonials || [];
   };
 
   /**
-   * Get bootcamp FAQ
+   * Get academy FAQ
    * @returns {Array} FAQ array
    */
   const getFAQ = () => {
-    return bootcamp.value?.faq || [];
+    return academy.value?.faq || [];
   };
 
   /**
@@ -143,18 +141,18 @@ export const useBootcampDetails = (slug) => {
   };
 
   /**
-   * Check if bootcamp is enrollable
-   * @returns {boolean} Whether bootcamp can be enrolled
+   * Check if academy is enrollable
+   * @returns {boolean} Whether academy can be enrolled
    */
   const isEnrollable = () => {
-    if (!bootcamp.value) return false;
+    if (!academy.value) return false;
 
-    // Check if bootcamp is active
-    if (bootcamp.value.status && bootcamp.value.status !== 'ACTIVE') return false;
+    // Check if academy is active
+    if (academy.value.status && academy.value.status !== 'ACTIVE') return false;
 
     // Check enrollment deadline if exists
-    if (bootcamp.value.enrollment_deadline) {
-      const deadline = new Date(bootcamp.value.enrollment_deadline);
+    if (academy.value.enrollment_deadline) {
+      const deadline = new Date(academy.value.enrollment_deadline);
       const now = new Date();
       if (now > deadline) return false;
     }
@@ -163,19 +161,19 @@ export const useBootcampDetails = (slug) => {
   };
 
   /**
-   * Get bootcamp duration in readable format
+   * Get academy duration in readable format
    * @returns {string} Formatted duration
    */
   const getFormattedDuration = () => {
-    if (!bootcamp.value?.duration) return '';
+    if (!academy.value?.duration) return '';
 
     // If duration is already formatted, return as is
-    if (typeof bootcamp.value.duration === 'string' && isNaN(bootcamp.value.duration)) {
-      return bootcamp.value.duration;
+    if (typeof academy.value.duration === 'string' && isNaN(academy.value.duration)) {
+      return academy.value.duration;
     }
 
     // Convert number to readable format
-    const weeks = parseInt(bootcamp.value.duration);
+    const weeks = parseInt(academy.value.duration);
     if (weeks === 1) return '1 minggu';
     if (weeks < 4) return `${weeks} minggu`;
 
@@ -190,7 +188,7 @@ export const useBootcampDetails = (slug) => {
     () => slug,
     async (newSlug) => {
       if (newSlug) {
-        await fetchBootcamp();
+        await fetchAcademy();
       }
     },
     { immediate: true }
@@ -198,15 +196,15 @@ export const useBootcampDetails = (slug) => {
 
   return {
     // Reactive state
-    bootcamp: readonly(bootcamp),
+    academy: readonly(academy),
     isLoading: readonly(isLoading),
     error: readonly(error),
     isLoaded,
     hasError,
 
     // Methods
-    fetchBootcamp,
-    refreshBootcamp,
+    fetchAcademy,
+    refreshAcademy,
 
     // Data getters
     getPricingTiers,

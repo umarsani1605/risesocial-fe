@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import RegistrationDetailModal from '@/components/admin/ryls/RegistrationDetailModal.vue';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '~/components/ui/sonner';
 import { toast } from 'vue-sonner';
 import { useRylsAdmin } from '@/composables/useRylsAdmin';
 import { DISCOVER_SOURCES, SCHOLARSHIP_TYPES, GENDER_OPTIONS } from '~/constants/ryls';

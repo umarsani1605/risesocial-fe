@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import UserFormDialog from '@/components/admin/users/UserFormDialog.vue';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '~/components/ui/sonner';
 import { ArrowUp, ArrowDown } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 

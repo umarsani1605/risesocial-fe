@@ -64,10 +64,10 @@ const navigationMenus = computed(() => [
     isActive: route.path === '/',
   },
   {
-    id: 'bootcamp',
-    name: 'Bootcamp',
-    path: '/bootcamp',
-    isActive: route.path.startsWith('/bootcamp'),
+    id: 'academy',
+    name: 'Academy',
+    path: '/academy',
+    isActive: route.path.startsWith('/academy'),
   },
   {
     id: 'opportunities',

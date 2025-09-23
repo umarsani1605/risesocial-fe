@@ -1,5 +1,5 @@
 <script setup>
-import { Toaster as Sonner } from "vue-sonner";
+import { Toaster as Sonner } from 'vue-sonner';
 
 const props = defineProps({
   invert: { type: Boolean, required: false },
@@ -28,6 +28,8 @@ const props = defineProps({
   <Sonner
     class="toaster group"
     v-bind="props"
+    rich-colors
+    position="top-right"
     :style="{
       '--normal-bg': 'var(--popover)',
       '--normal-text': 'var(--popover-foreground)',

@@ -422,12 +422,12 @@ const onDeleteSession = (session, topic) => {
 const sortByOrder = () => {
   if (!bootcamp.value) return;
   const b = bootcamp.value;
-  if (Array.isArray(b.pricing)) b.pricing.sort((a, b) => a.tier_order - b.tier_order);
-  if (Array.isArray(b.features)) b.features.sort((a, b) => a.feature_order - b.feature_order);
-  if (Array.isArray(b.instructors)) b.instructors.sort((a, b) => a.instructor_order - b.instructor_order);
-  if (Array.isArray(b.topics)) b.topics.sort((a, b) => a.topic_order - b.topic_order);
-  if (Array.isArray(b.testimonials)) b.testimonials.sort((a, b) => a.testimonial_order - b.testimonial_order);
-  if (Array.isArray(b.faqs)) b.faqs.sort((a, b) => a.faq_order - b.faq_order);
+  if (Array.isArray(b.pricing)) b.pricing.sort((a, b) => a.order - b.order);
+  if (Array.isArray(b.features)) b.features.sort((a, b) => a.order - b.order);
+  if (Array.isArray(b.instructors)) b.instructors.sort((a, b) => a.order - b.order);
+  if (Array.isArray(b.topics)) b.topics.sort((a, b) => a.order - b.order);
+  if (Array.isArray(b.testimonials)) b.testimonials.sort((a, b) => a.order - b.order);
+  if (Array.isArray(b.faqs)) b.faqs.sort((a, b) => a.order - b.order);
 };
 
 const onDialogSuccess = () => {
@@ -532,10 +532,13 @@ const onConfirmDelete = async () => {
       <div v-if="!pending && bootcamp" class="space-y-6">
         <section class="mb-10">
           <div class="flex items-center justify-between mb-4">
-            <Button as="a" href="/admin/bootcamp" variant="outline" class="flex items-center gap-2">
-              <Icon name="lucide:arrow-left" size="18" />
-              Back
-            </Button>
+            <div class="flex items-center gap-4">
+              <Button as="a" href="/admin/bootcamp" variant="outline" class="flex items-center gap-2 shadow-none">
+                <Icon name="lucide:arrow-left" size="18" />
+                Back
+              </Button>
+              <div class="font-medium">Edit Academy</div>
+            </div>
             <Button @click="saveBasicInfo" :disabled="basicInfoPending">
               <Icon name="lucide:circle-check" size="16" />
               {{ basicInfoPending ? 'Saving...' : 'Save Info' }}
@@ -673,7 +676,7 @@ const onConfirmDelete = async () => {
               </TableHeader>
               <TableBody>
                 <TableRow v-for="price in bootcamp?.pricing" :key="price.id">
-                  <TableCell>{{ price.tier_order }}</TableCell>
+                  <TableCell>{{ price.order }}</TableCell>
                   <TableCell>{{ price.name }}</TableCell>
                   <TableCell>{{ formatCurrency(price.original_price) }}</TableCell>
                   <TableCell>{{ formatCurrency(price.discount_price) }}</TableCell>
@@ -723,7 +726,7 @@ const onConfirmDelete = async () => {
               </TableHeader>
               <TableBody>
                 <TableRow v-for="feature in bootcamp?.features" :key="feature.id">
-                  <TableCell>{{ feature.feature_order }}</TableCell>
+                  <TableCell>{{ feature.order }}</TableCell>
                   <TableCell>{{ feature.title }}</TableCell>
                   <TableCell class="max-w-xs truncate" :title="feature.description">{{ feature.description }}</TableCell>
                   <TableCell>
@@ -775,7 +778,7 @@ const onConfirmDelete = async () => {
               </TableHeader>
               <TableBody>
                 <TableRow v-for="instructorData in bootcamp?.instructors" :key="instructorData.instructor_id">
-                  <TableCell>{{ instructorData.instructor_order }}</TableCell>
+                  <TableCell>{{ instructorData.order }}</TableCell>
                   <TableCell>{{ instructorData.name || '-' }}</TableCell>
                   <TableCell class="max-w-xs truncate" :title="instructorData.job_title">{{ instructorData.job_title || '-' }}</TableCell>
                   <TableCell class="max-w-xs truncate" :title="instructorData.description">{{ instructorData.description || '-' }}</TableCell>
@@ -850,7 +853,7 @@ const onConfirmDelete = async () => {
               </TableHeader>
               <TableBody>
                 <TableRow v-for="testimonial in bootcamp?.testimonials" :key="testimonial.id">
-                  <TableCell>{{ testimonial.testimonial_order }}</TableCell>
+                  <TableCell>{{ testimonial.order }}</TableCell>
                   <TableCell>{{ testimonial.name }}</TableCell>
                   <TableCell class="max-w-xs truncate" :title="testimonial.comment">{{ testimonial.comment }}</TableCell>
                   <TableCell class="px-4 sticky right-0 text-right">
@@ -899,7 +902,7 @@ const onConfirmDelete = async () => {
               </TableHeader>
               <TableBody>
                 <TableRow v-for="faq in bootcamp?.faqs" :key="faq.id">
-                  <TableCell>{{ faq.faq_order }}</TableCell>
+                  <TableCell>{{ faq.order }}</TableCell>
                   <TableCell class="font-medium max-w-xs truncate" :title="faq.question">{{ faq.question }}</TableCell>
                   <TableCell class="max-w-xs truncate" :title="faq.answer">{{ faq.answer }}</TableCell>
                   <TableCell class="text-muted-foreground text-sm">{{ new Date(faq.created_at).toLocaleDateString() }}</TableCell>
