@@ -125,12 +125,17 @@ const onOpenDelete = (academy) => {
 
 const onConfirmDelete = async () => {
   try {
-    toast.success('Academy deleted');
+    await $api(`/admin/academies/${selected.value.id}`, {
+      method: 'DELETE',
+    });
+
+    toast.success('Academy berhasil dihapus');
     deleteDialogOpen.value = false;
     selected.value = null;
     await refreshAcademies();
   } catch (error) {
-    toast.error(error?.message || 'Gagal menghapus academy');
+    console.error('Delete academy error:', error);
+    toast.error(error?.data?.message || 'Gagal menghapus academy');
   }
 };
 

@@ -182,7 +182,7 @@ onUnmounted(() => {
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+                  <DropdownMenuItem @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
                     <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>

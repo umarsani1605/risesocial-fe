@@ -1,4 +1,5 @@
 <script setup>
+import { JOB_TYPE_LABEL_BY_VALUE } from '~/constants/jobs';
 import { ref, computed } from 'vue';
 import { useFilter } from 'reka-ui';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell, TableEmpty } from '@/components/ui/table';
@@ -8,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
-import JobFormDialog from '@/components/admin/jobs/JobFormDialog.vue';
 import { useAdminJobs } from '@/composables/useAdminJobs';
 import { useAuthStore } from '@/store/auth';
 import { toast } from 'vue-sonner';
@@ -24,8 +24,6 @@ definePageMeta({
   auth: true,
   layout: 'admin-dashboard',
 });
-
-const { deleteJob } = useAdminJobs();
 
 const {
   data: jobs,
@@ -68,7 +66,7 @@ const settingsOpen = ref(false);
 const INDUSTRY_OPTIONS = ref(industriesJson);
 
 const syncFilters = ref({
-  title_filter: [],
+  advanced_title_filter: [],
   location_filter: [],
   description_filter: [],
   organization_description_filter: [],
@@ -91,7 +89,7 @@ if (savedSyncFilters.value) {
   const defaultFilters = savedSyncFilters.value;
   syncFilters.value = {
     ...syncFilters.value,
-    title_filter: toArray(defaultFilters.title_filter),
+    advanced_title_filter: toArray(defaultFilters.advanced_title_filter),
     location_filter: toArray(defaultFilters.location_filter),
     description_filter: toArray(defaultFilters.description_filter),
     organization_description_filter: toArray(defaultFilters.organization_description_filter),
@@ -260,13 +258,45 @@ const onOpenDelete = (jobRow) => {
 };
 const onConfirmDelete = async () => {
   try {
-    await deleteJob(selected.value.id);
+    const response = await $api(`/admin/jobs/${selected.value.id}`, { method: 'DELETE' });
+
+    if (response?.success === false) {
+      toast.error(response?.message || 'Failed to delete job');
+      return;
+    }
+
     toast.success('Job deleted');
     deleteDialogOpen.value = false;
     selected.value = null;
     await refreshJobs();
   } catch (error) {
-    toast.error(error?.message || 'Gagal menghapus job');
+    console.error('[admin/jobs/index] delete error:', error);
+    toast.error(error?.data?.message || 'Failed to delete job');
+  }
+};
+
+// Helpers
+const employmentTypeLabel = (value) => JOB_TYPE_LABEL_BY_VALUE?.[value] || value || '-';
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}/${month}/${day} ${hours}:${minutes}`;
+};
+
+const getStatusVariant = (status) => {
+  switch (status?.toUpperCase()) {
+    case 'ACTIVE':
+      return 'success';
+    case 'ARCHIVED':
+      return 'outline';
+    default:
+      return 'outline';
   }
 };
 
@@ -291,13 +321,18 @@ const syncJobs = async () => {
 
     const response = await $api('/admin/jobs/sync-linkedin', {
       method: 'POST',
-      body: { filter: filterPayload, limit: 1 },
+      body: { filter: filterPayload },
     });
 
     if (response?.success) {
-      const savedCount = response?.data?.saved ?? 0;
-      const skippedCount = response?.data?.skipped ?? 0;
-      toast.success(`Sync selesai. Saved: ${savedCount}`);
+      const savedCount = response?.data?.saved ?? response?.data?.savedJobs ?? 0;
+      if (savedCount > 0) {
+        const noun = savedCount === 1 ? 'job' : 'jobs';
+        const verb = savedCount === 1 ? 'has' : 'have';
+        toast.success(`${savedCount} ${noun} ${verb} been added.`);
+      } else {
+        toast.warning('No jobs found. Please adjust your search parameters and try again.');
+      }
       await refreshJobs();
       await refreshRateLimit();
     } else {
@@ -342,41 +377,8 @@ const onSaveSyncSettings = async () => {
 
 const pageSizes = [10, 20, 30, 50];
 
-const formOpen = ref(false);
-const formMode = ref('create');
-const editing = ref(null);
-const saving = ref(false);
-
-const onOpenCreate = () => {
-  formMode.value = 'create';
-  editing.value = null;
-  formOpen.value = true;
-};
-
-const onOpenEdit = (jobRow) => {
-  formMode.value = 'edit';
-  editing.value = jobRow;
-  formOpen.value = true;
-};
-
-const { createJob, updateJob } = useAdminJobs();
-const onSubmitForm = async (formPayload) => {
-  try {
-    saving.value = true;
-    if (formMode.value === 'create') {
-      await createJob(formPayload);
-      toast.success('Job created');
-    } else if (editing.value) {
-      await updateJob(editing.value.id, formPayload);
-      toast.success('Job updated');
-    }
-    formOpen.value = false;
-    await refreshJobs();
-  } catch (error) {
-    toast.error(error?.message || 'Gagal menyimpan job');
-  } finally {
-    saving.value = false;
-  }
+const onOpenEdit = async (jobRow) => {
+  await navigateTo(`/admin/jobs/${jobRow.id}`);
 };
 </script>
 
@@ -499,8 +501,8 @@ const onSubmitForm = async (formPayload) => {
         <div class="inline-flex items-stretch rounded-md overflow-hidden border">
           <Popover :open="confirmOpen" @update:open="(isOpen) => (confirmOpen = isOpen)">
             <PopoverTrigger as-child>
-              <Button class="rounded-none" :disabled="isSyncing">
-                <Icon name="lucide:refresh-ccw" class="mr-2 h-4 w-4" />
+              <Button class="rounded-none" :disabled="isSyncing" :aria-busy="isSyncing">
+                <Icon name="lucide:refresh-ccw" class="mr-2 h-4 w-4" :class="{ 'animate-spin': isSyncing }" />
                 {{ isSyncing ? 'Syncing...' : 'Sync Job' }}
               </Button>
             </PopoverTrigger>
@@ -526,8 +528,8 @@ const onSubmitForm = async (formPayload) => {
               <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label class="text-sm mb-2 block">Job titles</label>
-                  <TagsInput v-model="syncFilters.title_filter" class="w-full" placeholder="Add titles">
-                    <TagsInputItem v-for="item in syncFilters.title_filter" :key="item" :value="item">
+                  <TagsInput v-model="syncFilters.advanced_title_filter" class="w-full" placeholder="Add titles">
+                    <TagsInputItem v-for="item in syncFilters.advanced_title_filter" :key="item" :value="item">
                       <TagsInputItemText />
                       <TagsInputItemDelete />
                     </TagsInputItem>
@@ -745,121 +747,84 @@ const onSubmitForm = async (formPayload) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead @click="toggleSort('title')" class="cursor-pointer max-w-xs"
-              >Title
-              <span v-if="sortBy === 'title'" class="ml-1 inline-flex items-center text-muted-foreground">
-                <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
-                <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
-              </span>
-            </TableHead>
-            <TableHead @click="toggleSort('company')" class="cursor-pointer max-w-48"
-              >Company
-              <span v-if="sortBy === 'company'" class="ml-1 inline-flex items-center text-muted-foreground">
-                <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
-                <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
-              </span>
-            </TableHead>
-            <TableHead class="max-w-32">Location</TableHead>
-            <TableHead class="max-w-24">Job Type</TableHead>
-            <TableHead class="max-w-28">Experience</TableHead>
-            <TableHead class="max-w-20">Remote</TableHead>
-            <TableHead @click="toggleSort('salary')" class="cursor-pointer max-w-32"
-              >Salary
-              <span v-if="sortBy === 'salary'" class="ml-1 inline-flex items-center text-muted-foreground">
-                <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
-                <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
-              </span>
-            </TableHead>
-            <TableHead class="max-w-40">Skills</TableHead>
-            <TableHead class="max-w-40">Requirements</TableHead>
-            <TableHead class="max-w-40">Benefits</TableHead>
-            <TableHead class="max-w-32">External URL</TableHead>
-            <TableHead class="max-w-32">Recruiter</TableHead>
-            <TableHead class="max-w-32">Company Website</TableHead>
-            <TableHead class="max-w-24">Company Size</TableHead>
-            <TableHead class="max-w-36">Valid Until</TableHead>
-            <TableHead @click="toggleSort('created_at')" class="cursor-pointer max-w-36"
-              >Created At
-              <span v-if="sortBy === 'created_at'" class="ml-1 inline-flex items-center text-muted-foreground">
-                <Icon v-if="sortDir === 'asc'" name="lucide:arrow-up" class="w-3 h-3" />
-                <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
-              </span>
-            </TableHead>
-            <TableHead class="px-4 sticky right-0 bg-white">Actions</TableHead>
+            <TableHead class="w-10">#</TableHead>
+            <TableHead @click="toggleSort('title')" class="cursor-pointer max-w-xs">Title</TableHead>
+            <TableHead @click="toggleSort('company')" class="cursor-pointer w-40">Company</TableHead>
+            <TableHead class="w-40">Location</TableHead>
+            <TableHead class="max-w-40">Industry</TableHead>
+            <TableHead class="max-w-32">Website</TableHead>
+            <TableHead class="max-w-32">LinkedIn</TableHead>
+            <TableHead class="w-40">Employment Type</TableHead>
+            <TableHead class="w-40">Seniority</TableHead>
+            <TableHead class="max-w-20">Status</TableHead>
+            <TableHead class="w-40">Posted Date</TableHead>
+            <TableHead class="w-40">Valid Through</TableHead>
+            <TableHead class="px-4 sticky right-0">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <template v-if="paginated.length">
-            <TableRow v-for="job in paginated" :key="job.id">
-              <TableCell class="font-medium max-w-xs truncate" :title="job.title">{{ job.title }}</TableCell>
-              <TableCell class="max-w-48 truncate" :title="job.company?.name">{{ job.company?.name || '-' }}</TableCell>
+            <TableRow v-for="(job, idx) in paginated" :key="job.id">
+              <TableCell class="text-muted-foreground">{{ idx + 1 }}</TableCell>
+              <TableCell class="truncate" :title="job.title">{{ job.title }}</TableCell>
+              <TableCell class="w-40 truncate" :title="job.company?.name">{{ job.company?.name || '-' }}</TableCell>
               <TableCell
-                class="text-muted-foreground max-w-32 truncate"
-                :title="job.location?.city || job.location?.region || job.location?.country || '—'"
+                class="w-40 truncate"
+                :title="[job.location?.city, job.location?.region, job.location?.country].filter(Boolean).join(', ') || '—'"
               >
-                {{ job.location?.city || job.location?.region || job.location?.country || '—' }}
+                {{ [job.location?.city, job.location?.region, job.location?.country].filter(Boolean).join(', ') || '—' }}
               </TableCell>
-              <TableCell class="max-w-24 truncate" :title="job.employment_type || '-'">{{ job.employment_type || '-' }}</TableCell>
-              <TableCell class="max-w-28 truncate" :title="job.seniority_level || '-'">{{ job.seniority_level || '-' }}</TableCell>
-              <TableCell class="max-w-20 text-center">
-                <Badge v-if="job.location?.is_remote" variant="outline" class="text-xs"> Remote </Badge>
-                <span v-else class="text-muted-foreground">-</span>
-              </TableCell>
-              <TableCell class="text-muted-foreground max-w-32 truncate">
-                <span v-if="job.formattedSalary?.min || job.formattedSalary?.max">
-                  {{ job.formattedSalary?.min ? `$${job.formattedSalary.min.toLocaleString()}` : '' }}
-                  <span v-if="job.formattedSalary?.max"> - ${{ job.formattedSalary.max.toLocaleString() }}</span>
-                </span>
-                <span v-else>{{ job.salaryRange || '-' }}</span>
-              </TableCell>
-              <TableCell class="max-w-40 truncate" :title="Array.isArray(job.skills) ? job.skills.join(', ') : job.skills || '-'">
-                {{ Array.isArray(job.skills) ? job.skills.slice(0, 2).join(', ') + (job.skills.length > 2 ? '...' : '') : job.skills || '-' }}
-              </TableCell>
-              <TableCell class="max-w-40 truncate" :title="Array.isArray(job.requirements) ? job.requirements.join(', ') : job.requirements || '-'">
-                {{
-                  Array.isArray(job.requirements)
-                    ? job.requirements.slice(0, 2).join(', ') + (job.requirements.length > 2 ? '...' : '')
-                    : job.requirements || '-'
-                }}
-              </TableCell>
-              <TableCell class="max-w-40 truncate" :title="Array.isArray(job.benefits) ? job.benefits.join(', ') : job.benefits || '-'">
-                {{ Array.isArray(job.benefits) ? job.benefits.slice(0, 2).join(', ') + (job.benefits.length > 2 ? '...' : '') : job.benefits || '-' }}
-              </TableCell>
+              <TableCell class="max-w-40 truncate" :title="job.company?.industry || '-'">{{ job.company?.industry || '-' }}</TableCell>
               <TableCell class="max-w-32 truncate">
-                <a v-if="job.external_url" :href="job.external_url" target="_blank" class="text-primary hover:underline">
-                  <Icon name="lucide:external-link" class="w-3 h-3 inline mr-1" />
-                  Link
-                </a>
-                <span v-else class="text-muted-foreground">-</span>
-              </TableCell>
-              <TableCell class="max-w-32 truncate" :title="job.recruiter_name || '-'">
-                {{ job.recruiter_name || '-' }}
-              </TableCell>
-              <TableCell class="max-w-32 truncate">
-                <a v-if="job.company?.website_url" :href="job.company.website_url" target="_blank" class="text-primary hover:underline">
+                <a
+                  v-if="job.company?.website_url"
+                  :href="job.company.website_url"
+                  target="_blank"
+                  class="flex items-center text-primary hover:underline"
+                >
                   <Icon name="lucide:external-link" class="w-3 h-3 inline mr-1" />
                   Website
                 </a>
-                <span v-else class="text-muted-foreground">-</span>
               </TableCell>
-              <TableCell class="max-w-24 truncate" :title="job.company?.linkedin_size || '-'">
-                {{ job.company?.linkedin_size || '-' }}
+              <TableCell class="max-w-32 truncate">
+                <a
+                  v-if="job.company?.linkedin_url"
+                  :href="job.company.linkedin_url"
+                  target="_blank"
+                  class="flex items-center text-primary hover:underline"
+                >
+                  <Icon name="lucide:external-link" class="w-3 h-3 inline mr-1" />
+                  LinkedIn
+                </a>
               </TableCell>
-              <TableCell class="max-w-36 truncate" :title="job.valid_until ? new Date(job.valid_until).toLocaleDateString() : '-'">
-                {{ job.valid_until ? new Date(job.valid_until).toLocaleDateString() : '-' }}
+              <TableCell class="max-w-24 truncate" :title="employmentTypeLabel(job.employment_type)">
+                {{ employmentTypeLabel(job.employment_type) }}
               </TableCell>
-              <TableCell class="text-muted-foreground max-w-36 truncate" :title="job.created_at ? new Date(job.created_at).toLocaleString() : '-'">
-                {{ job.created_at ? new Date(job.created_at).toLocaleString() : '-' }}
+              <TableCell class="w-40 truncate" :title="job.seniority_level || '-'">{{ job.seniority_level || '-' }}</TableCell>
+              <TableCell class="w-40">
+                <Badge :variant="getStatusVariant(job.status)">
+                  {{ job.status || '-' }}
+                </Badge>
               </TableCell>
-              <TableCell class="px-4 sticky right-0 bg-white">
-                <div class="flex items-center gap-2">
-                  <Button size="sm" variant="outline" @click="onOpenEdit(job)">Edit</Button>
-                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onOpenDelete(job)">Delete</Button>
+              <TableCell class="w-40 truncate" :title="formatDate(job.posted_date)">
+                {{ formatDate(job.posted_date) }}
+              </TableCell>
+              <TableCell class="w-40 truncate" :title="formatDate(job.valid_until)">
+                {{ formatDate(job.valid_until) }}
+              </TableCell>
+              <TableCell class="px-4 sticky right-0 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <Button size="sm" variant="outline" @click="onOpenEdit(job)">
+                    <Icon name="lucide:edit" class="h-3 w-3" />
+                  </Button>
+                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onOpenDelete(job)">
+                    <Icon name="lucide:trash-2" class="h-3 w-3" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
           </template>
-          <TableEmpty v-else :colspan="16">No data</TableEmpty>
+          <TableEmpty v-else :colspan="13">No data</TableEmpty>
         </TableBody>
       </Table>
     </div>
@@ -893,8 +858,5 @@ const onSubmitForm = async (formPayload) => {
       Are you sure you want to delete job <span class="font-medium">{{ selected?.title }}</span
       >? This action cannot be undone.
     </DeleteConfirmDialog>
-
-    <!-- Create/Edit Form -->
-    <JobFormDialog v-model="formOpen" :mode="formMode" :job="editing" :pending="saving" @submit="onSubmitForm" />
   </div>
 </template>

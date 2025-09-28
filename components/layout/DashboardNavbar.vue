@@ -143,7 +143,7 @@ onMounted(() => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-48">
-              <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+              <DropdownMenuItem @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
                 <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
@@ -175,7 +175,7 @@ onMounted(() => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-48 dropdown-right-aligned">
-                <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+                <DropdownMenuItem @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
                   <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
