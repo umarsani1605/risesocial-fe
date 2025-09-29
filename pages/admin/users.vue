@@ -11,8 +11,12 @@ import { ArrowUp, ArrowDown } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
 definePageMeta({
-  auth: true,
   layout: 'admin-dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
 const { $api } = useNuxtApp();
@@ -45,6 +49,12 @@ const {
 
 const users = computed(() => usersResponse.value?.users || []);
 const meta = computed(() => usersResponse.value?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 });
+
+const pageCount = computed(() => Math.max(1, Number(meta.value.totalPages || 1)));
+const totalItems = computed(() => Number(meta.value.total || 0));
+const pageSizeDisplay = computed(() => Number(meta.value.limit || limit.value));
+const showingStart = computed(() => Math.min((page.value - 1) * pageSizeDisplay.value + 1, totalItems.value));
+const showingEnd = computed(() => Math.min(page.value * pageSizeDisplay.value, totalItems.value));
 
 // Watch for changes and refresh data
 watch(
@@ -233,7 +243,9 @@ const pageSizes = [10, 20, 30, 50];
               <TableCell>
                 <div class="flex items-center gap-2">
                   <Button variant="outline" size="sm" @click="openEdit(u)">Edit</Button>
-                  <Button variant="outline" size="sm" @click="openDelete(u)" class="hover:bg-red-50 hover:border-red-200">Delete</Button>
+                  <Button variant="outline" size="sm" @click="openDelete(u)" class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                    >Delete</Button
+                  >
                 </div>
               </TableCell>
             </TableRow>
@@ -243,25 +255,48 @@ const pageSizes = [10, 20, 30, 50];
       </Table>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex items-center justify-between px-2">
+    <!-- Pagination (RYL style) -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
       <div class="flex items-center gap-2">
-        <span class="text-sm">Rows per page</span>
-        <Select :model-value="String(meta.limit)" @update:model-value="(v) => (limit = Number(v))">
-          <SelectTrigger class="h-8 w-[80px]">
-            <SelectValue :placeholder="String(meta.limit)" />
-          </SelectTrigger>
-          <SelectContent side="top">
-            <SelectItem v-for="s in pageSizes" :key="s" :value="String(s)">{{ s }}</SelectItem>
-          </SelectContent>
-        </Select>
+        <span class="text-sm text-muted-foreground"> Showing {{ showingStart }} to {{ showingEnd }} of {{ totalItems }} entries </span>
       </div>
+
       <div class="flex items-center gap-2">
-        <Button variant="outline" class="h-8 px-2" :disabled="meta.page <= 1" @click="page = Math.max(1, meta.page - 1)">Prev</Button>
-        <span class="text-sm">Page {{ meta.page }} of {{ meta.totalPages }}</span>
-        <Button variant="outline" class="h-8 px-2" :disabled="meta.page >= meta.totalPages" @click="page = Math.min(meta.totalPages, meta.page + 1)"
-          >Next</Button
-        >
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-muted-foreground">Rows per page:</span>
+          <Select
+            :model-value="pageSizeDisplay"
+            @update:model-value="
+              (v) => {
+                limit = Number(v);
+                page = 1;
+              }
+            "
+          >
+            <SelectTrigger class="h-8 w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="size in [10, 20, 50, 100]" :key="size" :value="size">
+                {{ size }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <Button variant="outline" size="sm" :disabled="page <= 1 || pending" @click="page--" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-left" class="h-4 w-4" />
+            <span class="sr-only">Previous page</span>
+          </Button>
+          <div class="flex items-center justify-center w-8 h-8 text-sm">
+            {{ page }}
+          </div>
+          <Button variant="outline" size="sm" :disabled="page >= pageCount || pending" @click="page++" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-right" class="h-4 w-4" />
+            <span class="sr-only">Next page</span>
+          </Button>
+        </div>
       </div>
     </div>
 

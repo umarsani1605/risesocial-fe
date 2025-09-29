@@ -34,7 +34,12 @@
                   <Button size="sm" variant="outline" @click="onEditTopic(row.data)">
                     <Icon name="lucide:edit" class="h-3 w-3" />
                   </Button>
-                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeleteTopic(row.data)">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                    @click="onDeleteTopic(row.data)"
+                  >
                     <Icon name="lucide:trash-2" class="h-3 w-3" />
                   </Button>
                 </div>
@@ -51,7 +56,12 @@
                   <Button size="sm" variant="outline" @click="onEditSession(row.data, row.topic)">
                     <Icon name="lucide:edit" class="h-3 w-3" />
                   </Button>
-                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeleteSession(row.data, row.topic)">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                    @click="onDeleteSession(row.data, row.topic)"
+                  >
                     <Icon name="lucide:trash-2" class="h-3 w-3" />
                   </Button>
                 </div>

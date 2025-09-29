@@ -9,8 +9,12 @@ import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import { toast } from 'vue-sonner';
 
 definePageMeta({
-  auth: true,
   layout: 'admin-dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
 const {
@@ -92,6 +96,8 @@ const paginated = computed(() => {
 });
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / pageSize.value)));
+const showingStart = computed(() => Math.min((page.value - 1) * pageSize.value + 1, filtered.value.length));
+const showingEnd = computed(() => Math.min(page.value * pageSize.value, filtered.value.length));
 
 const toggleSort = (sortKey) => {
   if (sortBy.value === sortKey) {
@@ -147,7 +153,7 @@ const onOpenAdd = async () => {
   await navigateTo('/admin/academy/new');
 };
 
-const pageSizes = [10, 20, 30, 50];
+const pageSizes = [10, 20, 50, 100];
 </script>
 
 <template>
@@ -211,7 +217,7 @@ const pageSizes = [10, 20, 30, 50];
                 <Icon v-else name="lucide:arrow-down" class="w-3 h-3" />
               </span>
             </TableHead>
-            <TableHead class="px-4 sticky right-0 w-[120px] min-w-[120px]">Actions</TableHead>
+            <TableHead class="px-4 sticky right-0 w-[120px] min-w-[120px] bg-white">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -275,12 +281,17 @@ const pageSizes = [10, 20, 30, 50];
               >
                 {{ academy.created_at ? new Date(academy.created_at).toLocaleDateString() : '-' }}
               </TableCell>
-              <TableCell class="px-4 sticky right-0 w-[120px] min-w-[120px]">
+              <TableCell class="px-4 sticky right-0 w-[120px] min-w-[120px] bg-white">
                 <div class="flex items-center gap-2">
                   <Button size="sm" variant="outline" @click="onOpenEdit(academy)">
                     <Icon name="lucide:edit" class="h-3 w-3" />
                   </Button>
-                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onOpenDelete(academy)">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                    @click="onOpenDelete(academy)"
+                  >
                     <Icon name="lucide:trash-2" class="h-3 w-3" />
                   </Button>
                 </div>
@@ -293,24 +304,47 @@ const pageSizes = [10, 20, 30, 50];
       </Table>
     </div>
 
-    <div class="flex items-center justify-between px-2">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
       <div class="flex items-center gap-2">
-        <span class="text-sm">Rows per page</span>
-        <Select :model-value="String(pageSize)" @update:model-value="(newValue) => (pageSize = Number(newValue))">
-          <SelectTrigger class="h-8 w-[80px]">
-            <SelectValue :placeholder="String(pageSize)" />
-          </SelectTrigger>
-          <SelectContent side="top">
-            <SelectItem v-for="pageSizeOption in pageSizes" :key="pageSizeOption" :value="String(pageSizeOption)">
-              {{ pageSizeOption }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <span class="text-sm text-muted-foreground"> Showing {{ showingStart }} to {{ showingEnd }} of {{ filtered.length }} entries </span>
       </div>
+
       <div class="flex items-center gap-2">
-        <Button variant="outline" class="h-8 px-2" :disabled="page <= 1" @click="page = Math.max(1, page - 1)"> Prev </Button>
-        <span class="text-sm">Page {{ page }} of {{ totalPages }}</span>
-        <Button variant="outline" class="h-8 px-2" :disabled="page >= totalPages" @click="page = Math.min(totalPages, page + 1)"> Next </Button>
+        <div class="flex items-center gap-2">
+          <span class="whitespacetext-sm text-muted-foreground">Rows per page:</span>
+          <Select
+            :model-value="pageSize"
+            @update:model-value="
+              (v) => {
+                pageSize = Number(v);
+                page = 1;
+              }
+            "
+          >
+            <SelectTrigger class="h-8 w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="size in pageSizes" :key="size" :value="size">
+                {{ size }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <Button variant="outline" size="sm" :disabled="page <= 1 || isLoading" @click="page--" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-left" class="h-4 w-4" />
+            <span class="sr-only">Previous page</span>
+          </Button>
+          <div class="flex items-center justify-center w-8 h-8 text-sm">
+            {{ page }}
+          </div>
+          <Button variant="outline" size="sm" :disabled="page >= totalPages || isLoading" @click="page++" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-right" class="h-4 w-4" />
+            <span class="sr-only">Next page</span>
+          </Button>
+        </div>
       </div>
     </div>
 

@@ -1,36 +1,30 @@
 <script setup>
-// Set layout untuk halaman ini
 definePageMeta({
-  auth: true,
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
   layout: 'dashboard',
 });
 
-// Import store
 import { useJobsStore } from '~/store/jobs';
 import { storeToRefs } from 'pinia';
 
-// Jobs store
 const jobsStore = useJobsStore();
 const { jobsData, isLoading } = storeToRefs(jobsStore);
 const { getJobDetailUrl } = jobsStore;
 
-// Get favorite jobs (saved jobs)
 const favoriteJobs = computed(() => {
   if (!jobsData.value) return [];
   return jobsStore.getFavoriteJobs(jobsData.value);
 });
 
-// Get latest jobs (9 most recent jobs)
 const latestJobs = computed(() => {
   if (!jobsData.value?.length) return [];
   return [...jobsData.value].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 9);
 });
 
-onMounted(async () => {
-  // no-op for jobs; expect jobsData to be prefilled elsewhere or future SSR on this page
-});
-
-// Meta tags
 useSeoMeta({
   title: 'Jobs Management - Rise Social',
   description: 'Kelola pekerjaan yang disimpan dan temukan rekomendasi pekerjaan baru',
@@ -39,7 +33,6 @@ useSeoMeta({
 <template>
   <div class="bg-slate-50 mt-10">
     <div class="container-wrapper section-py-md space-y-6">
-      <!-- Saved Jobs Section -->
       <Card class="border border-gray-50">
         <CardContent>
           <div class="mb-8">
@@ -53,7 +46,6 @@ useSeoMeta({
               <Button variant="outline" size="sm" class="shadow-none" @click="navigateTo('/opportunities')">Explore Jobs</Button>
             </div>
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <!-- Saved Job Cards -->
               <div
                 v-for="job in favoriteJobs"
                 :key="job.id"
@@ -81,13 +73,10 @@ useSeoMeta({
                 View All Jobs
               </Button>
             </div>
-            <!-- Loading State -->
             <div v-if="isLoading" class="text-center py-12">
               <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 mx-auto"></div>
               <p class="mt-2 text-sm text-gray-500">Loading jobs...</p>
             </div>
-
-            <!-- No Jobs State -->
             <div v-else-if="!isLoading && latestJobs.length === 0" class="text-center py-12">
               <Icon name="lucide:briefcase" class="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <h3 class="text-lg font-medium text-gray-900 mb-2">Belum ada lowongan terbaru</h3>

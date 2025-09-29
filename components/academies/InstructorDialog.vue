@@ -49,7 +49,7 @@
             <div class="flex-1 flex justify-center items-center">
               <div class="size-28 rounded-full overflow-hidden flex items-center justify-center">
                 <img v-if="avatarPreview || avatarUrl" :src="avatarPreview || avatarUrl" alt="Avatar preview" class="w-full h-full object-cover" />
-                <div v-else class="w-full h-full bg-primary text-white flex items-center justify-center text-lg font-semibold">
+                <div v-else class="w-full h-full bg-orange-100 text-primary flex items-center justify-center text-lg font-semibold">
                   {{ getInitials(form.values.name) }}
                 </div>
               </div>

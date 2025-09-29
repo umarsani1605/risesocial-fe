@@ -13,13 +13,10 @@ import {
 } from '@/components/ui/navigation-menu';
 const route = useRoute();
 
-// Sidebase Auth
 const { data: user, status, signOut } = useAuth();
 
-// Reactive state
 const mobileMenuOpen = ref(false);
 
-// Computed properties
 const fullName = computed(() => {
   if (!user.value) return 'User';
   return `${user.value.first_name || ''} ${user.value.last_name || ''}`.trim() || 'User';
@@ -32,7 +29,6 @@ const initials = computed(() => {
   return `${first}${last}`.toUpperCase() || 'U';
 });
 
-// Dashboard navigation
 const dashboardNavigation = computed(() => [
   {
     id: 'dashboard',
@@ -70,9 +66,8 @@ const toggleMobileMenu = () => {
 };
 
 const handleLogout = async () => {
+  signOut({ callbackUrl: '/' });
   mobileMenuOpen.value = false;
-  await signOut();
-  await navigateTo('/');
 };
 
 // Close mobile menu when route changes

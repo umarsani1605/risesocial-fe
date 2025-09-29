@@ -66,7 +66,7 @@ export const useRylsSubmission = () => {
     }
 
     try {
-      const response = await $api(`/api/ryls/registrations/${submissionId}/status`);
+      const response = await $api(`/ryls/registrations/${submissionId}/status`);
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to get submission status');
@@ -263,7 +263,7 @@ export const useRylsSubmission = () => {
         throw new Error('Headshot file belum diupload');
       }
 
-      const response = await $api('/ryls/registrations/self-funded', {
+      const response = await $api('/api/ryls/registrations/self-funded', {
         method: 'POST',
         body: registrationData,
       });

@@ -1,7 +1,7 @@
-import { api } from '@/utils/api';
 import { useMidtransSnap } from './useMidtransSnap';
 
 export const useRylsPayment = () => {
+  const { $api } = useNuxtApp();
   const isLoading = ref(false);
   const error = ref(null);
 
@@ -25,7 +25,10 @@ export const useRylsPayment = () => {
         },
       };
 
-      const res = await api.post('/payments/ryls/transactions', payload);
+      const res = await $api('/payments/ryls/transactions', {
+        method: 'POST',
+        body: payload,
+      });
 
       if (!res?.data) {
         throw new Error('Invalid response from server');
@@ -102,7 +105,7 @@ export const useRylsPayment = () => {
 
   const getRegistrationBySubmissionId = async (submissionId) => {
     try {
-      const res = await api.get(`/api/registrations/submission/${submissionId}`);
+      const res = await $api(`/registrations/submission/${submissionId}`);
       return res?.data || res;
     } catch (e) {
       throw e;
@@ -111,7 +114,7 @@ export const useRylsPayment = () => {
 
   const getPaymentStatus = async (registrationId) => {
     try {
-      const res = await api.get(`/api/payments/ryls/${registrationId}/status`);
+      const res = await $api(`/payments/ryls/${registrationId}/status`);
       return res?.data || res;
     } catch (e) {
       throw e;

@@ -24,8 +24,12 @@ import FaqDialog from '@/components/academies/FaqDialog.vue';
 import { toast } from 'vue-sonner';
 
 definePageMeta({
-  auth: true,
   layout: 'admin-dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
 // Image URL state (needed for validation)
@@ -639,7 +643,7 @@ const onConfirmDelete = async () => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 pr-18 w-full h-full">
     <div class="relative">
       <div v-if="pending" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
         <div class="text-center">
@@ -665,8 +669,8 @@ const onConfirmDelete = async () => {
               <span class="text-xl font-semibold">Basic Information</span>
             </div>
             <Button @click="saveBasicInfo" :disabled="basicInfoPending">
-              <Icon name="lucide:circle-check" size="16" />
-              {{ basicInfoPending ? 'Saving...' : 'Save Information' }}
+              <Icon name="lucide:save" size="16" />
+              Save Academy
             </Button>
           </div>
 
@@ -896,7 +900,12 @@ const onConfirmDelete = async () => {
                         <Button size="sm" variant="outline" @click="onEditPricing(price)">
                           <Icon name="lucide:edit" class="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeletePricing(price)">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                          @click="onDeletePricing(price)"
+                        >
                           <Icon name="lucide:trash-2" class="h-3 w-3" />
                         </Button>
                       </div>
@@ -953,7 +962,12 @@ const onConfirmDelete = async () => {
                         <Button size="sm" variant="outline" @click="onEditFeature(feature)">
                           <Icon name="lucide:edit" class="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeleteFeature(feature)">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                          @click="onDeleteFeature(feature)"
+                        >
                           <Icon name="lucide:trash-2" class="h-3 w-3" />
                         </Button>
                       </div>
@@ -1008,7 +1022,12 @@ const onConfirmDelete = async () => {
                         <Button size="sm" variant="outline" @click="onEditInstructor(instructorData)">
                           <Icon name="lucide:edit" class="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeleteInstructor(instructorData)">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                          @click="onDeleteInstructor(instructorData)"
+                        >
                           <Icon name="lucide:trash-2" class="h-3 w-3" />
                         </Button>
                       </div>
@@ -1087,7 +1106,12 @@ const onConfirmDelete = async () => {
                         <Button size="sm" variant="outline" @click="onEditTestimonial(testimonial)">
                           <Icon name="lucide:edit" class="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeleteTestimonial(testimonial)">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                          @click="onDeleteTestimonial(testimonial)"
+                        >
                           <Icon name="lucide:trash-2" class="h-3 w-3" />
                         </Button>
                       </div>
@@ -1140,7 +1164,12 @@ const onConfirmDelete = async () => {
                         <Button size="sm" variant="outline" @click="onEditFaq(faq)">
                           <Icon name="lucide:edit" class="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDeleteFaq(faq)">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                          @click="onDeleteFaq(faq)"
+                        >
                           <Icon name="lucide:trash-2" class="h-3 w-3" />
                         </Button>
                       </div>

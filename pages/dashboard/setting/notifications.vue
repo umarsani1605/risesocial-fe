@@ -3,46 +3,56 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useAPI, $api } from '@/composables/useAPI';
+import { toast } from 'vue-sonner';
 
 definePageMeta({
-  auth: true,
   layout: 'dashboard-setting',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
 const prefs = reactive({
-  promo_notification: false,
+  promo_notification: true,
   job_notification: true,
-  course_notification: true,
+  program_notification: true,
 });
 
-// Load user settings from API
-const { data: userSettings, pending, error } = await useFetch('/api/user/settings');
+const {
+  data: notificationPreferences,
+  pending,
+  error,
+} = await useAPI('/users/notification-preferences', {
+  key: 'notification-preferences-data',
+  transform: (response) => response?.data || {},
+});
 
-// Initialize preferences from API data
-if (userSettings.value) {
-  userSettings.value.forEach((setting) => {
-    if (prefs.hasOwnProperty(setting.key)) {
-      prefs[setting.key] = setting.value;
+console.log('notification preferences:', notificationPreferences.value);
+
+watch(
+  () => notificationPreferences.value,
+  (val) => {
+    if (val && typeof val === 'object') {
+      Object.assign(prefs, val);
     }
-  });
-}
+  },
+  { immediate: true }
+);
 
 const saveSettings = async () => {
   try {
-    const settingsToSave = Object.entries(prefs).map(([key, value]) => ({
-      key,
-      value,
-    }));
-
-    await $fetch('/api/user/settings', {
+    await $api('/users/notification-preferences', {
       method: 'PUT',
-      body: { settings: settingsToSave },
+      body: { preferences: prefs },
     });
 
-    // Show success message
-    console.log('Settings saved successfully');
+    toast.success('Setting saved successfully');
   } catch (error) {
-    console.error('Failed to save settings:', error);
+    toast.error('Failed to save notification preferences');
+    console.error('Failed to save Setting');
   }
 };
 </script>
@@ -51,16 +61,16 @@ const saveSettings = async () => {
     <h1 class="text-xl font-bold">Notifications</h1>
     <div class="space-y-4">
       <div class="flex items-center gap-3">
-        <Checkbox id="promo" v-model:checked="prefs.promo_notification" />
+        <Checkbox id="promo" v-model="prefs.promo_notification" class="size-5" />
         <Label for="promo">Promo notifications</Label>
       </div>
       <div class="flex items-center gap-3">
-        <Checkbox id="jobs" v-model:checked="prefs.job_notification" />
+        <Checkbox id="jobs" v-model="prefs.job_notification" class="size-5" />
         <Label for="jobs">Job notifications</Label>
       </div>
       <div class="flex items-center gap-3">
-        <Checkbox id="courses" v-model:checked="prefs.course_notification" />
-        <Label for="courses">Course notifications</Label>
+        <Checkbox id="programs" v-model="prefs.program_notification" class="size-5" />
+        <Label for="programs">Program notifications</Label>
       </div>
     </div>
 

@@ -14,7 +14,11 @@
 
 <script setup>
 definePageMeta({
-  auth: true,
   layout: 'admin-dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 </script>

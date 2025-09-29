@@ -15,10 +15,8 @@ import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
 
 const route = useRoute();
 
-// Sidebase Auth
 const { data: user, status, signOut } = useAuth();
 
-// Computed properties for user data
 const isAuthenticated = computed(() => status.value === 'authenticated');
 const fullName = computed(() => {
   if (!user.value) return 'User';
@@ -31,13 +29,11 @@ const initials = computed(() => {
   return `${first}${last}`.toUpperCase() || 'U';
 });
 
-// Computed property for dynamic dashboard route based on user role
 const dashboardRoute = computed(() => {
   if (!user.value) return '/dashboard';
   return user.value.role === 'ADMIN' ? '/admin' : '/dashboard';
 });
 
-// Watch for auth changes for debugging
 watch(
   () => user.value,
   (newVal) => {
@@ -99,9 +95,8 @@ const openLoginDialog = () => {
 };
 
 const handleLogout = async () => {
-  await signOut();
+  signOut({ callbackUrl: '/' });
   mobileMenuOpen.value = false;
-  await navigateTo('/');
 };
 
 // Handle scroll detection
@@ -182,7 +177,7 @@ onUnmounted(() => {
                     <Icon name="lucide:layout-dashboard" class="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
+                  <DropdownMenuItem v-if="user?.role === 'USER'" @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
                     <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>

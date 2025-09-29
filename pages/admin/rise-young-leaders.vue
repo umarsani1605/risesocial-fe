@@ -13,8 +13,12 @@ import { useRylsAdmin } from '@/composables/useRylsAdmin';
 import { DISCOVER_SOURCES, SCHOLARSHIP_TYPES, GENDER_OPTIONS } from '~/constants/ryls';
 
 definePageMeta({
-  auth: true,
   layout: 'admin-dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
 const search = ref('');
@@ -79,7 +83,7 @@ const {
 
 // Action-based API calls using $api
 const deleteRegistration = async (id) => {
-  await $api(`/api/admin/ryls/registrations/${id}`, {
+  await $api(`/admin/ryls/registrations/${id}`, {
     method: 'DELETE',
   });
 };
@@ -92,14 +96,14 @@ const exportRegistrationsExcel = async () => {
 };
 
 const downloadFile = async (fileId) => {
-  const response = await $api(`/api/admin/uploads/${fileId}`);
+  const response = await $api(`/admin/uploads/${fileId}`);
   return response;
 };
 
 // Generate public file URL
 const getFileUrl = (fileId) => {
   const baseUrl = process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-  return `${baseUrl}/api/uploads/${fileId}`;
+  return `${baseUrl}/uploads/${fileId}`;
 };
 
 // Client-side filtered data

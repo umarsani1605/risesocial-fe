@@ -11,7 +11,11 @@ import { toast } from 'vue-sonner';
 import { JOB_TYPES, JOB_SENIORITIES } from '@/constants/jobs';
 
 definePageMeta({
-  auth: true,
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
   layout: 'admin-dashboard',
 });
 
@@ -224,17 +228,17 @@ const onConfirmDelete = async () => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="relative">
+  <div class="space-y-6 pr-24 w-full h-full">
+    <div class="relative w-full h-full">
       <div v-if="pending" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
         <div class="text-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <Icon name="lucide:loader-2" size="48" class="animate-spin text-primary mx-auto mb-2" />
           <p class="text-sm text-gray-600">Loading job...</p>
         </div>
       </div>
 
-      <div class="flex items-center justify-between gap-4 mb-6">
-        <div class="flex items-center gap-2">
+      <div class="flex items-center justify-between gap-4 mb-8">
+        <div class="flex items-center gap-4 mb-6">
           <Button @click="onBack" variant="outline" class="flex items-center gap-2 shadow-none">
             <Icon name="lucide:arrow-left" size="18" />
             Back
@@ -242,20 +246,16 @@ const onConfirmDelete = async () => {
           <div class="font-medium">Edit Job</div>
         </div>
         <div class="flex items-center gap-2">
-          <Button variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onDelete" :disabled="deleting">
-            <Icon name="lucide:trash-2" size="16" />
-            {{ deleting ? 'Deleting...' : 'Delete' }}
-          </Button>
           <Button :disabled="saving" @click="onSave">
-            <Icon name="lucide:circle-check" size="16" />
-            {{ saving ? 'Saving...' : 'Save' }}
+            <Icon name="lucide:save" size="16" />
+            Save Job
           </Button>
         </div>
       </div>
 
       <div v-if="job" class="space-y-6">
-        <section class="mb-6">
-          <div class="flex items-center justify-between mb-4">
+        <section class="mb-16">
+          <div class="flex items-center justify-between mb-8">
             <div class="flex items-center gap-3 text-lg font-semibold">
               <div class="size-7 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                 <Icon name="lucide:info" size="18" class="text-white" />
@@ -265,7 +265,7 @@ const onConfirmDelete = async () => {
           </div>
 
           <div class="py-1">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>
                 <label class="text-sm mb-2 block">Title<span class="text-red-500">*</span></label>
                 <Input v-model="jobData.title" placeholder="Enter job title" />
@@ -299,11 +299,6 @@ const onConfirmDelete = async () => {
                 </Select>
               </div>
 
-              <div class="md:col-span-3">
-                <label class="text-sm mb-2 block">Description<span class="text-red-500">*</span></label>
-                <Textarea v-model="jobData.description" class="h-52" placeholder="Enter job description" />
-              </div>
-
               <div>
                 <label class="text-sm mb-2 block">Status<span class="text-red-500">*</span></label>
                 <Select v-model="jobData.status">
@@ -315,6 +310,11 @@ const onConfirmDelete = async () => {
                     <SelectItem value="archived">Archived</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div class="md:col-span-4">
+                <label class="text-sm mb-2 block">Description<span class="text-red-500">*</span></label>
+                <Textarea v-model="jobData.description" class="h-52" placeholder="Enter job description" />
               </div>
 
               <div>
@@ -402,7 +402,7 @@ const onConfirmDelete = async () => {
 
         <!-- Section: Company -->
         <section class="mb-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-8">
             <div class="flex items-center gap-3 text-lg font-semibold">
               <div class="size-7 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                 <Icon name="lucide:building-2" size="18" class="text-white" />
@@ -412,7 +412,7 @@ const onConfirmDelete = async () => {
           </div>
 
           <div class="py-1">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>
                 <label class="text-sm mb-2 block">Name<span class="text-red-500">*</span></label>
                 <Input v-model="jobData.company_name" placeholder="Company name" />
@@ -428,14 +428,14 @@ const onConfirmDelete = async () => {
                 <Input v-model="jobData.company_industry" placeholder="e.g., Software" />
               </div>
 
-              <div class="md:col-span-3">
-                <label class="text-sm mb-2 block">Description</label>
-                <Textarea v-model="jobData.company_description" class="min-h-48" placeholder="Company description" />
-              </div>
-
               <div>
                 <label class="text-sm mb-2 block">Headquarters</label>
                 <Input v-model="jobData.company_headquarters" placeholder="City, Region" />
+              </div>
+
+              <div class="md:col-span-4">
+                <label class="text-sm mb-2 block">Description</label>
+                <Textarea v-model="jobData.company_description" class="min-h-48" placeholder="Company description" />
               </div>
 
               <div>
@@ -464,6 +464,11 @@ const onConfirmDelete = async () => {
               </div>
 
               <div>
+                <label class="text-sm mb-2 block">Type</label>
+                <Input v-model="jobData.company_linkedin_type" placeholder="e.g., Private" />
+              </div>
+
+              <div>
                 <label class="text-sm mb-2 block">Locations</label>
                 <TagsInput v-model="jobData.company_linkedin_locations">
                   <TagsInputItem v-for="item in jobData.company_linkedin_locations" :key="item" :value="item">
@@ -483,11 +488,6 @@ const onConfirmDelete = async () => {
                   </TagsInputItem>
                   <TagsInputInput placeholder="Type and press enter" />
                 </TagsInput>
-              </div>
-
-              <div>
-                <label class="text-sm mb-2 block">Type</label>
-                <Input v-model="jobData.company_linkedin_type" placeholder="e.g., Private" />
               </div>
             </div>
           </div>

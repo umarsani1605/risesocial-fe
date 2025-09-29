@@ -4,16 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAcademies } from '@/composables/useAcademies';
 import { onMounted } from 'vue';
 
-// Set layout untuk halaman ini
 definePageMeta({
-  auth: true,
   layout: 'dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
-// Get academy data
 const { academiesData, initializeAcademies } = useAcademies();
 
-// Meta tags
 useSeoMeta({
   title: 'Academy - Rise Social',
   description: 'Kelola academy dan progres pembelajaran Anda di Rise Social',
@@ -26,10 +27,8 @@ onMounted(() => {
 <template>
   <div class="bg-slate-50 mt-16 md:mt-10">
     <div class="container-wrapper section-py-md">
-      <!-- Main Card Container -->
       <Card class="border border-gray-50 min-h-[50rem]">
         <CardHeader>
-          <!-- Header Section -->
           <div class="flex flex-row items-center justify-between gap-3">
             <CardTitle class="heading-card">Academy</CardTitle>
             <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/academy')"> View All Academy </Button>
@@ -37,16 +36,13 @@ onMounted(() => {
         </CardHeader>
 
         <CardContent class="space-y-4">
-          <!-- Grid Container for Academy Cards -->
           <div class="grid gap-4 lg:gap-6">
-            <!-- Academy Cards -->
             <div
               v-for="academy in academiesData"
               :key="academy.id"
               @click="navigateTo(`/academy/${academy.path_slug}`)"
               class="border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300 hover:shadow-subtle bg-white overflow-hidden"
             >
-              <!-- Mobile Layout: Stacked -->
               <div class="block sm:hidden">
                 <div class="aspect-[4/3] w-full bg-gray-100 overflow-hidden">
                   <img :src="academy.image_url" :alt="academy.title" class="w-full h-full object-cover transition-transform duration-200" />
@@ -54,7 +50,6 @@ onMounted(() => {
                 <div class="p-4">
                   <h3 class="text-xl font-semibold text-gray-900 mb-3 leading-tight">{{ academy.title }}</h3>
 
-                  <!-- Meta Info - Mobile: 2 per row -->
                   <div class="grid grid-cols-2 gap-2 mb-3">
                     <div class="flex items-center gap-1.5 text-xs text-gray-500">
                       <Icon name="lucide:clock" class="w-3.5 h-3.5 flex-shrink-0" />
@@ -74,14 +69,12 @@ onMounted(() => {
                     </div>
                   </div>
 
-                  <!-- Description - Mobile -->
                   <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
                     {{ academy.description }}
                   </p>
                 </div>
               </div>
 
-              <!-- Tablet & Desktop Layout: Horizontal -->
               <div class="hidden sm:flex items-start p-4">
                 <div class="size-24 md:size-36 lg:size-40 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden mr-4 lg:mr-6">
                   <img :src="academy.image_url" :alt="academy.title" class="w-full h-full object-cover transition-transform duration-200" />
@@ -90,7 +83,6 @@ onMounted(() => {
                 <div class="flex-1 min-w-0">
                   <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-3 leading-tight">{{ academy.title }}</h3>
 
-                  <!-- Meta Info - Tablet/Desktop: Flexible wrap -->
                   <div class="flex flex-wrap items-center gap-3 lg:gap-4 text-gray-500 text-sm mb-3">
                     <div class="flex items-center gap-2">
                       <Icon name="lucide:clock" class="w-4 h-4 flex-shrink-0" />
@@ -110,7 +102,6 @@ onMounted(() => {
                     </div>
                   </div>
 
-                  <!-- Description - Tablet/Desktop -->
                   <p class="text-sm md:text-base text-gray-600 leading-relaxed line-clamp-2 mb-3">
                     {{ academy.description }}
                   </p>
@@ -127,7 +118,6 @@ onMounted(() => {
   </div>
 </template>
 <style scoped>
-/* Line clamp utility for text truncation */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

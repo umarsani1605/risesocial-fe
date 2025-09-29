@@ -23,6 +23,8 @@ const {
   },
 });
 
+console.log('academy: ' + JSON.stringify(academy.value));
+
 if (academyError.value || !academy.value) {
   throw createError({
     statusCode: 404,
@@ -129,11 +131,11 @@ onMounted(() => {
             </div>
             <div class="flex items-center gap-2" v-if="academy.certificate">
               <Icon name="lucide:award" class="w-4 h-4" />
-              <span>Sertifikat</span>
+              <span>Certificate</span>
             </div>
             <div class="flex items-center gap-2">
               <Icon name="lucide:briefcase" class="w-4 h-4" />
-              <span>Job Accelerator</span>
+              <span>Portfolio</span>
             </div>
           </div>
         </div>
@@ -171,13 +173,18 @@ onMounted(() => {
               <CardContent class="p-8">
                 <h2 class="heading-section mb-6">Curriculum</h2>
                 <Accordion type="multiple" class="space-y-4">
-                  <AccordionItem v-for="topic in academy.topics" :key="topic.id" :value="`topic-${topic.id}`" class="border-none rounded-lg px-0">
+                  <AccordionItem
+                    v-for="(topic, index) in academy.topics"
+                    :key="topic.id"
+                    :value="`topic-${topic.id}`"
+                    class="border-none rounded-lg px-0"
+                  >
                     <AccordionTrigger class="px-6 py-4 hover:no-underline hover:bg-gray-50 rounded-t-lg data-[state=open]:rounded-b-none">
                       <div class="flex flex-col md:flex-row items-start gap-4 text-left w-full">
                         <div
                           class="hidden md:flex w-8 h-8 bg-primary text-white rounded-full items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5"
                         >
-                          {{ topic.id }}
+                          {{ index + 1 }}
                         </div>
                         <div class="flex-1">
                           <h3 class="text-lg font-bold text-gray-900 mb-1">{{ topic.title }}</h3>
@@ -189,14 +196,14 @@ onMounted(() => {
                       <!-- Topic Sessions -->
                       <div class="md:ml-12 space-y-3 pt-2">
                         <div
-                          v-for="session in topic.sessions"
+                          v-for="(session, index) in topic.sessions"
                           :key="session.id"
                           class="flex gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                         >
                           <div
                             class="w-6 h-6 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
                           >
-                            {{ session.id }}
+                            {{ index + 1 }}
                           </div>
                           <div class="flex-1">
                             <h4 class="font-medium text-gray-900">{{ session.title }}</h4>
@@ -320,8 +327,8 @@ onMounted(() => {
             </Card>
           </div>
           <div class="lg:col-span-1 relative">
-            <div :class="['w-full transition-all duration-300 md:sticky md:top-24 md:-mt-[19.5rem]']">
-              <Card class="p-4 py-8 md:py-3">
+            <div :class="['w-full transition-all duration-300 md:sticky md:top-24 md:-mt-[16.5rem]']">
+              <Card class="p-4 py-8 md:py-4">
                 <CardContent class="p-0 space-y-2!">
                   <h2 class="block md:hidden heading-section mb-6!">Apply Programs</h2>
                   <div class="w-full aspect-square rounded-lg mb-0 overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -337,54 +344,95 @@ onMounted(() => {
                     </div>
                   </div>
 
-                  <!-- Pricing Tabs -->
-                  <Tabs default-value="pricing-1" class="w-full">
-                    <TabsList class="grid w-full grid-cols-2 bg-transparent h-auto p-0 border-none">
-                      <TabsTrigger
-                        v-for="tier in academy.pricing"
-                        :key="tier.id"
-                        :value="`pricing-${tier.id}`"
-                        class="relative cursor-pointer text-gray-400 bg-transparent hover:text-gray-500 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none rounded-none border-none data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-1/10 data-[state=active]:after:w-4/5 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-primary data-[state=active]:after:rounded-full data-[state=active]:font-semibold px-4 py-3 font-medium transition-colors"
-                      >
-                        {{ tier.name === '1 Tema' ? '1 Topic' : '3 Topics' }}
-                      </TabsTrigger>
-                    </TabsList>
+                  <template v-if="Array.isArray(academy.pricing) && academy.pricing.length > 1">
+                    <Tabs :default-value="`pricing-${academy.pricing[0]?.id}`" class="w-full">
+                      <TabsList class="grid w-full grid-cols-2 bg-transparent h-auto p-0 border-none">
+                        <TabsTrigger
+                          v-for="tier in academy.pricing"
+                          :key="tier.id"
+                          :value="`pricing-${tier.id}`"
+                          class="relative cursor-pointer text-gray-400 bg-transparent hover:text-gray-500 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none rounded-none border-none data-[state=active]:after:content-[''] data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-1/10 data-[state=active]:after:w-4/5 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-primary data-[state=active]:after:rounded-full data-[state=active]:font-semibold px-4 py-3 font-medium transition-colors"
+                        >
+                          {{ tier.name }}
+                        </TabsTrigger>
+                      </TabsList>
 
-                    <TabsContent v-for="tier in academy.pricing" :key="tier.id" :value="`pricing-${tier.id}`" class="p-4 mt-0">
-                      <!-- Meta Info -->
+                      <TabsContent v-for="(tier, index) in academy.pricing" :key="tier.id" :value="`pricing-${tier.id}`" class="p-4 mt-0">
+                        <div class="space-y-3 mb-6">
+                          <div class="flex items-center gap-2 text-gray-600">
+                            <Icon name="lucide:calendar" class="w-4 h-4" />
+                            <span v-if="index == 0" class="text-sm">1 month</span>
+                            <span v-if="index == 1" class="text-sm">3 months</span>
+                            <span v-if="index == 2" class="text-sm">6 months</span>
+                          </div>
+                          <div class="flex items-center gap-2 text-gray-600">
+                            <Icon name="lucide:book-open" class="w-4 h-4" />
+                            <span v-if="index == 0" class="text-sm">1 topic</span>
+                            <span v-if="index == 1" class="text-sm">3 topics</span>
+                            <span v-if="index == 2" class="text-sm">6 topics</span>
+                          </div>
+                          <div class="flex items-center gap-2 text-gray-600">
+                            <Icon name="lucide:video" class="w-4 h-4" />
+                            <span v-if="index == 0" class="text-sm">4 sessions</span>
+                            <span v-if="index == 1" class="text-sm">12 sessions</span>
+                            <span v-if="index == 2" class="text-sm">24 sessions</span>
+                          </div>
+                          <div class="flex items-center gap-2 text-gray-600" v-if="academy.certificate">
+                            <Icon name="lucide:award" class="w-4 h-4" />
+                            <span class="text-sm">Certificate</span>
+                          </div>
+                          <div class="flex items-center gap-2 text-gray-600" v-if="academy.certificate">
+                            <Icon name="lucide:briefcase" class="w-4 h-4" />
+                            <span class="text-sm">Portfolio</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-sm text-gray-500 line-through mb-1">
+                            {{ tier.formatted_original_price || `${formatPrice(tier.original_price)}` }}
+                          </div>
+                          <div class="text-2xl font-bold text-gray-900 mb-4">
+                            {{ tier.formatted_discount_price || `${formatPrice(tier.discount_price)}` }}
+                          </div>
+                          <Button class="w-full cursor-pointer"> Enroll Now </Button>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </template>
+                  <template v-else-if="Array.isArray(academy.pricing) && academy.pricing.length === 1">
+                    <div class="p-4 mt-0">
                       <div class="space-y-3 mb-6">
                         <div class="flex items-center gap-2 text-gray-600">
                           <Icon name="lucide:calendar" class="w-4 h-4" />
-                          <span class="text-sm">{{ tier.name === '1 Tema' ? '1 month' : '3 months' }}</span>
+                          <span class="text-sm">1 month</span>
                         </div>
                         <div class="flex items-center gap-2 text-gray-600">
                           <Icon name="lucide:book-open" class="w-4 h-4" />
-                          <span class="text-sm">{{ tier.name === '1 Tema' ? '1 topic' : '3 topics' }}</span>
+                          <span class="text-sm">1 topic</span>
                         </div>
                         <div class="flex items-center gap-2 text-gray-600">
                           <Icon name="lucide:video" class="w-4 h-4" />
-                          <span class="text-sm">{{ tier.name === '1 Tema' ? '5 sessions' : '15 sessions' }}</span>
+                          <span class="text-sm">4 sessions</span>
                         </div>
                         <div class="flex items-center gap-2 text-gray-600" v-if="academy.certificate">
                           <Icon name="lucide:award" class="w-4 h-4" />
                           <span class="text-sm">Certificate</span>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-600">
+                        <div class="flex items-center gap-2 text-gray-600" v-if="academy.certificate">
                           <Icon name="lucide:briefcase" class="w-4 h-4" />
-                          <span class="text-sm">Job Accelerator</span>
+                          <span class="text-sm">Portfolio</span>
                         </div>
                       </div>
-                      <div class="">
+                      <div>
                         <div class="text-sm text-gray-500 line-through mb-1">
-                          {{ tier.formatted_original_price || `${formatPrice(tier.original_price)}` }}
+                          {{ academy.pricing[0].formatted_original_price || `${formatPrice(academy.pricing[0].original_price)}` }}
                         </div>
                         <div class="text-2xl font-bold text-gray-900 mb-4">
-                          {{ tier.formatted_discount_price || `${formatPrice(tier.discount_price)}` }}
+                          {{ academy.pricing[0].formatted_discount_price || `${formatPrice(academy.pricing[0].discount_price)}` }}
                         </div>
                         <Button class="w-full cursor-pointer"> Enroll Now </Button>
                       </div>
-                    </TabsContent>
-                  </Tabs>
+                    </div>
+                  </template>
                 </CardContent>
               </Card>
             </div>

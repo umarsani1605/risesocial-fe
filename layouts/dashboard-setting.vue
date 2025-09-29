@@ -1,3 +1,13 @@
+<script setup>
+import { Card, CardContent } from '@/components/ui/card';
+
+const items = [
+  { label: 'Account', icon: 'lucide:user', to: '/dashboard/setting' },
+  { label: 'Notifications', icon: 'lucide:bell', to: '/dashboard/setting/notifications' },
+  { label: 'Security', icon: 'lucide:lock', to: '/dashboard/setting/security' },
+];
+</script>
+
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col">
     <LayoutDashboardNavbar />
@@ -39,13 +49,3 @@
     <LayoutDashboardFooter />
   </div>
 </template>
-
-<script setup>
-import { Card, CardContent } from '@/components/ui/card';
-
-const items = [
-  { label: 'Account', icon: 'lucide:user', to: '/dashboard/setting' },
-  { label: 'Notifications', icon: 'lucide:bell', to: '/dashboard/setting/notifications' },
-  { label: 'Security', icon: 'lucide:lock', to: '/dashboard/setting/security' },
-];
-</script>

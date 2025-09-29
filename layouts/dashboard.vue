@@ -9,8 +9,3 @@
     <LayoutDashboardFooter />
   </div>
 </template>
-
-<script setup>
-// Layout khusus untuk dashboard
-// Komponen akan auto-imported dari folder components/layout/
-</script>

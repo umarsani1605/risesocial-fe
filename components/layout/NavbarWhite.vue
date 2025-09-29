@@ -105,9 +105,8 @@ const openLoginDialog = () => {
 };
 
 const handleLogout = async () => {
-  await signOut();
+  signOut({ callbackUrl: '/' });
   mobileMenuOpen.value = false;
-  await navigateTo('/');
 };
 
 // Handle scroll detection

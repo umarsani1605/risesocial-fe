@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-// Define component props and events
 const props = defineProps({
   open: {
     type: Boolean,
@@ -14,22 +13,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open']);
 
-// Sidebase Auth
 const { signIn, signUp, data: user, status, isLoading } = useAuth();
 
-// Local state
 const isOpen = computed({
   get: () => props.open,
   set: (value) => emit('update:open', value),
 });
 
-// State to toggle between login and register
 const isRegisterMode = ref(false);
 
-// Error state
 const errorMessage = ref('');
 
-// Form states
 const loginForm = ref({
   email: '',
   password: '',
@@ -44,11 +38,9 @@ const registerForm = ref({
   confirmPassword: '',
 });
 
-// Password visibility
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle login dengan Sidebase Auth
 const handleLogin = async () => {
   errorMessage.value = '';
 
@@ -58,20 +50,16 @@ const handleLogin = async () => {
       password: loginForm.value.password,
       rememberMe: loginForm.value.keepSignedIn,
     };
-    const response = await signIn(credential, { redirect: false });
 
-    console.log('✅ Sidebase Auth: Login successful', response);
+    await signIn(credential, { redirect: false });
 
     isOpen.value = false;
 
-    // Simple role-based redirect
-    await nextTick(); // Wait for user data to be available
     const currentUser = user.value;
 
     const targetRoute = currentUser?.role === 'ADMIN' ? '/admin' : '/dashboard';
     const currentRoute = useRoute().path;
 
-    // Only navigate if we're not already on the target route
     if (currentRoute !== targetRoute) {
       await navigateTo(targetRoute, { replace: true });
     }
@@ -81,26 +69,21 @@ const handleLogin = async () => {
   }
 };
 
-// Handle register dengan Sidebase Auth
 const handleRegister = async () => {
   errorMessage.value = '';
 
-  // Validate passwords match
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
     errorMessage.value = 'Passwords do not match';
     return;
   }
 
-  // Password validation
   if (registerForm.value.password.length < 6) {
     errorMessage.value = 'Password must be at least 6 characters long';
     return;
   }
 
   try {
-    console.log('📝 Sidebase Auth: Registration in progress...');
-
-    const response = await signUp(
+    await signUp(
       {
         first_name: registerForm.value.first_name,
         last_name: registerForm.value.last_name,
@@ -110,34 +93,27 @@ const handleRegister = async () => {
       { redirect: false }
     );
 
-    console.log('✅ Sidebase Auth: Registration successful!', response);
-
     isOpen.value = false;
 
-    // Simple role-based redirect after registration
-    await nextTick(); // Wait for user data to be available
     const currentUser = user.value;
 
     const targetRoute = currentUser?.role === 'ADMIN' ? '/admin' : '/dashboard';
     const currentRoute = useRoute().path;
 
-    // Only navigate if we're not already on the target route
     if (currentRoute !== targetRoute) {
       await navigateTo(targetRoute, { replace: true });
     }
   } catch (error) {
-    console.error('Sidebase Auth register error:', error);
+    console.error('Register error:', error);
     errorMessage.value = error.data?.message || error.message || 'Registration failed';
   }
 };
 
-// Toggle between login and register
 const toggleMode = () => {
   isRegisterMode.value = !isRegisterMode.value;
   errorMessage.value = '';
 };
 
-// Reset forms when dialog closes
 watch(isOpen, (newValue) => {
   if (!newValue) {
     loginForm.value = { email: '', password: '', keepSignedIn: false };

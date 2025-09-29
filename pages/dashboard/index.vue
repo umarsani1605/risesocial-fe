@@ -6,30 +6,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useJobsStore } from '@/store/jobs';
 import { storeToRefs } from 'pinia';
 
-// Set layout untuk halaman ini
 definePageMeta({
-  auth: true,
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
   layout: 'dashboard',
 });
 
-// Get user data from Sidebase Auth
 const { data: user, status } = useAuth();
 
-// Debug user data
 watchEffect(() => {
   console.log('Dashboard - Auth Status:', status.value);
   console.log('Dashboard - User Data:', user.value);
 });
 
-// Get academy data
 const { academiesData, initializeAcademies } = useAcademies();
 
-// Get jobs store and helpers
 const jobsStore = useJobsStore();
 const { jobsData } = storeToRefs(jobsStore);
 const { formatEmploymentType, getJobImage, getJobDetailUrl } = jobsStore;
 
-// Initialize favorites on client side
 onMounted(() => {
   if (process.client) {
     jobsStore.initializeFavorites();
@@ -37,7 +35,6 @@ onMounted(() => {
   initializeAcademies();
 });
 
-// Dynamic greeting based on time
 const dynamicGreeting = computed(() => {
   const hour = new Date().getHours();
 
@@ -50,19 +47,15 @@ const dynamicGreeting = computed(() => {
   }
 });
 
-// Welcome message
 const welcomeMessage = computed(() => {
   return 'Continue your learning journey or explore new academy programs!';
 });
 
-// User's favorite jobs for dashboard
 const favoriteJobs = computed(() => {
   if (!jobsData.value || !Array.isArray(jobsData.value)) return [];
-  // Get limited favorite jobs using the store's method
   return jobsStore.getLimitedFavoriteJobs(jobsData.value, 2);
 });
 
-// Meta tags
 useSeoMeta({
   title: 'Dashboard - Rise Social',
   description: 'Dashboard pengguna Rise Social untuk mengelola kursus, pekerjaan, dan program',

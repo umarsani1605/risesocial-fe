@@ -7,23 +7,27 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { z } from 'zod';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
+import { $api } from '@/composables/useAPI';
+import { toast } from 'vue-sonner';
 
 definePageMeta({
-  auth: true,
   layout: 'dashboard-setting',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
 const securitySchema = z
   .object({
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    repeatPassword: z.string().min(6, 'Repeat password must be at least 6 characters'),
   })
   .refine((data) => data.password === data.repeatPassword, {
     message: "Passwords don't match",
     path: ['repeatPassword'],
   });
 
-// Form setup with vee-validate
 const form = useForm({
   validationSchema: toTypedSchema(securitySchema),
   initialValues: {
@@ -38,8 +42,7 @@ const onChange = form.handleSubmit(async (values) => {
   try {
     isSubmitting.value = true;
 
-    // Update password
-    await $fetch('/api/user/security', {
+    await $api('/users/security', {
       method: 'PUT',
       body: {
         password: values.password,
@@ -47,12 +50,12 @@ const onChange = form.handleSubmit(async (values) => {
       },
     });
 
-    // Reset form
     form.resetForm();
 
     console.log('Password updated successfully');
+    toast.success('Password updated');
   } catch (error) {
-    console.error('Failed to update password:', error);
+    console.error('Failed to update password');
   } finally {
     isSubmitting.value = false;
   }
@@ -81,9 +84,7 @@ const onChange = form.handleSubmit(async (values) => {
       </FormItem>
     </FormField>
     <div class="pt-2">
-      <Button @click="onChange" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Changing...' : 'Change' }}
-      </Button>
+      <Button @click="onChange" :disabled="isSubmitting"> Change Password </Button>
     </div>
   </div>
 </template>

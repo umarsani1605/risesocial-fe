@@ -76,7 +76,7 @@ export default defineNuxtConfig({
       backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://api.risesocial.org',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX', 
       midtransClientKey:
-        (process.env.MIDTRANS_MODE === 'PRODUCTION'
+        (process.env.MIDTRANS_MODE === 'SANDBOX'
           ? process.env.MIDTRANS_CLIENT_KEY
           : process.env.MIDTRANS_SANDBOX_CLIENT_KEY),
       scripts: {

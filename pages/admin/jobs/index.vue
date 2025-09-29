@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import { useAdminJobs } from '@/composables/useAdminJobs';
-import { useAuthStore } from '@/store/auth';
 import { toast } from 'vue-sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -21,7 +20,11 @@ import { JOB_TYPES, JOB_SENIORITIES } from '@/constants/jobs';
 import { $api } from '@/composables/useAPI';
 
 definePageMeta({
-  auth: true,
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
   layout: 'admin-dashboard',
 });
 
@@ -239,6 +242,8 @@ const paginated = computed(() => {
 });
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / pageSize.value)));
+const showingStart = computed(() => Math.min((page.value - 1) * pageSize.value + 1, filtered.value.length));
+const showingEnd = computed(() => Math.min(page.value * pageSize.value, filtered.value.length));
 
 const toggleSort = (sortKey) => {
   if (sortBy.value === sortKey) {
@@ -375,7 +380,7 @@ const onSaveSyncSettings = async () => {
   }
 };
 
-const pageSizes = [10, 20, 30, 50];
+const pageSizes = [10, 20, 50, 100];
 
 const onOpenEdit = async (jobRow) => {
   await navigateTo(`/admin/jobs/${jobRow.id}`);
@@ -523,7 +528,9 @@ const onOpenEdit = async (jobRow) => {
             <DialogContent class="sm:max-w-[920px]">
               <DialogHeader>
                 <DialogTitle>LinkedIn Job Sync Settings</DialogTitle>
-                <DialogDescription>Configure default parameters for LinkedIn job search. If empty, no filter will be applied.</DialogDescription>
+                <DialogDescription
+                  >Configure default parameters for LinkedIn job search. If filter is empty, no filter will be applied.</DialogDescription
+                >
               </DialogHeader>
               <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -752,14 +759,14 @@ const onOpenEdit = async (jobRow) => {
             <TableHead @click="toggleSort('company')" class="cursor-pointer w-40">Company</TableHead>
             <TableHead class="w-40">Location</TableHead>
             <TableHead class="max-w-40">Industry</TableHead>
-            <TableHead class="max-w-32">Website</TableHead>
+            <TableHead class="">Website</TableHead>
             <TableHead class="max-w-32">LinkedIn</TableHead>
             <TableHead class="w-40">Employment Type</TableHead>
             <TableHead class="w-40">Seniority</TableHead>
             <TableHead class="max-w-20">Status</TableHead>
             <TableHead class="w-40">Posted Date</TableHead>
             <TableHead class="w-40">Valid Through</TableHead>
-            <TableHead class="px-4 sticky right-0">Actions</TableHead>
+            <TableHead class="px-4 sticky right-0 bg-white">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -775,15 +782,15 @@ const onOpenEdit = async (jobRow) => {
                 {{ [job.location?.city, job.location?.region, job.location?.country].filter(Boolean).join(', ') || '—' }}
               </TableCell>
               <TableCell class="max-w-40 truncate" :title="job.company?.industry || '-'">{{ job.company?.industry || '-' }}</TableCell>
-              <TableCell class="max-w-32 truncate">
+              <TableCell class="">
                 <a
                   v-if="job.company?.website_url"
                   :href="job.company.website_url"
                   target="_blank"
                   class="flex items-center text-primary hover:underline"
                 >
-                  <Icon name="lucide:external-link" class="w-3 h-3 inline mr-1" />
-                  Website
+                  <Icon name="lucide:external-link" size="14" class="inline mr-1" />
+                  <span>{{ job.company.website_url }}</span>
                 </a>
               </TableCell>
               <TableCell class="max-w-32 truncate">
@@ -802,7 +809,7 @@ const onOpenEdit = async (jobRow) => {
               </TableCell>
               <TableCell class="w-40 truncate" :title="job.seniority_level || '-'">{{ job.seniority_level || '-' }}</TableCell>
               <TableCell class="w-40">
-                <Badge :variant="getStatusVariant(job.status)">
+                <Badge :variant="getStatusVariant(job.status)" class="uppercase">
                   {{ job.status || '-' }}
                 </Badge>
               </TableCell>
@@ -812,12 +819,12 @@ const onOpenEdit = async (jobRow) => {
               <TableCell class="w-40 truncate" :title="formatDate(job.valid_until)">
                 {{ formatDate(job.valid_until) }}
               </TableCell>
-              <TableCell class="px-4 sticky right-0 text-right">
+              <TableCell class="px-4 sticky right-0 text-right bg-white">
                 <div class="flex items-center justify-end gap-2">
                   <Button size="sm" variant="outline" @click="onOpenEdit(job)">
                     <Icon name="lucide:edit" class="h-3 w-3" />
                   </Button>
-                  <Button size="sm" variant="outline" class="hover:bg-red-50 hover:border-red-200" @click="onOpenDelete(job)">
+                  <Button size="sm" variant="outline" class="hover:bg-destructive/90 hover:text-destructive-foreground" @click="onOpenDelete(job)">
                     <Icon name="lucide:trash-2" class="h-3 w-3" />
                   </Button>
                 </div>
@@ -829,20 +836,45 @@ const onOpenEdit = async (jobRow) => {
       </Table>
     </div>
 
-    <div class="flex items-center justify-between px-2">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
       <div class="flex items-center gap-2">
-        <span class="text-sm">Rows per page</span>
-        <Select :model-value="String(pageSize)" @update:model-value="(newValue) => (pageSize = Number(newValue))">
-          <SelectTrigger class="h-8 w-[80px]"><SelectValue :placeholder="String(pageSize)" /></SelectTrigger>
-          <SelectContent side="top">
-            <SelectItem v-for="pageSizeOption in pageSizes" :key="pageSizeOption" :value="String(pageSizeOption)">{{ pageSizeOption }}</SelectItem>
-          </SelectContent>
-        </Select>
+        <span class="text-sm text-muted-foreground"> Showing {{ showingStart }} to {{ showingEnd }} of {{ filtered.length }} entries </span>
       </div>
+
       <div class="flex items-center gap-2">
-        <Button variant="outline" class="h-8 px-2" :disabled="page <= 1" @click="page = Math.max(1, page - 1)">Prev</Button>
-        <span class="text-sm">Page {{ page }} of {{ totalPages }}</span>
-        <Button variant="outline" class="h-8 px-2" :disabled="page >= totalPages" @click="page = Math.min(totalPages, page + 1)">Next</Button>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-muted-foreground">Rows per page:</span>
+          <Select
+            :model-value="pageSize"
+            @update:model-value="
+              (v) => {
+                pageSize = Number(v);
+                page = 1;
+              }
+            "
+          >
+            <SelectTrigger class="h-8 w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="size in pageSizes" :key="size" :value="size">{{ size }}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <Button variant="outline" size="sm" :disabled="page <= 1 || isLoading" @click="page--" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-left" class="h-4 w-4" />
+            <span class="sr-only">Previous page</span>
+          </Button>
+          <div class="flex items-center justify-center w-8 h-8 text-sm">
+            {{ page }}
+          </div>
+          <Button variant="outline" size="sm" :disabled="page >= totalPages || isLoading" @click="page++" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-right" class="h-4 w-4" />
+            <span class="sr-only">Next page</span>
+          </Button>
+        </div>
       </div>
     </div>
 

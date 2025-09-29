@@ -5,34 +5,38 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { z } from 'zod';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
+import { toast } from 'vue-sonner';
+import { useAPI, $api } from '@/composables/useAPI';
 
 definePageMeta({
-  auth: true,
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
   layout: 'dashboard-setting',
 });
 
-// Account state
 const avatarPreview = ref('');
 const avatarUrl = ref('');
 const avatarFile = ref(null);
 const avatarFileInputRef = ref(null);
 
-// Validation schema
 const accountSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email format').min(1, 'Email is required'),
-  phone: z.string().optional(),
+  email: z.string().email('Email format is not valid').min(1, 'Email is required'),
+  phone: z.string().min(1, 'Phone is required'),
   gender: z.string().optional(),
   country: z.string().optional(),
   province: z.string().optional(),
   city: z.string().optional(),
 });
 
-// Form setup with vee-validate
 const form = useForm({
   validationSchema: toTypedSchema(accountSchema),
   initialValues: {
@@ -49,22 +53,30 @@ const form = useForm({
 
 const isSubmitting = ref(false);
 
-// Load user data
-const { data: userData, pending } = await useFetch('/api/user/profile');
+const { data: userData, pending } = await useAPI('/users/profile', {
+  key: 'user-profile-data',
+  transform: (response) => response?.data || null,
+});
 
-if (userData.value) {
-  form.setValues({
-    firstName: userData.value.first_name || '',
-    lastName: userData.value.last_name || '',
-    email: userData.value.email || '',
-    phone: userData.value.phone || '',
-    gender: userData.value.gender || '',
-    country: userData.value.country || '',
-    province: userData.value.province || '',
-    city: userData.value.city || '',
-  });
-  avatarUrl.value = userData.value.avatar || '';
-}
+watch(
+  userData,
+  (newData) => {
+    if (newData) {
+      form.setValues({
+        firstName: newData.first_name || '',
+        lastName: newData.last_name || '',
+        email: newData.email || '',
+        phone: newData.phone || '',
+        gender: newData.gender || '',
+        country: newData.country || '',
+        province: newData.province || '',
+        city: newData.city || '',
+      });
+      avatarUrl.value = newData.avatar || '';
+    }
+  },
+  { immediate: true }
+);
 
 const onPickAvatar = () => {
   avatarFileInputRef.value?.click();
@@ -74,6 +86,21 @@ const onAvatarFileChange = (event) => {
   const files = event?.target?.files;
   if (!files || files.length === 0) return;
   const file = files[0];
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!allowedTypes.includes(file.type)) {
+    event.target.value = '';
+    return;
+  }
+
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    toast.error(`File size (${fileSizeMB}MB) exceeds the maximum limit of 5MB. Please choose a smaller image.`);
+    event.target.value = '';
+    return;
+  }
+
   avatarFile.value = file;
   try {
     avatarPreview.value = URL.createObjectURL(file);
@@ -96,42 +123,52 @@ const getInitials = (name) => {
   return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
 };
 
+const userInitials = computed(() => {
+  const firstName = form.values.firstName || '';
+  const lastName = form.values.lastName || '';
+  return getInitials(`${firstName} ${lastName}`);
+});
+
 const onSave = form.handleSubmit(async (values) => {
   try {
     isSubmitting.value = true;
 
-    // Prepare data for API
-    const accountData = {
-      first_name: values.firstName,
-      last_name: values.lastName,
-      email: values.email,
-      phone: values.phone || null,
-      gender: values.gender || null,
-      country: values.country || null,
-      province: values.province || null,
-      city: values.city || null,
-    };
+    const formData = new FormData();
+    formData.append('first_name', values.firstName);
+    formData.append('last_name', values.lastName);
+    formData.append('email', values.email);
+    formData.append('phone', values.phone || '');
+    formData.append('gender', values.gender || '');
+    formData.append('country', values.country || '');
+    formData.append('province', values.province || '');
+    formData.append('city', values.city || '');
 
-    // Update account
-    await $fetch('/api/user/account', {
-      method: 'PUT',
-      body: accountData,
-    });
-
-    // Upload avatar if changed
     if (avatarFile.value) {
-      const formData = new FormData();
-      formData.append('file', avatarFile.value);
-
-      await $fetch('/api/user/avatar', {
-        method: 'POST',
-        body: formData,
-      });
+      formData.append('avatar', avatarFile.value);
+    } else if (avatarUrl.value === '') {
+      formData.append('avatar', '');
     }
 
-    console.log('Account updated successfully');
+    await $api('/users/account', {
+      method: 'PUT',
+      body: formData,
+    });
+
+    const { getSession } = useAuth();
+    await getSession();
+
+    toast.success('Account updated successfully');
   } catch (error) {
     console.error('Failed to update account:', error);
+
+    let errorMessage = 'Failed to update account';
+    if (error.data?.message) {
+      errorMessage = error.data.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    toast.error(errorMessage);
   } finally {
     isSubmitting.value = false;
   }
@@ -150,25 +187,26 @@ const genderOptions = [
     <div class="grid grid-cols-1 md:pr-44 gap-4">
       <div class="space-y-2">
         <Label>Avatar</Label>
-        <div class="flex flex-row gap-4">
-          <div class="flex-1 flex justify-center items-center">
-            <div class="size-36 rounded-full overflow-hidden flex items-center justify-center">
-              <img v-if="avatarPreview || avatarUrl" :src="avatarPreview || avatarUrl" alt="Avatar preview" class="w-full h-full object-cover" />
-              <div v-else class="w-full h-full bg-primary text-white flex items-center justify-center text-lg font-semibold">
-                {{ getInitials(`${form.firstName} ${form.lastName}`) }}
-              </div>
-            </div>
+        <div class="flex flex-row gap-8 px-6">
+          <div class="flex justify-center items-center">
+            <Avatar class="size-36">
+              <AvatarImage :src="avatarPreview || avatarUrl" alt="Avatar preview" />
+              <AvatarFallback class="text-2xl">
+                {{ userInitials }}
+              </AvatarFallback>
+            </Avatar>
           </div>
-          <div class="flex-1 flex flex-col justify-center gap-2">
+          <div class="flex flex-col justify-center gap-2">
             <input ref="avatarFileInputRef" type="file" accept="image/*" class="hidden" @change="onAvatarFileChange" />
-            <Button type="button" variant="outline" size="sm" @click="onPickAvatar">
+            <Button type="button" variant="outline" class="justify-start" @click="onPickAvatar">
               <Icon name="lucide:image" size="16" />
-              {{ avatarPreview || avatarUrl ? 'Change' : 'Upload' }} Avatar
+              Change Avatar
             </Button>
-            <Button type="button" variant="outline" size="sm" @click="onRemoveAvatar" :disabled="avatarPreview || avatarUrl">
+            <Button :disabled="!avatarPreview && !avatarUrl" type="button" variant="outline" class="justify-start" @click="onRemoveAvatar">
               <Icon name="lucide:trash-2" size="16" />
-              Remove
+              Remove Avatar
             </Button>
+            <p class="text-sm text-muted-foreground mt-2">Max file size: 5MB</p>
           </div>
         </div>
       </div>
@@ -217,7 +255,7 @@ const genderOptions = [
           <FormLabel>Gender</FormLabel>
           <FormControl>
             <Select v-bind="componentField">
-              <SelectTrigger>
+              <SelectTrigger class="w-full">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
@@ -263,9 +301,7 @@ const genderOptions = [
     </div>
 
     <div class="pt-2">
-      <Button @click="onSave" :disabled="isSubmitting">
-        {{ isSubmitting ? 'Saving...' : 'Save changes' }}
-      </Button>
+      <Button @click="onSave" :disabled="isSubmitting"> Save changes </Button>
     </div>
   </div>
 </template>
