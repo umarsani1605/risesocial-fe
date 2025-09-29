@@ -35,7 +35,7 @@ export const useCourses = () => {
 
     try {
       const config = useRuntimeConfig();
-      const response = await $fetch('/api/programs', {
+      const response = await $fetch('/programs', {
         baseURL: config.public.backendUrl,
       });
 

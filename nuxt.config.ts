@@ -2,7 +2,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+
+    timeline: {
+      enabled: true
+    }
+  },
   css: ['~/assets/main.css'],
 
   ssr: true,
@@ -56,15 +62,21 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     'nuxt-easy-lightbox',
-    '@nuxt/scripts'
+    '@nuxt/scripts',
+    '@sidebase/nuxt-auth'
   ],
+
+  piniaPluginPersistedstate: {
+    storage: 'cookies',
+    debug: true,
+  },
   
   runtimeConfig: {
     public: {
       backendUrl: process.env.NUXT_PUBLIC_BACKEND_URL || 'https://api.risesocial.org',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX', 
       midtransClientKey:
-        (process.env.MIDTRANS_MODE === 'PRODUCTION'
+        (process.env.MIDTRANS_MODE === 'SANDBOX'
           ? process.env.MIDTRANS_CLIENT_KEY
           : process.env.MIDTRANS_SANDBOX_CLIENT_KEY),
       scripts: {
@@ -73,6 +85,48 @@ export default defineNuxtConfig({
         },
       },
     }
+  },
+
+
+  auth: {
+    originEnvKey: 'NUXT_PUBLIC_BACKEND_URL',
+    provider: {
+      type: 'local',
+      endpoints: {
+        signIn: { path: '/auth/login', method: 'post' },
+        signOut: { path: '/auth/logout', method: 'post' },
+        signUp: { path: '/auth/register', method: 'post' },
+        getSession: { path: '/auth/session', method: 'get' },
+      },
+      token: {
+        signInResponseTokenPointer: '/token',
+        type: 'Bearer',
+        cookieName: 'auth.token',
+        headerName: 'Authorization',
+        maxAgeInSeconds: 2592000, // 30 days (sesuai dengan backend)
+        sameSiteAttribute: 'lax',
+        secureCookieAttribute: false,
+        httpOnlyCookieAttribute: false,
+      },
+      session: {
+        dataType: {
+          id: 'number',
+          first_name: 'string',
+          last_name: 'string',
+          email: 'string',
+          phone: 'string | null',
+          avatar: 'string | null',
+          role: 'string',
+          created_at: 'string',
+          updated_at: 'string',
+        },
+      },
+    },
+  },
+
+  piniaPluginPersistedstate: {
+    storage: 'cookies',
+    debug: true,
   },
 
   scripts: {

@@ -1,96 +1,46 @@
 <script setup>
-// Use default layout
 definePageMeta({
   layout: 'default',
 });
 
-// Meta tags
 useHead({
-  title: 'Little Hero Camp - Rise Social',
+  title: 'Rise & Thrive: Youth Empowerment Program',
   meta: [
     {
       name: 'description',
       content:
-        'Little Hero Camp is an offline summer training for children aged 7-15 years old. Equipped with various topics in sustainability to enhance their skills and interests.',
+        "Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic.",
     },
   ],
 });
 
-// Registration steps data with icons
-const registrationSteps = [
+const featuresData = [
   {
     id: 1,
-    title: 'Click The "Enroll" Button',
-    description: 'Locate and click the "Enroll Now!" button on our website. It will redirect you to our official registration page.',
-    icon: '/images/rise-young-leaders/step-1.svg',
+    title: '25% Increase in Youth Income',
+    description: 'Strengthening financial independence and livelihood opportunities.',
+    icon: 'lucide:trending-up',
+    iconColor: 'text-emerald-600',
+    bgColor: 'bg-gray-100',
   },
   {
     id: 2,
-    title: 'Fill Out The Registration Form',
-    description: 'Complete the registration form with accurate information about your child. Ensure all required fields are filled in properly.',
-    icon: '/images/rise-young-leaders/step-2.svg',
+    title: 'Improved Productivity of Young People',
+    description: 'Enabling them to contribute actively to local economic and social development.',
+    icon: 'lucide:zap',
+    iconColor: 'text-emerald-600',
+    bgColor: 'bg-gray-100',
   },
   {
     id: 3,
-    title: 'Submit Your Form',
-    description: 'After completing the form, click the "Submit" button. You will receive a confirmation message with enrollment details.',
-    icon: '/images/rise-young-leaders/step-3.svg',
-  },
-  {
-    id: 4,
-    title: 'Wait For Confirmation',
-    description: 'Our team will review your application and contact you with further instructions and camp schedule information.',
-    icon: '/images/rise-young-leaders/step-4.svg',
+    title: 'Creation of Sustainable Local Businesses',
+    description: 'Built and managed by youth as “local heroes” who continue to drive change in their communities.',
+    icon: 'lucide:store',
+    iconColor: 'text-emerald-600',
+    bgColor: 'bg-gray-100',
   },
 ];
 
-// Alumni testimonials data
-const alumniTestimonials = [
-  {
-    id: 1,
-    name: 'Sarah Anderson',
-    country: 'Indonesia',
-    text: 'My daughter loved the Little Hero Camp! She learned so much about sustainability and made amazing friends. The activities were engaging and fun.',
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: 'Ahmad Rizki',
-    country: 'Indonesia',
-    text: 'The camp was incredible! My son came home excited every day, sharing what he learned about taking care of our environment.',
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: 'Maria Santos',
-    country: 'Indonesia',
-    text: 'Thank you Rise Social for this wonderful program. The mentors were fantastic and my child gained so much confidence and knowledge.',
-    rating: 5,
-  },
-  {
-    id: 4,
-    name: 'David Chen',
-    country: 'Indonesia',
-    text: 'Excellent program! My daughter is now more aware of environmental issues and actively participates in sustainable practices at home.',
-    rating: 5,
-  },
-  {
-    id: 5,
-    name: 'Lisa Wijaya',
-    country: 'Indonesia',
-    text: 'Little Hero Camp exceeded our expectations. The combination of learning and fun activities was perfect for kids this age.',
-    rating: 5,
-  },
-  {
-    id: 6,
-    name: 'Robert Johnson',
-    country: 'Indonesia',
-    text: 'Highly recommend this camp! My son learned valuable life skills and developed a passion for protecting our planet.',
-    rating: 5,
-  },
-];
-
-// Alumni testimonials carousel API functionality
 const alumniApi = ref(null);
 const currentAlumniSlide = ref(0);
 const totalAlumniSlides = ref(0);
@@ -122,25 +72,25 @@ const goToAlumniSlide = (index) => {
         <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
           <!-- Left Content -->
           <div class="flex-1 space-y-6 lg:space-y-8 px-4 lg:px-0">
-            <h1 class="text-2xl sm:text-3xl lg:text-6xl font-bold text-gray-800 leading-tight">Little Hero Camp</h1>
-
+            <h1 class="text-xl sm:text-2xl lg:text-5xl font-bold text-gray-800 leading-tight">Rise & Thrive: Youth Empowerment Program</h1>
             <div class="space-y-3 lg:space-y-4">
-              <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
-                Little Hero Camp is an offline summer training for children aged 7-15 years old. Equipped with various topics in sustainability, to
-                enhance their skills and interests and become more empowered during their summer vacation.
+              <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
+                Our program in Malang, Indonesia is dedicated to empowering local youth by helping them transform their natural resources into
+                meaningful economic opportunities. By equipping them with knowledge, mentorship, and practical tools, we encouraged young people to
+                see the value of their surroundings not only as resources to be preserved, but also as assets that can drive long-term prosperity for
+                their communities.
               </p>
             </div>
 
             <div class="pt-2 lg:pt-4">
-              <Button size="lg" class="bg-[#0a5c5b] hover:bg-[#095351]"> Enroll Now! </Button>
+              <Button size="lg" class="bg-[#0a5c5b] hover:bg-[#095351]"> Collaborate with Us! </Button>
             </div>
           </div>
 
-          <!-- Right Image -->
           <div class="relative flex-1 flex items-end justify-end">
             <NuxtImg
-              src="/images/rise-young-leaders/gallery-8.png"
-              alt="Little Hero Camp - Children learning with interactive floor projection"
+              src="/images/programs/rise-and-thrive/rise_and_thrive_1.jpeg"
+              alt="Rise & Thrive: Youth Empowerment Program"
               class="w-full aspect-[3/2] object-cover rounded-2xl shadow-xl"
               format="webp"
             />
@@ -149,128 +99,69 @@ const goToAlumniSlide = (index) => {
       </div>
     </section>
 
-    <!-- How to Register Section -->
-    <section class="section-py-lg bg-slate-100 text-gray-800 relative overflow-hidden">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-0 left-0 w-full h-full">
-          <div class="w-full h-full bg-white/5 rounded-full blur-3xl transform rotate-45"></div>
+    <section class="section-py-md bg-gray-50">
+      <div class="container-wrapper">
+        <div class="grid grid-cols-1`` md:grid-cols-3 gap-4 lg:gap-8">
+          <Card v-for="feature in featuresData" :key="feature.id" class="text-center p-6 duration-200">
+            <CardHeader>
+              <div class="flex justify-center mb-4">
+                <div :class="['size-20 rounded-full flex items-center justify-center', feature.bgColor]">
+                  <Icon :name="feature.icon" :class="['size-10!', feature.iconColor]" />
+                </div>
+              </div>
+              <CardTitle class="heading-card">{{ feature.title }}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription class="text-gray-600 leading-relaxed">
+                {{ feature.description }}
+              </CardDescription>
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      <div class="relative z-10 container-wrapper">
-        <!-- Section Title -->
-        <div class="section-title-wrapper">
-          <h2 class="heading-section">How to Register</h2>
-          <div class="w-24 h-1 bg-[#0a5c5b] mx-auto rounded-full"></div>
-        </div>
-
-        <!-- Registration Steps -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div
-            v-for="step in registrationSteps"
-            :key="step.id"
-            class="group bg-white rounded-3xl p-6 lg:p-8 text-center space-y-4 lg:space-y-6 border border-gray-100 hover:bg-white transition-all duration-300 transform hover:-translate-y-2 shadow-sm"
-          >
-            <!-- Icon Circle -->
-            <div
-              class="mx-auto w-16 h-16 lg:w-20 lg:h-20 bg-[#0a5c5b] rounded-full flex items-center justify-center mb-4 lg:mb-6 group-hover:scale-105 transition-transform duration-300"
-            >
-              <NuxtImg :src="step.icon" :alt="`Step ${step.id} icon`" class="w-8 h-8 lg:w-10 lg:h-10 filter brightness-0 invert" />
+    </section>
+    <section class="bg-white section-py-lg py-8 lg:py-12">
+      <div class="container-wrapper">
+        <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
+          <div class="relative flex-1 flex items-start justify-start">
+            <NuxtImg
+              src="/images/programs/rise-and-thrive/rise_and_thrive_2.jpg"
+              alt="Rise & Thrive: Youth Empowerment Program"
+              class="max-h-[300px] aspect-[3/2] object-cover rounded-2xl"
+              format="webp"
+            />
+          </div>
+          <div class="flex-1 space-y-6 lg:space-y-8 px-4 lg:px-0">
+            <div class="space-y-3 lg:space-y-4">
+              <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+                At the heart of the program are these young leaders, who have transformed local knowledge and resources into sustainable enterprises.
+                These community-driven businesses are designed to last, ensuring long-term benefits for both the youth and the broader community.
+                Their success inspires peers and sets an example of how grassroots leadership can shape sustainable growth.
+              </p>
             </div>
-
-            <!-- Step Number & Title -->
-            <h3 class="text-lg lg:text-xl font-bold leading-tight">{{ step.id }}. {{ step.title }}</h3>
-
-            <!-- Description -->
-            <p class="text-sm leading-relaxed text-gray-600">
-              {{ step.description }}
-            </p>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- Hear from Our Parents Section -->
-    <section class="section-py-lg bg-white">
+    <section class="bg-white section-py-lg py-8 lg:py-12">
       <div class="container-wrapper">
-        <!-- Section Title -->
-        <div class="section-title-wrapper">
-          <h2 class="heading-section">Hear from Our Parents</h2>
-          <div class="w-24 h-1 bg-[#0a5c5b] mx-auto rounded-full"></div>
-        </div>
-
-        <!-- Parent Testimonials Carousel -->
-        <Carousel
-          :opts="{
-            align: 'start',
-            loop: true,
-          }"
-          class="w-full"
-          @init-api="setAlumniApi"
-        >
-          <CarouselContent class="-ml-2 md:-ml-4 py-4 cursor-pointer">
-            <CarouselItem v-for="testimonial in alumniTestimonials" :key="testimonial.id" class="pl-2 md:pl-4 lg:basis-1/3">
-              <Card class="p-4 sm:p-6 lg:p-8 text-center h-full">
-                <CardContent class="flex flex-col justify-between p-0 h-full">
-                  <div class="space-y-3 lg:space-y-4">
-                    <p class="text-sm text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
-                  </div>
-
-                  <!-- Parent Info -->
-                  <div class="mt-4 lg:mt-6 space-y-2">
-                    <!-- Rating Stars -->
-                    <div class="flex justify-center space-x-1">
-                      <Icon
-                        v-for="i in 5"
-                        :key="i"
-                        name="heroicons:star-solid"
-                        class="h-3 w-3 lg:h-4 lg:w-4 text-yellow-400"
-                        style="fill: currentColor"
-                      />
-                    </div>
-
-                    <!-- Name -->
-                    <h4 class="text-sm lg:text-base font-semibold text-gray-900">
-                      {{ testimonial.name }}
-                    </h4>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          </CarouselContent>
-          <CarouselPrevious class="hidden shadow-none sm:flex" />
-          <CarouselNext class="hidden shadow-none sm:flex" />
-        </Carousel>
-
-        <!-- Navigation Dots -->
-        <div class="flex justify-center mt-4 space-x-2">
-          <button
-            v-for="(dot, index) in totalAlumniSlides"
-            :key="index"
-            @click="goToAlumniSlide(index)"
-            :class="[
-              'size-2 rounded-full transition-all duration-300 hover:scale-110 cursor-pointer',
-              currentAlumniSlide === index ? 'bg-[#0a5c5b]' : 'bg-gray-300 hover:bg-gray-400',
-            ]"
-          ></button>
-        </div>
-        <div class="mt-8 lg:mt-16 text-center bg-gradient-to-r from-[#0a5c5b]/10 to-[#095351]/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12">
-          <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">Ready to Accelerate Your Sustainability Career?</h3>
-          <p class="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 lg:mb-6 max-w-2xl mx-auto">
-            Join our comprehensive bootcamp programs and get direct access to job opportunities with our hiring partners
-          </p>
-          <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
-            <Button size="lg" class="bg-[#0a5c5b] text-white hover:bg-[#095351] text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3">
-              View All Programs
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              class="border-[#0a5c5b] text-[#0a5c5b] hover:bg-[#0a5c5b] hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
-            >
-              Contact Our Team
-            </Button>
+        <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
+          <div class="flex-1 space-y-6 lg:space-y-8 px-4 lg:px-0">
+            <div class="space-y-3 lg:space-y-4">
+              <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+                Ultimately, this initiative is not just about economic gain, but about fostering a resilient ecosystem where youth, natural resources,
+                and community development are interconnected. It serves as a model for how local empowerment can drive sustainable change, with young
+                people at the forefront of building a better future for Malang and beyond.
+              </p>
+            </div>
+          </div>
+          <div class="relative flex-1 flex items-end justify-end">
+            <NuxtImg
+              src="/images/programs/rise-and-thrive/rise_and_thrive_3.jpg"
+              alt="Rise & Thrive: Youth Empowerment Program"
+              class="max-h-[300px] aspect-[3/2] object-cover rounded-2xl"
+              format="webp"
+            />
           </div>
         </div>
       </div>

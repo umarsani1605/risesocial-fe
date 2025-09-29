@@ -11,37 +11,24 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { useAuthStore } from '@/store/auth';
-
 const route = useRoute();
-const authStore = useAuthStore();
 
-// Reactive state
+const { data: user, status, signOut } = useAuth();
+
 const mobileMenuOpen = ref(false);
 
-// Track auth initialization state
-const isInitialized = ref(false);
-
-// Initialize auth state
-onMounted(async () => {
-  if (!authStore.isInitialized) {
-    await authStore.initAuth();
-  }
-  isInitialized.value = true;
-});
-
-// Computed properties with null checks
 const fullName = computed(() => {
-  if (!isInitialized.value) return 'Loading...';
-  return authStore.user?.fullName || 'User';
+  if (!user.value) return 'User';
+  return `${user.value.first_name || ''} ${user.value.last_name || ''}`.trim() || 'User';
 });
 
 const initials = computed(() => {
-  if (!isInitialized.value || !authStore.user) return 'U';
-  return authStore.initials || 'U';
+  if (!user.value) return 'U';
+  const first = user.value.first_name?.[0] || '';
+  const last = user.value.last_name?.[0] || '';
+  return `${first}${last}`.toUpperCase() || 'U';
 });
 
-// Dashboard navigation
 const dashboardNavigation = computed(() => [
   {
     id: 'dashboard',
@@ -53,9 +40,9 @@ const dashboardNavigation = computed(() => [
   {
     id: 'academy',
     name: 'Academy',
-    path: '/dashboard/bootcamp',
+    path: '/dashboard/academy',
     icon: 'lucide:book',
-    isActive: route.path.startsWith('/dashboard/bootcamp'),
+    isActive: route.path.startsWith('/dashboard/academy'),
   },
   {
     id: 'jobs',
@@ -79,9 +66,8 @@ const toggleMobileMenu = () => {
 };
 
 const handleLogout = async () => {
+  signOut({ callbackUrl: '/' });
   mobileMenuOpen.value = false;
-  await authStore.signOut();
-  await navigateTo('/');
 };
 
 // Close mobile menu when route changes
@@ -144,15 +130,15 @@ onMounted(() => {
             <DropdownMenuTrigger class="h-full" as-child>
               <Button variant="ghost" class="flex items-center p-2">
                 <Avatar class="size-8">
-                  <AvatarImage :src="authStore.user?.avatar" />
-                  <AvatarFallback>{{ authStore.initials || 'U' }}</AvatarFallback>
+                  <AvatarImage :src="user?.avatar" />
+                  <AvatarFallback>{{ initials || 'U' }}</AvatarFallback>
                 </Avatar>
-                <span class="hidden sm:block text-sm">{{ authStore.fullName || 'User' }}</span>
+                <span class="hidden sm:block text-sm">{{ fullName || 'User' }}</span>
                 <Icon name="lucide:chevron-down" class="h-4 w-4 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-48">
-              <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+              <DropdownMenuItem @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
                 <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
@@ -178,13 +164,13 @@ onMounted(() => {
               <DropdownMenuTrigger as-child>
                 <Button variant="ghost" size="icon" class="rounded-full p-1">
                   <Avatar class="h-8 w-8">
-                    <AvatarImage :src="authStore.user?.avatar" />
-                    <AvatarFallback class="text-sm">{{ authStore.initials }}</AvatarFallback>
+                    <AvatarImage :src="user?.avatar" />
+                    <AvatarFallback class="text-sm">{{ initials }}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-48 dropdown-right-aligned">
-                <DropdownMenuItem @click="navigateTo('#')" class="cursor-pointer">
+                <DropdownMenuItem @click="navigateTo('/dashboard/setting')" class="cursor-pointer">
                   <Icon name="lucide:settings" class="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>

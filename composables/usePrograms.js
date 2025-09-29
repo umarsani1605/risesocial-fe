@@ -24,7 +24,11 @@ export const usePrograms = () => {
 
     try {
       const config = useRuntimeConfig();
+<<<<<<< HEAD
       const response = await $fetch('/api/programs', {
+=======
+      const response = await $fetch('/programs', {
+>>>>>>> admin-dashboard
         baseURL: config.public.backendUrl,
       });
       const transformedData = response.data || response;
@@ -94,7 +98,7 @@ export const usePrograms = () => {
         search: searchTerm,
         ...filters,
       };
-      const response = await $fetch('/api/programs/search', { params });
+      const response = await $fetch('/programs/search', { params });
       return response.data || response;
     } catch (err) {
       console.error('Error searching programs:', err);
@@ -131,7 +135,7 @@ export const usePrograms = () => {
    */
   const getUserPrograms = async () => {
     try {
-      const response = await $fetch('/api/programs/user');
+      const response = await $fetch('/programs/user');
       return response.data || response;
     } catch (err) {
       console.error('Error fetching user programs:', err);

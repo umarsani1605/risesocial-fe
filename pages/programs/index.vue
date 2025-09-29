@@ -2,18 +2,15 @@
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-// Use default layout
 definePageMeta({
   layout: 'default',
 });
 
-// Meta tags
 useHead({
   title: 'Programs - Rise Social',
   meta: [{ name: 'description', content: 'Join Rise exclusive programs and gain hands-on learning experience in various countries' }],
 });
 
-// Programs data
 const programsData = [
   {
     id: 1,

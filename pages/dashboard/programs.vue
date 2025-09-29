@@ -2,13 +2,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// Set layout untuk halaman ini
 definePageMeta({
-  middleware: 'auth',
   layout: 'dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
 });
 
-// Additional programs data
 const programs = [
   {
     id: 'ryls-2025',
@@ -33,7 +35,6 @@ const programs = [
   },
 ];
 
-// Meta tags
 useSeoMeta({
   title: 'Programs Management - Rise Social',
   description: 'Kelola program yang diikuti dan temukan program-program baru Rise Social',
@@ -42,7 +43,6 @@ useSeoMeta({
 <template>
   <div class="bg-slate-50 mt-16 md:mt-10">
     <div class="container-wrapper section-py-md">
-      <!-- Programs Section -->
       <Card class="border border-gray-50 min-h-[50rem]">
         <CardHeader>
           <div class="flex flex-row items-center justify-between gap-3">
@@ -51,40 +51,30 @@ useSeoMeta({
         </CardHeader>
 
         <CardContent class="space-y-4">
-          <!-- Grid Container for Program Cards -->
           <div class="grid gap-4 lg:gap-6">
-            <!-- Program Cards -->
             <div
               v-for="program in programs"
               :key="program.id"
               @click="navigateTo(program.detailUrl)"
               class="border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300 hover:shadow-subtle bg-white overflow-hidden"
             >
-              <!-- Mobile Layout: Stacked -->
               <div class="block sm:hidden">
                 <div class="aspect-[4/3] w-full bg-gray-100 overflow-hidden">
                   <img :src="program.image" :alt="program.title" class="w-full h-full object-cover transition-transform duration-200" />
                 </div>
                 <div class="p-4">
                   <h3 class="text-base font-semibold text-gray-900 mb-3 leading-tight">{{ program.title }}</h3>
-
-                  <!-- Description - Mobile -->
                   <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
                     {{ program.description }}
                   </p>
                 </div>
               </div>
-
-              <!-- Tablet & Desktop Layout: Horizontal -->
               <div class="hidden sm:flex items-start p-4">
                 <div class="size-24 md:size-32 lg:size-36 bg-gray-100 rounded-md flex-shrink-0 overflow-hidden mr-4 lg:mr-6">
                   <img :src="program.image" :alt="program.title" class="w-full h-full object-cover transition-transform duration-200" />
                 </div>
-
                 <div class="flex-1 min-w-0">
                   <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-3 leading-tight">{{ program.title }}</h3>
-
-                  <!-- Description - Tablet/Desktop -->
                   <p class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed line-clamp-3">
                     {{ program.description }}
                   </p>
@@ -101,7 +91,6 @@ useSeoMeta({
   </div>
 </template>
 <style scoped>
-/* Line clamp utility for text truncation */
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;

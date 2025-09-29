@@ -6,49 +6,65 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import UserFormDialog from '@/components/admin/users/UserFormDialog.vue';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
-import { api } from '@/utils/api';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '~/components/ui/sonner';
 import { ArrowUp, ArrowDown } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
-definePageMeta({ layout: 'admin-dashboard' });
+definePageMeta({
+  layout: 'admin-dashboard',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
+});
 
-// Server-side params
+const { $api } = useNuxtApp();
+
 const page = ref(1);
 const limit = ref(10);
 const search = ref('');
 const role = ref('ALL'); // 'ALL' | 'USER' | 'ADMIN'
 const roleFilter = computed(() => (role.value === 'ALL' ? '' : role.value));
 
-const users = ref([]);
-const meta = ref({ page: 1, limit: 10, total: 0, totalPages: 1 });
-const pending = ref(false);
-const error = ref(null);
+// Initial data fetching with useAPI
+const {
+  data: usersResponse,
+  pending,
+  error,
+  refresh: refreshUsers,
+} = await useAPI('/admin/users', {
+  key: 'admin-users-data',
+  query: {
+    page: String(page.value),
+    limit: String(limit.value),
+    ...(search.value ? { search: search.value } : {}),
+    ...(roleFilter.value ? { role: roleFilter.value } : {}),
+  },
+  transform: (response) => ({
+    users: response?.data || [],
+    meta: response?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 },
+  }),
+});
 
-const fetchUsers = async () => {
-  pending.value = true;
-  error.value = null;
-  try {
-    const resp = await api.get('/api/users', {
-      query: {
-        page: String(page.value),
-        limit: String(limit.value),
-        ...(search.value ? { search: search.value } : {}),
-        ...(roleFilter.value ? { role: roleFilter.value } : {}),
-      },
-    });
-    users.value = resp?.data || [];
-    meta.value = resp?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 };
-  } catch (e) {
-    error.value = e;
-  } finally {
-    pending.value = false;
-  }
-};
+const users = computed(() => usersResponse.value?.users || []);
+const meta = computed(() => usersResponse.value?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 });
 
-watch([page, limit, search, role], fetchUsers, { immediate: true });
+const pageCount = computed(() => Math.max(1, Number(meta.value.totalPages || 1)));
+const totalItems = computed(() => Number(meta.value.total || 0));
+const pageSizeDisplay = computed(() => Number(meta.value.limit || limit.value));
+const showingStart = computed(() => Math.min((page.value - 1) * pageSizeDisplay.value + 1, totalItems.value));
+const showingEnd = computed(() => Math.min(page.value * pageSizeDisplay.value, totalItems.value));
 
-// Client-side sorting (on current page data)
+// Watch for changes and refresh data
+watch(
+  [page, limit, search, role],
+  () => {
+    refreshUsers();
+  },
+  { immediate: false }
+);
+
 const sortBy = ref('first_name');
 const sortDir = ref('asc'); // 'asc' | 'desc'
 const toggleSort = (key) => {
@@ -104,11 +120,13 @@ const confirmDelete = async () => {
   if (!userToDelete.value) return;
   try {
     deleting.value = true;
-    await api.delete(`/api/users/${userToDelete.value.id}`);
+    await $api(`/api/admin/users/${userToDelete.value.id}`, {
+      method: 'DELETE',
+    });
     toast.success('User deleted');
     deleteDialogOpen.value = false;
     userToDelete.value = null;
-    fetchUsers();
+    refreshUsers();
   } catch (e) {
     toast.error(e.message || 'Failed to delete user');
   } finally {
@@ -119,16 +137,22 @@ const onSubmit = async (payload) => {
   try {
     saving.value = true;
     if (dialogMode.value === 'create') {
-      await api.post('/api/users', payload);
+      await $api('/admin/users', {
+        method: 'POST',
+        body: payload,
+      });
       toast.success('User created');
     } else {
       const updateBody = { ...payload };
       if (!updateBody.password) delete updateBody.password;
-      await api.put(`/api/users/${selectedUser.value.id}`, updateBody);
+      await $api(`/api/admin/users/${selectedUser.value.id}`, {
+        method: 'PUT',
+        body: updateBody,
+      });
       toast.success('User updated');
     }
     dialogOpen.value = false;
-    fetchUsers();
+    refreshUsers();
   } catch (e) {
     toast.error(e.message || 'Failed to save user');
   } finally {
@@ -219,7 +243,9 @@ const pageSizes = [10, 20, 30, 50];
               <TableCell>
                 <div class="flex items-center gap-2">
                   <Button variant="outline" size="sm" @click="openEdit(u)">Edit</Button>
-                  <Button variant="outline" size="sm" @click="openDelete(u)" class="hover:bg-red-50 hover:border-red-200">Delete</Button>
+                  <Button variant="outline" size="sm" @click="openDelete(u)" class="hover:bg-destructive/90 hover:text-destructive-foreground"
+                    >Delete</Button
+                  >
                 </div>
               </TableCell>
             </TableRow>
@@ -229,25 +255,48 @@ const pageSizes = [10, 20, 30, 50];
       </Table>
     </div>
 
-    <!-- Pagination -->
-    <div class="flex items-center justify-between px-2">
+    <!-- Pagination (RYL style) -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4">
       <div class="flex items-center gap-2">
-        <span class="text-sm">Rows per page</span>
-        <Select :model-value="String(meta.limit)" @update:model-value="(v) => (limit = Number(v))">
-          <SelectTrigger class="h-8 w-[80px]">
-            <SelectValue :placeholder="String(meta.limit)" />
-          </SelectTrigger>
-          <SelectContent side="top">
-            <SelectItem v-for="s in pageSizes" :key="s" :value="String(s)">{{ s }}</SelectItem>
-          </SelectContent>
-        </Select>
+        <span class="text-sm text-muted-foreground"> Showing {{ showingStart }} to {{ showingEnd }} of {{ totalItems }} entries </span>
       </div>
+
       <div class="flex items-center gap-2">
-        <Button variant="outline" class="h-8 px-2" :disabled="meta.page <= 1" @click="page = Math.max(1, meta.page - 1)">Prev</Button>
-        <span class="text-sm">Page {{ meta.page }} of {{ meta.totalPages }}</span>
-        <Button variant="outline" class="h-8 px-2" :disabled="meta.page >= meta.totalPages" @click="page = Math.min(meta.totalPages, meta.page + 1)"
-          >Next</Button
-        >
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-muted-foreground">Rows per page:</span>
+          <Select
+            :model-value="pageSizeDisplay"
+            @update:model-value="
+              (v) => {
+                limit = Number(v);
+                page = 1;
+              }
+            "
+          >
+            <SelectTrigger class="h-8 w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="size in [10, 20, 50, 100]" :key="size" :value="size">
+                {{ size }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <Button variant="outline" size="sm" :disabled="page <= 1 || pending" @click="page--" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-left" class="h-4 w-4" />
+            <span class="sr-only">Previous page</span>
+          </Button>
+          <div class="flex items-center justify-center w-8 h-8 text-sm">
+            {{ page }}
+          </div>
+          <Button variant="outline" size="sm" :disabled="page >= pageCount || pending" @click="page++" class="h-8 w-8 p-0">
+            <Icon name="lucide:chevron-right" class="h-4 w-4" />
+            <span class="sr-only">Next page</span>
+          </Button>
+        </div>
       </div>
     </div>
 

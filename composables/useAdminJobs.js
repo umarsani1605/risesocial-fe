@@ -1,4 +1,4 @@
-import { api } from '@/utils/api';
+// Use Nuxt $api plugin that injects Authorization header from auth store
 
 /**
  * Admin Jobs Composable (camelCase only)
@@ -20,7 +20,8 @@ export const useAdminJobs = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.get('/api/jobs', {
+      const nuxtApp = useNuxtApp();
+      const response = await nuxtApp.$api('/jobs', {
         query: {
           ...(params.search ? { search: params.search } : {}),
           ...(params.location ? { location: params.location } : {}),
@@ -55,7 +56,8 @@ export const useAdminJobs = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.post('/api/jobs', payload);
+      const nuxtApp = useNuxtApp();
+      const response = await nuxtApp.$api('/jobs', { method: 'POST', body: payload });
       return response?.data || response;
     } catch (e) {
       error.value = e?.message || 'Gagal membuat job';
@@ -75,7 +77,8 @@ export const useAdminJobs = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await api.put(`/api/jobs/${id}`, payload);
+      const nuxtApp = useNuxtApp();
+      const response = await nuxtApp.$api(`/api/jobs/${id}`, { method: 'PUT', body: payload });
       return response?.data || response;
     } catch (e) {
       error.value = e?.message || 'Gagal memperbarui job';
@@ -94,12 +97,41 @@ export const useAdminJobs = () => {
     isLoading.value = true;
     error.value = null;
     try {
-      await api.delete(`/api/jobs/${id}`);
+      const nuxtApp = useNuxtApp();
+      await nuxtApp.$api(`/api/jobs/${id}`, { method: 'DELETE' });
     } catch (e) {
       error.value = e?.message || 'Gagal menghapus job';
       throw e;
     } finally {
       isLoading.value = false;
+    }
+  };
+
+  /**
+   * Sync jobs dari LinkedIn API via backend
+   * @param {Object} options
+   * @returns {Promise<Object>} response backend
+   */
+  const syncJobsFromLinkedIn = async (options = {}) => {
+    try {
+      const { query = 'software engineer', location = 'Indonesia', limit = 10 } = options;
+
+      const params = {
+        query,
+        location,
+        limit: String(limit),
+      };
+
+      const nuxtApp = useNuxtApp();
+      const response = await nuxtApp.$api('/api/jobs/sync-linkedin', { query: params });
+
+      return response;
+    } catch (err) {
+      console.error('[useAdminJobs] Sync error:', err);
+      return {
+        success: false,
+        message: err?.data?.message || err?.message || 'Failed to sync jobs',
+      };
     }
   };
 
@@ -114,5 +146,6 @@ export const useAdminJobs = () => {
     createJob,
     updateJob,
     deleteJob,
+    syncJobsFromLinkedIn,
   };
 };

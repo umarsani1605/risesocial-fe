@@ -1,6 +1,5 @@
 <script setup>
 import LoginRegisterDialog from '@/components/auth/LoginRegisterDialog.vue';
-import { useAuthStore } from '@/store/auth';
 
 // Use default layout
 definePageMeta({
@@ -24,10 +23,10 @@ onMounted(() => {
   }
 });
 
-// Watch for successful login and handle redirect using custom auth system
-const authStore = useAuthStore();
+// Watch for successful login and handle redirect using Sidebase Auth
+const { status } = useAuth();
 watch(
-  () => authStore.status,
+  () => status.value,
   (newStatus) => {
     if (newStatus === 'authenticated' && route.query.redirect) {
       // User just logged in and there's a redirect parameter
@@ -52,25 +51,26 @@ const handleLoginDialogClose = () => {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useJobsStore } from '@/store/jobs';
+import { storeToRefs } from 'pinia';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 
-// Jobs data from backend (via composable)
-const { jobsData, isLoading, initializeJobs } = useJobs();
+// Jobs data via store (assume prefilled from opportunities page or future SSR fetch on this page)
+const jobsStore = useJobsStore();
+const { jobsData, isLoading } = storeToRefs(jobsStore);
 
 // Ambil 6 job terbaru untuk homepage (tanpa filtered jobs)
 const homeJobs = computed(() => (Array.isArray(jobsData.value) ? jobsData.value.slice(0, 12) : []));
 
-// Initialize jobs saat mount
+// On mounted: only handle login dialog for this page
 onMounted(async () => {
-  // Check if login parameter is present
   if (route.query.login === 'true') {
     showLoginDialog.value = true;
   }
-  await initializeJobs();
 });
 
 // Testimonials data and functionality

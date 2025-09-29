@@ -6,56 +6,49 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useJobsStore } from '@/store/jobs';
+import { storeToRefs } from 'pinia';
+import { useAPI } from '@/composables/useAPI';
 
-// Use default layout
 definePageMeta({
   layout: 'default',
 });
 
-// Meta tags
 useHead({
   title: 'Job Opportunities - Rise Social',
   meta: [{ name: 'description', content: 'Find your dream green job from thousands of opportunities available' }],
 });
 
-// ✅ Hybrid Approach: Composable for local state + Store for global state
 const {
-  // Local state (search, filter, pagination)
-  filteredJobs,
-  paginatedJobs,
-  isLoading,
-  filters,
-  hasActiveFilters,
-  currentPage,
-  totalPages,
-
-  // Local methods
-  initializeJobs,
-  updateFilter,
-  clearAllFilters,
-  setCurrentPage,
-  nextPage,
-  prevPage,
-  getUniqueLocations,
-  getUniqueIndustries,
-  getUniqueJobTypes,
-} = useJobs();
-
-// Store for global state (favorites, user preferences)
-const jobsStore = useJobsStore();
-
-// Filter drawer state
-const isFilterOpen = ref(false);
-
-// Initialize jobs data on mount
-onMounted(async () => {
-  await initializeJobs();
+  data: jobsData,
+  pending: jobsPending,
+  error: jobsError,
+} = await useAPI('/jobs', {
+  key: 'jobs-data',
+  transform: (response) => {
+    return response.data;
+  },
 });
 
-// Helper functions for pagination
+const jobsStore = useJobsStore();
+const { filteredJobs, paginatedJobs, isLoading, filters, hasActiveFilters, currentPage, totalPages } = storeToRefs(jobsStore);
+
+const { updateFilter, clearAllFilters, setCurrentPage, nextPage, prevPage, getUniqueLocations, getUniqueIndustries, getUniqueJobTypes, setJobsData } =
+  jobsStore;
+
+watch(
+  jobsData,
+  (newData) => {
+    if (newData) {
+      setJobsData(newData);
+    }
+  },
+  { immediate: true }
+);
+
+const isFilterOpen = ref(false);
+
 const goToPage = (page) => {
   setCurrentPage(page);
-  // Scroll to top when changing pages
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -67,7 +60,17 @@ const clearFilters = () => {
   clearAllFilters();
 };
 
-// Watch for meta tag updates
+const selectAndNavigate = (job) => {
+  console.log('🎯 selectAndNavigate called with job:', job);
+  console.log('🎯 Job company slug:', job.company?.slug);
+  console.log('🎯 Job slug:', job.slug);
+
+  jobsStore.setSelectedJob(job);
+  console.log('🎯 selectedJob set, navigating to:', `/opportunities/${job.company.slug}/${job.slug}`);
+
+  navigateTo(`/opportunities/${job.company.slug}/${job.slug}`);
+};
+
 watch(
   () => filteredJobs.value,
   (newJobs) => {
@@ -143,7 +146,7 @@ watch(
                   <!-- Location -->
                   <div>
                     <label class="form-label">Location</label>
-                    <Select :model-value="filters.location" @update:model-value="(value) => updateFilter('location', value)">
+                    <Select position="popper" :model-value="filters.location" @update:model-value="(value) => updateFilter('location', value)">
                       <SelectTrigger class="w-full">
                         <SelectValue placeholder="All Locations" />
                       </SelectTrigger>
@@ -195,7 +198,7 @@ watch(
                       <Icon name="lucide:search" class="mr-2 h-4 w-4" />
                       Show Results ({{ filteredJobs.length }})
                     </Button>
-                    <Button variant="outline" class="w-full" @click="clearFilters">
+                    <Button v-if="hasActiveFilters" variant="outline" class="w-full" @click="clearFilters">
                       <Icon name="lucide:x" class="mr-2 h-4 w-4" />
                       Clear All
                     </Button>
@@ -290,9 +293,8 @@ watch(
 
                 <!-- Action Buttons -->
                 <div class="space-y-3">
-                  <div class="text-sm text-gray-600 text-center">Showing {{ filteredJobs.length }} results</div>
-                  <Button variant="outline" class="w-full" @click="clearFilters">
-                    <Icon name="lucide:x" class="mr-2 h-4 w-4" />
+                  <Button v-if="hasActiveFilters" variant="outline" class="w-full" @click="clearFilters">
+                    <Icon name="lucide:x" class="size-4" />
                     Clear All Filters
                   </Button>
                 </div>
@@ -326,13 +328,7 @@ watch(
                   v-for="job in paginatedJobs"
                   :key="job.id"
                   class="py-0 hover:shadow! hover:-translate-y-1 cursor-pointer transition-all duration-300 min-h-[160px] flex flex-col"
-                  @click="
-                    $router.push(
-                      `/opportunities/${job.company?.slug || job.company?.name?.toLowerCase().replace(/\s+/g, '-')}/${
-                        job.slug || job.title?.toLowerCase().replace(/\s+/g, '-')
-                      }`
-                    )
-                  "
+                  @click="selectAndNavigate(job)"
                 >
                   <CardContent class="px-3 flex-1 flex">
                     <div class="flex w-full relative">
@@ -395,8 +391,9 @@ watch(
               </div>
 
               <!-- Pagination -->
-              <div v-if="totalPages > 1" class="flex justify-center">
-                <nav class="flex items-center space-x-2">
+              <div v-if="totalPages > 1" class="flex flex-col sm:flex-row justify-between gap-4">
+                <div class="hidden sm:block text-sm text-gray-600 text-center">Showing {{ filteredJobs.length }} results</div>
+                <nav class="flex items-center justify-center space-x-2">
                   <!-- Previous Button -->
                   <Button variant="outline" size="sm" :disabled="currentPage === 1" @click="prevPage()">
                     <Icon name="lucide:chevron-left" class="h-4 w-4" />

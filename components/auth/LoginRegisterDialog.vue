@@ -3,9 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuthStore } from '@/store/auth';
 
-// Define component props and events
 const props = defineProps({
   open: {
     type: Boolean,
@@ -15,23 +13,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open']);
 
-// Backend auth store
-const authStore = useAuthStore();
+const { signIn, signUp, data: user, status, isLoading } = useAuth();
 
-// Local state
 const isOpen = computed({
   get: () => props.open,
   set: (value) => emit('update:open', value),
 });
 
-// State to toggle between login and register
 const isRegisterMode = ref(false);
 
-// Error state
 const errorMessage = ref('');
-const isLoading = ref(false);
 
-// Form states
 const loginForm = ref({
   email: '',
   password: '',
@@ -46,101 +38,82 @@ const registerForm = ref({
   confirmPassword: '',
 });
 
-// Password visibility
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle login dengan backend auth
 const handleLogin = async () => {
   errorMessage.value = '';
-  isLoading.value = true;
 
   try {
-    const response = await authStore.signIn({
+    const credential = {
       email: loginForm.value.email,
       password: loginForm.value.password,
       rememberMe: loginForm.value.keepSignedIn,
-    });
+    };
 
-    console.log('✅ Backend Auth: Login successful' + JSON.stringify(response));
+    await signIn(credential, { redirect: false });
+
     isOpen.value = false;
 
-    const route = useRoute();
-    const redirectTo = route.query.redirect;
+    const currentUser = user.value;
 
-    // Redirect based on user role
-    if (redirectTo) {
-      await navigateTo(decodeURIComponent(redirectTo));
-    } else if (authStore.user?.role === 'ADMIN') {
-      await navigateTo('/admin');
-    } else {
-      await navigateTo('/dashboard');
+    const targetRoute = currentUser?.role === 'ADMIN' ? '/admin' : '/dashboard';
+    const currentRoute = useRoute().path;
+
+    if (currentRoute !== targetRoute) {
+      await navigateTo(targetRoute, { replace: true });
     }
   } catch (error) {
     console.error('Login error:', error);
-    errorMessage.value = error.message || 'Invalid email or password';
-  } finally {
-    isLoading.value = false;
+    errorMessage.value = error.data?.message || error.message || 'Invalid email or password';
   }
 };
 
-// Handle register dengan backend auth
 const handleRegister = async () => {
   errorMessage.value = '';
 
-  // Validate passwords match
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
     errorMessage.value = 'Passwords do not match';
     return;
   }
 
-  // Password validation
   if (registerForm.value.password.length < 6) {
     errorMessage.value = 'Password must be at least 6 characters long';
     return;
   }
 
-  isLoading.value = true;
-
   try {
-    console.log('📝 Backend Auth: Registration in progress...');
-
-    // Register using backend auth (automatically logs in user)
-    await authStore.signUp({
-      first_name: registerForm.value.first_name,
-      last_name: registerForm.value.last_name,
-      email: registerForm.value.email,
-      password: registerForm.value.password,
-    });
-
-    console.log('✅ Backend Auth: Registration successful!');
+    await signUp(
+      {
+        first_name: registerForm.value.first_name,
+        last_name: registerForm.value.last_name,
+        email: registerForm.value.email,
+        password: registerForm.value.password,
+      },
+      { redirect: false }
+    );
 
     isOpen.value = false;
 
-    // Check for redirect parameter
-    const route = useRoute();
-    const redirectTo = route.query.redirect;
+    const currentUser = user.value;
 
-    if (redirectTo) {
-      await navigateTo(decodeURIComponent(redirectTo));
-    } else {
-      await navigateTo('/dashboard');
+    const targetRoute = currentUser?.role === 'ADMIN' ? '/admin' : '/dashboard';
+    const currentRoute = useRoute().path;
+
+    if (currentRoute !== targetRoute) {
+      await navigateTo(targetRoute, { replace: true });
     }
   } catch (error) {
-    console.error('Backend register error:', error);
-    errorMessage.value = error.message || 'Registration failed';
-  } finally {
-    isLoading.value = false;
+    console.error('Register error:', error);
+    errorMessage.value = error.data?.message || error.message || 'Registration failed';
   }
 };
 
-// Toggle between login and register
 const toggleMode = () => {
   isRegisterMode.value = !isRegisterMode.value;
   errorMessage.value = '';
 };
 
-// Reset forms when dialog closes
 watch(isOpen, (newValue) => {
   if (!newValue) {
     loginForm.value = { email: '', password: '', keepSignedIn: false };
@@ -149,7 +122,6 @@ watch(isOpen, (newValue) => {
     showPassword.value = false;
     showConfirmPassword.value = false;
     errorMessage.value = '';
-    isLoading.value = false;
   }
 });
 </script>

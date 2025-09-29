@@ -168,7 +168,7 @@ export const useCoursesStore = defineStore('courses', {
       try {
         // Try to fetch from programs API first
         const { $api } = useNuxtApp();
-        const response = await $api.get('/api/programs');
+        const response = await $api.get('/programs');
 
         if (response.success && response.data) {
           // Transform backend programs data untuk compatibility dengan frontend courses

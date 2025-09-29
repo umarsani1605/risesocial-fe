@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import type { ComboboxEmptyProps } from 'reka-ui'
-import { cn } from '@/lib/utils'
-import { ComboboxEmpty } from 'reka-ui'
-import { computed, type HTMLAttributes } from 'vue'
+import type { ComboboxEmptyProps } from 'reka-ui';
+import { cn } from '@/lib/utils';
+import { ComboboxEmpty } from 'reka-ui';
+import { computed, type HTMLAttributes } from 'vue';
 
-const props = defineProps<ComboboxEmptyProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<ComboboxEmptyProps & { class?: HTMLAttributes['class'] }>();
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props
+  const { class: _, ...delegated } = props;
 
-  return delegated
-})
+  return delegated;
+});
 </script>
 
 <template>
-  <ComboboxEmpty
-    data-slot="combobox-empty"
-    v-bind="delegatedProps"
-    :class="cn('py-6 text-center text-sm', props.class)"
-  >
+  <ComboboxEmpty data-slot="combobox-empty" v-bind="delegatedProps" :class="cn('px-6 pt-2 justify-center text-center text-sm', props.class)">
     <slot />
   </ComboboxEmpty>
 </template>

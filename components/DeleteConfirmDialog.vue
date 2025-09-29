@@ -42,7 +42,7 @@ const onConfirm = () => emit('confirm');
       </div>
       <DialogFooter>
         <Button variant="outline" @click="onCancel" :disabled="pending">{{ cancelText }}</Button>
-        <Button variant="destructive" @click="onConfirm" :disabled="true">{{ pending ? 'Memproses...' : confirmText }}</Button>
+        <Button variant="destructive" @click="onConfirm" :disabled="pending">{{ pending ? 'Memproses...' : confirmText }}</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

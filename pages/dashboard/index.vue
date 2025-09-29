@@ -3,35 +3,38 @@ import { computed, onMounted } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuthStore } from '@/store/auth';
 import { useJobsStore } from '@/store/jobs';
+import { storeToRefs } from 'pinia';
 
-// Set layout untuk halaman ini
 definePageMeta({
-  middleware: 'auth',
+  auth: {
+    unauthenticatedOnly: false,
+    navigateUnauthenticatedTo: '/',
+  },
+  middleware: ['sidebase-auth'],
   layout: 'dashboard',
 });
 
-// Get user data
-const authStore = useAuthStore();
-const user = computed(() => authStore.user);
+const { data: user, status } = useAuth();
 
-// Get bootcamp data
-const { bootcampsData, initializeBootcamps } = useBootcamps();
+watchEffect(() => {
+  console.log('Dashboard - Auth Status:', status.value);
+  console.log('Dashboard - User Data:', user.value);
+});
 
-// Get jobs store and data
+const { academiesData, initializeAcademies } = useAcademies();
+
 const jobsStore = useJobsStore();
-const { jobsData, formatEmploymentType, getJobImage, getJobDetailUrl } = useJobs();
+const { jobsData } = storeToRefs(jobsStore);
+const { formatEmploymentType, getJobImage, getJobDetailUrl } = jobsStore;
 
-// Initialize favorites on client side
 onMounted(() => {
   if (process.client) {
     jobsStore.initializeFavorites();
   }
-  initializeBootcamps();
+  initializeAcademies();
 });
 
-// Dynamic greeting based on time
 const dynamicGreeting = computed(() => {
   const hour = new Date().getHours();
 
@@ -44,19 +47,15 @@ const dynamicGreeting = computed(() => {
   }
 });
 
-// Welcome message
 const welcomeMessage = computed(() => {
-  return 'Continue your learning journey or explore new bootcamp programs!';
+  return 'Continue your learning journey or explore new academy programs!';
 });
 
-// User's favorite jobs for dashboard
 const favoriteJobs = computed(() => {
   if (!jobsData.value || !Array.isArray(jobsData.value)) return [];
-  // Get limited favorite jobs using the store's method
   return jobsStore.getLimitedFavoriteJobs(jobsData.value, 2);
 });
 
-// Meta tags
 useSeoMeta({
   title: 'Dashboard - Rise Social',
   description: 'Dashboard pengguna Rise Social untuk mengelola kursus, pekerjaan, dan program',
@@ -68,12 +67,12 @@ useSeoMeta({
     <div class="container-wrapper section-py-md relative">
       <!-- Welcome Section -->
       <div class="relative bg-[#0E5C59] shadow rounded-xl p-4 sm:px-10 sm:pt-14 sm:pb-10 text-white mb-6 sm:mb-8 overflow-hidden z-10">
-        <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user ? user.first_name || 'User' : 'User' }}!</h1>
+        <h1 class="text-xl sm:text-2xl md:text-4xl font-bold mb-6">{{ dynamicGreeting }}, {{ user?.first_name || 'User' }}!</h1>
         <p class="text-base mb-8">{{ welcomeMessage }}</p>
         <div class="relative flex flex-col sm:flex-row mt-8 gap-3 sm:gap-4 z-20">
-          <Button @click="navigateTo('/dashboard/bootcamp')"> Continue Learning</Button>
+          <Button @click="navigateTo('/dashboard/academy')"> Continue Learning</Button>
           <Button variant="outline" class="bg-white/10 hover:bg-white/15 border-none text-white!" @click="navigateTo('/academy')">
-            Explore Bootcamp
+            Explore Academy
           </Button>
         </div>
         <img
@@ -84,34 +83,34 @@ useSeoMeta({
       </div>
       <!-- Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 z-30">
-        <!-- Bootcamp -->
+        <!-- Academy -->
         <Card class="border border-gray-50 gap-3">
           <CardHeader>
             <div class="flex items-center justify-between">
-              <CardTitle class="heading-card">Bootcamp</CardTitle>
+              <CardTitle class="heading-card">Academy</CardTitle>
               <Button variant="link" size="sm" class="text-slate-500 hover:text-slate-600" @click="navigateTo('/academy')"> View All </Button>
             </div>
           </CardHeader>
 
           <CardContent class="space-y-4">
-            <!-- Dynamic Bootcamp Cards -->
+            <!-- Dynamic Academy Cards -->
             <div
-              v-for="bootcamp in bootcampsData"
-              :key="bootcamp.id"
-              @click="navigateTo(`/academy/${bootcamp.path_slug}`)"
+              v-for="academy in academiesData"
+              :key="academy.id"
+              @click="navigateTo(`/academy/${academy.path_slug}`)"
               class="flex items-start space-x-3 sm:space-x-4 p-4 border rounded-lg transition-all duration-200 cursor-pointer hover:border-gray-300"
             >
               <div class="size-16 sm:size-20 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-                <img :src="bootcamp.image_url" :alt="bootcamp.title" class="w-full h-full object-cover" />
+                <img :src="academy.image_url" :alt="academy.title" class="w-full h-full object-cover" />
               </div>
               <div class="flex-1 min-w-0">
-                <h3 class="text-sm sm:text-base font-medium text-gray-900 mb-2">{{ bootcamp.title }}</h3>
+                <h3 class="text-sm sm:text-base font-medium text-gray-900 mb-2">{{ academy.title }}</h3>
                 <!-- Description -->
                 <p
                   class="text-xs sm:text-sm text-gray-600 leading-relaxed"
                   style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden"
                 >
-                  {{ bootcamp.description }}
+                  {{ academy.description }}
                 </p>
               </div>
             </div>

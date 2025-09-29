@@ -11,12 +11,13 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 
 import { useRoute } from 'vue-router';
 import { NuxtLink } from '#components';
 
-import { Home, Users, BriefcaseBusiness, UserCog, Users2 } from 'lucide-vue-next';
+// Removed lucide-vue-next imports - using NuxtIcon instead
 
 const route = useRoute();
 
@@ -24,7 +25,7 @@ const programItems = computed(() => [
   {
     title: 'Rise Young Leaders',
     to: '/admin/rise-young-leaders',
-    icon: Users2,
+    icon: 'lucide:users-2',
     isActive: route.path.startsWith('/admin/rise-young-leaders'),
   },
 ]);
@@ -33,19 +34,25 @@ const managementItems = computed(() => [
   {
     title: 'Dashboard',
     to: '/admin',
-    icon: Home,
+    icon: 'lucide:home',
     isActive: route.path === '/admin',
+  },
+  {
+    title: 'Academy Management',
+    to: '/admin/academy',
+    icon: 'lucide:graduation-cap',
+    isActive: route.path === '/admin/academy',
   },
   {
     title: 'Jobs Management',
     to: '/admin/jobs',
-    icon: BriefcaseBusiness,
+    icon: 'lucide:briefcase',
     isActive: route.path === '/admin/jobs',
   },
   {
     title: 'Users Management',
     to: '/admin/users',
-    icon: Users,
+    icon: 'lucide:users',
     isActive: route.path === '/admin/users',
   },
 ]);
@@ -73,7 +80,7 @@ const user = {
             <SidebarMenuItem v-for="item in managementItems" :key="item.to">
               <SidebarMenuButton asChild class="transition-all duration-200" :class="item.isActive ? 'bg-primary/10! text-orange-500!' : ''">
                 <NuxtLink :to="item.to" class="flex items-center gap-2 w-full">
-                  <component :is="item.icon" class="h-4 w-4" />
+                  <Icon :name="item.icon" class="h-4 w-4" />
                   <span>{{ item.title }}</span>
                 </NuxtLink>
               </SidebarMenuButton>
@@ -88,7 +95,7 @@ const user = {
             <SidebarMenuItem v-for="item in programItems" :key="item.to">
               <SidebarMenuButton asChild :class="item.isActive ? 'bg-primary/10! text-orange-500!' : ''">
                 <NuxtLink :to="item.to" class="flex items-center gap-2 w-full">
-                  <component :is="item.icon" class="h-4 w-4" />
+                  <Icon :name="item.icon" class="h-4 w-4" />
                   <span>{{ item.title }}</span>
                 </NuxtLink>
               </SidebarMenuButton>
