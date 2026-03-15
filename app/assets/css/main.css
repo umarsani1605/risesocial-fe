@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@source "../../../content/**/*";
+
+@theme static {
+  --font-sans: 'Public Sans', sans-serif;
+
+  /* Rise Social Primary Orange */
+  --color-rise-orange-50: #fff5ed;
+  --color-rise-orange-100: #ffe9d4;
+  --color-rise-orange-200: #ffcea8;
+  --color-rise-orange-300: #ffac71;
+  --color-rise-orange-400: #ff8b4c;
+  --color-rise-orange-500: #fe5b11;
+  --color-rise-orange-600: #ef4007;
+  --color-rise-orange-700: #c62c08;
+  --color-rise-orange-800: #9d250f;
+  --color-rise-orange-900: #7e2110;
+  --color-rise-orange-950: #440d06;
+
+  /* Rise Social Deep Teal (Secondary) */
+  --color-deep-teal-50: #f1fcfa;
+  --color-deep-teal-100: #cef9f0;
+  --color-deep-teal-200: #9df2e2;
+  --color-deep-teal-300: #64e4d0;
+  --color-deep-teal-400: #34cdba;
+  --color-deep-teal-500: #1bb1a0;
+  --color-deep-teal-600: #138e83;
+  --color-deep-teal-700: #13726a;
+  --color-deep-teal-800: #145b56;
+  --color-deep-teal-900: #164b48;
+  --color-deep-teal-950: #073635;
+
+  /* Utilities Colors */
+  --color-background-page: #f8fafc;
+  --color-sidebar-foreground: #52525b;
+  --color-border: #e4e4e7;
+}
+
+:root {
+  --ui-primary: var(--color-rise-orange-400);
+  --ui-secondary: var(--color-deep-teal-800);
+  --ui-border: #eef2f6;
+  --ui-header-height: 5rem;
+}
+
+/* Custom utilities untuk Rise Social homepage */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-subtle {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+}

@@ -1,0 +1,128 @@
+title: One-stop Platform for Your [Green Careers]{class="text-primary"}
+description: Explore 40,000+ Green Job Opportunities Today!
+seo:
+  title: Rise - Provider for Your Green Careers
+  description: Explore 40,000+ Green Job Opportunities Today!
+navigation: false
+
+hero:
+  title: One-stop Platform for Your [Green Careers]{class="text-primary"}
+  description: Explore 40,000+ Green Job Opportunities Today!
+  image: /images/rise_hero.png
+  categories:
+    - Designer
+    - Developer
+    - Social Media
+    - Writing
+    - Project Manager
+
+features:
+  title: ""
+  items:
+    - title: AI Career Buddy
+      description: Personalized courses and jobs recommendation based on your search history, applications, CV, and employment background.
+      icon: i-hugeicons-artificial-intelligence-04
+    - title: Proposal & CV Builder
+      description: Need help to write your own resume and grants proposal? We've got your back!
+      icon: i-lucide-file-text
+    - title: Job Alert Emails
+      description: Ensure you never miss out on valuable green opportunities—stay informed and ahead.
+      icon: i-lucide-mail
+
+how_it_works:
+  title: How It Works?
+  steps:
+    - step: 1
+      title: Set Your Goals
+      description: Tell us about your career goals and we will find you the right path.
+      image: /images/rise_step_1.png
+    - step: 2
+      title: Finish Courses
+      description: AI career buddy will find the right courses to achieve your dream.
+      image: /images/rise_step_2.png
+    - step: 3
+      title: Build Resume
+      description: Complete your application with CV builder to optimize your chances.
+      image: /images/rise_step_3.png
+    - step: 4
+      title: Track Your Application
+      description: Track your application while finish more course and application.
+      image: /images/rise_step_4.png
+
+featured_jobs:
+  title: Featured Jobs
+  description: ""
+
+cta:
+  title: Get the Perfect Job for You!
+  description: Unlock your potential with personalized job matches and comprehensive career tools.
+  image: /images/rise_cta.png
+  features:
+    - AI-powered job matching algorithm
+    - Professional CV and cover letter builder
+    - Real-time job alerts and notifications
+    - Direct connection with green employers
+    - Career development resources and guidance
+  button:
+    label: Get Started Now
+    to: /opportunities
+
+testimonials:
+  title: What They Said About Us
+  items:
+    - quote: I am very grateful to Rise Social for this trip. Here's to future reunions and the continued success and expansion of the Rise ASEAN Leaders Summit.
+      name: Annisa Faradila
+      country: Indonesia
+      rating: 5
+    - quote: Thank you Rise Social for bring up my childhood memories in a very prestigious way. I learned a lot about disaster and also the meaning of life
+      name: Muhammad Zuhry
+      country: Indonesia
+      rating: 5
+    - quote: Rise Social makes me want visit Japan again and again and give motivation and support, it's totally new journey and life learning experience
+      name: Oualid Abbane
+      country: Algeria
+      rating: 5
+    - quote: THANK YOU VERY MUCH FOR THE BEST STUDY TRIP I'VE EVER EXPERIENCED IN MY LIFE ! WHAT A REMARKABLE EXPERIENCE! ^^
+      name: Aaron Alexander
+      country: Indonesia
+      rating: 5
+    - quote: Very good topic and insights from the lecturer. great job, Rise Social. Looking forward for another journey with you!
+      name: Nisrina Amalia C.
+      country: Indonesia
+      rating: 5
+    - quote: You're all great people doing great things. Keep doing what you do best and don't forget your friend here! Hope can jump in another session.
+      name: Alvin Rajendra Rabani
+      country: Indonesia
+      rating: 5
+
+partners:
+  title: Strategic and Media Partners
+  logos:
+    - name: GoTo Impact
+      src: /images/goto_impact.png
+    - name: Pandawara
+      src: /images/pandawara.png
+    - name: Kyoto University
+      src: /images/kyoto_univ.png
+    - name: Inspire
+      src: /images/inspire.png
+    - name: Universitas Syiah Kuala
+      src: /images/unsyiah.png
+    - name: Universitas Airlangga
+      src: /images/unair.png
+    - name: Universitas Pendidikan Indonesia
+      src: /images/upi.png
+    - name: Youth Force ID
+      src: /images/youth_force_id.png
+    - name: Changemaker Catalyst
+      src: /images/changemaker_catalyst.jpeg
+    - name: Biops Agrotechno
+      src: /images/biops_agrotechno.png
+    - name: FAM Rural
+      src: /images/fam_rural.jpeg
+    - name: Komben
+      src: /images/komben.png
+    - name: Desamind
+      src: /images/desamind.png
+    - name: Siaga Bencana
+      src: /images/siaga_bencana.png
