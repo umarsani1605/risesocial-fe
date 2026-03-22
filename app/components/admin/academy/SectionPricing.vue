@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AcademyPricing } from '@/types'
+import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
   academyId: number
@@ -11,9 +12,11 @@ const toast = useToast()
 
 const items = ref<AcademyPricing[]>(structuredClone(props.initialData))
 const isModalOpen = ref(false)
-const editingId = ref<number | null>(null)
-const loading = ref(false)
-const form = reactive({ name: '', original_price: '', discount_price: '', order: '' })
+const editingItem = ref<AcademyPricing | null>(null)
+
+const deleteTarget = ref<AcademyPricing | null>(null)
+const isDeleteModalOpen = ref(false)
+const isDeleting = ref(false)
 
 watch(
   () => props.initialData,
@@ -31,165 +34,104 @@ async function refresh() {
 }
 
 function openAdd() {
-  editingId.value = null
-  form.name = ''
-  form.original_price = ''
-  form.discount_price = ''
-  form.order = String(items.value.length + 1)
+  editingItem.value = null
   isModalOpen.value = true
 }
 
 function openEdit(item: AcademyPricing) {
-  editingId.value = item.id
-  form.name = item.name
-  form.original_price = String(item.original_price)
-  form.discount_price = String(item.discount_price)
-  form.order = String(item.order)
+  editingItem.value = item
   isModalOpen.value = true
 }
 
-async function save() {
-  if (!form.name.trim()) {
-    toast.add({ title: 'Package name is required', color: 'error' })
-    return
-  }
-  loading.value = true
-  try {
-    const body = {
-      name: form.name,
-      original_price: Number(form.original_price),
-      discount_price: Number(form.discount_price),
-      order: Number(form.order)
-    }
-    if (editingId.value !== null) {
-      await api(`/admin/academies/${props.academyId}/pricing/${editingId.value}`, {
-        method: 'PUT',
-        body
-      })
-    } else {
-      await api(`/admin/academies/${props.academyId}/pricing`, { method: 'POST', body })
-    }
-    await refresh()
-    isModalOpen.value = false
-    toast.add({ title: 'Pricing saved', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
-  } finally {
-    loading.value = false
-  }
+function confirmRemove(item: AcademyPricing) {
+  deleteTarget.value = item
+  isDeleteModalOpen.value = true
 }
 
-async function remove(item: AcademyPricing) {
+async function remove() {
+  if (!deleteTarget.value) return
+  isDeleting.value = true
   try {
-    await api(`/admin/academies/${props.academyId}/pricing/${item.id}`, { method: 'DELETE' })
+    await api(`/admin/academies/${props.academyId}/pricing/${deleteTarget.value.id}`, {
+      method: 'DELETE'
+    })
     await refresh()
+    isDeleteModalOpen.value = false
     toast.add({ title: 'Pricing deleted', color: 'success' })
   } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } finally {
+    isDeleting.value = false
   }
 }
 
 function formatPrice(val: number) {
   return `Rp ${val.toLocaleString('id-ID')}`
 }
+
+const columns: TableColumn<AcademyPricing>[] = [
+  { accessorKey: 'order', header: 'Order' },
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'original_price', header: 'Original Price' },
+  { accessorKey: 'discount_price', header: 'Discount Price' },
+  {
+    id: 'actions',
+    header: () => h('div', 'Actions'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  }
+]
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">Pricing</h3>
-      <UButton label="+ Add New" color="primary" @click="openAdd" />
+      <UButton label="+ Add" color="primary" @click="openAdd" />
     </div>
-    <div class="border border-default rounded-lg overflow-hidden">
-      <div
-        class="grid grid-cols-[2.5rem_1fr_1fr_1fr_auto] gap-4 px-4 py-3 bg-elevated/50 border-b border-default text-sm font-medium"
-      >
-        <span>Order</span>
-        <span>Name</span>
-        <span>Original Price</span>
-        <span>Discount Price</span>
-        <span>Actions</span>
-      </div>
-      <div
-        v-for="item in items"
-        :key="item.id"
-        class="grid grid-cols-[2.5rem_1fr_1fr_1fr_auto] gap-4 px-4 py-3 border-b border-default last:border-b-0 items-center"
-      >
-        <span class="text-sm text-muted">{{ item.order }}</span>
-        <span class="text-sm font-medium">{{ item.name }}</span>
-        <span class="text-sm">{{
-          item.formatted_original_price ?? formatPrice(item.original_price)
-        }}</span>
-        <span class="text-sm">{{
-          item.formatted_discount_price ?? formatPrice(item.discount_price)
-        }}</span>
-        <div class="flex items-center gap-2">
-          <UButton
-            label="Edit"
-            size="xs"
-            color="neutral"
-            variant="outline"
-            leading-icon="i-lucide-pencil"
-            @click="openEdit(item)"
-          />
-          <UButton
-            label="Delete"
-            size="xs"
-            color="error"
-            variant="outline"
-            leading-icon="i-lucide-trash-2"
-            @click="remove(item)"
-          />
-        </div>
-      </div>
-      <div v-if="items.length === 0" class="px-4 py-8 text-center text-sm text-muted">
-        No pricing data available
-      </div>
+    <div class="p-px overflow-x-auto">
+      <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
+        <template #original_price-cell="{ row }">
+          {{ row.original.formatted_original_price ?? formatPrice(row.original.original_price) }}
+        </template>
+        <template #discount_price-cell="{ row }">
+          {{ row.original.formatted_discount_price ?? formatPrice(row.original.discount_price) }}
+        </template>
+        <template #actions-cell="{ row }">
+          <div class="flex items-center gap-2 justify-end">
+            <UButton
+              size="sm"
+              color="primary"
+              variant="outline"
+              leading-icon="i-lucide-pencil"
+              label="Edit"
+              @click="openEdit(row.original)"
+            />
+            <UButton
+              size="sm"
+              color="error"
+              variant="outline"
+              leading-icon="i-lucide-trash-2"
+              label="Delete"
+              @click="confirmRemove(row.original)"
+            />
+          </div>
+        </template>
+      </UTable>
     </div>
   </div>
 
-  <UModal
+  <AdminAcademyPricingModal
     v-model:open="isModalOpen"
-    :title="editingId !== null ? 'Edit Pricing' : 'Add Pricing'"
-    :ui="{ footer: 'justify-end' }"
-  >
-    <template #body>
-      <div class="space-y-4">
-        <UFormField label="Package Name">
-          <UInput v-model="form.name" placeholder="e.g. Early Bird" class="w-full" />
-        </UFormField>
-        <UFormField label="Original Price">
-          <UInput
-            v-model="form.original_price"
-            type="number"
-            placeholder="5000000"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Discount Price">
-          <UInput
-            v-model="form.discount_price"
-            type="number"
-            placeholder="3500000"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Order">
-          <UInput v-model="form.order" type="number" placeholder="1" class="w-full" />
-        </UFormField>
-      </div>
-    </template>
-    <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" @click="isModalOpen = false" />
-      <UButton
-        label="Save"
-        color="primary"
-        :loading="loading"
-        :disabled="loading"
-        @click="save"
-      />
-    </template>
-  </UModal>
+    :academy-id="academyId"
+    :item="editingItem"
+    :next-order="items.length + 1"
+    @saved="refresh"
+  />
+
+  <AdminConfirmDeleteModal
+    v-model:open="isDeleteModalOpen"
+    :item-name="deleteTarget?.name"
+    :loading="isDeleting"
+    @confirm="remove"
+  />
 </template>

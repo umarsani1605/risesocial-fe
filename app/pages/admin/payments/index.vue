@@ -93,28 +93,34 @@ const columns: TableColumn<AdminPayment>[] = [
 
 <template>
       <UCard :ui="{ body: 'p-0' }">
-        <div class="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-default">
-          <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." class="w-56" />
-          <USelect v-model="academyFilter" :items="academyOptions" class="w-44" />
-          <USelect v-model="statusFilter" :items="statusOptions" class="w-36" />
+        <div class="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-default">
+          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." class="w-full sm:w-56" />
+            <div class="flex w-full sm:w-auto gap-2">
+              <USelect v-model="academyFilter" :items="academyOptions" class="flex-1 sm:flex-none sm:w-44" />
+              <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
+            </div>
+          </div>
         </div>
 
-        <UTable
-          ref="table"
-          v-model:pagination="pagination"
-          :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-          :data="filteredData"
-          :columns="columns"
-          :ui="{
-            base: 'table-fixed border-separate border-spacing-0',
-            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-            tbody: '[&>tr]:last:[&>td]:border-b-0',
-            th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-            td: 'border-b border-default'
-          }"
-        />
+        <div class="overflow-x-auto">
+          <UTable
+            ref="table"
+            v-model:pagination="pagination"
+            :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+            :data="filteredData"
+            :columns="columns"
+            :ui="{
+              base: 'table-fixed border-separate border-spacing-0',
+              thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+              tbody: '[&>tr]:last:[&>td]:border-b-0',
+              th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+              td: 'border-b border-default'
+            }"
+          />
+        </div>
 
-        <div class="flex items-center justify-between px-4 py-3 border-t border-default">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-4 py-3 border-t border-default">
           <p class="text-sm text-muted">
             {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
             {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.

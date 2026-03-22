@@ -7,8 +7,8 @@
   >
     <template #top>
       <UContainer>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:items-start lg:text-left">
-          <div class="flex gap-8 lg:gap-6 lg:flex-col items-end lg:items-start">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 lg:items-start lg:text-left">
+          <div class="flex gap-4 sm:gap-6 lg:gap-6 lg:flex-col items-center lg:items-start">
             <div
               class="flex-2 lg:flex-1 flex items-end lg:items-center justify-center lg:justify-start h-12 sm:h-20 lg:h-22"
             >
@@ -42,7 +42,7 @@
                   :href="social.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="size-7 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300"
+                  class="size-8 sm:size-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300"
                   :aria-label="social.ariaLabel"
                 >
                   <UIcon :name="social.icon" class="size-5! text-white" />

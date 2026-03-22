@@ -24,7 +24,7 @@ if (companyError.value || !companyRes.value?.data?.length) {
   throw createError({ statusCode: 404, statusMessage: 'Company not found' })
 }
 
-const company = computed(() => companyRes.value!.data[0])
+const company = computed(() => companyRes.value!.data[0]!)
 const companyJobs = computed(() => jobsRes.value?.data ?? [])
 
 useSeoMeta({
@@ -105,7 +105,7 @@ useSeoMeta({
           Available Positions ({{ companyJobs.length }})
         </h2>
       </div>
-      <div v-if="companyJobs.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div v-if="companyJobs.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <SharedJobCard v-for="job in companyJobs" :key="job.id" :job="job" />
       </div>
       <div v-else class="text-center py-12">

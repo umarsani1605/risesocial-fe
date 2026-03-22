@@ -1,6 +1,7 @@
 export const useApi = () => {
   const config = useRuntimeConfig()
   const token = useCookie<string | null>('auth_token')
+  const userCookie = useCookie<UserProfile | null>('auth_user')
 
   const api = $fetch.create({
     baseURL: config.public.apiBaseUrl,
@@ -15,6 +16,7 @@ export const useApi = () => {
     async onResponseError({ response }) {
       if (response.status === 401) {
         token.value = null
+        userCookie.value = null
         await navigateTo('/login')
         return
       }

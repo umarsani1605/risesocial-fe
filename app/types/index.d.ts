@@ -15,7 +15,6 @@ export interface BlogPost extends ParsedContent {
   } & Link)[]
 }
 
-// Dashboard types
 export type UserStatus = 'subscribed' | 'unsubscribed' | 'bounced'
 export type SaleStatus = 'paid' | 'failed' | 'refunded'
 
@@ -84,6 +83,9 @@ export type {
   AcademyPricing, AcademyFeature, AcademyInstructor,
   AcademyTopic, AcademyTheme, AcademyTestimonial, AcademyFaq
 } from './academy'
+
+// ── Cohort Types (Admin) ──────────────────────────────────────────────────────
+export type { AdminCohortDetail, AdminCohortModule, AdminCohortAttachment, AdminCohortEnrollment, AdminCohortMentor } from './cohort'
 
 // ── Cohort Types (User Dashboard) ────────────────────────────────────────────
 
@@ -161,6 +163,29 @@ export interface CohortEnrollment {
       image_url: string
     }
   }
+}
+
+// ── User Transaction Types ───────────────────────────────────────────────────
+
+export interface UserTransaction {
+  id: number
+  transaction_code: string
+  product_type: string
+  amount: number
+  currency: string
+  status: 'pending' | 'paid' | 'failed' | 'expired'
+  payment_method: string | null
+  created_at: string
+  paid_at: string | null
+  expired_at: string | null
+  items: { product_name: string, quantity: number, unit_price: number, total_price: number }[]
+}
+
+export interface UserTransactionDetail extends UserTransaction {
+  customer_name: string
+  customer_email: string
+  provider: string
+  provider_reference: string | null
 }
 
 // ── Blog Management types ─────────────────────────────────────────────────────

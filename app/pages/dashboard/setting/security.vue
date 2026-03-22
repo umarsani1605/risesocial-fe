@@ -1,39 +1,35 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'dashboard-user' })
+import { userPasswordSchema } from '@/schemas/user'
 
-useSeoMeta({
-  title: 'Security Settings - Rise Social'
-})
+definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
+
+useSeoMeta({ title: 'Security Settings - Rise Social' })
 
 const toast = useToast()
+const { api } = useApi()
 
 const form = reactive({
   password: '',
   repeatPassword: ''
 })
 
-const passwordError = ref('')
+const formRef = useTemplateRef('securityForm')
 const isSubmitting = ref(false)
 
-const onChangePassword = () => {
-  passwordError.value = ''
-
-  if (form.password.length < 6) {
-    passwordError.value = 'Password must be at least 6 characters'
-    return
-  }
-  if (form.password !== form.repeatPassword) {
-    passwordError.value = "Passwords don't match"
-    return
-  }
-
+async function onChangePassword() {
   isSubmitting.value = true
-  setTimeout(() => {
+  try {
+    await api('/users/security', { method: 'PUT', body: { password: form.password } })
     form.password = ''
     form.repeatPassword = ''
+    toast.add({ title: 'Password updated', color: 'success' })
+  }
+  catch (error: any) {
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  }
+  finally {
     isSubmitting.value = false
-    toast.add({ title: 'Password updated successfully', color: 'success' })
-  }, 600)
+  }
 }
 </script>
 
@@ -42,11 +38,8 @@ const onChangePassword = () => {
     <div class="space-y-6">
       <h1 class="text-xl font-bold">Security</h1>
 
-      <div class="space-y-4 max-w-lg">
-        <UFormField
-          label="Password"
-          :error="form.password && form.password.length < 6 ? 'Password must be at least 6 characters' : undefined"
-        >
+      <UForm ref="securityForm" :schema="userPasswordSchema" :state="form" class="space-y-4 max-w-lg" @submit="onChangePassword">
+        <UFormField name="password" label="Password">
           <UInput
             v-model="form.password"
             type="password"
@@ -55,7 +48,7 @@ const onChangePassword = () => {
           />
         </UFormField>
 
-        <UFormField label="Repeat password" :error="passwordError || undefined">
+        <UFormField name="repeatPassword" label="Repeat password">
           <UInput
             v-model="form.repeatPassword"
             type="password"
@@ -63,9 +56,9 @@ const onChangePassword = () => {
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
 
-      <UButton color="primary" :loading="isSubmitting" @click="onChangePassword">
+      <UButton color="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="formRef?.submit()">
         Change Password
       </UButton>
     </div>

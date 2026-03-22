@@ -12,12 +12,16 @@ useSeoMeta({
 })
 
 const { api } = useApi()
-const { data: academiesData, status } = await useAsyncData('academies', () =>
-  api<PaginatedResponse<Academy>>('/academies', {
-    params: { status: 'ACTIVE', limit: 100 }
-  })
+const page = ref(1)
+const { data: academiesData, status, error } = await useAsyncData(
+  'academies',
+  () => api<PaginatedResponse<Academy>>('/academies', { params: { status: 'ACTIVE', page: page.value } }),
+  { watch: [page] }
 )
+if (error.value) throw createError({ statusCode: 500, message: 'Failed to load academies' })
+
 const academies = computed(() => academiesData.value?.data ?? [])
+const pagination = computed(() => academiesData.value?.pagination)
 const isLoading = computed(() => status.value === 'pending')
 </script>
 
@@ -82,6 +86,7 @@ const isLoading = computed(() => status.value === 'pending')
       <div v-else class="space-y-4 lg:space-y-6">
         <NuxtLink
           v-for="academy in academies"
+
           :key="academy.id"
           :to="`/academy/${academy.slug}`"
           class="block group"
@@ -130,6 +135,14 @@ const isLoading = computed(() => status.value === 'pending')
             </div>
           </UCard>
         </NuxtLink>
+
+        <div v-if="pagination && pagination.totalPages > 1" class="flex justify-center pt-4">
+          <UPagination
+            v-model:page="page"
+            :total="pagination.total"
+            :items-per-page="pagination.limit"
+          />
+        </div>
       </div>
     </UPageSection>
   </div>

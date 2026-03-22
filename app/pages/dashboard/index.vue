@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Academy } from '@/types'
+import type { CohortEnrollment } from '@/types'
 
 definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
@@ -11,12 +11,12 @@ useSeoMeta({
 const { user } = useAuth()
 const { api } = useApi()
 
-const { data: academiesData } = await useAsyncData('dashboard:academies', () =>
-  api<PaginatedResponse<Academy>>('/academies', {
-    params: { status: 'ACTIVE', page: 1, limit: 10 }
+const { data: enrollmentsData } = await useAsyncData('dashboard:enrollments', () =>
+  api<PaginatedResponse<CohortEnrollment>>('/cohorts/my', {
+    params: { page: 1, limit: 5 }
   })
 )
-const academies = computed(() => academiesData.value?.data ?? [])
+const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.cohort) ?? [])
 
 const dynamicGreeting = computed(() => {
   const hour = new Date().getHours()
@@ -56,10 +56,10 @@ const programs = [
 <template>
   <div class="space-y-6">
     <div
-      class="relative rounded-xl bg-[#0E5C59] text-white px-6 pt-16 pb-12 sm:px-10 overflow-hidden"
+      class="relative rounded-xl bg-[#0E5C59] text-white px-6 sm:px-10 pt-10 sm:pt-16 pb-8 sm:pb-12 overflow-hidden"
     >
       <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
-        {{ dynamicGreeting }}, {{ user.first_name }}!
+        {{ dynamicGreeting }}, {{ user?.first_name }}!
       </h1>
       <p class="text-base mb-8 opacity-90">
         Continue your learning journey or explore new academy programs!
@@ -88,31 +88,47 @@ const programs = [
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-bold">Academy</h2>
-            <UButton variant="link" color="neutral" size="sm" to="/academy" class="text-muted">
+            <UButton variant="link" color="neutral" size="sm" to="/dashboard/academy" class="text-muted">
               View All
             </UButton>
           </div>
         </template>
-        <div class="space-y-3">
+        <div v-if="enrollments.length === 0" class="flex flex-col items-center justify-center py-10 text-center gap-2">
+          <UIcon name="i-lucide-graduation-cap" class="size-10 text-muted" />
+          <p class="text-sm text-muted">No enrolled programs yet</p>
+          <UButton to="/academy" color="primary" variant="outline" size="sm" class="mt-1">
+            Explore Academy
+          </UButton>
+        </div>
+        <div v-else class="space-y-3">
           <NuxtLink
-            v-for="academy in academies"
-            :key="academy.id"
-            :to="`/academy/${academy.slug}`"
+            v-for="enrollment in enrollments"
+            :key="enrollment.id"
+            :to="`/dashboard/academy/${enrollment.cohort.id}`"
             class="flex items-start gap-3 p-3 rounded-lg border border-transparent hover:border-default hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <div class="size-16 sm:size-20 rounded-md overflow-hidden bg-gray-100 shrink-0">
               <NuxtImg
-                :src="academy.image_url"
-                :alt="academy.title"
+                :src="enrollment.cohort.academy.image_url"
+                :alt="enrollment.cohort.academy.title"
                 class="w-full h-full object-cover"
                 loading="lazy"
               />
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-base font-medium mb-1 line-clamp-1">{{ academy.title }}</p>
-              <p class="text-sm text-muted line-clamp-2 leading-relaxed">
-                {{ academy.description }}
-              </p>
+              <p class="text-base font-medium mb-1 line-clamp-1">{{ enrollment.cohort.academy.title }}</p>
+              <p class="text-sm text-muted line-clamp-1">{{ enrollment.cohort.name }}</p>
+              <div class="flex items-center gap-2 mt-1">
+                <UIcon name="i-lucide-calendar" class="size-3.5 text-muted shrink-0" />
+                <span class="text-xs text-muted">{{ formatDate(enrollment.cohort.start_date) }}</span>
+                <UBadge
+                  :color="enrollment.status === 'completed' ? 'success' : enrollment.status === 'active' ? 'primary' : 'warning'"
+                  variant="subtle"
+                  size="xs"
+                >
+                  {{ enrollment.status }}
+                </UBadge>
+              </div>
             </div>
           </NuxtLink>
         </div>

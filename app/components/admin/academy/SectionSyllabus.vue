@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AcademyTheme } from '@/types'
+import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
   academyId: number
@@ -10,34 +11,92 @@ const { api } = useApi()
 const toast = useToast()
 
 const themes = ref<AcademyTheme[]>(structuredClone(props.initialData))
-const expandedThemes = ref<Set<number>>(new Set(themes.value[0] ? [themes.value[0].id] : []))
+
+interface SyllabusRow {
+  id: number
+  _kind: 'theme' | 'topic'
+  order: number
+  title: string
+  description: string
+  theme_id?: number
+}
+
+// Use reactive Set so .has()/.add()/.delete() trigger computed recomputation
+const expandedThemes = reactive(new Set<number>(themes.value[0] ? [themes.value[0].id] : []))
+
+function toggleTheme(id: number) {
+  if (expandedThemes.has(id)) expandedThemes.delete(id)
+  else expandedThemes.add(id)
+}
+
+// Flat list: theme rows + topic rows (only for expanded themes)
+const flatData = computed<SyllabusRow[]>(() => {
+  const result: SyllabusRow[] = []
+  for (const theme of themes.value) {
+    result.push({
+      id: theme.id,
+      _kind: 'theme',
+      order: theme.order,
+      title: theme.title,
+      description: theme.description
+    })
+    if (expandedThemes.has(theme.id)) {
+      for (const topic of theme.topics) {
+        result.push({
+          id: topic.id,
+          _kind: 'topic',
+          order: topic.order,
+          title: topic.title,
+          description: topic.description ?? '',
+          theme_id: topic.theme_id
+        })
+      }
+    }
+  }
+  return result
+})
+
+// Per-row background via table-level meta
+const tableMeta = {
+  class: {
+    tr: (row: { original: SyllabusRow }) =>
+      row.original._kind === 'topic' ? 'bg-slate-50 dark:bg-slate-900/30' : ''
+  }
+}
+
+type DeleteTarget = { kind: 'theme'; item: SyllabusRow } | { kind: 'topic'; item: SyllabusRow }
+
+const deleteTarget = ref<DeleteTarget | null>(null)
+const isDeleteModalOpen = ref(false)
+const isDeleting = ref(false)
+
+const deleteItemName = computed(() => deleteTarget.value?.item.title ?? '')
 
 // Theme modal
 const isThemeModalOpen = ref(false)
-const editingThemeId = ref<number | null>(null)
-const isSavingTheme = ref(false)
-const themeForm = reactive({ title: '', description: '', order: '' })
+const editingTheme = ref<AcademyTheme | null>(null)
 
 // Topic modal
 const isTopicModalOpen = ref(false)
-const editingTopicId = ref<number | null>(null)
-const isSavingTopic = ref(false)
-const topicForm = reactive({ title: '', description: '', theme_id: 0, order: '' })
+const editingTopic = ref<{
+  id: number
+  theme_id?: number
+  title: string
+  description: string
+  order: number
+} | null>(null)
+const topicDefaultThemeId = ref(0)
+const topicNextOrder = ref(1)
 
-watch(() => props.initialData, (val) => {
-  themes.value = structuredClone(val)
-}, { deep: true })
-
-const themeOptions = computed(() =>
-  themes.value.map((t) => ({ label: t.title, value: t.id }))
+watch(
+  () => props.initialData,
+  (val) => {
+    themes.value = structuredClone(val)
+  },
+  { deep: true }
 )
 
-const isThemeExpanded = (id: number) => expandedThemes.value.has(id)
-
-function toggleTheme(id: number) {
-  if (expandedThemes.value.has(id)) expandedThemes.value.delete(id)
-  else expandedThemes.value.add(id)
-}
+const themeOptions = computed(() => themes.value.map((t) => ({ label: t.title, value: t.id })))
 
 async function refresh() {
   const res = await api<ApiResponse<AcademyTheme[]>>(`/admin/academies/${props.academyId}/themes`)
@@ -45,121 +104,91 @@ async function refresh() {
 }
 
 function openAddTheme() {
-  editingThemeId.value = null
-  themeForm.title = ''
-  themeForm.description = ''
-  themeForm.order = String(themes.value.length + 1)
+  editingTheme.value = null
   isThemeModalOpen.value = true
 }
 
-function openEditTheme(item: AcademyTheme) {
-  editingThemeId.value = item.id
-  themeForm.title = item.title
-  themeForm.description = item.description
-  themeForm.order = String(item.order)
+function openEditTheme(row: SyllabusRow) {
+  editingTheme.value = themes.value.find((t) => t.id === row.id) ?? null
   isThemeModalOpen.value = true
 }
 
-async function saveTheme() {
-  if (!themeForm.title.trim()) {
-    toast.add({ title: 'Title is required', color: 'error' })
-    return
-  }
-  isSavingTheme.value = true
-  try {
-    const body = {
-      title: themeForm.title,
-      description: themeForm.description,
-      order: Number(themeForm.order)
-    }
-    if (editingThemeId.value !== null) {
-      await api(`/admin/academies/${props.academyId}/themes/${editingThemeId.value}`, { method: 'PUT', body })
-    } else {
-      const res = await api<ApiResponse<AcademyTheme>>(`/admin/academies/${props.academyId}/themes`, { method: 'POST', body })
-      expandedThemes.value.add(res.data.id)
-    }
-    await refresh()
-    isThemeModalOpen.value = false
-    toast.add({ title: 'Theme saved', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
-  } finally {
-    isSavingTheme.value = false
-  }
-}
-
-async function deleteTheme(item: AcademyTheme) {
-  try {
-    await api(`/admin/academies/${props.academyId}/themes/${item.id}`, { method: 'DELETE' })
-    expandedThemes.value.delete(item.id)
-    await refresh()
-    toast.add({ title: 'Theme deleted', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
-  }
+function onThemeSaved(newThemeId?: number) {
+  refresh()
+  if (newThemeId) expandedThemes.add(newThemeId)
 }
 
 function openAddTopic(themeId: number) {
-  editingTopicId.value = null
-  topicForm.title = ''
-  topicForm.description = ''
-  topicForm.theme_id = themeId
+  editingTopic.value = null
+  topicDefaultThemeId.value = themeId
   const theme = themes.value.find((t) => t.id === themeId)
-  topicForm.order = String((theme?.topics.length ?? 0) + 1)
-  expandedThemes.value.add(themeId)
+  topicNextOrder.value = (theme?.topics.length ?? 0) + 1
+  expandedThemes.add(themeId)
   isTopicModalOpen.value = true
 }
 
-function openEditTopic(item: AcademyTopic) {
-  editingTopicId.value = item.id
-  topicForm.title = item.title
-  topicForm.description = item.description
-  topicForm.theme_id = item.theme_id
-  topicForm.order = String(item.order)
-  isTopicModalOpen.value = true
-}
-
-async function saveTopic() {
-  if (!topicForm.title.trim()) {
-    toast.add({ title: 'Title is required', color: 'error' })
-    return
+function openEditTopic(row: SyllabusRow) {
+  editingTopic.value = {
+    id: row.id,
+    theme_id: row.theme_id,
+    title: row.title,
+    description: row.description,
+    order: row.order
   }
-  isSavingTopic.value = true
+  topicDefaultThemeId.value = 0
+  isTopicModalOpen.value = true
+}
+
+function confirmDeleteTheme(row: SyllabusRow) {
+  deleteTarget.value = { kind: 'theme', item: row }
+  isDeleteModalOpen.value = true
+}
+
+function confirmDeleteTopic(row: SyllabusRow) {
+  deleteTarget.value = { kind: 'topic', item: row }
+  isDeleteModalOpen.value = true
+}
+
+async function executeDelete() {
+  if (!deleteTarget.value) return
+  isDeleting.value = true
   try {
-    const body = {
-      theme_id: topicForm.theme_id,
-      title: topicForm.title,
-      description: topicForm.description,
-      topic_order: Number(topicForm.order)
-    }
-    if (editingTopicId.value !== null) {
-      await api(`/admin/academies/${props.academyId}/topics/${editingTopicId.value}`, { method: 'PUT', body })
+    const { kind, item } = deleteTarget.value
+    if (kind === 'theme') {
+      await api(`/admin/academies/${props.academyId}/themes/${item.id}`, { method: 'DELETE' })
+      expandedThemes.delete(item.id)
+      toast.add({ title: 'Theme deleted', color: 'success' })
     } else {
-      await api(`/admin/academies/${props.academyId}/topics`, { method: 'POST', body })
+      await api(`/admin/academies/${props.academyId}/topics/${item.id}`, { method: 'DELETE' })
+      toast.add({ title: 'Topic deleted', color: 'success' })
     }
     await refresh()
-    isTopicModalOpen.value = false
-    toast.add({ title: 'Topic saved', color: 'success' })
+    isDeleteModalOpen.value = false
   } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
   } finally {
-    isSavingTopic.value = false
+    isDeleting.value = false
   }
 }
 
-async function deleteTopic(_themeId: number, item: AcademyTopic) {
-  try {
-    await api(`/admin/academies/${props.academyId}/topics/${item.id}`, { method: 'DELETE' })
-    await refresh()
-    toast.add({ title: 'Topic deleted', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+const columns: TableColumn<SyllabusRow>[] = [
+  {
+    id: 'expand',
+    meta: { class: { th: 'w-px', td: 'w-px' } }
+  },
+  {
+    accessorKey: 'order',
+    header: 'Order',
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  },
+  { accessorKey: 'title', header: 'Title' },
+  { accessorKey: 'description', header: 'Description' },
+  {
+    id: 'actions',
+    header: () => h('div', 'Actions'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
   }
-}
+]
 </script>
 
 <template>
@@ -168,101 +197,129 @@ async function deleteTopic(_themeId: number, item: AcademyTopic) {
       <UButton label="+ Add Theme" color="primary" @click="openAddTheme" />
     </div>
 
-    <div class="border border-default rounded-lg overflow-hidden">
-      <div class="grid grid-cols-[2.5rem_2.5rem_1fr_1fr_auto] gap-4 px-4 py-3 bg-elevated/50 border-b border-default text-sm font-medium">
-        <span />
-        <span>Order</span>
-        <span>Title</span>
-        <span>Description</span>
-        <span>Actions</span>
-      </div>
+    <div class="p-px overflow-x-auto">
+      <UTable
+        :data="flatData"
+        :columns="columns"
+        :meta="tableMeta"
+        empty="No themes added yet. Click + Add Theme to get started."
+        class="px-0 overflow-visible"
+      >
+        <template #expand-cell="{ row }">
+          <UButton
+            v-if="row.original._kind === 'theme'"
+            :icon="
+              expandedThemes.has(row.original.id)
+                ? 'i-lucide-chevron-down'
+                : 'i-lucide-chevron-right'
+            "
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            square
+            @click="toggleTheme(row.original.id)"
+          />
+        </template>
 
-      <template v-for="(theme, themeIdx) in themes" :key="theme.id">
-        <div class="grid grid-cols-[2.5rem_2.5rem_1fr_1fr_auto] gap-4 px-4 py-3 border-b border-default items-center">
-          <button class="flex items-center justify-center" @click="toggleTheme(theme.id)">
-            <UIcon
-              :name="isThemeExpanded(theme.id) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
-              class="size-4 text-muted"
-            />
-          </button>
-          <span class="text-sm font-medium text-muted">{{ themeIdx + 1 }}</span>
-          <span class="text-sm font-semibold">{{ theme.title }}</span>
-          <span class="text-sm text-muted truncate">{{ theme.description }}</span>
-          <div class="flex items-center gap-2 shrink-0">
-            <UButton label="+ Add Topic" size="xs" color="primary" variant="outline" @click="openAddTopic(theme.id)" />
-            <UButton label="Edit" size="xs" color="neutral" variant="outline" leading-icon="i-lucide-pencil" @click="openEditTheme(theme)" />
-            <UButton label="Delete" size="xs" color="error" variant="outline" leading-icon="i-lucide-trash-2" @click="deleteTheme(theme)" />
-          </div>
-        </div>
+        <template #order-cell="{ row }">
+          <span class="text-sm text-muted">
+            {{
+              row.original._kind === 'topic'
+                ? String.fromCharCode(96 + row.original.order)
+                : row.original.order
+            }}
+          </span>
+        </template>
 
-        <!-- Topic rows (visible when theme is expanded) -->
-        <template v-if="isThemeExpanded(theme.id)">
-          <div
-            v-for="(topic, topicIdx) in theme.topics"
-            :key="topic.id"
-            class="grid grid-cols-[2.5rem_2.5rem_1fr_1fr_auto] gap-4 pl-10 pr-4 py-2.5 border-b border-default last:border-b-0 items-center bg-elevated/20"
+        <template #title-cell="{ row }">
+          <span
+            :class="
+              row.original._kind === 'theme'
+                ? 'font-bold text-highlight text-sm'
+                : 'text-sm text-muted'
+            "
           >
-            <span />
-            <span class="text-sm text-muted">{{ topicIdx + 1 }}.</span>
-            <span class="text-sm">{{ topic.title }}</span>
-            <span class="text-sm text-muted truncate">{{ topic.description }}</span>
-            <div class="flex items-center gap-2 shrink-0">
-              <UButton label="Edit" size="xs" color="neutral" variant="outline" leading-icon="i-lucide-pencil" @click="openEditTopic(topic)" />
-              <UButton label="Delete" size="xs" color="error" variant="outline" leading-icon="i-lucide-trash-2" @click="deleteTopic(theme.id, topic)" />
-            </div>
-          </div>
-          <div v-if="theme.topics.length === 0" class="pl-10 pr-4 py-3 border-b border-default text-sm text-muted bg-elevated/20">
-            No topics yet. Click "+ Add Topic" to add one.
+            {{ row.original.title }}
+          </span>
+        </template>
+
+        <template #description-cell="{ row }">
+          <span class="text-sm text-muted">{{ row.original.description }}</span>
+        </template>
+
+        <template #actions-cell="{ row }">
+          <div class="flex items-center gap-2 justify-end">
+            <template v-if="row.original._kind === 'theme'">
+              <UButton
+                size="sm"
+                color="primary"
+                variant="outline"
+                label="+ Add Topic"
+                @click="openAddTopic(row.original.id)"
+              />
+              <UButton
+                size="sm"
+                color="primary"
+                variant="outline"
+                leading-icon="i-lucide-pencil"
+                label="Edit"
+                @click="openEditTheme(row.original)"
+              />
+              <UButton
+                size="sm"
+                color="error"
+                variant="outline"
+                leading-icon="i-lucide-trash-2"
+                label="Delete"
+                @click="confirmDeleteTheme(row.original)"
+              />
+            </template>
+            <template v-else>
+              <UButton
+                size="sm"
+                color="primary"
+                variant="outline"
+                leading-icon="i-lucide-pencil"
+                label="Edit"
+                @click="openEditTopic(row.original)"
+              />
+              <UButton
+                size="sm"
+                color="error"
+                variant="outline"
+                leading-icon="i-lucide-trash-2"
+                label="Delete"
+                @click="confirmDeleteTopic(row.original)"
+              />
+            </template>
           </div>
         </template>
-      </template>
-
-      <div v-if="themes.length === 0" class="px-4 py-8 text-center text-sm text-muted">
-        No themes added yet. Click "+ Add Theme" to get started.
-      </div>
+      </UTable>
     </div>
   </div>
 
-  <UModal v-model:open="isThemeModalOpen" :title="editingThemeId !== null ? 'Edit Theme' : 'Add Theme'" :ui="{ footer: 'justify-end' }">
-    <template #body>
-      <div class="space-y-4">
-        <UFormField label="Title">
-          <UInput v-model="themeForm.title" placeholder="e.g. Introduction to Carbon Accounting" class="w-full" />
-        </UFormField>
-        <UFormField label="Description">
-          <UTextarea v-model="themeForm.description" placeholder="Theme description" :rows="3" class="w-full" />
-        </UFormField>
-        <UFormField label="Order">
-          <UInput v-model="themeForm.order" type="number" placeholder="1" class="w-full" />
-        </UFormField>
-      </div>
-    </template>
-    <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" @click="isThemeModalOpen = false" />
-      <UButton label="Save" color="primary" :loading="isSavingTheme" :disabled="isSavingTheme" @click="saveTheme" />
-    </template>
-  </UModal>
+  <AdminAcademyThemeModal
+    v-model:open="isThemeModalOpen"
+    :academy-id="academyId"
+    :item="editingTheme"
+    :next-order="themes.length + 1"
+    @saved="onThemeSaved"
+  />
 
-  <UModal v-model:open="isTopicModalOpen" :title="editingTopicId !== null ? 'Edit Topic' : 'Add Topic'" :ui="{ footer: 'justify-end' }">
-    <template #body>
-      <div class="space-y-4">
-        <UFormField label="Theme">
-          <USelect v-model="topicForm.theme_id" :items="themeOptions" placeholder="Select theme" class="w-full" />
-        </UFormField>
-        <UFormField label="Title">
-          <UInput v-model="topicForm.title" placeholder="e.g. What is Carbon Accounting?" class="w-full" />
-        </UFormField>
-        <UFormField label="Description">
-          <UTextarea v-model="topicForm.description" placeholder="Topic description" :rows="3" class="w-full" />
-        </UFormField>
-        <UFormField label="Order">
-          <UInput v-model="topicForm.order" type="number" placeholder="1" class="w-full" />
-        </UFormField>
-      </div>
-    </template>
-    <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" @click="isTopicModalOpen = false" />
-      <UButton label="Save" color="primary" :loading="isSavingTopic" :disabled="isSavingTopic" @click="saveTopic" />
-    </template>
-  </UModal>
+  <AdminAcademyTopicModal
+    v-model:open="isTopicModalOpen"
+    :academy-id="academyId"
+    :item="editingTopic"
+    :themes="themeOptions"
+    :default-theme-id="topicDefaultThemeId"
+    :next-order="topicNextOrder"
+    @saved="refresh"
+  />
+
+  <AdminConfirmDeleteModal
+    v-model:open="isDeleteModalOpen"
+    :item-name="deleteItemName"
+    :loading="isDeleting"
+    @confirm="executeDelete"
+  />
 </template>

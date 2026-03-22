@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import type { AcademyPricing, Academy } from '@/types'
 
-defineProps<{
+const props = defineProps<{
   tier: AcademyPricing
   academy: Academy
-  enrollLink: string
+  academySlug: string
+  isEnrolled?: boolean
+  hasPendingPayment?: boolean
 }>()
+
+const { isLoggedIn } = useAuth()
+
+const onEnroll = () => {
+  const paymentPath = `/academy/${props.academySlug}/payment?pricing_id=${props.tier.id}`
+  if (!isLoggedIn.value) {
+    navigateTo(`/login?redirect=${encodeURIComponent(paymentPath)}`)
+    return
+  }
+  navigateTo(paymentPath)
+}
 </script>
 
 <template>
@@ -36,13 +49,31 @@ defineProps<{
         {{ tier.formatted_discount_price || formatPrice(tier.discount_price) }}
       </div>
       <UButton
-        as="a"
-        :href="enrollLink"
-        target="_blank"
+        v-if="isEnrolled"
+        label="Go to Academy"
+        icon="i-lucide-layout-dashboard"
+        color="primary"
+        variant="outline"
+        size="md"
+        to="/dashboard/academy"
+        class="flex items-center justify-center w-full rounded-lg"
+      />
+      <UButton
+        v-else-if="hasPendingPayment"
+        label="Complete Payment"
+        icon="i-lucide-clock"
+        color="warning"
+        size="lg"
+        class="flex items-center justify-center w-full rounded-lg"
+        @click="onEnroll"
+      />
+      <UButton
+        v-else
         label="Enroll Now"
         color="primary"
-        size="md"
+        size="lg"
         class="flex items-center justify-center w-full rounded-lg"
+        @click="onEnroll"
       />
     </div>
   </div>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ACADEMY_TAB_ITEMS } from '@/utils/academyOptions'
+import type { AcademyForm } from '@/types'
+import { ACADEMY_TAB_ITEMS } from '@/constants/academy'
+import { academyFormSchema } from '@/schemas/academy'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -15,7 +17,7 @@ const { api } = useApi()
 
 const activeTab = ref('0')
 
-const form = reactive({
+const form = reactive<AcademyForm>({
   title: '',
   description: '',
   duration: '',
@@ -30,21 +32,16 @@ const formRef = useTemplateRef('formRef')
 const loading = ref(false)
 
 async function onSave() {
-  if (!form.title) {
-    toast.add({ title: 'Please enter a title', color: 'error' })
-    return
-  }
-
   loading.value = true
   const formData = new FormData()
   formData.append('title', form.title)
-  if (form.description) formData.append('description', form.description)
+  formData.append('description', form.description)
   formData.append('status', form.status)
   formData.append('certificate', String(form.certificate === 'Yes'))
   formData.append('portfolio', String(form.portfolio === 'Yes'))
-  if (form.duration) formData.append('duration', form.duration)
-  if (form.format) formData.append('format', form.format)
-  if (form.category) formData.append('category', form.category)
+  formData.append('duration', form.duration)
+  formData.append('format', form.format)
+  formData.append('category', form.category)
   if (formRef.value?.imageFile) formData.append('file', formRef.value.imageFile)
 
   try {
@@ -82,17 +79,27 @@ async function onSave() {
         <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
           <div class="space-y-10">
             <div class="space-y-6">
-              <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Basic Information</h3>
-                <UButton label="Save" color="primary" :loading="loading" :disabled="loading" @click="onSave" />
-              </div>
-              <AdminAcademyFormBasicInfo ref="formRef" v-model="form" />
+              <UForm ref="uformRef" :schema="academyFormSchema" :state="form" @submit="onSave">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-lg font-semibold">Basic Information</h3>
+                  <UButton
+                    type="submit"
+                    label="Save"
+                    color="primary"
+                    :loading="loading"
+                    :disabled="loading"
+                  />
+                </div>
+                <AdminAcademyFormBasicInfo ref="formRef" v-model="form" />
+              </UForm>
             </div>
 
-            <!-- Sub-resource placeholders -->
             <template
               v-for="section in [
-                { label: 'Pricing', columns: ['Order', 'Name', 'Original Price', 'Discount Price'] },
+                {
+                  label: 'Pricing',
+                  columns: ['Order', 'Name', 'Original Price', 'Discount Price']
+                },
                 { label: 'Featured Benefits', columns: ['Order', 'Title', 'Description', 'Icon'] },
                 { label: 'Instructors', columns: ['Order', 'Name', 'Job Title', 'Description'] },
                 { label: 'Testimonials', columns: ['Order', 'Name', 'Comment'] },

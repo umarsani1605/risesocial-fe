@@ -3,7 +3,8 @@ import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
+  middleware: 'guest'
 })
 
 const error = ref(false)
@@ -47,8 +48,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     error.value = false
     await login({ email: payload.data.email, password: payload.data.password })
     const redirect = route.query.redirect as string | undefined
-    if (redirect) {
-      await navigateTo(redirect)
+    const safeRedirect = redirect && redirect.startsWith('/') ? redirect : undefined
+    if (safeRedirect) {
+      await navigateTo(safeRedirect)
     } else if (isAdmin.value) {
       await navigateTo('/admin')
     } else {

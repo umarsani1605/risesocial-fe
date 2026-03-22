@@ -3,14 +3,15 @@ import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
+  middleware: 'guest'
 })
 
 const error = ref(false)
 const isLoading = ref(false)
 
 const { api } = useApi()
-const { token, user } = useAuth()
+const { setSession } = useAuth()
 
 const fields: AuthFormField[] = [
   {
@@ -71,7 +72,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     isLoading.value = true
     error.value = false
-    const res = await api<ApiResponse<{ token: string, user: typeof user.value }>>('/auth/register', {
+    const res = await api<ApiResponse<{ token: string, user: UserProfile }>>('/auth/register', {
       method: 'POST',
       body: {
         first_name: payload.data.first_name,
@@ -80,8 +81,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         password: payload.data.password
       }
     })
-    token.value = res.data.token
-    user.value = res.data.user as typeof user.value
+    setSession(res.data.token, res.data.user)
     await navigateTo('/dashboard')
   }
   catch {
@@ -105,7 +105,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         :schema="schema"
         :fields="fields"
         title="Masuk ke Akun"
-        class="w-90"
+        class="w-full"
         :submit="{
           label: 'Register',
           class: 'rounded-lg',

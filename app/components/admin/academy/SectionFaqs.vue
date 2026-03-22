@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AcademyFaq } from '@/types'
+import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
   academyId: number
@@ -11,13 +12,19 @@ const toast = useToast()
 
 const items = ref<AcademyFaq[]>(structuredClone(props.initialData))
 const isModalOpen = ref(false)
-const editingId = ref<number | null>(null)
-const loading = ref(false)
-const form = reactive({ question: '', answer: '', order: '' })
+const editingItem = ref<AcademyFaq | null>(null)
 
-watch(() => props.initialData, (val) => {
-  items.value = JSON.parse(JSON.stringify(val))
-}, { deep: true })
+const deleteTarget = ref<AcademyFaq | null>(null)
+const isDeleteModalOpen = ref(false)
+const isDeleting = ref(false)
+
+watch(
+  () => props.initialData,
+  (val) => {
+    items.value = structuredClone(val)
+  },
+  { deep: true }
+)
 
 async function refresh() {
   const res = await api<ApiResponse<AcademyFaq[]>>(`/admin/academies/${props.academyId}/faqs`)
@@ -25,59 +32,47 @@ async function refresh() {
 }
 
 function openAdd() {
-  editingId.value = null
-  form.question = ''
-  form.answer = ''
-  form.order = String(items.value.length + 1)
+  editingItem.value = null
   isModalOpen.value = true
 }
 
 function openEdit(item: AcademyFaq) {
-  editingId.value = item.id
-  form.question = item.question
-  form.answer = item.answer
-  form.order = String(item.order ?? '')
+  editingItem.value = item
   isModalOpen.value = true
 }
 
-async function save() {
-  if (!form.question.trim()) {
-    toast.add({ title: 'Question is required', color: 'error' })
-    return
-  }
-  loading.value = true
+function confirmRemove(item: AcademyFaq) {
+  deleteTarget.value = item
+  isDeleteModalOpen.value = true
+}
+
+async function remove() {
+  if (!deleteTarget.value) return
+  isDeleting.value = true
   try {
-    const body = {
-      question: form.question,
-      answer: form.answer,
-      faq_order: Number(form.order)
-    }
-    if (editingId.value !== null) {
-      await api(`/admin/academies/${props.academyId}/faqs/${editingId.value}`, { method: 'PUT', body })
-    } else {
-      await api(`/admin/academies/${props.academyId}/faqs`, { method: 'POST', body })
-    }
+    await api(`/admin/academies/${props.academyId}/faqs/${deleteTarget.value.id}`, {
+      method: 'DELETE'
+    })
     await refresh()
-    isModalOpen.value = false
-    toast.add({ title: 'FAQ saved', color: 'success' })
+    isDeleteModalOpen.value = false
+    toast.add({ title: 'FAQ deleted', color: 'success' })
   } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
   } finally {
-    loading.value = false
+    isDeleting.value = false
   }
 }
 
-async function remove(item: AcademyFaq) {
-  try {
-    await api(`/admin/academies/${props.academyId}/faqs/${item.id}`, { method: 'DELETE' })
-    await refresh()
-    toast.add({ title: 'FAQ deleted', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+const columns: TableColumn<AcademyFaq>[] = [
+  { accessorKey: 'order', header: 'Order' },
+  { accessorKey: 'question', header: 'Question' },
+  { accessorKey: 'answer', header: 'Answer' },
+  {
+    id: 'actions',
+    header: () => h('div', 'Actions'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
   }
-}
+]
 </script>
 
 <template>
@@ -86,49 +81,44 @@ async function remove(item: AcademyFaq) {
       <h3 class="text-lg font-semibold">FAQs</h3>
       <UButton label="+ Add" color="primary" @click="openAdd" />
     </div>
-    <div class="border border-default rounded-lg overflow-hidden">
-      <div class="grid grid-cols-[2.5rem_2fr_3fr_auto] gap-4 px-4 py-3 bg-elevated/50 border-b border-default text-sm font-medium">
-        <span>Order</span>
-        <span>Question</span>
-        <span>Answer</span>
-        <span>Actions</span>
-      </div>
-      <div
-        v-for="item in items"
-        :key="item.id"
-        class="grid grid-cols-[2.5rem_2fr_3fr_auto] gap-4 px-4 py-3 border-b border-default last:border-b-0 items-center"
-      >
-        <span class="text-sm text-muted">{{ item.order }}</span>
-        <span class="text-sm font-medium">{{ item.question }}</span>
-        <span class="text-sm text-muted">{{ item.answer }}</span>
-        <div class="flex items-center gap-2">
-          <UButton label="Edit" size="xs" color="neutral" variant="outline" leading-icon="i-lucide-pencil" @click="openEdit(item)" />
-          <UButton label="Delete" size="xs" color="error" variant="outline" leading-icon="i-lucide-trash-2" @click="remove(item)" />
-        </div>
-      </div>
-      <div v-if="items.length === 0" class="px-4 py-8 text-center text-sm text-muted">
-        No FAQs available
-      </div>
+    <div class="p-px overflow-x-auto">
+      <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
+        <template #actions-cell="{ row }">
+          <div class="flex items-center gap-2 justify-end">
+            <UButton
+              size="sm"
+              color="primary"
+              variant="outline"
+              leading-icon="i-lucide-pencil"
+              label="Edit"
+              @click="openEdit(row.original)"
+            />
+            <UButton
+              size="sm"
+              color="error"
+              variant="outline"
+              leading-icon="i-lucide-trash-2"
+              label="Delete"
+              @click="confirmRemove(row.original)"
+            />
+          </div>
+        </template>
+      </UTable>
     </div>
   </div>
 
-  <UModal v-model:open="isModalOpen" :title="editingId !== null ? 'Edit FAQ' : 'Add FAQ'" :ui="{ footer: 'justify-end' }">
-    <template #body>
-      <div class="space-y-4">
-        <UFormField label="Question">
-          <UInput v-model="form.question" placeholder="e.g. What is the duration?" class="w-full" />
-        </UFormField>
-        <UFormField label="Answer">
-          <UTextarea v-model="form.answer" placeholder="The answer to this question..." :rows="4" class="w-full" />
-        </UFormField>
-        <UFormField label="Order">
-          <UInput v-model="form.order" type="number" placeholder="1" class="w-full" />
-        </UFormField>
-      </div>
-    </template>
-    <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" @click="isModalOpen = false" />
-      <UButton label="Save" color="primary" :loading="loading" :disabled="loading" @click="save" />
-    </template>
-  </UModal>
+  <AdminAcademyFaqModal
+    v-model:open="isModalOpen"
+    :academy-id="academyId"
+    :item="editingItem"
+    :next-order="items.length + 1"
+    @saved="refresh"
+  />
+
+  <AdminConfirmDeleteModal
+    v-model:open="isDeleteModalOpen"
+    :item-name="deleteTarget?.question"
+    :loading="isDeleting"
+    @confirm="remove"
+  />
 </template>

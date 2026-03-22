@@ -1,26 +1,3 @@
-export interface UserProfile {
-  id: number
-  username: string
-  first_name: string
-  last_name: string
-  avatar: string
-  email: string
-  phone: string
-  email_verified_at: string
-  phone_verified_at: string
-  role: string
-  gender: string
-  country: string
-  province: string
-  city: string
-  last_education: string
-  current_job: string
-  current_company: string
-  skills: string[]
-  created_at: string
-  updated_at: string
-}
-
 const defaultUser: UserProfile = {
   id: 1,
   username: 'admin',

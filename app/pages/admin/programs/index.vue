@@ -264,13 +264,15 @@ const columns: TableColumn<RylsRegistration>[] = [
 <template>
   <UCard :ui="{ body: 'p-0' }">
     <!-- Toolbar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-default">
-      <div class="flex flex-wrap items-center gap-2">
-        <UInput v-model="search" icon="i-lucide-search" placeholder="Search name or email..." class="w-52" />
-        <USelect v-model="scholarshipFilter" :items="scholarshipOptions" class="w-36" />
-        <USelect v-model="genderFilter" :items="genderOptions" class="w-32" />
-        <USelect v-model="nationalityFilter" :items="rylsNationalityOptions" class="w-36" />
-        <USelect v-model="paymentTypeFilter" :items="paymentTypeOptions" class="w-36" />
+    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-default">
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <UInput v-model="search" icon="i-lucide-search" placeholder="Search name or email..." class="w-full sm:w-52" />
+        <div class="flex flex-wrap w-full sm:w-auto gap-2">
+          <USelect v-model="scholarshipFilter" :items="scholarshipOptions" class="flex-1 sm:flex-none sm:w-36" />
+          <USelect v-model="genderFilter" :items="genderOptions" class="flex-1 sm:flex-none sm:w-32" />
+          <USelect v-model="nationalityFilter" :items="rylsNationalityOptions" class="flex-1 sm:flex-none sm:w-36" />
+          <USelect v-model="paymentTypeFilter" :items="paymentTypeOptions" class="flex-1 sm:flex-none sm:w-36" />
+        </div>
       </div>
 
       <UButton
@@ -299,7 +301,7 @@ const columns: TableColumn<RylsRegistration>[] = [
       />
     </div>
 
-    <div class="flex items-center justify-between px-4 py-3 border-t border-default">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-4 py-3 border-t border-default">
       <p class="text-sm text-muted">
         Showing {{ (pagination.pageIndex * pagination.pageSize) + 1 }} to
         {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
@@ -326,7 +328,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         <!-- Personal Information -->
         <div>
           <h3 class="font-semibold mb-4">Personal Information</h3>
-          <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
             <div>
               <p class="text-xs text-muted mb-0.5">Full Name</p>
               <p class="text-sm font-medium">{{ selectedRegistration.full_name }}</p>
@@ -396,44 +398,46 @@ const columns: TableColumn<RylsRegistration>[] = [
         <USeparator />
 
         <!-- Payment Information -->
-        <div v-if="selectedRegistration.payments.length">
-          <h3 class="font-semibold mb-4">Payment Information</h3>
-          <div class="grid grid-cols-2 gap-x-8 gap-y-4">
-            <div>
-              <p class="text-xs text-muted mb-0.5">Payment Type</p>
-              <p class="text-sm font-medium">{{ formatPaymentType(selectedRegistration.payments[0].type) }}</p>
-            </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Payment Status</p>
-              <p class="text-sm font-medium capitalize">{{ selectedRegistration.payments[0].status?.toLowerCase() ?? '–' }}</p>
-            </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Amount</p>
-              <p class="text-sm font-medium">{{ formatAmount(selectedRegistration.payments[0].amount) }}</p>
-            </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Payment Date</p>
-              <p class="text-sm">
-                {{ selectedRegistration.payments[0].paid_at
-                  ? new Date(selectedRegistration.payments[0].paid_at).toLocaleString('en-US')
-                  : '–' }}
-              </p>
-            </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Payment Proof</p>
-              <template v-if="selectedRegistration.payments[0].payment_proof">
-                <UButton
-                  icon="i-lucide-download"
-                  label="Download"
-                  size="xs"
-                  color="neutral"
-                  variant="outline"
-                />
-              </template>
-              <p v-else class="text-sm text-muted">–</p>
+        <template v-for="payment in selectedRegistration.payments.slice(0, 1)" :key="payment.id">
+          <div>
+            <h3 class="font-semibold mb-4">Payment Information</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <p class="text-xs text-muted mb-0.5">Payment Type</p>
+                <p class="text-sm font-medium">{{ formatPaymentType(payment.type) }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-muted mb-0.5">Payment Status</p>
+                <p class="text-sm font-medium capitalize">{{ payment.status?.toLowerCase() ?? '–' }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-muted mb-0.5">Amount</p>
+                <p class="text-sm font-medium">{{ formatAmount(payment.amount) }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-muted mb-0.5">Payment Date</p>
+                <p class="text-sm">
+                  {{ payment.paid_at
+                    ? new Date(payment.paid_at).toLocaleString('en-US')
+                    : '–' }}
+                </p>
+              </div>
+              <div>
+                <p class="text-xs text-muted mb-0.5">Payment Proof</p>
+                <template v-if="payment.payment_proof">
+                  <UButton
+                    icon="i-lucide-download"
+                    label="Download"
+                    size="xs"
+                    color="neutral"
+                    variant="outline"
+                  />
+                </template>
+                <p v-else class="text-sm text-muted">–</p>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </div>
     </template>
   </UModal>

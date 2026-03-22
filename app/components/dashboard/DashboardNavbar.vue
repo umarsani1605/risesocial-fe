@@ -1,19 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
 
-const { user, logout } = useAuth()
-
-const fullName = computed(() => {
-  if (!user.value) return ''
-  return `${user.value.first_name} ${user.value.last_name}`.trim()
-})
-
-const initials = computed(() => {
-  if (!user.value) return 'U'
-  const first = user.value.first_name?.charAt(0) ?? ''
-  const last = user.value.last_name?.charAt(0) ?? ''
-  return (first + last).toUpperCase() || 'U'
-})
+const { user, logout, fullName, initials } = useAuth()
 
 const navItems = computed<NavigationMenuItem[]>(() => [
   { label: 'Dashboard', to: '/dashboard', exact: true },

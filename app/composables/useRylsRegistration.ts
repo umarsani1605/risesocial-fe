@@ -1,4 +1,4 @@
-type ScholarshipType = 'fully_funded' | 'self_funded' | ''
+type ScholarshipType = 'FULLY_FUNDED' | 'SELF_FUNDED' | ''
 type YesNoEmpty = 'YES' | 'NO' | ''
 type PaymentType = 'PAYPAL' | 'MIDTRANS' | null
 type PaymentStatus = 'PENDING' | 'EXPIRED' | 'PAID' | 'FAILED' | null
@@ -49,14 +49,14 @@ const defaultPayment = (): PaymentData => ({
   midtransData: null,
 })
 
-export const useRylsRegistration = () => {
+export const useRylsRegistration = createSharedComposable(() => {
   const step1 = useState<Step1Data>('ryls:step1', defaultStep1)
   const essayTopic = useState<string>('ryls:essayTopic', () => '')
   const essayFile = useState<string | null>('ryls:essayFile', () => null)
   const essayDescription = useState<string>('ryls:essayDescription', () => '')
   const passportNumber = useState<string>('ryls:passportNumber', () => '')
   const needVisa = useState<YesNoEmpty>('ryls:needVisa', () => '')
-  const headshotFile = useState<File | null>('ryls:headshotFile', () => null)
+  const headshotFile = useState<File | string | null>('ryls:headshotFile', () => null)
   const readPolicies = useState<YesNoEmpty>('ryls:readPolicies', () => '')
   const payment = useState<PaymentData>('ryls:payment', defaultPayment)
 
@@ -106,7 +106,7 @@ export const useRylsRegistration = () => {
   }) => {
     passportNumber.value = payload.passportNumber
     needVisa.value = payload.needVisa
-    headshotFile.value = payload.headshotFile instanceof File ? payload.headshotFile : null
+    headshotFile.value = payload.headshotFile
     readPolicies.value = payload.readPolicies
   }
 
@@ -143,10 +143,11 @@ export const useRylsRegistration = () => {
     needVisa.value = ''
     headshotFile.value = null
     readPolicies.value = ''
-    payment.value = { id: null, type: null, status: null, paymentProof: null, midtransData: null }
+    // preserve payment.id — matches original store behaviour
+    payment.value = { ...payment.value, status: null, type: null, paymentProof: null, midtransData: null }
   }
 
-  return {
+  return reactive({
     // State
     step1,
     essayTopic,
@@ -173,5 +174,5 @@ export const useRylsRegistration = () => {
     setMidtransData,
     resetPayment,
     resetAll,
-  }
-}
+  })
+})

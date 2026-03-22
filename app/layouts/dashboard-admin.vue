@@ -5,7 +5,7 @@ const route = useRoute()
 
 const open = ref(false)
 
-const { user, fullName, initials } = useMockUser()
+const { user, logout, fullName, initials } = useAuth()
 
 const menuItems: DropdownMenuItem[][] = [
   [
@@ -26,7 +26,7 @@ const menuItems: DropdownMenuItem[][] = [
     {
       label: 'Logout',
       icon: 'i-lucide-log-out',
-      onSelect: () => navigateTo('/')
+      onSelect: () => logout()
     }
   ]
 ]
@@ -214,7 +214,7 @@ const programLinks = [
                 class="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100 transition-colors"
               >
                 <UAvatar
-                  :src="user.avatar"
+                  :src="user?.avatar"
                   :alt="fullName"
                   :text="initials"
                   size="sm"

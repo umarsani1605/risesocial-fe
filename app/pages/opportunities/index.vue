@@ -38,10 +38,10 @@ const {
 const jobsResult = computed(() => ({
   data: rawResult.value?.data ?? [],
   meta: {
-    page: rawResult.value?.pagination?.page ?? 1,
-    limit: rawResult.value?.pagination?.limit ?? 12,
-    total: rawResult.value?.pagination?.total ?? 0,
-    totalPages: rawResult.value?.pagination?.totalPages ?? 0
+    page: rawResult.value?.meta?.page ?? 1,
+    limit: rawResult.value?.meta?.limit ?? 12,
+    total: rawResult.value?.meta?.total ?? 0,
+    totalPages: rawResult.value?.meta?.totalPages ?? 0
   }
 }))
 
@@ -71,26 +71,8 @@ const locationOptions = [
   { label: 'United States', value: 'United States' }
 ]
 
-const jobTypeOptions = [
-  { label: 'All Types', value: '' },
-  { label: 'Full Time', value: 'FULL_TIME' },
-  { label: 'Part Time', value: 'PART_TIME' },
-  { label: 'Contract', value: 'CONTRACT' },
-  { label: 'Internship', value: 'INTERNSHIP' },
-  { label: 'Freelance', value: 'FREELANCE' },
-  { label: 'Remote', value: 'REMOTE' }
-]
-
-const experienceLevelOptions = [
-  { label: 'All Levels', value: '' },
-  { label: 'Entry Level', value: 'ENTRY_LEVEL' },
-  { label: 'Junior', value: 'JUNIOR' },
-  { label: 'Mid Level', value: 'MID_LEVEL' },
-  { label: 'Senior', value: 'SENIOR' },
-  { label: 'Lead', value: 'LEAD' },
-  { label: 'Manager', value: 'MANAGER' },
-  { label: 'Director', value: 'DIRECTOR' }
-]
+const jobTypeOptionsWithAll = [{ label: 'All Types', value: '' }, ...jobTypeOptions]
+const experienceLevelOptionsWithAll = [{ label: 'All Levels', value: '' }, ...experienceLevelOptions]
 
 useSeoMeta({
   title: computed(() => {
@@ -155,7 +137,7 @@ useSeoMeta({
               <USelectMenu
                 v-model="pendingFilters.jobType"
                 value-key="value"
-                :items="jobTypeOptions"
+                :items="jobTypeOptionsWithAll"
                 placeholder="All Types"
                 class="w-full"
               />
@@ -165,7 +147,7 @@ useSeoMeta({
               <USelectMenu
                 v-model="pendingFilters.experienceLevel"
                 value-key="value"
-                :items="experienceLevelOptions"
+                :items="experienceLevelOptionsWithAll"
                 placeholder="All Levels"
                 class="w-full"
               />
@@ -227,7 +209,7 @@ useSeoMeta({
               <USelectMenu
                 v-model="pendingFilters.jobType"
                 value-key="value"
-                :items="jobTypeOptions"
+                :items="jobTypeOptionsWithAll"
                 placeholder="All Types"
                 class="w-full"
               />
@@ -237,7 +219,7 @@ useSeoMeta({
               <USelectMenu
                 v-model="pendingFilters.experienceLevel"
                 value-key="value"
-                :items="experienceLevelOptions"
+                :items="experienceLevelOptionsWithAll"
                 placeholder="All Levels"
                 class="w-full"
               />
@@ -290,7 +272,7 @@ useSeoMeta({
         </div>
 
         <div v-else>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <SharedJobCard v-for="job in jobsResult.data" :key="job.id" :job="job" />
           </div>
 

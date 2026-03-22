@@ -1,85 +1,111 @@
 <script setup lang="ts">
 import type { AdminCohort } from '@/types'
+import type { TableColumn } from '@nuxt/ui'
+import { COHORT_STATUS_LABEL, COHORT_STATUS_COLOR } from '@/constants/cohort'
 
 const props = defineProps<{
   academyId: number
 }>()
 
 const { api } = useApi()
+const toast = useToast()
 
 const items = ref<AdminCohort[]>([])
 const loading = ref(false)
+const isModalOpen = ref(false)
 
-onMounted(async () => {
+async function fetchCohorts() {
   loading.value = true
   try {
-    const res = await api<ApiResponse<AdminCohort[]>>(`/admin/cohorts?academy_id=${props.academyId}`)
+    const res = await api<ApiResponse<AdminCohort[]>>(
+      `/admin/cohorts?academy_id=${props.academyId}`
+    )
     items.value = res.data
-  } catch {
-    // error already shown by useApi's onResponseError
+  } catch (error: any) {
+    toast.add({ title: error?.data?.message ?? 'Failed to load cohorts', color: 'error' })
   } finally {
     loading.value = false
   }
-})
-
-function statusColor(status: CohortStatus) {
-  if (status === 'COMPLETED') return 'success' as const
-  if (status === 'ONGOING') return 'warning' as const
-  return 'neutral' as const
 }
+
+onMounted(fetchCohorts)
+
+const columns: TableColumn<AdminCohort>[] = [
+  {
+    id: 'index',
+    header: '#',
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  },
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'description', header: 'Description' },
+  {
+    accessorKey: 'enrollment_count',
+    header: 'Students',
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  },
+  {
+    id: 'status',
+    header: 'Status',
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  },
+  {
+    id: 'actions',
+    header: () => h('div', 'Actions'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  }
+]
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="flex justify-end">
-      <UButton
-        label="+ Create Cohort"
-        color="primary"
-        :to="`/admin/cohorts/create?academyId=${academyId}`"
-      />
+      <UButton label="+ Add Cohort" color="primary" @click="isModalOpen = true" />
     </div>
 
-    <div class="border border-default rounded-lg overflow-hidden">
-      <div v-if="loading" class="px-4 py-8 text-center text-sm text-muted">
-        Loading cohorts...
-      </div>
-
-      <template v-else>
-        <div class="grid grid-cols-[2.5rem_1fr_8rem_8rem_8rem_auto] gap-4 px-4 py-3 bg-elevated/50 border-b border-default text-sm font-medium">
-          <span>#</span>
-          <span>Name</span>
-          <span>Students</span>
-          <span>Start Date</span>
-          <span>Status</span>
-          <span>Actions</span>
-        </div>
-
-        <div
-          v-for="(cohort, idx) in items"
-          :key="cohort.id"
-          class="grid grid-cols-[2.5rem_1fr_8rem_8rem_8rem_auto] gap-4 px-4 py-3 border-b border-default last:border-b-0 items-center"
-        >
-          <span class="text-sm text-muted">{{ idx + 1 }}</span>
-          <span class="text-sm font-medium">{{ cohort.name }}</span>
-          <span class="text-sm">{{ cohort.enrollment_count }}</span>
-          <span class="text-sm text-muted">{{ formatDate(cohort.start_date) }}</span>
-          <UBadge :color="statusColor(cohort.status)" variant="subtle" class="w-fit">
-            {{ cohort.status }}
+    <div class="p-px overflow-x-auto">
+      <UTable
+        :data="items"
+        :columns="columns"
+        :loading="loading"
+        empty="No cohorts yet. Click + Add Cohort to add one."
+        class="px-0 overflow-visible"
+      >
+        <template #index-cell="{ row }">
+          <span class="text-sm text-muted">{{ row.index + 1 }}</span>
+        </template>
+        <template #name-cell="{ row }">
+          <span class="text-sm font-medium">{{ row.original.name }}</span>
+        </template>
+        <template #description-cell="{ row }">
+          <span class="text-sm text-muted">{{ row.original.description ?? '-' }}</span>
+        </template>
+        <template #enrollment_count-cell="{ row }">
+          <span class="text-sm">{{ row.original.enrollment_count ?? 0 }}</span>
+        </template>
+        <template #status-cell="{ row }">
+          <UBadge :color="COHORT_STATUS_COLOR[row.original.status] ?? 'neutral'" variant="subtle">
+            {{ COHORT_STATUS_LABEL[row.original.status] ?? row.original.status }}
           </UBadge>
-          <UButton
-            label="Detail"
-            trailing-icon="i-lucide-chevrons-right"
-            size="xs"
-            color="neutral"
-            variant="outline"
-            :to="`/admin/cohorts/${cohort.id}`"
-          />
-        </div>
-
-        <div v-if="items.length === 0" class="px-4 py-8 text-center text-sm text-muted">
-          No cohorts yet. Click "+ Create Cohort" to add one.
-        </div>
-      </template>
+        </template>
+        <template #actions-cell="{ row }">
+          <div class="flex items-center gap-2 justify-end">
+            <UButton
+              label="Detail"
+              trailing-icon="i-lucide-chevrons-right"
+              size="sm"
+              color="neutral"
+              variant="outline"
+              :to="`/admin/cohorts/${row.original.id}`"
+            />
+          </div>
+        </template>
+      </UTable>
     </div>
   </div>
+
+  <AdminAcademyCohortModal
+    v-model:open="isModalOpen"
+    :academy-id="academyId"
+    @saved="fetchCohorts"
+  />
 </template>

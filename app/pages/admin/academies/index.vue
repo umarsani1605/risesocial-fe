@@ -2,6 +2,8 @@
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminAcademy } from '@/types'
+import { ACADEMY_STATUS_FILTER_OPTIONS, ACADEMY_DURATION_OPTIONS, ACADEMY_FORMAT_OPTIONS } from '@/constants/academy'
+import { academyCreateSchema } from '@/schemas/academy'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -20,6 +22,44 @@ const { data: rawAcademies, refresh } = await useAsyncData('admin:academies', ()
 const deleteTarget = ref<AdminAcademy | null>(null)
 const deleteModalOpen = ref(false)
 const loading = ref(false)
+
+// Create academy dialog
+const createModalOpen = ref(false)
+const isCreating = ref(false)
+const createFormRef = useTemplateRef('createFormRef')
+const createForm = reactive({ title: '', description: '', duration: '', format: '', category: '' })
+
+async function onCreateAcademy() {
+  isCreating.value = true
+  const fd = new FormData()
+  fd.append('title', createForm.title)
+  fd.append('description', createForm.description)
+  fd.append('duration', createForm.duration)
+  fd.append('format', createForm.format)
+  fd.append('category', createForm.category)
+  fd.append('status', 'DRAFT')
+  fd.append('certificate', 'false')
+  fd.append('portfolio', 'false')
+  try {
+    const res = await api<ApiResponse<{ slug: string }>>('/admin/academies', { method: 'POST', body: fd })
+    toast.add({ title: 'Academy created', color: 'success' })
+    createModalOpen.value = false
+    await navigateTo(`/admin/academies/${res.data.slug}/edit`)
+  } catch (error: any) {
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } finally {
+    isCreating.value = false
+  }
+}
+
+watch(createModalOpen, (val) => {
+  if (!val) return
+  createForm.title = ''
+  createForm.description = ''
+  createForm.duration = ''
+  createForm.format = ''
+  createForm.category = ''
+})
 
 function confirmDelete(academy: AdminAcademy) {
   deleteTarget.value = academy
@@ -56,13 +96,9 @@ const pagination = ref({ pageIndex: 0, pageSize: 10 })
 
 const search = ref('')
 const categoryFilter = ref('all')
-const statusFilter = ref('all')
+const statusFilter = ref<'all' | 'ACTIVE' | 'ARCHIVED'>('all')
 
-const statusOptions: { label: string; value: 'all' | 'ACTIVE' | 'ARCHIVED' }[] = [
-  { label: 'All Status', value: 'all' },
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Archived', value: 'ARCHIVED' }
-]
+const statusOptions = ACADEMY_STATUS_FILTER_OPTIONS
 
 const filteredData = computed(() => {
   let result = rawAcademies.value?.data ?? []
@@ -129,7 +165,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           to: `/admin/academies/${row.original.slug}/edit`
         }),
         h(UButton, {
-          label: 'Hapus',
+          label: 'Delete',
           size: 'sm',
           color: 'error',
           variant: 'outline',
@@ -142,29 +178,32 @@ const columns: TableColumn<AdminAcademy>[] = [
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-2!' }">
-    <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." class="w-56" />
-        <USelect v-model="categoryFilter" :items="categoryOptions" class="w-40" />
-        <USelect v-model="statusFilter" :items="statusOptions" class="w-36" />
+  <UCard :ui="{ body: 'p-0!' }">
+    <div class="flex flex-wrap items-center justify-between gap-2 p-4">
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." class="w-full sm:w-56" />
+        <div class="flex w-full sm:w-auto gap-2">
+          <USelect v-model="categoryFilter" :items="categoryOptions" class="flex-1 sm:flex-none sm:w-40" />
+          <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
+        </div>
       </div>
-
-      <UButton label="Add New" icon="i-lucide-plus" color="primary" to="/admin/academies/create" />
+      <UButton label="Add New" icon="i-lucide-plus" color="primary" @click="createModalOpen = true" />
     </div>
 
-    <UTable
-      ref="table"
-      v-model:pagination="pagination"
-      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-      :data="filteredData"
-      :columns="columns"
-    />
+    <div class="overflow-x-auto">
+      <UTable
+        ref="table"
+        v-model:pagination="pagination"
+        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+        :data="filteredData"
+        :columns="columns"
+      />
+    </div>
 
-    <div class="flex items-center justify-between px-4 py-3">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4">
       <p class="text-sm text-muted">
-        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-        {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+        {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
+        {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} shown.
       </p>
       <UPagination
         :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
@@ -177,17 +216,43 @@ const columns: TableColumn<AdminAcademy>[] = [
     </div>
   </UCard>
 
-  <UModal v-model:open="deleteModalOpen" title="Hapus Academy" :ui="{ footer: 'justify-end' }">
+  <UModal v-model:open="createModalOpen" title="Add New Academy" :ui="{ footer: 'justify-end' }">
+    <template #body>
+      <UForm ref="createFormRef" :schema="academyCreateSchema" :state="createForm" class="space-y-4" @submit="onCreateAcademy">
+        <UFormField name="title" label="Title" required>
+          <UInput v-model="createForm.title" placeholder="Academy title" class="w-full" />
+        </UFormField>
+        <UFormField name="description" label="Description" required>
+          <UTextarea v-model="createForm.description" placeholder="Academy description" :rows="3" class="w-full" />
+        </UFormField>
+        <UFormField name="duration" label="Duration" required>
+          <USelect v-model="createForm.duration" :items="ACADEMY_DURATION_OPTIONS" placeholder="Select duration" class="w-full" />
+        </UFormField>
+        <UFormField name="format" label="Format" required>
+          <USelect v-model="createForm.format" :items="ACADEMY_FORMAT_OPTIONS" placeholder="Select format" class="w-full" />
+        </UFormField>
+        <UFormField name="category" label="Category" required>
+          <UInput v-model="createForm.category" placeholder="e.g. Carbon Accounting" class="w-full" />
+        </UFormField>
+      </UForm>
+    </template>
+    <template #footer>
+      <UButton label="Cancel" color="neutral" variant="outline" @click="createModalOpen = false" />
+      <UButton label="Create" color="primary" :loading="isCreating" @click="createFormRef?.submit()" />
+    </template>
+  </UModal>
+
+  <UModal v-model:open="deleteModalOpen" title="Delete Academy" :ui="{ footer: 'justify-end' }">
     <template #body>
       <p class="text-sm">
-        Apakah kamu yakin ingin menghapus academy
+        Are you sure you want to delete
         <span class="font-semibold">{{ deleteTarget?.title }}</span
-        >? <br />Tindakan ini tidak dapat dibatalkan.
+        >? <br />This action cannot be undone.
       </p>
     </template>
     <template #footer>
-      <UButton label="Batal" color="neutral" variant="outline" @click="deleteModalOpen = false" />
-      <UButton label="Hapus" color="error" :loading="loading" @click="onDelete" />
+      <UButton label="Cancel" color="neutral" variant="outline" @click="deleteModalOpen = false" />
+      <UButton label="Delete" color="error" :loading="loading" @click="onDelete" />
     </template>
   </UModal>
 </template>

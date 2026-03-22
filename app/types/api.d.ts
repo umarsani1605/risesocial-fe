@@ -7,11 +7,13 @@ interface ApiResponse<T = unknown> {
 interface PaginatedResponse<T = unknown> {
   success: true
   data: T[]
-  pagination: {
+  meta: {
     page: number
     limit: number
     total: number
     totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
   }
 }
 

@@ -31,18 +31,6 @@ export interface AdminPayment {
   createdAt: string
 }
 
-export interface AdminUser {
-  id: number
-  username: string
-  first_name: string
-  last_name: string
-  email: string
-  phone: string | null
-  avatar: string | null
-  role: string
-  created_at: string
-}
-
 
 export interface RylsPayment {
   id: number
@@ -139,14 +127,14 @@ const adminAcademies: AdminAcademy[] = [
 ]
 
 const adminCohorts: AdminCohort[] = [
-  { id: 1, academy: 'Carbon Accounting', name: 'Batch 1', description: 'November 2025', students: 5, status: 'Completed' },
-  { id: 2, academy: 'Carbon Accounting', name: 'Batch 2', description: '-', students: 10, status: 'On Going' },
-  { id: 3, academy: 'ESG (Environmental, Social, an...', name: 'Summer Class', description: 'Summer Class', students: 20, status: 'Not Started' },
-  { id: 4, academy: 'LCA (Life Cycle Assessment)', name: 'Batch 1', description: 'April 2026', students: 15, status: 'Completed' },
-  { id: 5, academy: 'LCA (Life Cycle Assessment)', name: 'Batch 2', description: '-', students: 8, status: 'On Going' },
-  { id: 6, academy: 'Sustainable Finance', name: 'Batch 1', description: 'February 2026', students: 12, status: 'On Going' },
-  { id: 7, academy: 'Green Business', name: 'Batch 1', description: 'March 2026', students: 18, status: 'Not Started' },
-  { id: 8, academy: 'Carbon Accounting', name: 'Batch 3', description: 'January 2026', students: 22, status: 'Completed' }
+  { id: 1, academy_id: 1, academy: { id: 1, title: 'Carbon Accounting', slug: 'carbon-accounting' }, name: 'Batch 1', description: 'November 2025', status: 'Completed', start_date: null, end_date: null },
+  { id: 2, academy_id: 1, academy: { id: 1, title: 'Carbon Accounting', slug: 'carbon-accounting' }, name: 'Batch 2', description: null, status: 'On Going', start_date: null, end_date: null },
+  { id: 3, academy_id: 2, academy: { id: 2, title: 'ESG Academy', slug: 'esg-academy' }, name: 'Summer Class', description: 'Summer Class', status: 'Not Started', start_date: null, end_date: null },
+  { id: 4, academy_id: 3, academy: { id: 3, title: 'LCA Mini Academy', slug: 'lca-mini-academy' }, name: 'Batch 1', description: 'April 2026', status: 'Completed', start_date: null, end_date: null },
+  { id: 5, academy_id: 3, academy: { id: 3, title: 'LCA Mini Academy', slug: 'lca-mini-academy' }, name: 'Batch 2', description: null, status: 'On Going', start_date: null, end_date: null },
+  { id: 6, academy_id: 4, academy: { id: 4, title: 'Sustainable Finance Academy', slug: 'sustainable-finance-academy' }, name: 'Batch 1', description: 'February 2026', status: 'On Going', start_date: null, end_date: null },
+  { id: 7, academy_id: 5, academy: { id: 5, title: 'Green Business Academy', slug: 'green-business-academy' }, name: 'Batch 1', description: 'March 2026', status: 'Not Started', start_date: null, end_date: null },
+  { id: 8, academy_id: 1, academy: { id: 1, title: 'Carbon Accounting', slug: 'carbon-accounting' }, name: 'Batch 3', description: 'January 2026', status: 'Completed', start_date: null, end_date: null }
 ]
 
 const adminPayments: AdminPayment[] = [
@@ -262,10 +250,10 @@ export const useMockAdminData = () => {
     let result = [...adminCohorts]
     if (filters?.search) {
       const s = filters.search.toLowerCase()
-      result = result.filter(c => c.academy.toLowerCase().includes(s) || c.name.toLowerCase().includes(s))
+      result = result.filter(c => c.academy?.title.toLowerCase().includes(s) || c.name.toLowerCase().includes(s))
     }
     if (filters?.academy && filters.academy !== 'all') {
-      result = result.filter(c => c.academy === filters.academy)
+      result = result.filter(c => String(c.academy?.id) === filters.academy)
     }
     if (filters?.status && filters.status !== 'all') {
       result = result.filter(c => c.status === filters.status)

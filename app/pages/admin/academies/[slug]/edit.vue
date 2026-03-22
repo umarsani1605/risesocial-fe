@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Academy } from '@/types'
-import { ACADEMY_TAB_ITEMS } from '@/utils/academyOptions'
+import { ACADEMY_TAB_ITEMS } from '@/constants/academy'
+import { academyFormSchema } from '@/schemas/academy'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -45,6 +46,20 @@ const loading = ref(false)
 
 async function onSave() {
   loading.value = true
+  const imageFile = formRef.value?.imageFile
+  if (imageFile) {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(imageFile.type)) {
+      toast.add({ title: 'Image must be JPG, PNG, or WebP', color: 'error' })
+      loading.value = false
+      return
+    }
+    if (imageFile.size > 2 * 1024 * 1024) {
+      toast.add({ title: 'Image must be under 2MB', color: 'error' })
+      loading.value = false
+      return
+    }
+  }
   const fd = new FormData()
   fd.append('title', form.title)
   if (form.description) fd.append('description', form.description)
@@ -57,13 +72,15 @@ async function onSave() {
   if (formRef.value?.imageFile) fd.append('image', formRef.value.imageFile)
 
   try {
-    const res = await api<any>(`/admin/academies/${source.id}`, { method: 'PUT', body: fd })
+    const res = await api<ApiResponse<{ slug: string }>>(`/admin/academies/${source.id}`, {
+      method: 'PUT',
+      body: fd
+    })
     pageTitle.value = form.title
 
+    toast.add({ title: 'Academy saved', color: 'success' })
     if (res.data.slug !== academySlug) {
       await navigateTo(`/admin/academies/${res.data.slug}/edit`, { replace: true })
-    } else {
-      toast.add({ title: 'Academy saved', color: 'success' })
     }
   } catch (error: any) {
     const message = error?.data?.message ?? 'An error occurred'
@@ -76,10 +93,10 @@ async function onSave() {
 
 <template>
   <UCard :ui="{ body: 'p-0' }">
-    <div class="flex items-center justify-between gap-2 mb-4">
-      <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center justify-between gap-2 p-4 sm:p-6">
+      <div class="flex items-center gap-2 min-w-0">
         <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/admin/academies" />
-        <h2 class="text-xl font-semibold">Edit {{ pageTitle }}</h2>
+        <h2 class="text-xl font-semibold truncate">Edit {{ pageTitle }}</h2>
       </div>
       <UButton
         label="View Public Page"
@@ -94,53 +111,94 @@ async function onSave() {
       variant="link"
       color="primary"
       :unmount-on-hide="false"
-      :ui="{ list: 'p-0! border-b border-default', trigger: 'px-6', content: '' }"
+      :ui="{
+        trigger: 'px-3 sm:px-6 whitespace-nowrap',
+        content: ''
+      }"
     >
       <template #information>
-        <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
+        <UScrollArea
+          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
+          :ui="{ viewport: 'p-6' }"
+        >
           <div class="space-y-10">
             <div class="space-y-6">
-              <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Basic Information</h3>
-                <UButton label="Save" color="primary" :loading="loading" :disabled="loading" @click="onSave" />
-              </div>
-              <AdminAcademyFormBasicInfo
-                ref="formRef"
-                v-model="form"
-                :initial-image-url="source.image_url"
-              />
+              <UForm :schema="academyFormSchema" :state="form" @submit="onSave">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-lg font-semibold">Basic Information</h3>
+                  <UButton
+                    type="submit"
+                    label="Save"
+                    color="primary"
+                    :loading="loading"
+                    :disabled="loading"
+                  />
+                </div>
+                <AdminAcademyFormBasicInfo
+                  ref="formRef"
+                  v-model="form"
+                  :initial-image-url="source.image_url"
+                />
+              </UForm>
             </div>
 
             <!-- Section components -->
-            <AdminAcademySectionPricing :academy-id="source.id" :initial-data="source.pricing ?? []" />
-            <AdminAcademySectionFeatures :academy-id="source.id" :initial-data="source.features ?? []" />
-            <AdminAcademySectionInstructors :academy-id="source.id" :initial-data="source.instructors ?? []" />
-            <AdminAcademySectionTestimonials :academy-id="source.id" :initial-data="source.testimonials ?? []" />
+            <AdminAcademySectionPricing
+              :academy-id="source.id"
+              :initial-data="source.pricing ?? []"
+            />
+            <AdminAcademySectionFeatures
+              :academy-id="source.id"
+              :initial-data="source.features ?? []"
+            />
+            <AdminAcademySectionInstructors
+              :academy-id="source.id"
+              :initial-data="source.instructors ?? []"
+            />
+            <AdminAcademySectionTestimonials
+              :academy-id="source.id"
+              :initial-data="source.testimonials ?? []"
+            />
             <AdminAcademySectionFaqs :academy-id="source.id" :initial-data="source.faqs ?? []" />
           </div>
         </UScrollArea>
       </template>
 
       <template #syllabus>
-        <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
-          <AdminAcademySectionSyllabus :academy-id="source.id" :initial-data="source.themes ?? []" />
+        <UScrollArea
+          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
+          :ui="{ viewport: 'p-6' }"
+        >
+          <AdminAcademySectionSyllabus
+            :academy-id="source.id"
+            :initial-data="source.themes ?? []"
+          />
         </UScrollArea>
       </template>
 
       <template #cohorts>
-        <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
+        <UScrollArea
+          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
+          :ui="{ viewport: 'p-6' }"
+        >
           <AdminAcademySectionCohorts :academy-id="source.id" />
         </UScrollArea>
       </template>
 
       <template #students>
-        <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
+        <UScrollArea
+          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
+          :ui="{ viewport: 'p-6' }"
+        >
           <p class="py-8 text-center text-sm text-muted">No students enrolled yet.</p>
         </UScrollArea>
       </template>
 
       <template #mentors>
-        <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
+        <UScrollArea
+          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
+          :ui="{ viewport: 'p-6' }"
+        >
           <p class="py-8 text-center text-sm text-muted">No mentors assigned yet.</p>
         </UScrollArea>
       </template>

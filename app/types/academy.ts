@@ -48,6 +48,7 @@ export interface AcademyTestimonial {
   id: number
   name: string
   comment: string
+  avatar_url?: string | null
   order?: number
 }
 
@@ -101,7 +102,7 @@ export interface AcademyForm {
   duration: string
   format: string
   category: string
-  status: 'ACTIVE' | 'ARCHIVED'
+  status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
   certificate: string
   portfolio: string
 }
@@ -109,7 +110,10 @@ export interface AcademyForm {
 export interface AdminCohort {
   id: number
   name: string
-  status: 'UPCOMING' | 'ONGOING' | 'COMPLETED'
+  description: string | null
+  academy_id: number
+  academy: { id: number; title: string; slug: string }
+  status: 'not_started' | 'ongoing' | 'completed'
   enrollment_count: number
   start_date: string
   end_date: string

@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 const route = useRoute()
-const academySlug = route.params.academy_name as string
+const academySlug = route.params.slug as string
 
 if (!academySlug || academySlug === 'undefined') {
   throw createError({ statusCode: 404, statusMessage: 'Academy slug is required' })
@@ -36,7 +36,20 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
   { label: academy.value.title }
 ])
 
-const config = useRuntimeConfig()
+const { isLoggedIn } = useAuth()
+const { checkEnrollment } = useAcademyPayment()
+const isEnrolled = ref(false)
+const hasPendingPayment = ref(false)
+
+if (isLoggedIn.value) {
+  try {
+    const result = await checkEnrollment(academy.value.id)
+    isEnrolled.value = result.enrolled
+    hasPendingPayment.value = result.hasPendingPayment ?? false
+  } catch {
+    // silently fail — enrollment check is not critical
+  }
+}
 
 const curriculumItems = computed<AccordionItem[]>(() =>
   (academy.value.topics ?? []).map((topic) => ({ value: `topic-${topic.id}` }))
@@ -58,12 +71,14 @@ const pricingTabs = computed<TabsItem[]>(() =>
 )
 
 const testimonialItems = computed(() => academy.value.testimonials ?? [])
+const testimonialCarousel = useTemplateRef('testimonialCarousel')
 
-const getEnrollLink = () => {
-  const message = encodeURIComponent(
-    `Halo Kak, saya tertarik mengikuti Rise Academy yang bertema ${academy.value.title}`
-  )
-  return `https://api.whatsapp.com/send?phone=${config.public.whatsappNumber}&text=${message}`
+function prevTestimonial() {
+  testimonialCarousel.value?.emblaApi?.value?.scrollPrev()
+}
+
+function nextTestimonial() {
+  testimonialCarousel.value?.emblaApi?.value?.scrollNext()
 }
 </script>
 
@@ -89,9 +104,6 @@ const getEnrollLink = () => {
           <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold mb-4">
             {{ academy.title }}
           </h1>
-          <p class="text-white/90 text-lg mb-6">
-            {{ academy.name }}
-          </p>
           <div class="flex flex-wrap items-center gap-4 md:gap-6 text-white/90 text-sm">
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-clock" class="size-4" />
@@ -130,16 +142,21 @@ const getEnrollLink = () => {
 
             <!-- What You'll Get -->
             <UCard v-if="(academy.features?.length ?? 0) > 0" class="py-8">
-              <div class="px-8">
+              <div class="px-4 sm:px-8">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">What You'll Get</h2>
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div
                     v-for="feature in academy.features"
                     :key="feature.id"
                     class="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <div class="shrink-0">
-                      <UIcon :name="feature.icon?.startsWith('i-') ? feature.icon : `i-lucide-${feature.icon}`" class="size-12 md:size-6 text-primary" />
+                      <UIcon
+                        :name="
+                          feature.icon?.startsWith('i-') ? feature.icon : `i-lucide-${feature.icon}`
+                        "
+                        class="size-12 md:size-6 text-primary"
+                      />
                     </div>
                     <div>
                       <h3 class="font-semibold mb-1">{{ feature.title }}</h3>
@@ -152,7 +169,7 @@ const getEnrollLink = () => {
 
             <!-- Curriculum -->
             <UCard v-if="(academy.topics?.length ?? 0) > 0">
-              <div class="p-8">
+              <div class="p-4 sm:p-8">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">Curriculum</h2>
                 <UAccordion
                   type="multiple"
@@ -193,7 +210,7 @@ const getEnrollLink = () => {
                     class="flex flex-col lg:flex-row gap-4 lg:gap-12 items-start lg:items-center"
                   >
                     <UAvatar
-                      :src="instructor.avatar_url"
+                      :src="instructor.avatar_url ?? undefined"
                       :alt="instructor.name"
                       :text="instructor.name.charAt(0)"
                       :ui="{
@@ -218,11 +235,30 @@ const getEnrollLink = () => {
               <div class="px-8">
                 <div class="flex items-center justify-between mb-6">
                   <h2 class="text-2xl sm:text-3xl font-bold">Alumni Testimonials</h2>
+                  <div class="flex gap-2">
+                    <UButton
+                      color="neutral"
+                      variant="outline"
+                      icon="i-lucide-chevron-left"
+                      size="sm"
+                      class="rounded-full"
+                      @click="prevTestimonial"
+                    />
+                    <UButton
+                      color="neutral"
+                      variant="outline"
+                      icon="i-lucide-chevron-right"
+                      size="sm"
+                      class="rounded-full"
+                      @click="nextTestimonial"
+                    />
+                  </div>
                 </div>
                 <UCarousel
+                  ref="testimonialCarousel"
                   v-slot="{ item }"
                   :items="testimonialItems"
-                  loop
+                  align="start"
                   :ui="{
                     item: 'basis-full md:basis-1/2',
                     container: 'items-stretch',
@@ -309,7 +345,9 @@ const getEnrollLink = () => {
                         <AcademyPricingContent
                           :tier="academy.pricing[Number(item.value)]!"
                           :academy="academy"
-                          :enroll-link="getEnrollLink()"
+                          :academy-slug="academySlug"
+                          :is-enrolled="isEnrolled"
+                          :has-pending-payment="hasPendingPayment"
                         />
                       </template>
                     </UTabs>
@@ -319,7 +357,9 @@ const getEnrollLink = () => {
                       <AcademyPricingContent
                         :tier="academy.pricing[0]!"
                         :academy="academy"
-                        :enroll-link="getEnrollLink()"
+                        :academy-slug="academySlug"
+                        :is-enrolled="isEnrolled"
+                        :has-pending-payment="hasPendingPayment"
                       />
                     </div>
                   </template>

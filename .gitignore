@@ -32,3 +32,13 @@ coverage/
 # Playwright
 playwright-report/
 test-results/
+
+.claude/worktrees/eager-gould/.data
+.agent
+.agents
+.claude
+.kiro
+.superpowers
+.docs
+.CLAUDE.md
+.skills-lock.json

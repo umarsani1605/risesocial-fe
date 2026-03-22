@@ -12,7 +12,7 @@ const { api } = useApi()
 const { data: enrollmentsData } = await useAsyncData('dashboard:my-cohorts', () =>
   api<PaginatedResponse<CohortEnrollment>>('/cohorts/my')
 )
-const enrollments = computed(() => enrollmentsData.value?.data ?? [])
+const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.cohort) ?? [])
 </script>
 
 <template>
@@ -36,15 +36,12 @@ const enrollments = computed(() => enrollmentsData.value?.data ?? [])
     </div>
 
     <div v-else class="space-y-4">
-      <NuxtLink
+      <div
         v-for="enrollment in enrollments"
         :key="enrollment.id"
-        :to="`/dashboard/academy/${enrollment.cohort.id}`"
-        class="flex flex-col sm:flex-row items-start gap-4 p-4 border border-default rounded-lg hover:border-gray-300 transition-colors cursor-pointer bg-white"
+        class="flex items-start gap-4 p-4 border border-default rounded-lg bg-white"
       >
-        <div
-          class="w-full sm:w-24 md:w-36 lg:w-40 aspect-video sm:aspect-square rounded-md overflow-hidden bg-gray-100 shrink-0"
-        >
+        <div class="w-32 md:w-44 aspect-video rounded-md overflow-hidden bg-gray-100 shrink-0">
           <NuxtImg
             :src="enrollment.cohort.academy.image_url"
             :alt="enrollment.cohort.academy.title"
@@ -55,23 +52,38 @@ const enrollments = computed(() => enrollmentsData.value?.data ?? [])
 
         <div class="flex-1 min-w-0">
           <h3 class="font-semibold mb-1 leading-tight">{{ enrollment.cohort.academy.title }}</h3>
-          <p class="text-sm text-muted mb-2">{{ enrollment.cohort.name }}</p>
 
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
-            <span class="flex items-center gap-1.5">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted mb-2">
+            <span class="flex items-center gap-1">
+              <UIcon name="i-lucide-layers" class="size-3.5 shrink-0" />
+              {{ enrollment.cohort.name }}
+            </span>
+            <span class="flex items-center gap-1">
               <UIcon name="i-lucide-calendar" class="size-3.5 shrink-0" />
-              {{ formatDate(enrollment.cohort.start_date) }}
+              INTAKE: {{ formatDate(enrollment.cohort.start_date) }}
             </span>
             <UBadge
               :color="enrollment.status === 'completed' ? 'success' : enrollment.status === 'active' ? 'primary' : 'warning'"
               variant="subtle"
-              size="sm"
+              size="xs"
             >
               {{ enrollment.status }}
             </UBadge>
           </div>
+
+          <div class="flex justify-end">
+            <UButton
+              :to="`/dashboard/academy/${enrollment.cohort.id}`"
+              variant="link"
+              color="neutral"
+              size="sm"
+              class="text-muted"
+            >
+              More Detail
+            </UButton>
+          </div>
         </div>
-      </NuxtLink>
+      </div>
     </div>
   </UCard>
 </template>

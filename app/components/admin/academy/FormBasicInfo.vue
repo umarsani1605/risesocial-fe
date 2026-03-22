@@ -5,102 +5,113 @@ import {
   ACADEMY_FORMAT_OPTIONS,
   ACADEMY_STATUS_OPTIONS,
   ACADEMY_YES_NO_OPTIONS
-} from '@/utils/academyOptions'
+} from '@/constants/academy'
 
 const form = defineModel<AcademyForm>({ required: true })
 const props = defineProps<{ initialImageUrl?: string | null }>()
 
-const { file: imageFile, previewUrl, inputRef, onChange, remove } = useImageUpload(
-  props.initialImageUrl ?? null
-)
+const imageFile = ref<File | null>(null)
+const isNewFile = ref(false)
 
-defineExpose({ imageFile })
+onMounted(async () => {
+  if (!props.initialImageUrl) return
+  try {
+    const res = await fetch(props.initialImageUrl)
+    const blob = await res.blob()
+    const filename = props.initialImageUrl.split('/').pop()?.split('?')[0] ?? 'cover.jpg'
+    imageFile.value = new File([blob], filename, { type: blob.type })
+  } catch {
+    // do nothing
+  }
+})
+
+defineExpose({
+  get imageFile() {
+    return isNewFile.value ? imageFile.value : null
+  }
+})
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-x-16">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
     <!-- Left column -->
     <div class="space-y-5">
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Title</span>
-        <UInput v-model="form.title" placeholder="Academy title" class="flex-1" />
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Title <span class="text-error">*</span></span>
+        <UFormField name="title" class="flex-1">
+          <UInput v-model="form.title" placeholder="Academy title" class="w-full" />
+        </UFormField>
       </div>
-      <div class="flex items-start gap-4">
-        <span class="text-sm w-28 shrink-0 pt-2">Description</span>
-        <UTextarea
-          v-model="form.description"
-          placeholder="Academy description"
-          :rows="4"
-          class="flex-1"
-        />
-      </div>
-      <div class="flex items-start gap-4">
-        <span class="text-sm w-28 shrink-0 pt-2">Cover Image</span>
-        <div class="flex-1">
-          <input
-            ref="inputRef"
-            type="file"
-            accept="image/png,image/jpeg"
-            class="hidden"
-            @change="onChange"
+      <div class="flex flex-col md:flex-row items-start gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2 md:pt-2">Description</span>
+        <UFormField name="description" class="flex-1 w-full">
+          <UTextarea
+            v-model="form.description"
+            placeholder="Academy description"
+            :rows="4"
+            class="w-full"
           />
-          <div
-            v-if="!previewUrl"
-            class="border-2 border-dashed border-default rounded-lg p-10 flex flex-col items-center gap-2 cursor-pointer hover:bg-elevated/30 transition-colors"
-            @click="inputRef?.click()"
-          >
-            <UIcon name="i-lucide-image" class="size-8 text-muted" />
-            <p class="text-sm">Click to upload cover image</p>
-            <p class="text-xs text-muted">PNG or JPG (max. 2MB)</p>
-          </div>
-          <div v-else class="relative inline-block">
-            <img :src="previewUrl" class="rounded-lg w-90 h-auto object-cover" />
-            <button
-              class="absolute -top-1.5 -right-1.5 size-5 bg-white border border-default rounded-full flex items-center justify-center shadow-sm"
-              @click="remove"
-            >
-              <UIcon name="i-lucide-x" class="size-3" />
-            </button>
-          </div>
-        </div>
+        </UFormField>
+      </div>
+      <div class="flex flex-col md:flex-row items-start gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2 md:pt-2">Cover Image</span>
+        <UFileUpload
+          v-model="imageFile"
+          accept="image/png,image/jpeg"
+          icon="i-lucide-image"
+          label="Click to upload or drag & drop"
+          description="PNG or JPG (max. 2MB)"
+          layout="list"
+          :ui="{ fileLeadingAvatar: 'size-16 rounded-md' }"
+          class="flex-1 w-full"
+          @update:model-value="isNewFile = true"
+        />
       </div>
     </div>
 
     <!-- Right column -->
-    <div class="space-y-5">
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Duration</span>
-        <USelect
-          v-model="form.duration"
-          :items="ACADEMY_DURATION_OPTIONS"
-          placeholder="Select duration"
-          class="flex-1"
-        />
+    <div class="space-y-5 mt-5 md:mt-0">
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Duration</span>
+        <UFormField name="duration" class="flex-1">
+          <USelect
+            v-model="form.duration"
+            :items="ACADEMY_DURATION_OPTIONS"
+            placeholder="Select duration"
+            class="w-full"
+          />
+        </UFormField>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Format</span>
-        <USelect
-          v-model="form.format"
-          :items="ACADEMY_FORMAT_OPTIONS"
-          placeholder="Select format"
-          class="flex-1"
-        />
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Format</span>
+        <UFormField name="format" class="flex-1">
+          <USelect
+            v-model="form.format"
+            :items="ACADEMY_FORMAT_OPTIONS"
+            placeholder="Select format"
+            class="w-full"
+          />
+        </UFormField>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Category</span>
-        <UInput v-model="form.category" placeholder="Category" class="flex-1" />
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Category</span>
+        <UFormField name="category" class="flex-1">
+          <UInput v-model="form.category" placeholder="Category" class="w-full" />
+        </UFormField>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Status</span>
-        <USelect
-          v-model="form.status"
-          :items="ACADEMY_STATUS_OPTIONS"
-          placeholder="Select status"
-          class="flex-1"
-        />
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Status</span>
+        <UFormField name="status" class="flex-1">
+          <USelect
+            v-model="form.status"
+            :items="ACADEMY_STATUS_OPTIONS"
+            placeholder="Select status"
+            class="w-full"
+          />
+        </UFormField>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Certificate</span>
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Certificate</span>
         <USelect
           v-model="form.certificate"
           :items="ACADEMY_YES_NO_OPTIONS"
@@ -108,8 +119,8 @@ defineExpose({ imageFile })
           class="flex-1"
         />
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-sm w-28 shrink-0">Portfolio</span>
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Portfolio</span>
         <USelect
           v-model="form.portfolio"
           :items="ACADEMY_YES_NO_OPTIONS"

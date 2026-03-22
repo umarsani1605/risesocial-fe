@@ -146,7 +146,7 @@ const teamMembersData = [
       <div class="relative z-10">
         <UContainer>
           <div class="bg-white rounded-2xl shadow-2xl p-8 sm:p-12">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
               <div v-for="stat in statsData" :key="stat.id" class="space-y-2">
                 <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary">
                   {{ stat.value }}

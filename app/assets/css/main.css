@@ -45,6 +45,11 @@
   --ui-header-height: 5rem;
 }
 
+/* RYLS (Rise Young Leaders Summit) blue theme override */
+.ryls-blue-theme {
+  --ui-primary: var(--color-sky-400);
+}
+
 /* Custom utilities untuk Rise Social homepage */
 @layer utilities {
   .text-balance {

@@ -1,37 +1,26 @@
 <script setup lang="ts">
-export interface CohortAttachment {
-  id: number
-  label: string
-  type: 'pdf' | 'docx' | 'pptx' | 'xlsx' | 'url' | 'file'
-  url?: string
-}
-
-export interface CohortModule {
-  id: number
-  order: number
-  title: string
-  description?: string
-  date?: string | null
-  meetingLink?: string | null
-  attendanceLink?: string | null
-  assignmentLink?: string | null
-  attachments: CohortAttachment[]
-}
+import type { AdminCohortModule, AdminCohortAttachment } from '~/types/cohort'
 
 const props = defineProps<{
-  modules: CohortModule[]
+  modules: AdminCohortModule[]
 }>()
 
 const emit = defineEmits<{
-  addModule: []
-  editModule: [module: CohortModule]
-  deleteModule: [moduleId: number]
+  'add-module': []
+  'edit-module': [module: AdminCohortModule]
+  'delete-module': [moduleId: number]
 }>()
 
-// Same pattern as DashboardAcademyTabModules – open first 1 by default
 const openModules = ref<Set<number>>(
   new Set(props.modules.slice(0, 1).map(m => m.id))
 )
+
+// Keep openModules in sync when modules are refreshed from parent
+watch(() => props.modules, (newModules) => {
+  if (openModules.value.size === 0 && newModules.length > 0) {
+    openModules.value = new Set(newModules.slice(0, 1).map(m => m.id))
+  }
+})
 
 function toggleModule(id: number) {
   if (openModules.value.has(id)) openModules.value.delete(id)
@@ -42,26 +31,32 @@ function isOpen(id: number) {
   return openModules.value.has(id)
 }
 
-const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: string; icon: string }> = {
-  pdf:  { bg: '#ef4444', label: 'PDF',  icon: 'i-lucide-file-text' },
-  docx: { bg: '#3b82f6', label: 'DOCX', icon: 'i-lucide-file-text' },
-  pptx: { bg: '#f97316', label: 'PPTX', icon: 'i-lucide-presentation' },
-  xlsx: { bg: '#22c55e', label: 'XLSX', icon: 'i-lucide-table-2' },
-  url:  { bg: '#60a5fa', label: 'LINK', icon: 'i-lucide-link' },
-  file: { bg: '#9ca3af', label: 'FILE', icon: 'i-lucide-paperclip' },
+function formatDate(iso: string) {
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  }).format(new Date(iso))
+}
+
+const attachmentStyle: Record<AdminCohortAttachment['type'], { bg: string; icon: string }> = {
+  pdf:  { bg: 'bg-red-500',    icon: 'i-lucide-file-text' },
+  docx: { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
+  pptx: { bg: 'bg-orange-500', icon: 'i-lucide-presentation' },
+  xlsx: { bg: 'bg-green-500',  icon: 'i-lucide-table-2' },
+  url:  { bg: 'bg-blue-400',   icon: 'i-lucide-link' },
+  file: { bg: 'bg-gray-400',   icon: 'i-lucide-paperclip' },
 }
 </script>
 
 <template>
   <div class="space-y-3 pt-2 min-h-[400px]">
-    <!-- Add Module button -->
     <div class="flex justify-end mb-4">
       <UButton
         label="Add Module"
         icon="i-lucide-plus"
         color="primary"
         size="sm"
-        @click="emit('addModule')"
+        @click="emit('add-module')"
       />
     </div>
 
@@ -70,35 +65,32 @@ const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: str
       class="flex flex-col items-center justify-center py-16 text-muted text-sm"
     >
       <UIcon name="i-lucide-book-open" class="size-10 mb-3 opacity-30" />
-      Belum ada module. Klik "Add Module" untuk mulai.
+      No modules yet. Click "Add Module" to get started.
     </div>
 
-    <!-- Accordion list – pola identik dengan DashboardAcademyTabModules -->
     <div
       v-for="module in modules"
       :key="module.id"
       class="border border-default rounded-lg overflow-hidden"
     >
-      <!-- Header row -->
       <button
         type="button"
         class="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-elevated/50 transition-colors"
         @click="toggleModule(module.id)"
       >
-        <!-- Numbered circle – admin: outlined (border only), student: filled -->
         <span
           class="flex items-center justify-center size-7 rounded-full border border-primary text-primary text-sm font-bold shrink-0"
         >
           {{ module.order }}
         </span>
 
-        <span class="flex-1 font-medium text-sm leading-snug truncate">
+        <span class="flex-1 min-w-0 font-medium text-sm leading-snug truncate">
           {{ module.title }}
         </span>
 
         <div class="flex items-center gap-3 shrink-0">
-          <span v-if="module.date" class="hidden sm:block text-xs text-muted">
-            {{ module.date }}
+          <span v-if="module.session_timestamp" class="hidden sm:block text-xs text-muted">
+            {{ formatDate(module.session_timestamp) }}
           </span>
           <UIcon
             :name="isOpen(module.id) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
@@ -107,44 +99,46 @@ const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: str
         </div>
       </button>
 
-      <!-- Expanded body -->
       <template v-if="isOpen(module.id)">
         <div class="border-t border-default px-4 py-4 space-y-4">
-          <!-- Description -->
           <p v-if="module.description" class="text-sm text-default leading-relaxed">
             {{ module.description }}
           </p>
 
-          <!-- Links -->
           <div class="space-y-2">
-            <div v-if="module.date" class="flex items-start gap-3 text-sm">
+            <div v-if="module.session_timestamp" class="flex items-start gap-3 text-sm">
               <UIcon name="i-lucide-calendar" class="size-4 text-muted mt-0.5 shrink-0" />
-              <span>{{ module.date }}</span>
+              <span>{{ formatDate(module.session_timestamp) }}</span>
             </div>
-            <div v-if="module.meetingLink" class="flex items-start gap-3 text-sm">
+            <div v-if="module.meeting_link" class="flex items-start gap-3 text-sm">
               <UIcon name="i-lucide-video" class="size-4 text-muted mt-0.5 shrink-0" />
-              <span class="w-28 shrink-0 text-muted font-medium">Meeting Link</span>
-              <a :href="module.meetingLink" target="_blank" class="text-primary hover:underline break-all">
-                {{ module.meetingLink }}
-              </a>
+              <div class="flex flex-col sm:flex-row items-start gap-1 sm:gap-3 min-w-0">
+                <span class="text-muted font-medium sm:w-28 sm:shrink-0">Meeting Link</span>
+                <a :href="module.meeting_link" target="_blank" class="text-primary hover:underline break-all">
+                  {{ module.meeting_link }}
+                </a>
+              </div>
             </div>
-            <div v-if="module.attendanceLink" class="flex items-start gap-3 text-sm">
+            <div v-if="module.attendance_link" class="flex items-start gap-3 text-sm">
               <UIcon name="i-lucide-user-check" class="size-4 text-muted mt-0.5 shrink-0" />
-              <span class="w-28 shrink-0 text-muted font-medium">Attendance Link</span>
-              <a :href="module.attendanceLink" target="_blank" class="text-primary hover:underline break-all">
-                {{ module.attendanceLink }}
-              </a>
+              <div class="flex flex-col sm:flex-row items-start gap-1 sm:gap-3 min-w-0">
+                <span class="text-muted font-medium sm:w-28 sm:shrink-0">Attendance Link</span>
+                <a :href="module.attendance_link" target="_blank" class="text-primary hover:underline break-all">
+                  {{ module.attendance_link }}
+                </a>
+              </div>
             </div>
-            <div v-if="module.assignmentLink" class="flex items-start gap-3 text-sm">
+            <div v-if="module.assignment_link" class="flex items-start gap-3 text-sm">
               <UIcon name="i-lucide-file-text" class="size-4 text-muted mt-0.5 shrink-0" />
-              <span class="w-28 shrink-0 text-muted font-medium">Assignment Link</span>
-              <a :href="module.assignmentLink" target="_blank" class="text-primary hover:underline break-all">
-                {{ module.assignmentLink }}
-              </a>
+              <div class="flex flex-col sm:flex-row items-start gap-1 sm:gap-3 min-w-0">
+                <span class="text-muted font-medium sm:w-28 sm:shrink-0">Assignment Link</span>
+                <a :href="module.assignment_link" target="_blank" class="text-primary hover:underline break-all">
+                  {{ module.assignment_link }}
+                </a>
+              </div>
             </div>
           </div>
 
-          <!-- Attachments – pola identik dengan student dashboard -->
           <div v-if="module.attachments.length">
             <p class="text-xs text-muted mb-2 flex items-center gap-1.5">
               <UIcon name="i-lucide-paperclip" class="size-3.5" />
@@ -160,7 +154,7 @@ const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: str
               >
                 <div
                   class="flex items-center justify-center size-12 text-white shrink-0"
-                  :style="{ backgroundColor: attachmentStyle[att.type]?.bg ?? '#9ca3af' }"
+                  :class="attachmentStyle[att.type]?.bg ?? 'bg-gray-400'"
                 >
                   <span v-if="att.type === 'pdf'" class="text-xs font-bold leading-none">PDF</span>
                   <span v-else-if="att.type === 'docx'" class="text-xs font-bold leading-none">DOCX</span>
@@ -177,7 +171,6 @@ const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: str
           </div>
         </div>
 
-        <!-- Admin action footer – delete + edit -->
         <div class="flex justify-end gap-2 border-t border-default p-2.5">
           <UButton
             label="Delete"
@@ -185,7 +178,7 @@ const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: str
             size="sm"
             color="neutral"
             variant="outline"
-            @click.stop="emit('deleteModule', module.id)"
+            @click.stop="emit('delete-module', module.id)"
           />
           <UButton
             label="Edit Module"
@@ -193,7 +186,7 @@ const attachmentStyle: Record<CohortAttachment['type'], { bg: string; label: str
             size="sm"
             color="primary"
             variant="outline"
-            @click.stop="emit('editModule', module)"
+            @click.stop="emit('edit-module', module)"
           />
         </div>
       </template>

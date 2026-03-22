@@ -1,20 +1,41 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'dashboard-user' })
+definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
-useSeoMeta({
-  title: 'Notification Settings - Rise Social'
-})
+useSeoMeta({ title: 'Notification Settings - Rise Social' })
 
 const toast = useToast()
+const { api } = useApi()
 
-const prefs = reactive({
-  promo: true,
-  jobs: true,
-  programs: true
+const prefs = reactive<NotificationPreferences>({
+  promo: false,
+  jobs: false,
+  programs: false
 })
 
-const saveSettings = () => {
-  toast.add({ title: 'Settings saved successfully', color: 'success' })
+const isSaving = ref(false)
+
+onMounted(async () => {
+  try {
+    const res = await api<ApiResponse<NotificationPreferences>>('/users/notification-preferences')
+    Object.assign(prefs, res.data)
+  }
+  catch {
+    // non-critical, keep defaults
+  }
+})
+
+async function saveSettings() {
+  isSaving.value = true
+  try {
+    await api('/users/notification-preferences', { method: 'PUT', body: { ...prefs } })
+    toast.add({ title: 'Notification preferences saved', color: 'success' })
+  }
+  catch (error: any) {
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  }
+  finally {
+    isSaving.value = false
+  }
 }
 </script>
 
@@ -29,7 +50,7 @@ const saveSettings = () => {
         <UCheckbox v-model="prefs.programs" label="Program notifications" color="primary" />
       </div>
 
-      <UButton color="primary" @click="saveSettings">Save Settings</UButton>
+      <UButton color="primary" :loading="isSaving" :disabled="isSaving" @click="saveSettings">Save Settings</UButton>
     </div>
   </DashboardSettingSidebar>
 </template>

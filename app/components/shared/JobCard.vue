@@ -16,7 +16,7 @@ const handleClick = () => {
     @click="handleClick"
   >
     <div class="flex w-full relative gap-6">
-      <div class="size-32 flex items-center justify-center">
+      <div class="size-20 sm:size-24 md:size-28 shrink-0 flex items-center justify-center">
         <NuxtImg
           v-if="job.company.logo_url"
           :src="job.company.logo_url"
@@ -28,7 +28,7 @@ const handleClick = () => {
           <UIcon name="i-lucide-building-2" class="size-8 text-gray-400" />
         </div>
       </div>
-      <div class="flex-1 flex flex-col justify-between min-h-[120px] min-w-0 overflow-hidden">
+      <div class="flex-1 flex flex-col justify-between min-w-0 overflow-hidden">
         <div class="space-y-2 min-w-0">
           <h3 class="font-bold text-gray-900 line-clamp-2">
             {{ job.title }}
@@ -49,7 +49,8 @@ const handleClick = () => {
           <div class="flex gap-2 text-gray-500 text-sm mt-auto">
             <div class="flex items-center min-w-0 shrink-0">
               <UIcon name="i-lucide-calendar" class="size-4 mr-2 shrink-0" />
-              <span class="text-xs whitespace-nowrap">{{ formatDate(job.posted_date) }}</span>
+              <span v-if="job.valid_until" class="text-xs whitespace-nowrap">Deadline: {{ formatDate(job.valid_until) }}</span>
+              <span v-else class="text-xs whitespace-nowrap text-muted">No deadline</span>
             </div>
             <div class="flex items-center min-w-0 flex-1">
               <UIcon name="i-lucide-map-pin" class="size-4 mr-2 shrink-0" />

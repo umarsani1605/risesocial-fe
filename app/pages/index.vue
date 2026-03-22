@@ -138,17 +138,17 @@ useSeoMeta({
 <template>
   <div>
     <UPageSection class="bg-deep-teal-950 text-white rounded-b-3xl md:rounded-b-[3.25rem]">
-      <div class="flex flex-col lg:flex-row gap-4 lg:gap-12 items-center">
-        <div class="lg:flex-3 space-y-10 lg:space-y-8 text-center lg:text-left order-2 lg:order-1">
+      <div class="flex flex-col md:flex-row gap-4 lg:gap-12 items-center">
+        <div class="lg:flex-3 space-y-10 lg:space-y-8 text-center md:text-left order-2 md:order-1">
           <div class="space-y-4">
-            <h1 class="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               One-stop Platform for Your
               <span class="text-orange-400">Green Careers</span>
             </h1>
             <p class="text-base">Explore 40,000+ Green Job Opportunities Today!</p>
           </div>
           <HomeHeroSearchBar />
-          <div class="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start">
+          <div class="flex flex-wrap gap-2 sm:gap-3 justify-center md:justify-start">
             <UBadge
               v-for="category in heroCategories"
               :key="category"
@@ -162,9 +162,9 @@ useSeoMeta({
           </div>
         </div>
 
-        <div class="lg:flex-2 flex justify-end order-1 lg:order-2">
+        <div class="lg:flex-2 flex justify-end order-1 md:order-2">
           <div class="relative">
-            <div class="w-full h-56 pt-6 py-4 lg:h-96 flex items-center justify-center">
+            <div class="w-full h-56 pt-6 py-4 md:h-72 lg:h-96 flex items-center justify-center">
               <NuxtImg
                 src="/images/rise_hero.png"
                 alt="Green careers platform - Find sustainable jobs in renewable energy, environmental science, and climate action"
@@ -201,7 +201,7 @@ useSeoMeta({
     </UPageSection>
 
     <UPageSection title="How It Works?" class="bg-[#e6edcc]" :ui="{ container: 'lg:py-24' }">
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <HomeHowItWorksStep
           v-for="stepData in howItWorksSteps"
           :key="stepData.step"
@@ -231,7 +231,7 @@ useSeoMeta({
 
     <UPageSection class="bg-green-50" :ui="{ container: 'lg:py-0' }">
       <div class="flex flex-col-reverse lg:flex-row gap-12 items-center">
-        <div class="flex-1 hidden lg:block">
+        <div class="flex-1 hidden md:block">
           <NuxtImg
             src="/images/rise_cta.png"
             alt="Get the Perfect Job"
@@ -239,7 +239,7 @@ useSeoMeta({
             loading="lazy"
           />
         </div>
-        <div class="flex-1 space-y-6 text-center lg:text-left">
+        <div class="flex-1 space-y-6 text-center md:text-left">
           <div>
             <h2 class="text-4xl font-bold mb-4">Get the Perfect Job for You!</h2>
             <p class="text-lg text-gray-600">
@@ -266,7 +266,7 @@ useSeoMeta({
               color="secondary"
               size="xl"
               trailing-icon="i-lucide-arrow-right"
-              class="w-full sm:w-auto"
+              class="w-full justify-center"
             >
               Get Started Now
             </UButton>
@@ -285,7 +285,9 @@ useSeoMeta({
           item: 'basis-full md:basis-1/2 lg:basis-1/3',
           dot: 'size-2',
           viewport: 'pb-4',
-          container: 'items-stretch'
+          container: 'items-stretch',
+          prev: 'hidden sm:flex absolute rounded-full sm:-start-12 top-1/2 -translate-y-1/2',
+          next: 'hidden sm:flex absolute rounded-full sm:-end-12 top-1/2 -translate-y-1/2'
         }"
         :autoplay="{ delay: 3000 }"
         arrows
@@ -305,7 +307,9 @@ useSeoMeta({
           item: 'basis-1/2 md:basis-1/3 lg:basis-1/5',
           dot: 'size-2',
           viewport: 'pb-2',
-          container: 'items-stretch'
+          container: 'items-stretch',
+          prev: 'hidden sm:flex absolute rounded-full sm:-start-12 top-1/2 -translate-y-1/2',
+          next: 'hidden sm:flex absolute rounded-full sm:-end-12 top-1/2 -translate-y-1/2'
         }"
         arrows
         :autoplay="{ delay: 3000 }"

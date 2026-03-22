@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
 
-const { user, fullName, initials } = useMockUser()
+const { user, logout, fullName, initials } = useAuth()
 
 const navItems = computed<NavigationMenuItem[]>(() => [
   { label: 'Dashboard', to: '/dashboard', exact: true },
@@ -29,7 +29,7 @@ const userMenuItems: DropdownMenuItem[][] = [
     {
       label: 'Logout',
       icon: 'i-lucide-log-out',
-      onSelect: () => navigateTo('/')
+      onSelect: () => logout()
     }
   ]
 ]
@@ -55,7 +55,7 @@ const userMenuItems: DropdownMenuItem[][] = [
       <UDropdownMenu :items="userMenuItems" :modal="false">
         <button class="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100 transition-colors">
           <UAvatar
-            :src="user.avatar"
+            :src="user?.avatar"
             :alt="fullName"
             :text="initials"
             size="sm"

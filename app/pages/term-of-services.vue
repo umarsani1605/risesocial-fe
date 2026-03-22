@@ -15,7 +15,7 @@ useSeoMeta({
     <UCard
       class="border-default"
       :ui="{
-        root: 'p-8 sm:p-10'
+        root: 'p-6 sm:p-8 md:p-10'
       }"
     >
       <template #header>

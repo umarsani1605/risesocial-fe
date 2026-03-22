@@ -14,10 +14,10 @@ const { api } = useApi()
 
 const [{ data: jobRes, error: jobError }, { data: similarJobsRes }] = await Promise.all([
   useAsyncData(`job:${companySlug}:${jobSlug}`, () =>
-    api<ApiResponse<Job[]>>('/jobs', { params: { jobSlug, companySlug, limit: 1 } })
+    api<PaginatedResponse<Job>>('/jobs', { params: { jobSlug, companySlug, limit: 1 } })
   ),
   useAsyncData(`job-similar:${companySlug}:${jobSlug}`, () =>
-    api<ApiResponse<Job[]>>('/jobs', { params: { companySlug, limit: 5 } })
+    api<PaginatedResponse<Job>>('/jobs', { params: { companySlug, limit: 5 } })
   )
 ])
 
@@ -25,7 +25,7 @@ if (jobError.value || !jobRes.value?.data?.length) {
   throw createError({ statusCode: 404, statusMessage: 'Job not found' })
 }
 
-const job = computed(() => jobRes.value!.data[0])
+const job = computed(() => jobRes.value!.data[0]!)
 const similarJobs = computed(() =>
   (similarJobsRes.value?.data ?? []).filter(j => j.id !== job.value.id).slice(0, 4)
 )
@@ -76,8 +76,8 @@ const parsedDescription = computed(() => {
 })
 
 const handleApply = () => {
-  if (job.value?.applicationUrl) {
-    window.open(job.value.applicationUrl, '_blank')
+  if (job.value?.external_url) {
+    window.open(job.value.external_url, '_blank')
   }
 }
 
@@ -114,14 +114,14 @@ useSeoMeta({
               <UBadge v-if="job.company?.industry" color="neutral" variant="soft" size="sm">
                 {{ job.company.industry }}
               </UBadge>
-              <UBadge color="neutral" variant="soft" size="sm" class="capitalize">
-                {{ formatJobType(job.jobType) }}
+              <UBadge v-if="job.employment_type" color="neutral" variant="soft" size="sm" class="capitalize">
+                {{ formatJobType(job.employment_type) }}
               </UBadge>
-              <UBadge v-if="job.isRemote" color="success" variant="soft" size="sm">
+              <UBadge v-if="job.location?.is_remote" color="success" variant="soft" size="sm">
                 Remote
               </UBadge>
-              <UBadge v-if="job.experienceLevel" color="neutral" variant="soft" size="sm">
-                {{ formatExperienceLevel(job.experienceLevel) }}
+              <UBadge v-if="job.seniority_level" color="neutral" variant="soft" size="sm">
+                {{ formatExperienceLevel(job.seniority_level) }}
               </UBadge>
             </div>
 
@@ -133,7 +133,7 @@ useSeoMeta({
                   icon="i-lucide-send"
                   class="whitespace-nowrap"
                   size="lg"
-                  :disabled="!job.applicationUrl"
+                  :disabled="!job.external_url"
                   @click="handleApply"
                 >
                   Apply Now
@@ -142,31 +142,18 @@ useSeoMeta({
             </div>
 
             <div class="flex flex-wrap gap-4 lg:gap-6 mb-4">
-              <div v-if="job.applicationDeadline" class="flex items-center">
+              <div v-if="job.valid_until" class="flex items-center">
                 <UIcon name="i-lucide-calendar" class="mr-2 size-4 shrink-0" />
-                <span class="text-sm whitespace-nowrap">Deadline: {{ formatDate(job.applicationDeadline) }}</span>
+                <span class="text-sm whitespace-nowrap">Deadline: {{ formatDate(job.valid_until) }}</span>
               </div>
               <div class="flex items-center">
                 <UIcon name="i-lucide-map-pin" class="mr-2 size-4 shrink-0" />
                 <span class="text-sm">{{ locationString }}</span>
               </div>
-              <div v-if="job.minSalary || job.maxSalary" class="flex items-center">
+              <div v-if="job.salary_raw" class="flex items-center">
                 <UIcon name="i-lucide-banknote" class="mr-2 size-4 shrink-0" />
-                <span class="text-sm">{{ formatSalary(job.minSalary, job.maxSalary) }}</span>
+                <span class="text-sm">{{ job.salary_raw }}</span>
               </div>
-            </div>
-
-            <!-- Skills -->
-            <div v-if="job.skills?.length" class="flex flex-wrap gap-2 mb-2">
-              <UBadge
-                v-for="skill in job.skills"
-                :key="skill"
-                color="primary"
-                variant="subtle"
-                size="sm"
-              >
-                {{ skill }}
-              </UBadge>
             </div>
           </div>
 
@@ -179,21 +166,6 @@ useSeoMeta({
               </div>
             </div>
 
-            <!-- Requirements -->
-            <div v-if="job.requirements?.length">
-              <h2 class="text-xl font-semibold mb-4">Requirements</h2>
-              <ul class="list-disc list-inside space-y-1 text-muted">
-                <li v-for="req in job.requirements" :key="req">{{ req }}</li>
-              </ul>
-            </div>
-
-            <!-- Benefits -->
-            <div v-if="job.benefits?.length">
-              <h2 class="text-xl font-semibold mb-4">Benefits</h2>
-              <ul class="list-disc list-inside space-y-1 text-muted">
-                <li v-for="benefit in job.benefits" :key="benefit">{{ benefit }}</li>
-              </ul>
-            </div>
           </div>
         </UCard>
       </div>

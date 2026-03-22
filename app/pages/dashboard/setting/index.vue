@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserProfile } from '@/composables/useMockUser'
+import { userAccountSchema } from '@/schemas/user'
 
 definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
@@ -22,7 +22,10 @@ const initials = computed(() => {
   return (first + last).toUpperCase() || 'U'
 })
 
+const isSubmitting = ref(false)
+const formRef = useTemplateRef('accountForm')
 const avatarPreview = ref('')
+const avatarFile = ref<File | null>(null)
 const avatarFileInputRef = ref<HTMLInputElement | null>(null)
 
 const form = reactive({
@@ -55,29 +58,46 @@ const onAvatarFileChange = (event: Event) => {
   if (!file) return
   const maxSize = 5 * 1024 * 1024
   if (file.size > maxSize) {
-    toast.add({ title: 'File terlalu besar', description: 'Maksimal 5MB', color: 'error' })
+    toast.add({ title: 'File too large', description: 'Max 5MB', color: 'error' })
     input.value = ''
     return
   }
+  avatarFile.value = file
   avatarPreview.value = URL.createObjectURL(file)
 }
 
 const onRemoveAvatar = () => {
   avatarPreview.value = ''
+  avatarFile.value = null
   if (avatarFileInputRef.value) avatarFileInputRef.value.value = ''
 }
 
 const onSave = async () => {
-  await api('/users/account', {
-    method: 'PUT',
-    body: {
-      first_name: form.first_name,
-      last_name: form.last_name,
-      email: form.email,
-      phone: form.phone
-    }
-  })
-  toast.add({ title: 'Account updated successfully', color: 'success' })
+  isSubmitting.value = true
+  try {
+    const fd = new FormData()
+    fd.append('first_name', form.first_name)
+    fd.append('last_name', form.last_name)
+    fd.append('email', form.email)
+    fd.append('phone', form.phone ?? '')
+    fd.append('gender', form.gender ?? '')
+    fd.append('country', form.country ?? '')
+    fd.append('province', form.province ?? '')
+    fd.append('city', form.city ?? '')
+    fd.append('last_education', form.last_education ?? '')
+    fd.append('current_job', form.current_job ?? '')
+    fd.append('current_company', form.current_company ?? '')
+    if (avatarFile.value) fd.append('image', avatarFile.value)
+
+    await api('/users/account', { method: 'PUT', body: fd })
+    toast.add({ title: 'Account updated', color: 'success' })
+  }
+  catch (error: any) {
+    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  }
+  finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -87,7 +107,7 @@ const onSave = async () => {
       <h1 class="text-xl font-bold">Account</h1>
 
       <UFormField label="Avatar">
-        <div class="flex items-center gap-6 mt-1">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-1">
           <UAvatar
             :src="currentAvatar"
             :text="initials"
@@ -126,7 +146,7 @@ const onSave = async () => {
         </div>
       </UFormField>
 
-      <div class="grid grid-cols-1 gap-4 max-w-lg">
+      <UForm ref="accountForm" :schema="userAccountSchema" :state="form" class="grid grid-cols-1 gap-4 max-w-lg" @submit="onSave">
         <UFormField label="First name" required>
           <UInput v-model="form.first_name" placeholder="John" class="w-full" />
         </UFormField>
@@ -135,7 +155,7 @@ const onSave = async () => {
           <UInput v-model="form.last_name" placeholder="Doe" class="w-full" />
         </UFormField>
 
-        <UFormField label="Email" required>
+        <UFormField name="email" label="Email" required>
           <UInput v-model="form.email" type="email" placeholder="john@example.com" class="w-full" />
         </UFormField>
 
@@ -177,17 +197,9 @@ const onSave = async () => {
         <UFormField label="Current Company">
           <UInput v-model="form.current_company" placeholder="Rise Social" class="w-full" />
         </UFormField>
+      </UForm>
 
-        <!-- <UFormField label="Skills">
-          <div class="flex flex-wrap gap-2 mt-1">
-            <UBadge v-for="skill in user.skills" :key="skill" color="neutral" variant="outline">
-              {{ skill }}
-            </UBadge>
-          </div>
-        </UFormField> -->
-      </div>
-
-      <UButton color="primary" @click="onSave">Save changes</UButton>
+      <UButton color="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="formRef?.submit()">Save changes</UButton>
     </div>
   </DashboardSettingSidebar>
 </template>

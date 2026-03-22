@@ -26,14 +26,14 @@ const search = ref('')
 const toast = useToast()
 
 // ── Filter popover state (pending) ───────────────────────────────────────────
-const filterJobType = ref('')
-const filterExperienceLevel = ref('')
-const filterIsRemote = ref<boolean | undefined>(undefined)
+const filterEmploymentType = ref('')
+const filterSeniorityLevel = ref('')
+const filterIsRemote = ref('')
 
 // Applied filter state
-const appliedJobType = ref('')
-const appliedExperienceLevel = ref('')
-const appliedIsRemote = ref<boolean | undefined>(undefined)
+const appliedEmploymentType = ref('')
+const appliedSeniorityLevel = ref('')
+const appliedIsRemote = ref('')
 
 const filterPopoverOpen = ref(false)
 const confirmSyncOpen = ref(false)
@@ -43,24 +43,39 @@ const isSyncing = ref(false)
 // Delete confirmation
 const deleteTarget = ref<Job | null>(null)
 const confirmDeleteOpen = ref(false)
+const isDeleting = ref(false)
 
 // ── Sync settings ─────────────────────────────────────────────────────────────
 const syncFilters = ref({
-  job_titles: ['sustainability', 'esg', 'carbon', 'climate', 'csr', 'corporate social responsibility', 'waste', 'waste management', 'green', 'renewable', 'environment'] as string[],
-  job_locations: [] as string[],
-  job_descriptions: [] as string[],
-  job_types: [] as string[],
-  company_descriptions: [] as string[],
-  company_specialties: [] as string[],
-  industries: [] as string[],
-  seniority_levels: [] as string[]
+  advanced_title_filter: ['sustainability', 'esg', 'carbon', 'climate', 'csr', 'corporate social responsibility', 'waste', 'waste management', 'green', 'renewable', 'environment'] as string[],
+  location_filter: [] as string[],
+  description_filter: [] as string[],
+  type_filter: [] as string[],
+  organization_description_filter: [] as string[],
+  organization_specialties_filter: [] as string[],
+  industry_filter: [] as string[],
+  seniority_filter: [] as string[]
+})
+
+const isSavingSettings = ref(false)
+
+onMounted(async () => {
+  try {
+    const res = await api<ApiResponse<{ value: typeof syncFilters.value }>>('/admin/system/settings/linkedin_sync_filters')
+    if (res?.data?.value) {
+      Object.assign(syncFilters.value, res.data.value)
+    }
+  }
+  catch {
+    // setting belum pernah disimpan — pakai default
+  }
 })
 
 // ── Derived ───────────────────────────────────────────────────────────────────
 const allJobs = computed(() => rawJobs.value?.data ?? [])
 
 const activeFilterCount = computed(() =>
-  [appliedJobType.value, appliedExperienceLevel.value, appliedIsRemote.value !== undefined].filter(Boolean).length
+  [appliedEmploymentType.value, appliedSeniorityLevel.value, appliedIsRemote.value].filter(Boolean).length
 )
 
 const filteredData = computed(() => {
@@ -69,27 +84,28 @@ const filteredData = computed(() => {
     || j.title.toLowerCase().includes(search.value.toLowerCase())
     || j.company.name.toLowerCase().includes(search.value.toLowerCase())
   )
-  if (appliedJobType.value) result = result.filter(j => j.jobType === appliedJobType.value)
-  if (appliedExperienceLevel.value) result = result.filter(j => j.experienceLevel === appliedExperienceLevel.value)
-  if (appliedIsRemote.value !== undefined) result = result.filter(j => j.isRemote === appliedIsRemote.value)
+  if (appliedEmploymentType.value) result = result.filter(j => j.employment_type === appliedEmploymentType.value)
+  if (appliedSeniorityLevel.value) result = result.filter(j => j.seniority_level === appliedSeniorityLevel.value)
+  if (appliedIsRemote.value === 'yes') result = result.filter(j => j.location?.is_remote === true)
+  if (appliedIsRemote.value === 'no') result = result.filter(j => j.location?.is_remote === false)
   return result
 })
 
 // ── Actions ───────────────────────────────────────────────────────────────────
 function applyFilters() {
-  appliedJobType.value = filterJobType.value
-  appliedExperienceLevel.value = filterExperienceLevel.value
+  appliedEmploymentType.value = filterEmploymentType.value
+  appliedSeniorityLevel.value = filterSeniorityLevel.value
   appliedIsRemote.value = filterIsRemote.value
   filterPopoverOpen.value = false
 }
 
 function clearFilters() {
-  filterJobType.value = ''
-  filterExperienceLevel.value = ''
-  filterIsRemote.value = undefined
-  appliedJobType.value = ''
-  appliedExperienceLevel.value = ''
-  appliedIsRemote.value = undefined
+  filterEmploymentType.value = ''
+  filterSeniorityLevel.value = ''
+  filterIsRemote.value = ''
+  appliedEmploymentType.value = ''
+  appliedSeniorityLevel.value = ''
+  appliedIsRemote.value = ''
   filterPopoverOpen.value = false
 }
 
@@ -97,20 +113,39 @@ async function onConfirmSync() {
   confirmSyncOpen.value = false
   isSyncing.value = true
   try {
-    await api('/admin/jobs/sync', { method: 'POST' })
+    await api('/admin/jobs/sync-linkedin', { method: 'POST', body: { filter: syncFilters.value } })
     await refreshJobs()
     toast.add({ title: 'Sync completed successfully.', color: 'success' })
   }
-  catch {
-    toast.add({ title: 'Sync completed. No new jobs found.', color: 'warning' })
+  catch (error: any) {
+    const message = error?.data?.message ?? 'Sync failed'
+    toast.add({ title: message, color: 'error' })
   }
   finally {
     isSyncing.value = false
   }
 }
 
-function onSaveSyncSettings() {
-  toast.add({ title: 'Sync settings saved', color: 'success' })
+async function onSaveSyncSettings() {
+  isSavingSettings.value = true
+  try {
+    await api('/admin/system/settings/linkedin_sync_filters', {
+      method: 'PUT',
+      body: { value: syncFilters.value }
+    })
+    toast.add({ title: 'Sync settings saved', color: 'success' })
+    syncSettingsOpen.value = false
+  }
+  catch (error: any) {
+    const message = error?.data?.message ?? 'An error occurred'
+    toast.add({ title: message, color: 'error' })
+  }
+  finally {
+    isSavingSettings.value = false
+  }
+}
+
+function onCloseSyncSettings() {
   syncSettingsOpen.value = false
 }
 
@@ -121,40 +156,30 @@ function openDeleteConfirm(job: Job) {
 
 async function onConfirmDelete() {
   if (!deleteTarget.value) return
+  isDeleting.value = true
   try {
     await api(`/admin/jobs/${deleteTarget.value.id}`, { method: 'DELETE' })
     toast.add({ title: `Job "${deleteTarget.value.title}" deleted`, color: 'success' })
     await refreshJobs()
   }
-  catch {
-    toast.add({ title: 'Failed to delete job', color: 'error' })
+  catch (error: any) {
+    const message = error?.data?.message ?? 'An error occurred'
+    toast.add({ title: message, color: 'error' })
   }
   finally {
     confirmDeleteOpen.value = false
     deleteTarget.value = null
+    isDeleting.value = false
   }
 }
 
 // ── Options ───────────────────────────────────────────────────────────────────
-const jobTypeOptions = [
-  { label: 'All Types', value: '' },
-  { label: 'Full Time', value: 'FULL_TIME' },
-  { label: 'Part Time', value: 'PART_TIME' },
-  { label: 'Contract', value: 'CONTRACT' },
-  { label: 'Internship', value: 'INTERNSHIP' },
-  { label: 'Freelance', value: 'FREELANCE' },
-  { label: 'Remote', value: 'REMOTE' }
-]
-
-const experienceLevelOptions = [
-  { label: 'All Levels', value: '' },
-  { label: 'Entry Level', value: 'ENTRY_LEVEL' },
-  { label: 'Junior', value: 'JUNIOR' },
-  { label: 'Mid Level', value: 'MID_LEVEL' },
-  { label: 'Senior', value: 'SENIOR' },
-  { label: 'Lead', value: 'LEAD' },
-  { label: 'Manager', value: 'MANAGER' },
-  { label: 'Director', value: 'DIRECTOR' }
+const jobTypeOptionsWithAll = [{ label: 'All Types', value: '' }, ...jobTypeOptions]
+const experienceLevelOptionsWithAll = [{ label: 'All Levels', value: '' }, ...experienceLevelOptions]
+const remoteFilterOptions = [
+  { label: 'All', value: '' },
+  { label: 'Yes', value: 'yes' },
+  { label: 'No', value: 'no' }
 ]
 
 const syncDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -188,49 +213,44 @@ const columns: TableColumn<Job>[] = [
     }
   },
   {
-    id: 'jobType',
+    id: 'employment_type',
     header: 'Type',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm whitespace-nowrap' }, formatJobType(row.original.jobType))
+      h('span', { class: 'text-sm whitespace-nowrap' }, formatJobType(row.original.employment_type))
   },
   {
-    id: 'experienceLevel',
+    id: 'seniority_level',
     header: 'Level',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm whitespace-nowrap' }, formatExperienceLevel(row.original.experienceLevel))
+      h('span', { class: 'text-sm whitespace-nowrap' }, formatExperienceLevel(row.original.seniority_level ?? ''))
   },
   {
     id: 'salary',
     header: 'Salary',
-    cell: ({ row }) => {
-      const s = formatSalary(row.original.minSalary, row.original.maxSalary)
-      return h('span', { class: 'text-sm whitespace-nowrap text-muted' }, s)
-    }
+    cell: ({ row }) =>
+      h('span', { class: 'text-sm whitespace-nowrap text-muted' }, row.original.salary_raw ?? '–')
   },
   {
-    id: 'isRemote',
+    id: 'is_remote',
     header: 'Remote',
-    cell: ({ row }) =>
-      h(UBadge, {
-        variant: 'subtle',
-        color: row.original.isRemote ? 'success' : 'neutral'
-      }, () => row.original.isRemote ? 'Yes' : 'No')
+    cell: ({ row }) => {
+      const remote = row.original.location?.is_remote ?? false
+      return h(UBadge, { variant: 'subtle', color: remote ? 'success' : 'neutral' }, () => remote ? 'Yes' : 'No')
+    }
   },
   {
     id: 'status',
     header: 'Status',
-    cell: ({ row }) =>
-      h(UBadge, {
-        variant: 'subtle',
-        color: row.original.isActive ? 'success' : 'neutral',
-        class: 'uppercase'
-      }, () => row.original.isActive ? 'Active' : 'Inactive')
+    cell: ({ row }) => {
+      const active = row.original.status === 'active'
+      return h(UBadge, { variant: 'subtle', color: active ? 'success' : 'neutral', class: 'capitalize' }, () => row.original.status)
+    }
   },
   {
-    id: 'applicationDeadline',
+    id: 'valid_until',
     header: 'Deadline',
     cell: ({ row }) => {
-      const d = row.original.applicationDeadline
+      const d = row.original.valid_until
       return h('span', { class: 'text-sm whitespace-nowrap' }, d ? formatDate(d) : '–')
     }
   },
@@ -259,12 +279,12 @@ const columns: TableColumn<Job>[] = [
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0' }">
+  <UCard :ui="{ body: 'p-0!' }">
     <!-- Toolbar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-default">
+    <div class="flex flex-wrap items-center justify-between gap-3 p-4">
       <!-- Left: Search + Filters -->
       <div class="flex flex-wrap items-center gap-2">
-        <UInput v-model="search" icon="i-lucide-search" placeholder="Search title or company..." class="w-56" />
+        <UInput v-model="search" icon="i-lucide-search" placeholder="Search title or company..." class="w-full sm:w-56" />
 
         <UPopover v-model:open="filterPopoverOpen">
           <UButton
@@ -287,27 +307,29 @@ const columns: TableColumn<Job>[] = [
 
               <UFormField label="Job Type">
                 <USelectMenu
-                  v-model="filterJobType"
+                  v-model="filterEmploymentType"
                   value-key="value"
-                  :items="jobTypeOptions"
+                  :items="jobTypeOptionsWithAll"
                   class="w-full"
                 />
               </UFormField>
 
               <UFormField label="Experience Level">
                 <USelectMenu
-                  v-model="filterExperienceLevel"
+                  v-model="filterSeniorityLevel"
                   value-key="value"
-                  :items="experienceLevelOptions"
+                  :items="experienceLevelOptionsWithAll"
                   class="w-full"
                 />
               </UFormField>
 
               <UFormField label="Remote Work">
-                <div class="flex items-center gap-2 mt-1">
-                  <UToggle v-model="filterIsRemote" />
-                  <span class="text-sm text-muted">Remote only</span>
-                </div>
+                <USelectMenu
+                  v-model="filterIsRemote"
+                  value-key="value"
+                  :items="remoteFilterOptions"
+                  class="w-full"
+                />
               </UFormField>
 
               <div class="flex gap-2 pt-1">
@@ -319,8 +341,17 @@ const columns: TableColumn<Job>[] = [
         </UPopover>
       </div>
 
-      <!-- Right: Sync button group -->
-      <div class="flex items-center gap-3">
+      <!-- Right: Add Job + Sync button group -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <UButton
+          label="Add Job"
+          icon="i-lucide-plus"
+          color="primary"
+          size="sm"
+          to="/admin/jobs/create"
+        />
+
+        <div class="hidden sm:block h-4 w-px bg-default" />
         <UTooltip text="Rate Limit: General API 100 req/min">
           <div class="flex items-center gap-1.5 cursor-default select-none">
             <UIcon name="i-lucide-info" class="size-4 text-muted" />
@@ -328,14 +359,14 @@ const columns: TableColumn<Job>[] = [
           </div>
         </UTooltip>
 
-        <div class="h-4 w-px bg-default" />
+        <div class="hidden sm:block h-4 w-px bg-default" />
 
         <div class="flex items-center gap-1.5 cursor-default select-none">
           <UIcon name="i-lucide-calendar" class="size-4 text-muted" />
           <span class="text-sm text-muted">{{ syncDate }}</span>
         </div>
 
-        <div class="h-4 w-px bg-default" />
+        <div class="hidden sm:block h-4 w-px bg-default" />
 
         <!-- Sync Job + Settings button group -->
         <div class="inline-flex rounded-lg overflow-hidden">
@@ -393,7 +424,7 @@ const columns: TableColumn<Job>[] = [
       />
     </div>
 
-    <div class="flex items-center justify-between px-4 py-3 border-t border-default">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4">
       <p class="text-sm text-muted">
         Showing {{ (pagination.pageIndex * pagination.pageSize) + 1 }} to
         {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
@@ -403,6 +434,8 @@ const columns: TableColumn<Job>[] = [
         :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
         :items-per-page="table?.tableApi?.getState().pagination.pageSize"
         :total="table?.tableApi?.getFilteredRowModel().rows.length"
+        size="sm"
+        variant="ghost"
         @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
       />
     </div>
@@ -416,8 +449,8 @@ const columns: TableColumn<Job>[] = [
     :ui="{ footer: 'justify-end' }"
   >
     <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" @click="confirmDeleteOpen = false" />
-      <UButton label="Delete" color="error" @click="onConfirmDelete" />
+      <UButton label="Cancel" color="neutral" variant="outline" :disabled="isDeleting" @click="confirmDeleteOpen = false" />
+      <UButton label="Delete" color="error" :loading="isDeleting" :disabled="isDeleting" @click="onConfirmDelete" />
     </template>
   </UModal>
 
@@ -425,40 +458,40 @@ const columns: TableColumn<Job>[] = [
   <UModal
     v-model:open="syncSettingsOpen"
     title="LinkedIn Job Sync Settings"
-    description="Configure default parameters for LinkedIn job search. If filter is empty, no filter will be applied."
+    description="Current sync filter configuration. These settings are managed on the server."
     :ui="{ content: 'max-w-3xl', footer: 'justify-end' }"
   >
     <template #body>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <UFormField label="Job titles">
-          <UInputTags v-model="syncFilters.job_titles" placeholder="Type and press enter" class="w-full" />
+        <UFormField label="Job title keywords">
+          <UInputTags v-model="syncFilters.advanced_title_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
-        <UFormField label="Job locations">
-          <UInputTags v-model="syncFilters.job_locations" placeholder="Type and press enter" class="w-full" />
+        <UFormField label="Locations">
+          <UInputTags v-model="syncFilters.location_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
-        <UFormField label="Job descriptions">
-          <UInputTags v-model="syncFilters.job_descriptions" placeholder="Type and press enter" class="w-full" />
+        <UFormField label="Description keywords">
+          <UInputTags v-model="syncFilters.description_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
-        <UFormField label="Job types">
-          <UInputTags v-model="syncFilters.job_types" placeholder="Type and press enter" class="w-full" />
+        <UFormField label="Job types (e.g. Full Time)">
+          <UInputTags v-model="syncFilters.type_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
-        <UFormField label="Company descriptions">
-          <UInputTags v-model="syncFilters.company_descriptions" placeholder="Type and press enter" class="w-full" />
+        <UFormField label="Company description keywords">
+          <UInputTags v-model="syncFilters.organization_description_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
         <UFormField label="Company specialties">
-          <UInputTags v-model="syncFilters.company_specialties" placeholder="Type and press enter" class="w-full" />
+          <UInputTags v-model="syncFilters.organization_specialties_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
         <UFormField label="Industries">
-          <UInputTags v-model="syncFilters.industries" placeholder="Type and press enter" class="w-full" />
+          <UInputTags v-model="syncFilters.industry_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
         <UFormField label="Seniority levels">
-          <UInputTags v-model="syncFilters.seniority_levels" placeholder="Type and press enter" class="w-full" />
+          <UInputTags v-model="syncFilters.seniority_filter" placeholder="Type and press enter" class="w-full" />
         </UFormField>
       </div>
     </template>
     <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" @click="syncSettingsOpen = false" />
-      <UButton label="Save" color="primary" @click="onSaveSyncSettings" />
+      <UButton label="Cancel" color="neutral" variant="outline" :disabled="isSavingSettings" @click="onCloseSyncSettings" />
+      <UButton label="Save Settings" color="primary" :loading="isSavingSettings" :disabled="isSavingSettings" @click="onSaveSyncSettings" />
     </template>
   </UModal>
 </template>
