@@ -13,12 +13,19 @@ definePageMeta({
 useSeoMeta({ title: 'Rise Young Leaders Scholarship - Rise Social' })
 
 const { api } = useApi()
+interface RylsListResponse {
+  registrations: RylsRegistration[]
+  pagination: { page: number; limit: number; total: number; totalPages: number }
+}
+
 const { data: rawRegistrations } = await useAsyncData('admin:ryls', () =>
-  api<PaginatedResponse<RylsRegistration>>('/admin/ryls/registrations')
+  api<ApiResponse<RylsListResponse>>('/admin/ryls/registrations')
 )
 
+const allRegistrations = computed(() => rawRegistrations.value?.data?.registrations ?? [])
+
 const rylsNationalityOptions = computed(() => {
-  const nats = [...new Set((rawRegistrations.value?.data ?? []).map(r => r.nationality))]
+  const nats = [...new Set(allRegistrations.value.map(r => r.nationality))]
   return [
     { label: 'All Nationalities', value: 'all' },
     ...nats.map(n => ({ label: n, value: n }))
@@ -30,6 +37,8 @@ const UBadge = resolveComponent('UBadge')
 
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
+
+const route = useRoute()
 
 const search = ref('')
 const scholarshipFilter = ref('all')
@@ -59,8 +68,13 @@ const paymentTypeOptions = [
   { label: 'Bank Transfer', value: 'BANK_TRANSFER' }
 ]
 
+const idFilter = computed(() => route.query.id ? Number(route.query.id) : null)
+
 const filteredData = computed(() => {
-  let result = rawRegistrations.value?.data ?? []
+  let result = allRegistrations.value
+  if (idFilter.value) {
+    return result.filter(r => r.id === idFilter.value)
+  }
   if (search.value) {
     const s = search.value.toLowerCase()
     result = result.filter(r =>
@@ -291,13 +305,6 @@ const columns: TableColumn<RylsRegistration>[] = [
         :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
         :data="filteredData"
         :columns="columns"
-        :ui="{
-          base: 'border-separate border-spacing-0',
-          thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-          tbody: '[&>tr]:last:[&>td]:border-b-0',
-          th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r whitespace-nowrap',
-          td: 'border-b border-default'
-        }"
       />
     </div>
 

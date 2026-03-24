@@ -337,5 +337,19 @@ export default defineAppConfig({
         }
       }
     },
+    drawer: {
+      variants: {
+        overlay: {
+          true: {
+            overlay: 'bg-black/50'
+          }
+        }
+      }
+    },
+    slideover: {
+      slots: {
+        overlay: 'bg-black/50'
+      }
+    },
   }
 })

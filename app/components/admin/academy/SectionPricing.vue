@@ -91,10 +91,10 @@ const columns: TableColumn<AcademyPricing>[] = [
     <div class="p-px overflow-x-auto">
       <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
         <template #original_price-cell="{ row }">
-          {{ row.original.formatted_original_price ?? formatPrice(row.original.original_price) }}
+          {{ formatPrice(row.original.original_price) }}
         </template>
         <template #discount_price-cell="{ row }">
-          {{ row.original.formatted_discount_price ?? formatPrice(row.original.discount_price) }}
+          {{ formatPrice(row.original.discount_price) }}
         </template>
         <template #actions-cell="{ row }">
           <div class="flex items-center gap-2 justify-end">

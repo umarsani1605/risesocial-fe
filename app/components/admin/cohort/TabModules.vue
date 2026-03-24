@@ -38,13 +38,29 @@ function formatDate(iso: string) {
   }).format(new Date(iso))
 }
 
-const attachmentStyle: Record<AdminCohortAttachment['type'], { bg: string; icon: string }> = {
-  pdf:  { bg: 'bg-red-500',    icon: 'i-lucide-file-text' },
-  docx: { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
-  pptx: { bg: 'bg-orange-500', icon: 'i-lucide-presentation' },
-  xlsx: { bg: 'bg-green-500',  icon: 'i-lucide-table-2' },
-  url:  { bg: 'bg-blue-400',   icon: 'i-lucide-link' },
-  file: { bg: 'bg-gray-400',   icon: 'i-lucide-paperclip' },
+function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: string } {
+  if (att.type === 'external_link') return { bg: 'bg-blue-500', icon: 'i-lucide-link' }
+  if (att.type === 'embed_video')   return { bg: 'bg-red-500',  icon: 'i-lucide-video' }
+
+  const ext = (att.file_mime?.split('/').pop() ?? att.file_path?.split('.').pop() ?? '').toLowerCase()
+  const byExt: Record<string, { bg: string; icon: string }> = {
+    pdf:   { bg: 'bg-red-500',    icon: 'i-lucide-file-text' },
+    msword: { bg: 'bg-blue-500',  icon: 'i-lucide-file-text' },
+    doc:   { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
+    docx:  { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
+    'vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'bg-blue-500', icon: 'i-lucide-file-text' },
+    ppt:   { bg: 'bg-orange-500', icon: 'i-lucide-file' },
+    pptx:  { bg: 'bg-orange-500', icon: 'i-lucide-file' },
+    'vnd.openxmlformats-officedocument.presentationml.presentation': { bg: 'bg-orange-500', icon: 'i-lucide-file' },
+    xls:   { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
+    xlsx:  { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
+    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'bg-green-600', icon: 'i-lucide-table-2' },
+    jpeg:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    jpg:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    png:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    webp:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+  }
+  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-lucide-file' }
 }
 </script>
 
@@ -84,9 +100,16 @@ const attachmentStyle: Record<AdminCohortAttachment['type'], { bg: string; icon:
           {{ module.order }}
         </span>
 
-        <span class="flex-1 min-w-0 font-medium text-sm leading-snug truncate">
-          {{ module.title }}
-        </span>
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+          <span class="font-medium text-sm leading-snug truncate">{{ module.title }}</span>
+          <UBadge
+            v-if="!module.is_published"
+            label="Draft"
+            color="primary"
+            variant="outline"
+            class="shrink-0"
+          />
+        </div>
 
         <div class="flex items-center gap-3 shrink-0">
           <span v-if="module.session_timestamp" class="hidden sm:block text-xs text-muted">
@@ -148,24 +171,17 @@ const attachmentStyle: Record<AdminCohortAttachment['type'], { bg: string; icon:
               <a
                 v-for="att in module.attachments"
                 :key="att.id"
-                :href="att.url ?? '#'"
+                :href="att.file_url ?? att.url ?? '#'"
                 target="_blank"
                 class="flex items-center border border-default rounded-lg overflow-hidden hover:border-gray-300 transition-colors"
               >
                 <div
                   class="flex items-center justify-center size-12 text-white shrink-0"
-                  :class="attachmentStyle[att.type]?.bg ?? 'bg-gray-400'"
+                  :class="getAttachmentStyle(att).bg"
                 >
-                  <span v-if="att.type === 'pdf'" class="text-xs font-bold leading-none">PDF</span>
-                  <span v-else-if="att.type === 'docx'" class="text-xs font-bold leading-none">DOCX</span>
-                  <span v-else-if="att.type === 'pptx'" class="text-xs font-bold leading-none">PPTX</span>
-                  <UIcon
-                    v-else
-                    :name="attachmentStyle[att.type]?.icon ?? 'i-lucide-paperclip'"
-                    class="size-4"
-                  />
+                  <UIcon :name="getAttachmentStyle(att).icon" class="size-4" />
                 </div>
-                <span class="text-sm pr-3 pl-2 max-w-32 truncate">{{ att.label }}</span>
+                <span class="text-sm pr-3 pl-2 max-w-32 truncate">{{ att.label || att.url || att.file_path }}</span>
               </a>
             </div>
           </div>

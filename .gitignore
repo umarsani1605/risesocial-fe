@@ -39,6 +39,6 @@ test-results/
 .claude
 .kiro
 .superpowers
-.docs
-.CLAUDE.md
-.skills-lock.json
+docs
+CLAUDE.md
+skills-lock.json

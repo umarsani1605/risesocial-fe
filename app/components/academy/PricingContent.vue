@@ -43,10 +43,10 @@ const onEnroll = () => {
     </div>
     <div class="mb-4">
       <div class="text-base line-through mb-2">
-        {{ tier.formatted_original_price || formatPrice(tier.original_price) }}
+        {{ formatPrice(tier.original_price) }}
       </div>
       <div class="text-2xl font-bold mb-6">
-        {{ tier.formatted_discount_price || formatPrice(tier.discount_price) }}
+        {{ formatPrice(tier.discount_price) }}
       </div>
       <UButton
         v-if="isEnrolled"

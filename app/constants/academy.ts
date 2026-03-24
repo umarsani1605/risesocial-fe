@@ -24,6 +24,4 @@ export const ACADEMY_TAB_ITEMS = [
   { label: 'Information', slot: 'information' as const },
   { label: 'Syllabus', slot: 'syllabus' as const },
   { label: 'Cohorts', slot: 'cohorts' as const },
-  { label: 'Students', slot: 'students' as const },
-  { label: 'Mentors', slot: 'mentors' as const }
 ]

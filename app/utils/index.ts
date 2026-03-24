@@ -19,6 +19,22 @@ export function formatDate(dateString: string): string {
   }
 }
 
+export function formatDatetime(dateString: string): string {
+  if (!dateString) return 'N/A'
+  try {
+    return new Date(dateString).toLocaleString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
 export function formatLocation(location?: { city?: string; region?: string; country?: string }): string {
   if (!location) return 'Location not specified'
   return [location.city, location.region, location.country].filter(Boolean).join(', ') || 'Location not specified'

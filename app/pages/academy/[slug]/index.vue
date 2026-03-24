@@ -51,8 +51,8 @@ if (isLoggedIn.value) {
   }
 }
 
-const curriculumItems = computed<AccordionItem[]>(() =>
-  (academy.value.topics ?? []).map((topic) => ({ value: `topic-${topic.id}` }))
+const syllabusItems = computed<AccordionItem[]>(() =>
+  (academy.value.themes ?? []).map((theme) => ({ value: `theme-${theme.id}` }))
 )
 
 const faqItems = computed<AccordionItem[]>(() =>
@@ -167,13 +167,13 @@ function nextTestimonial() {
               </div>
             </UCard>
 
-            <!-- Curriculum -->
-            <UCard v-if="(academy.topics?.length ?? 0) > 0">
+            <!-- Syllabus -->
+            <UCard v-if="academy.themes.length > 0">
               <div class="p-4 sm:p-8">
-                <h2 class="text-2xl sm:text-3xl font-bold mb-6">Curriculum</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">Syllabus</h2>
                 <UAccordion
                   type="multiple"
-                  :items="curriculumItems"
+                  :items="syllabusItems"
                   :ui="{
                     item: 'border-none',
                     trigger:
@@ -189,11 +189,30 @@ function nextTestimonial() {
                       </div>
                       <div class="flex-1">
                         <h3 class="text-lg font-bold mb-1">
-                          {{ academy.topics[index]?.title }}
+                          {{ academy.themes[index]?.title }}
                         </h3>
                         <p class="text-muted text-sm">
-                          {{ academy.topics[index]?.description }}
+                          {{ academy.themes[index]?.description }}
                         </p>
+                      </div>
+                    </div>
+                  </template>
+                  <template #body="{ index }">
+                    <div
+                      v-if="academy.themes[index]?.topics?.length"
+                      class="px-6 pb-4 space-y-2"
+                    >
+                      <div
+                        v-for="topic in academy.themes[index]!.topics"
+                        :key="topic.id"
+                        class="flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-lg"
+                      >
+                        <div
+                          class="size-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-semibold shrink-0"
+                        >
+                          {{ topic.order }}
+                        </div>
+                        <span class="text-sm">{{ topic.title }}</span>
                       </div>
                     </div>
                   </template>

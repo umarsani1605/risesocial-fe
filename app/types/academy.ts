@@ -6,8 +6,6 @@ export interface AcademyPricing {
   original_price: number
   discount_price: number
   discount_percentage?: number
-  formatted_original_price: string
-  formatted_discount_price: string
   order?: number
 }
 
@@ -76,12 +74,12 @@ export interface Academy {
   pricing: AcademyPricing[]
   features: AcademyFeature[]
   instructors: AcademyInstructor[]
-  topics: AcademyTopic[]
-  themes?: AcademyTheme[]
+  themes: AcademyTheme[]
   testimonials: AcademyTestimonial[]
   faqs: AcademyFaq[]
   topicCount?: number
   instructorCount?: number
+  active_cohort?: { id: number; name: string; status: string } | null
 }
 
 export interface AdminAcademy {

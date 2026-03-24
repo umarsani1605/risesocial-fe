@@ -7,7 +7,7 @@ definePageMeta({
   middleware: 'guest'
 })
 
-const error = ref(false)
+const errorMessage = ref('')
 const isLoading = ref(false)
 
 const { login, isAdmin } = useAuth()
@@ -45,7 +45,7 @@ type Schema = z.output<typeof schema>
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     isLoading.value = true
-    error.value = false
+    errorMessage.value = ''
     await login({ email: payload.data.email, password: payload.data.password })
     const redirect = route.query.redirect as string | undefined
     const safeRedirect = redirect && redirect.startsWith('/') ? redirect : undefined
@@ -56,11 +56,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     } else {
       await navigateTo('/dashboard')
     }
-  }
-  catch {
-    error.value = true
-  }
-  finally {
+  } catch (e: any) {
+    errorMessage.value = e?.data?.message ?? 'An error occurred'
+  } finally {
     isLoading.value = false
   }
 }
@@ -99,7 +97,16 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           </div>
         </template>
         <template #validation>
-          <UAlert v-if="error" color="error" icon="i-lucide-info" title="Error signing in" />
+          <UAlert
+            v-if="errorMessage"
+            color="error"
+            icon="i-lucide-info"
+            variant="subtle"
+            :description="errorMessage"
+            :ui="{
+              icon: 'size-5'
+            }"
+          />
         </template>
         <template #footer>
           Don't you have an account?

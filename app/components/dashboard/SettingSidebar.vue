@@ -5,7 +5,7 @@ const settingLinks: NavigationMenuItem[] = [
   { label: 'Account', icon: 'i-lucide-user', to: '/dashboard/setting', exact: true },
   { label: 'Notifications', icon: 'i-lucide-bell', to: '/dashboard/setting/notifications' },
   { label: 'Security', icon: 'i-lucide-lock', to: '/dashboard/setting/security' },
-  { label: 'Transactions', icon: 'i-lucide-receipt', to: '/dashboard/setting/transactions' }
+  { label: 'Invoices', icon: 'i-lucide-receipt', to: '/dashboard/setting/invoices' }
 ]
 </script>
 

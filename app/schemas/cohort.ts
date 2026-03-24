@@ -26,9 +26,9 @@ export const moduleFormSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   sessionDate: z.string().optional(),
-  meetingLink: z.string().optional(),
-  attendanceLink: z.string().optional(),
-  assignmentLink: z.string().optional(),
+  meetingLink: z.string().url('Invalid URL').or(z.literal('')).optional(),
+  attendanceLink: z.string().url('Invalid URL').or(z.literal('')).optional(),
+  assignmentLink: z.string().url('Invalid URL').or(z.literal('')).optional(),
   isPublished: z.boolean().optional(),
 })
 

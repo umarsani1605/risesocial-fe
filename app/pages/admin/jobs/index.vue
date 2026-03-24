@@ -12,10 +12,21 @@ definePageMeta({
 
 useSeoMeta({ title: 'Jobs Management - Rise Social' })
 
+interface RateLimitData {
+  requests: { remaining: number; limit: number; reset: number }
+  jobs: { remaining: number; limit: number; reset: number }
+  last_updated: string
+}
+
 const { api } = useApi()
 const { data: rawJobs, refresh: refreshJobs } = await useAsyncData('admin:jobs', () =>
   api<PaginatedResponse<Job>>('/admin/jobs')
 )
+const { data: rateLimitRaw, refresh: refreshRateLimit } = await useAsyncData(
+  'admin:jobs:rate-limit',
+  () => api<ApiResponse<RateLimitData>>('/admin/system/settings/linkedin/rate-limit')
+)
+const rateLimit = computed(() => rateLimitRaw.value?.data)
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -26,14 +37,16 @@ const search = ref('')
 const toast = useToast()
 
 // ── Filter popover state (pending) ───────────────────────────────────────────
-const filterEmploymentType = ref('')
-const filterSeniorityLevel = ref('')
-const filterIsRemote = ref('')
+const filterEmploymentType = ref<string | undefined>(undefined)
+const filterSeniorityLevel = ref<string | undefined>(undefined)
+const filterIsRemote = ref<string | undefined>(undefined)
+const filterCountry = ref<string | undefined>(undefined)
 
 // Applied filter state
-const appliedEmploymentType = ref('')
-const appliedSeniorityLevel = ref('')
-const appliedIsRemote = ref('')
+const appliedEmploymentType = ref<string | undefined>(undefined)
+const appliedSeniorityLevel = ref<string | undefined>(undefined)
+const appliedIsRemote = ref<string | undefined>(undefined)
+const appliedCountry = ref<string | undefined>(undefined)
 
 const filterPopoverOpen = ref(false)
 const confirmSyncOpen = ref(false)
@@ -47,7 +60,19 @@ const isDeleting = ref(false)
 
 // ── Sync settings ─────────────────────────────────────────────────────────────
 const syncFilters = ref({
-  advanced_title_filter: ['sustainability', 'esg', 'carbon', 'climate', 'csr', 'corporate social responsibility', 'waste', 'waste management', 'green', 'renewable', 'environment'] as string[],
+  advanced_title_filter: [
+    'sustainability',
+    'esg',
+    'carbon',
+    'climate',
+    'csr',
+    'corporate social responsibility',
+    'waste',
+    'waste management',
+    'green',
+    'renewable',
+    'environment'
+  ] as string[],
   location_filter: [] as string[],
   description_filter: [] as string[],
   type_filter: [] as string[],
@@ -61,12 +86,13 @@ const isSavingSettings = ref(false)
 
 onMounted(async () => {
   try {
-    const res = await api<ApiResponse<{ value: typeof syncFilters.value }>>('/admin/system/settings/linkedin_sync_filters')
+    const res = await api<ApiResponse<{ value: typeof syncFilters.value }>>(
+      '/admin/system/settings/linkedin_sync_filters'
+    )
     if (res?.data?.value) {
       Object.assign(syncFilters.value, res.data.value)
     }
-  }
-  catch {
+  } catch {
     // setting belum pernah disimpan — pakai default
   }
 })
@@ -74,20 +100,44 @@ onMounted(async () => {
 // ── Derived ───────────────────────────────────────────────────────────────────
 const allJobs = computed(() => rawJobs.value?.data ?? [])
 
-const activeFilterCount = computed(() =>
-  [appliedEmploymentType.value, appliedSeniorityLevel.value, appliedIsRemote.value].filter(Boolean).length
+const rateLimitText = computed(() => {
+  const req = rateLimit.value?.requests
+  const jobs = rateLimit.value?.jobs
+  return `Requests: ${req?.remaining ?? '–'}/${req?.limit ?? '–'} · Jobs: ${jobs?.remaining ?? '–'}/${jobs?.limit ?? '–'}`
+})
+
+const activeFilterCount = computed(
+  () =>
+    [
+      appliedEmploymentType.value,
+      appliedSeniorityLevel.value,
+      appliedIsRemote.value,
+      appliedCountry.value
+    ].filter(Boolean).length
 )
 
+const uniqueCountries = computed(() => {
+  const countries = [
+    ...new Set(allJobs.value.map((j) => j.location?.country).filter(Boolean))
+  ].sort() as string[]
+  return countries.map((c) => ({ label: c, value: c }))
+})
+
 const filteredData = computed(() => {
-  let result = allJobs.value.filter(j =>
-    !search.value
-    || j.title.toLowerCase().includes(search.value.toLowerCase())
-    || j.company.name.toLowerCase().includes(search.value.toLowerCase())
+  let result = allJobs.value.filter(
+    (j) =>
+      !search.value ||
+      j.title.toLowerCase().includes(search.value.toLowerCase()) ||
+      j.company.name.toLowerCase().includes(search.value.toLowerCase())
   )
-  if (appliedEmploymentType.value) result = result.filter(j => j.employment_type === appliedEmploymentType.value)
-  if (appliedSeniorityLevel.value) result = result.filter(j => j.seniority_level === appliedSeniorityLevel.value)
-  if (appliedIsRemote.value === 'yes') result = result.filter(j => j.location?.is_remote === true)
-  if (appliedIsRemote.value === 'no') result = result.filter(j => j.location?.is_remote === false)
+  if (appliedEmploymentType.value)
+    result = result.filter((j) => j.employment_type === appliedEmploymentType.value)
+  if (appliedSeniorityLevel.value)
+    result = result.filter((j) => j.seniority_level === appliedSeniorityLevel.value)
+  if (appliedIsRemote.value === 'yes') result = result.filter((j) => j.location?.is_remote === true)
+  if (appliedIsRemote.value === 'no') result = result.filter((j) => j.location?.is_remote === false)
+  if (appliedCountry.value)
+    result = result.filter((j) => j.location?.country === appliedCountry.value)
   return result
 })
 
@@ -96,16 +146,19 @@ function applyFilters() {
   appliedEmploymentType.value = filterEmploymentType.value
   appliedSeniorityLevel.value = filterSeniorityLevel.value
   appliedIsRemote.value = filterIsRemote.value
+  appliedCountry.value = filterCountry.value
   filterPopoverOpen.value = false
 }
 
 function clearFilters() {
-  filterEmploymentType.value = ''
-  filterSeniorityLevel.value = ''
-  filterIsRemote.value = ''
-  appliedEmploymentType.value = ''
-  appliedSeniorityLevel.value = ''
-  appliedIsRemote.value = ''
+  filterEmploymentType.value = undefined
+  filterSeniorityLevel.value = undefined
+  filterIsRemote.value = undefined
+  filterCountry.value = undefined
+  appliedEmploymentType.value = undefined
+  appliedSeniorityLevel.value = undefined
+  appliedIsRemote.value = undefined
+  appliedCountry.value = undefined
   filterPopoverOpen.value = false
 }
 
@@ -115,13 +168,12 @@ async function onConfirmSync() {
   try {
     await api('/admin/jobs/sync-linkedin', { method: 'POST', body: { filter: syncFilters.value } })
     await refreshJobs()
+    await refreshRateLimit()
     toast.add({ title: 'Sync completed successfully.', color: 'success' })
-  }
-  catch (error: any) {
+  } catch (error: any) {
     const message = error?.data?.message ?? 'Sync failed'
     toast.add({ title: message, color: 'error' })
-  }
-  finally {
+  } finally {
     isSyncing.value = false
   }
 }
@@ -135,12 +187,10 @@ async function onSaveSyncSettings() {
     })
     toast.add({ title: 'Sync settings saved', color: 'success' })
     syncSettingsOpen.value = false
-  }
-  catch (error: any) {
+  } catch (error: any) {
     const message = error?.data?.message ?? 'An error occurred'
     toast.add({ title: message, color: 'error' })
-  }
-  finally {
+  } finally {
     isSavingSettings.value = false
   }
 }
@@ -161,12 +211,10 @@ async function onConfirmDelete() {
     await api(`/admin/jobs/${deleteTarget.value.id}`, { method: 'DELETE' })
     toast.add({ title: `Job "${deleteTarget.value.title}" deleted`, color: 'success' })
     await refreshJobs()
-  }
-  catch (error: any) {
+  } catch (error: any) {
     const message = error?.data?.message ?? 'An error occurred'
     toast.add({ title: message, color: 'error' })
-  }
-  finally {
+  } finally {
     confirmDeleteOpen.value = false
     deleteTarget.value = null
     isDeleting.value = false
@@ -174,15 +222,17 @@ async function onConfirmDelete() {
 }
 
 // ── Options ───────────────────────────────────────────────────────────────────
-const jobTypeOptionsWithAll = [{ label: 'All Types', value: '' }, ...jobTypeOptions]
-const experienceLevelOptionsWithAll = [{ label: 'All Levels', value: '' }, ...experienceLevelOptions]
 const remoteFilterOptions = [
-  { label: 'All', value: '' },
   { label: 'Yes', value: 'yes' },
   { label: 'No', value: 'no' }
 ]
 
-const syncDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+const syncDate = computed(() => {
+  const d = rateLimit.value?.last_updated
+  return d
+    ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '–'
+})
 
 // ── Table columns ─────────────────────────────────────────────────────────────
 const columns: TableColumn<Job>[] = [
@@ -190,26 +240,91 @@ const columns: TableColumn<Job>[] = [
     id: 'no',
     header: '#',
     cell: ({ row }) =>
-      h('span', { class: 'text-muted' }, row.index + 1 + pagination.value.pageIndex * pagination.value.pageSize)
+      h(
+        'span',
+        { class: 'text-muted' },
+        row.index + 1 + pagination.value.pageIndex * pagination.value.pageSize
+      )
   },
   {
     accessorKey: 'title',
     header: 'Title',
     cell: ({ row }) =>
-      h('span', { class: 'line-clamp-2 text-sm leading-snug', title: row.getValue('title') }, row.getValue('title'))
+      h(
+        'span',
+        { class: 'line-clamp-2 text-sm leading-snug', title: row.getValue('title') },
+        row.getValue('title')
+      )
   },
   {
     id: 'company',
     header: 'Company',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm truncate block', title: row.original.company.name }, row.original.company.name)
+      h(
+        'span',
+        { class: 'text-sm truncate block', title: row.original.company.name },
+        row.original.company.name
+      )
   },
   {
     id: 'location',
     header: 'Location',
     cell: ({ row }) => {
-      const loc = formatLocation(row.original.location)
+      const l = row.original.location
+      const loc = formatLocation(l ? { city: l.city ?? undefined, region: l.region ?? undefined, country: l.country } : undefined)
       return h('span', { class: 'text-sm truncate block', title: loc }, loc)
+    }
+  },
+  {
+    id: 'industry',
+    header: 'Industry',
+    cell: ({ row }) =>
+      h('span', { class: 'text-sm truncate block' }, row.original.company.industry ?? '–')
+  },
+  {
+    id: 'website',
+    header: 'Website',
+    cell: ({ row }) => {
+      const url = row.original.company.website_url
+      return url
+        ? h(
+            'a',
+            {
+              href: url,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+              class: 'text-primary text-sm hover:underline'
+            },
+            'Link'
+          )
+        : h('span', { class: 'text-muted text-sm' }, '–')
+    }
+  },
+  {
+    id: 'linkedin',
+    header: 'LinkedIn',
+    cell: ({ row }) => {
+      const url = row.original.company.linkedin_url
+      return url
+        ? h(
+            'a',
+            {
+              href: url,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+              class: 'text-primary text-sm hover:underline'
+            },
+            'Link'
+          )
+        : h('span', { class: 'text-muted text-sm' }, '–')
+    }
+  },
+  {
+    id: 'posted_date',
+    header: 'Posted',
+    cell: ({ row }) => {
+      const d = row.original.posted_date
+      return h('span', { class: 'text-sm whitespace-nowrap' }, d ? formatDate(d) : '–')
     }
   },
   {
@@ -222,7 +337,11 @@ const columns: TableColumn<Job>[] = [
     id: 'seniority_level',
     header: 'Level',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm whitespace-nowrap' }, formatExperienceLevel(row.original.seniority_level ?? ''))
+      h(
+        'span',
+        { class: 'text-sm whitespace-nowrap' },
+        formatExperienceLevel(row.original.seniority_level ?? '')
+      )
   },
   {
     id: 'salary',
@@ -235,7 +354,9 @@ const columns: TableColumn<Job>[] = [
     header: 'Remote',
     cell: ({ row }) => {
       const remote = row.original.location?.is_remote ?? false
-      return h(UBadge, { variant: 'subtle', color: remote ? 'success' : 'neutral' }, () => remote ? 'Yes' : 'No')
+      return h(UBadge, { variant: 'subtle', color: remote ? 'success' : 'neutral' }, () =>
+        remote ? 'Yes' : 'No'
+      )
     }
   },
   {
@@ -243,7 +364,11 @@ const columns: TableColumn<Job>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const active = row.original.status === 'active'
-      return h(UBadge, { variant: 'subtle', color: active ? 'success' : 'neutral', class: 'capitalize' }, () => row.original.status)
+      return h(
+        UBadge,
+        { variant: 'subtle', color: active ? 'success' : 'neutral', class: 'capitalize' },
+        () => row.original.status
+      )
     }
   },
   {
@@ -284,7 +409,12 @@ const columns: TableColumn<Job>[] = [
     <div class="flex flex-wrap items-center justify-between gap-3 p-4">
       <!-- Left: Search + Filters -->
       <div class="flex flex-wrap items-center gap-2">
-        <UInput v-model="search" icon="i-lucide-search" placeholder="Search title or company..." class="w-full sm:w-56" />
+        <UInput
+          v-model="search"
+          icon="i-lucide-search"
+          placeholder="Search title or company..."
+          class="w-full sm:w-56"
+        />
 
         <UPopover v-model:open="filterPopoverOpen">
           <UButton
@@ -295,7 +425,9 @@ const columns: TableColumn<Job>[] = [
             size="sm"
           >
             <template v-if="activeFilterCount > 0" #trailing>
-              <span class="size-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+              <span
+                class="size-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center"
+              >
                 {{ activeFilterCount }}
               </span>
             </template>
@@ -306,35 +438,57 @@ const columns: TableColumn<Job>[] = [
               <h4 class="font-medium text-sm">Filter Jobs</h4>
 
               <UFormField label="Job Type">
-                <USelectMenu
+                <USelect
                   v-model="filterEmploymentType"
-                  value-key="value"
-                  :items="jobTypeOptionsWithAll"
+                  :items="jobTypeOptions"
+                  placeholder="All Types"
                   class="w-full"
                 />
               </UFormField>
 
               <UFormField label="Experience Level">
-                <USelectMenu
+                <USelect
                   v-model="filterSeniorityLevel"
-                  value-key="value"
-                  :items="experienceLevelOptionsWithAll"
+                  :items="experienceLevelOptions"
+                  placeholder="All Levels"
                   class="w-full"
                 />
               </UFormField>
 
               <UFormField label="Remote Work">
-                <USelectMenu
+                <USelect
                   v-model="filterIsRemote"
-                  value-key="value"
                   :items="remoteFilterOptions"
+                  placeholder="All"
+                  class="w-full"
+                />
+              </UFormField>
+
+              <UFormField label="Country">
+                <USelect
+                  v-model="filterCountry"
+                  :items="uniqueCountries"
+                  placeholder="All Countries"
                   class="w-full"
                 />
               </UFormField>
 
               <div class="flex gap-2 pt-1">
-                <UButton label="Apply" color="primary" size="sm" class="flex-1" @click="applyFilters" />
-                <UButton label="Clear" color="neutral" variant="outline" size="sm" class="flex-1" @click="clearFilters" />
+                <UButton
+                  label="Apply"
+                  color="primary"
+                  size="sm"
+                  class="flex-1"
+                  @click="applyFilters"
+                />
+                <UButton
+                  label="Clear"
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  class="flex-1"
+                  @click="clearFilters"
+                />
               </div>
             </div>
           </template>
@@ -352,7 +506,7 @@ const columns: TableColumn<Job>[] = [
         />
 
         <div class="hidden sm:block h-4 w-px bg-default" />
-        <UTooltip text="Rate Limit: General API 100 req/min">
+        <UTooltip :text="rateLimitText">
           <div class="flex items-center gap-1.5 cursor-default select-none">
             <UIcon name="i-lucide-info" class="size-4 text-muted" />
             <span class="text-sm text-muted">Rate Limit</span>
@@ -387,7 +541,13 @@ const columns: TableColumn<Job>[] = [
               <div class="p-4 w-56 space-y-3">
                 <p class="text-sm">Perform manual job sync?</p>
                 <div class="flex justify-end gap-2">
-                  <UButton label="No" color="neutral" variant="outline" size="sm" @click="confirmSyncOpen = false" />
+                  <UButton
+                    label="No"
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    @click="confirmSyncOpen = false"
+                  />
                   <UButton label="Yes" color="primary" size="sm" @click="onConfirmSync" />
                 </div>
               </div>
@@ -426,7 +586,7 @@ const columns: TableColumn<Job>[] = [
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4">
       <p class="text-sm text-muted">
-        Showing {{ (pagination.pageIndex * pagination.pageSize) + 1 }} to
+        Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
         {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
         {{ filteredData.length }} entries
       </p>
@@ -449,8 +609,20 @@ const columns: TableColumn<Job>[] = [
     :ui="{ footer: 'justify-end' }"
   >
     <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" :disabled="isDeleting" @click="confirmDeleteOpen = false" />
-      <UButton label="Delete" color="error" :loading="isDeleting" :disabled="isDeleting" @click="onConfirmDelete" />
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="isDeleting"
+        @click="confirmDeleteOpen = false"
+      />
+      <UButton
+        label="Delete"
+        color="error"
+        :loading="isDeleting"
+        :disabled="isDeleting"
+        @click="onConfirmDelete"
+      />
     </template>
   </UModal>
 
@@ -464,34 +636,81 @@ const columns: TableColumn<Job>[] = [
     <template #body>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <UFormField label="Job title keywords">
-          <UInputTags v-model="syncFilters.advanced_title_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.advanced_title_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Locations">
-          <UInputTags v-model="syncFilters.location_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.location_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Description keywords">
-          <UInputTags v-model="syncFilters.description_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.description_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
-        <UFormField label="Job types (e.g. Full Time)">
-          <UInputTags v-model="syncFilters.type_filter" placeholder="Type and press enter" class="w-full" />
+        <UFormField label="Job types">
+          <USelectMenu
+            v-model="syncFilters.type_filter"
+            :items="jobTypeOptions"
+            value-key="value"
+            multiple
+            placeholder="Select job types..."
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Company description keywords">
-          <UInputTags v-model="syncFilters.organization_description_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.organization_description_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Company specialties">
-          <UInputTags v-model="syncFilters.organization_specialties_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.organization_specialties_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Industries">
-          <UInputTags v-model="syncFilters.industry_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.industry_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
         <UFormField label="Seniority levels">
-          <UInputTags v-model="syncFilters.seniority_filter" placeholder="Type and press enter" class="w-full" />
+          <UInputTags
+            v-model="syncFilters.seniority_filter"
+            placeholder="Type and press enter"
+            class="w-full"
+          />
         </UFormField>
       </div>
     </template>
     <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" :disabled="isSavingSettings" @click="onCloseSyncSettings" />
-      <UButton label="Save Settings" color="primary" :loading="isSavingSettings" :disabled="isSavingSettings" @click="onSaveSyncSettings" />
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="isSavingSettings"
+        @click="onCloseSyncSettings"
+      />
+      <UButton
+        label="Save Settings"
+        color="primary"
+        :loading="isSavingSettings"
+        :disabled="isSavingSettings"
+        @click="onSaveSyncSettings"
+      />
     </template>
   </UModal>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CohortModule, ModuleSessionStatus } from '@/types'
+import type { CohortModule, CohortModuleAttachment, ModuleSessionStatus } from '@/types'
 
 const props = defineProps<{
   modules: CohortModule[]
@@ -38,11 +38,41 @@ const sessionStatusConfig: Record<
   hidden: { label: 'Hidden', color: 'warning', variant: 'soft' }
 }
 
-const attachmentConfig: Record<string, { icon: string }> = {
-  pdf: { icon: 'i-lucide-file-text' },
-  docx: { icon: 'i-lucide-file-text' },
-  jpg: { icon: 'i-lucide-image' },
-  url: { icon: 'i-lucide-link' }
+function formatSessionTime(iso: string) {
+  const d = new Date(iso)
+  const date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  const time = d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZoneName: 'short'
+  })
+  return `${date}, ${time}`
+}
+
+function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: string } {
+  if (att.type === 'external_link') return { bg: 'bg-blue-500',   icon: 'i-lucide-link' }
+  if (att.type === 'embed_video')   return { bg: 'bg-red-500',    icon: 'i-lucide-video' }
+
+  const ext = (att.file_mime?.split('/').pop() ?? att.file_path?.split('.').pop() ?? '').toLowerCase()
+  const byExt: Record<string, { bg: string; icon: string }> = {
+    pdf:   { bg: 'bg-red-500',    icon: 'i-lucide-file-text' },
+    msword: { bg: 'bg-blue-500',  icon: 'i-lucide-file-text' },
+    doc:   { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
+    docx:  { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
+    'vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'bg-blue-500', icon: 'i-lucide-file-text' },
+    ppt:   { bg: 'bg-orange-500', icon: 'i-lucide-file' },
+    pptx:  { bg: 'bg-orange-500', icon: 'i-lucide-file' },
+    'vnd.openxmlformats-officedocument.presentationml.presentation': { bg: 'bg-orange-500', icon: 'i-lucide-file' },
+    xls:   { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
+    xlsx:  { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
+    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'bg-green-600', icon: 'i-lucide-table-2' },
+    jpeg:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    jpg:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    png:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    webp:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+  }
+  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-lucide-file' }
 }
 </script>
 
@@ -78,7 +108,7 @@ const attachmentConfig: Record<string, { icon: string }> = {
         </div>
         <div class="flex items-center gap-3 shrink-0">
           <span v-if="module.session_timestamp" class="hidden sm:block text-sm text-muted">
-            {{ formatDate(module.session_timestamp) }}
+            {{ formatSessionTime(module.session_timestamp) }}
           </span>
           <UIcon
             :name="isModuleOpen(module.id) ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
@@ -93,33 +123,19 @@ const attachmentConfig: Record<string, { icon: string }> = {
             {{ module.description }}
           </p>
 
-          <div v-if="module.attachments.length" class="flex flex-wrap gap-2">
+          <div v-if="module.attachments?.length" class="flex flex-wrap gap-2">
             <a
               v-for="attachment in module.attachments"
               :key="attachment.id"
-              :href="attachment.url"
+              :href="attachment.type === 'file' ? attachment.file_url : attachment.url"
               target="_blank"
               class="flex items-center gap-2 border border-default rounded-lg overflow-hidden hover:border-gray-300 transition-colors"
             >
               <div
                 class="flex items-center justify-center size-12 text-white shrink-0"
-                :style="{
-                  backgroundColor:
-                    attachment.type === 'pdf'
-                      ? '#ef4444'
-                      : attachment.type === 'docx'
-                        ? '#3b82f6'
-                        : attachment.type === 'jpg'
-                          ? '#22c55e'
-                          : '#60a5fa'
-                }"
+                :class="getAttachmentStyle(attachment).bg"
               >
-                <span v-if="attachment.type === 'pdf'" class="text-sm font-bold leading-none">PDF</span>
-                <UIcon
-                  v-else
-                  :name="attachmentConfig[attachment.type]?.icon ?? 'i-lucide-paperclip'"
-                  class="size-4"
-                />
+                <UIcon :name="getAttachmentStyle(attachment).icon" class="size-4" />
               </div>
               <span class="text-sm pr-3">{{ attachment.label }}</span>
             </a>

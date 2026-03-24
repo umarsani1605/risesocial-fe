@@ -29,9 +29,13 @@ const { data: academiesData } = await useAsyncData('admin-academy-list', () =>
 const cohorts = computed(() => cohortsData.value?.data ?? [])
 const academies = computed(() => academiesData.value?.data ?? [])
 
+const route = useRoute()
+
 const search = ref('')
 const academyFilter = ref('all')
 const statusFilter = ref('all')
+
+const idFilter = computed(() => route.query.id ? Number(route.query.id) : null)
 
 const academyOptions = computed(() => [
   { label: 'All Academy', value: 'all' },
@@ -42,6 +46,9 @@ const statusOptions = [{ label: 'All Status', value: 'all' }, ...COHORT_STATUS_I
 
 const filteredData = computed(() => {
   let result = [...cohorts.value]
+  if (idFilter.value) {
+    return result.filter((c) => c.id === idFilter.value)
+  }
   if (search.value) {
     const s = search.value.toLowerCase()
     result = result.filter(

@@ -20,6 +20,7 @@ export interface JobCompany {
   slug: string
   logo_url: string | null
   website_url: string | null
+  linkedin_url?: string | null
   industry?: string | null
 }
 

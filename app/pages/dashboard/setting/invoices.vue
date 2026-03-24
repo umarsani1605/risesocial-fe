@@ -15,6 +15,7 @@ const statusFilter = ref<string | undefined>(undefined)
 const transactions = ref<UserTransaction[]>([])
 const totalPages = ref(0)
 const total = ref(0)
+const hasFetched = ref(false)
 
 const statusOptions = [
   { label: 'All', value: undefined },
@@ -47,6 +48,8 @@ const loadTransactions = async () => {
     total.value = res.meta?.total ?? 0
   } catch {
     toast.add({ title: 'Failed to load transactions', color: 'error' })
+  } finally {
+    hasFetched.value = true
   }
 }
 
@@ -77,7 +80,7 @@ const onRowClick = async (_e: Event, row: { original: UserTransaction }) => {
 
 const formatPaymentMethod = (method: string | null) => {
   if (!method) return '-'
-  return method.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return method.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 </script>
 
@@ -85,7 +88,7 @@ const formatPaymentMethod = (method: string | null) => {
   <DashboardSettingSidebar>
     <div class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 class="text-xl font-bold">Transactions</h1>
+        <h1 class="text-xl font-bold">Invoices</h1>
         <USelect
           v-model="statusFilter"
           :items="statusOptions"
@@ -97,17 +100,15 @@ const formatPaymentMethod = (method: string | null) => {
       </div>
 
       <UTable
+        v-if="isLoading || transactions.length > 0"
         :data="transactions"
         :columns="columns"
         :loading="isLoading"
-        class="w-full"
-        :ui="{
-          tr: 'cursor-pointer hover:bg-gray-50 transition-colors'
-        }"
+        class="w-full p-0! overflow-visible"
         @select="onRowClick"
       >
         <template #created_at-cell="{ row }">
-          <span class="text-sm">{{ formatDate(row.original.created_at) }}</span>
+          <span class="text-sm">{{ formatDatetime(row.original.created_at) }}</span>
         </template>
         <template #items-cell="{ row }">
           <span class="text-sm font-medium">
@@ -126,19 +127,20 @@ const formatPaymentMethod = (method: string | null) => {
           />
         </template>
         <template #payment_method-cell="{ row }">
-          <span class="text-sm text-muted">{{ formatPaymentMethod(row.original.payment_method) }}</span>
+          <span class="text-sm text-muted">{{
+            formatPaymentMethod(row.original.payment_method)
+          }}</span>
         </template>
       </UTable>
 
       <div v-if="totalPages > 1" class="flex justify-center">
-        <UPagination
-          v-model="page"
-          :total="total"
-          :items-per-page="limit"
-        />
+        <UPagination v-model="page" :total="total" :items-per-page="limit" />
       </div>
 
-      <div v-if="!isLoading && transactions.length === 0" class="text-center py-12 text-muted">
+      <div
+        v-if="hasFetched && !isLoading && transactions.length === 0"
+        class="text-center py-12 text-muted"
+      >
         <UIcon name="i-lucide-receipt" class="size-12 mb-4 mx-auto" />
         <p>No transactions found</p>
       </div>
@@ -153,23 +155,38 @@ const formatPaymentMethod = (method: string | null) => {
           </div>
           <template v-else-if="selectedTransaction">
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-bold">Transaction Detail</h2>
-              <UBadge
-                :label="selectedTransaction.status"
-                :color="statusColor[selectedTransaction.status] ?? 'neutral'"
-                variant="subtle"
-                class="capitalize"
-              />
+              <h2 class="text-lg font-bold">Invoice Details</h2>
+            </div>
+            <div>
+              <h3 class="font-semibold mb-2">Items</h3>
+              <div
+                v-for="(item, i) in selectedTransaction.items"
+                :key="i"
+                class="flex justify-between text-sm py-1"
+              >
+                <span class="text-muted">{{ item.product_name }}</span>
+                <span>{{ formatPrice(item.total_price) }}</span>
+              </div>
             </div>
 
             <div class="space-y-3 text-sm">
+              <h3 class="font-semibold mb-3">Payment</h3>
               <div class="flex justify-between">
                 <span class="text-muted">Transaction Code</span>
-                <span class="font-mono font-semibold">{{ selectedTransaction.transaction_code }}</span>
+                <span>{{ selectedTransaction.transaction_code }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-muted">Amount</span>
-                <span class="font-semibold">{{ formatPrice(selectedTransaction.amount) }}</span>
+                <span>{{ formatPrice(selectedTransaction.amount) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-muted">Status</span>
+                <UBadge
+                  :label="selectedTransaction.status"
+                  :color="statusColor[selectedTransaction.status] ?? 'neutral'"
+                  variant="subtle"
+                  class="capitalize"
+                />
               </div>
               <div class="flex justify-between">
                 <span class="text-muted">Provider</span>
@@ -181,37 +198,16 @@ const formatPaymentMethod = (method: string | null) => {
               </div>
               <div class="flex justify-between">
                 <span class="text-muted">Created</span>
-                <span>{{ formatDate(selectedTransaction.created_at) }}</span>
+                <span>{{ formatDatetime(selectedTransaction.created_at) }}</span>
               </div>
               <div v-if="selectedTransaction.paid_at" class="flex justify-between">
                 <span class="text-muted">Paid At</span>
-                <span>{{ formatDate(selectedTransaction.paid_at) }}</span>
+                <span>{{ formatDatetime(selectedTransaction.paid_at) }}</span>
               </div>
               <div v-if="selectedTransaction.expired_at" class="flex justify-between">
                 <span class="text-muted">Expired At</span>
-                <span>{{ formatDate(selectedTransaction.expired_at) }}</span>
+                <span>{{ formatDatetime(selectedTransaction.expired_at) }}</span>
               </div>
-            </div>
-
-            <hr class="border-gray-200" />
-
-            <div>
-              <h3 class="font-semibold mb-2">Items</h3>
-              <div
-                v-for="(item, i) in selectedTransaction.items"
-                :key="i"
-                class="flex justify-between text-sm py-1"
-              >
-                <span>{{ item.product_name }} x{{ item.quantity }}</span>
-                <span class="font-semibold">{{ formatPrice(item.total_price) }}</span>
-              </div>
-            </div>
-
-            <hr class="border-gray-200" />
-
-            <div class="text-sm space-y-1 text-muted">
-              <p>{{ selectedTransaction.customer_name }}</p>
-              <p>{{ selectedTransaction.customer_email }}</p>
             </div>
           </template>
 

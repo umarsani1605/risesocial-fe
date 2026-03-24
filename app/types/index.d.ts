@@ -85,20 +85,21 @@ export type {
 } from './academy'
 
 // ── Cohort Types (Admin) ──────────────────────────────────────────────────────
-export type { AdminCohortDetail, AdminCohortModule, AdminCohortAttachment, AdminCohortEnrollment, AdminCohortMentor } from './cohort'
+export type { AdminCohortDetail, AdminCohortModule, AdminCohortAttachment, AdminCohortEnrollment, AdminCohortMentor, PendingAttachment } from './cohort'
 
 // ── Cohort Types (User Dashboard) ────────────────────────────────────────────
 
 export type CohortStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED'
 export type EnrollmentStatus = 'active' | 'pending' | 'completed'
 export type ModuleSessionStatus = 'upcoming' | 'live' | 'completed' | 'hidden'
-export type ModuleAttachmentType = 'pdf' | 'docx' | 'jpg' | 'url'
-
 export interface CohortModuleAttachment {
   id: number
-  label: string
-  type: ModuleAttachmentType
-  url: string
+  label: string | null
+  type: 'file' | 'external_link' | 'embed_video'
+  url: string | null
+  file_url: string | null
+  file_path: string | null
+  file_mime: string | null
   order: number
 }
 
@@ -141,6 +142,11 @@ export interface Cohort {
     title: string
     slug: string
     image_url?: string
+    description?: string | null
+    duration?: string | null
+    certificate?: boolean | null
+    portfolio?: boolean | null
+    format?: string | null
   }
 }
 
@@ -160,7 +166,12 @@ export interface CohortEnrollment {
     academy: {
       id: number
       title: string
-      image_url: string
+      slug: string | null
+      image_url: string | null
+      duration: string | null
+      format: string | null
+      certificate: boolean | null
+      description: string | null
     }
   }
 }
@@ -186,6 +197,61 @@ export interface UserTransactionDetail extends UserTransaction {
   customer_email: string
   provider: string
   provider_reference: string | null
+}
+
+// ── Admin Transaction Types ───────────────────────────────────────────────────
+
+export interface AdminTransaction {
+  id: number
+  transaction_code: string
+  customer_name: string
+  customer_email: string
+  customer_phone: string | null
+  product_type: string
+  amount: number
+  currency: string
+  status: string
+  provider: string
+  payment_method: string | null
+  created_at: string
+}
+
+export interface AdminTransactionItem {
+  id: number
+  product_name: string
+  quantity: number
+  unit_price: number
+  total_price: number
+}
+
+export interface AdminTransactionDetail {
+  id: number
+  transaction_code: string
+  amount: number
+  currency: string
+  status: string
+  provider: string
+  payment_method: string | null
+  created_at: string
+  paid_at: string | null
+  expired_at: string | null
+  customer_details: {
+    user_id: number | null
+    user_name: string | null
+    name: string
+    email: string
+    phone: string | null
+    address: string | null
+    city: string | null
+    postal_code: string | null
+    country_code: string | null
+  }
+  product_details: {
+    type: string
+    items: AdminTransactionItem[]
+    enrollment: { cohort_id: number; cohort_name: string } | null
+    ryls_registration: { id: number; full_name: string; scholarship_type: string } | null
+  }
 }
 
 // ── Blog Management types ─────────────────────────────────────────────────────

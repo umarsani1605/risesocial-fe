@@ -16,9 +16,8 @@ const route = useRoute()
 const cohortId = route.params.id as string
 
 const { api } = useApi()
-const { data: cohortRaw, error: cohortError } = await useAsyncData(
-  `admin-cohort-${cohortId}`,
-  () => api<ApiResponse<AdminCohortDetail>>(`/admin/cohorts/${cohortId}`)
+const { data: cohortRaw, error: cohortError } = await useAsyncData(`admin-cohort-${cohortId}`, () =>
+  api<ApiResponse<AdminCohortDetail>>(`/admin/cohorts/${cohortId}`)
 )
 if (cohortError.value || !cohortRaw.value?.data) {
   throw createError({ statusCode: 404, message: 'Cohort not found' })
@@ -83,7 +82,10 @@ const headerMenuItems: DropdownMenuItem[][] = [
       variant="link"
       color="primary"
       :unmount-on-hide="false"
-      :ui="{ list: 'p-0! border-b border-default overflow-x-auto', trigger: 'px-3 sm:px-6 whitespace-nowrap', content: '' }"
+      :ui="{
+        list: 'p-0!',
+        trigger: 'px-3 sm:px-6 whitespace-nowrap'
+      }"
     >
       <template #modules>
         <AdminCohortTabModules
@@ -95,7 +97,9 @@ const headerMenuItems: DropdownMenuItem[][] = [
       </template>
 
       <template #statistics>
-        <div class="py-8 sm:py-16 text-center text-muted text-sm min-h-[200px] sm:min-h-[400px]">On Planning...</div>
+        <div class="py-8 sm:py-16 text-center text-muted text-sm min-h-[200px] sm:min-h-[400px]">
+          On Planning...
+        </div>
       </template>
 
       <template #students>
@@ -116,20 +120,33 @@ const headerMenuItems: DropdownMenuItem[][] = [
     </UTabs>
   </UCard>
 
-  <AdminCohortModuleAddModal
+  <AdminCohortModuleModal
+    mode="add"
     v-model:open="cohortModules.isAddModuleOpen"
     v-model:form="cohortModules.addModuleForm"
     v-model:save-and-add-more="cohortModules.saveAndAddMore"
     :loading="cohortModules.isAddingModule"
+    :pending-attachments="cohortModules.pendingAttachments"
     @submit="cohortModules.submitAddModule"
     @cancel="cohortModules.resetAddModuleForm"
+    @add-link="cohortModules.addPendingLink"
+    @add-file="cohortModules.addPendingFile"
+    @remove-attachment="cohortModules.removePendingAttachment"
   />
 
-  <AdminCohortModuleEditModal
+  <AdminCohortModuleModal
+    mode="edit"
     v-model:open="cohortModules.isEditModuleOpen"
     v-model:form="cohortModules.editModuleForm"
     :loading="cohortModules.isEditingModule"
+    :attachments="cohortModules.moduleAttachments"
+    :pending-attachments="cohortModules.editPendingAttachments"
+    :is-deleting-attachment="cohortModules.isDeletingAttachment"
     @submit="cohortModules.submitEditModule"
+    @add-link="cohortModules.addEditPendingLink"
+    @add-file="cohortModules.addEditPendingFile"
+    @remove-attachment="cohortModules.removeEditPendingAttachment"
+    @delete-attachment="cohortModules.submitDeleteAttachment"
   />
 
   <AdminCohortEditInfoModal

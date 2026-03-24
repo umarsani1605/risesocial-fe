@@ -85,7 +85,6 @@ const columns: TableColumn<AcademyFeature>[] = [
       <UButton label="+ Add" color="primary" @click="openAdd" />
     </div>
     <div class="p-px overflow-x-auto">
-      uto">
       <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
         <template #icon-cell="{ row }">
           <div class="flex items-center gap-1.5">

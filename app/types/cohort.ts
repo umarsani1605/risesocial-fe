@@ -1,8 +1,22 @@
+export interface PendingAttachment {
+  id: string
+  type: 'file' | 'external_link'
+  label: string
+  url?: string
+  file?: File
+}
+
 export interface AdminCohortAttachment {
   id: number
-  label: string
-  type: 'pdf' | 'docx' | 'pptx' | 'xlsx' | 'url' | 'file'
+  type: 'file' | 'external_link' | 'embed_video'
+  label: string | null
+  file_path: string | null
+  file_mime: string | null
+  file_size_kb: number | null
   url: string | null
+  embed_provider: string | null
+  file_url: string | null
+  order: number
 }
 
 export interface AdminCohortModule {

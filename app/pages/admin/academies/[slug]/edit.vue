@@ -93,18 +93,25 @@ async function onSave() {
 
 <template>
   <UCard :ui="{ body: 'p-0' }">
-    <div class="flex flex-wrap items-center justify-between gap-2 p-4 sm:p-6">
-      <div class="flex items-center gap-2 min-w-0">
-        <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/admin/academies" />
-        <h2 class="text-xl font-semibold truncate">Edit {{ pageTitle }}</h2>
+    <template #header>
+      <div class="flex items-center justify-between gap-3 px-1">
+        <div class="flex items-center gap-3 min-w-0">
+          <UButton
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
+            to="/admin/academies"
+          />
+          <h2 class="text-xl font-semibold truncate">Edit {{ pageTitle }}</h2>
+        </div>
+        <UButton
+          label="View Public Page"
+          trailing-icon="i-lucide-external-link"
+          color="neutral"
+          variant="ghost"
+        />
       </div>
-      <UButton
-        label="View Public Page"
-        trailing-icon="i-lucide-external-link"
-        color="neutral"
-        variant="ghost"
-      />
-    </div>
+    </template>
 
     <UTabs
       :items="ACADEMY_TAB_ITEMS"
@@ -112,8 +119,8 @@ async function onSave() {
       color="primary"
       :unmount-on-hide="false"
       :ui="{
-        trigger: 'px-3 sm:px-6 whitespace-nowrap',
-        content: ''
+        list: 'p-0!',
+        trigger: 'px-3 sm:px-6 whitespace-nowrap'
       }"
     >
       <template #information>
@@ -182,24 +189,6 @@ async function onSave() {
           :ui="{ viewport: 'p-6' }"
         >
           <AdminAcademySectionCohorts :academy-id="source.id" />
-        </UScrollArea>
-      </template>
-
-      <template #students>
-        <UScrollArea
-          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
-          :ui="{ viewport: 'p-6' }"
-        >
-          <p class="py-8 text-center text-sm text-muted">No students enrolled yet.</p>
-        </UScrollArea>
-      </template>
-
-      <template #mentors>
-        <UScrollArea
-          class="h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]"
-          :ui="{ viewport: 'p-6' }"
-        >
-          <p class="py-8 text-center text-sm text-muted">No mentors assigned yet.</p>
         </UScrollArea>
       </template>
     </UTabs>

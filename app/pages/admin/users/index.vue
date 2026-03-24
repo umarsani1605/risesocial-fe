@@ -21,17 +21,25 @@ const { data: rawUsers, refresh } = await useAsyncData('admin:users', () =>
 const UButton = resolveComponent('UButton')
 const UAvatar = resolveComponent('UAvatar')
 
+const route = useRoute()
+
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const search = ref('')
 
+const idFilter = computed(() => (route.query.id ? Number(route.query.id) : null))
+
 const filteredData = computed(() => {
-  let result = (rawUsers.value?.data ?? []).filter(u => u.role === 'USER')
+  let result = (rawUsers.value?.data ?? []).filter((u) => u.role === 'USER')
+  if (idFilter.value) {
+    return result.filter((u) => u.id === idFilter.value)
+  }
   if (search.value) {
     const s = search.value.toLowerCase()
-    result = result.filter(u =>
-      `${u.first_name} ${u.last_name}`.toLowerCase().includes(s) ||
-      u.email.toLowerCase().includes(s)
+    result = result.filter(
+      (u) =>
+        `${u.first_name} ${u.last_name}`.toLowerCase().includes(s) ||
+        u.email.toLowerCase().includes(s)
     )
   }
   return result
@@ -142,7 +150,10 @@ async function executeDelete() {
   isDeleting.value = true
   try {
     await api(`/admin/users/${deleteTarget.value.id}`, { method: 'DELETE' })
-    toast.add({ title: `User "${deleteTarget.value.first_name} ${deleteTarget.value.last_name}" deleted`, color: 'success' })
+    toast.add({
+      title: `User "${deleteTarget.value.first_name} ${deleteTarget.value.last_name}" deleted`,
+      color: 'success'
+    })
     isDeleteOpen.value = false
     deleteTarget.value = null
     await refresh()
@@ -155,8 +166,12 @@ async function executeDelete() {
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleString('en-US', {
-    year: 'numeric', month: 'numeric', day: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
   })
 }
 
@@ -183,7 +198,8 @@ const columns: TableColumn<AdminUser>[] = [
   {
     accessorKey: 'phone',
     header: 'Phone',
-    cell: ({ row }) => h('span', { class: row.getValue('phone') ? '' : 'text-muted' }, row.getValue('phone') ?? '–')
+    cell: ({ row }) =>
+      h('span', { class: row.getValue('phone') ? '' : 'text-muted' }, row.getValue('phone') ?? '–')
   },
   {
     accessorKey: 'created_at',
@@ -219,7 +235,12 @@ const columns: TableColumn<AdminUser>[] = [
 <template>
   <UCard :ui="{ body: 'p-0!' }">
     <div class="flex flex-wrap items-center justify-between gap-2 p-4">
-      <UInput v-model="search" icon="i-lucide-search" placeholder="Search name or email..." class="w-full sm:w-64" />
+      <UInput
+        v-model="search"
+        icon="i-lucide-search"
+        placeholder="Search name or email..."
+        class="w-full sm:w-64"
+      />
       <UButton label="Add New" icon="i-lucide-plus" color="primary" @click="openCreate" />
     </div>
 
@@ -249,7 +270,7 @@ const columns: TableColumn<AdminUser>[] = [
     </div>
   </UCard>
 
-  <AdminUserUserFormModal
+  <AdminUserFormModal
     v-model:open="isCreateOpen"
     v-model:form="createForm"
     title="Add New User"
@@ -259,7 +280,7 @@ const columns: TableColumn<AdminUser>[] = [
     @cancel="isCreateOpen = false"
   />
 
-  <AdminUserUserFormModal
+  <AdminUserFormModal
     v-model:open="isEditOpen"
     v-model:form="editForm"
     title="Edit User"

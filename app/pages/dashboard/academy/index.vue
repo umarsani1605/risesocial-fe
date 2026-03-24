@@ -36,54 +36,65 @@ const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.coh
     </div>
 
     <div v-else class="space-y-4">
-      <div
+      <NuxtLink
         v-for="enrollment in enrollments"
         :key="enrollment.id"
-        class="flex items-start gap-4 p-4 border border-default rounded-lg bg-white"
+        :to="`/dashboard/academy/${enrollment.cohort.id}`"
+        class="block group"
       >
-        <div class="w-32 md:w-44 aspect-video rounded-md overflow-hidden bg-gray-100 shrink-0">
-          <NuxtImg
-            :src="enrollment.cohort.academy.image_url"
-            :alt="enrollment.cohort.academy.title"
-            class="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
+        <UCard :ui="{ root: 'shadow-sm' }">
+          <div class="flex gap-4 md:gap-6">
+            <!-- Image: small, left, rectangular -->
+            <div class="w-36 md:w-44 shrink-0 rounded-lg overflow-hidden bg-gray-100 aspect-video self-start">
+              <NuxtImg
+                v-if="enrollment.cohort.academy.image_url"
+                :src="enrollment.cohort.academy.image_url"
+                :alt="enrollment.cohort.academy.title"
+                class="w-full h-full object-cover"
+                format="webp"
+                loading="lazy"
+              />
+              <div v-else class="w-full h-full flex items-center justify-center">
+                <UIcon name="i-lucide-image" class="size-8 text-gray-400" />
+              </div>
+            </div>
 
-        <div class="flex-1 min-w-0">
-          <h3 class="font-semibold mb-1 leading-tight">{{ enrollment.cohort.academy.title }}</h3>
-
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted mb-2">
-            <span class="flex items-center gap-1">
-              <UIcon name="i-lucide-layers" class="size-3.5 shrink-0" />
-              {{ enrollment.cohort.name }}
-            </span>
-            <span class="flex items-center gap-1">
-              <UIcon name="i-lucide-calendar" class="size-3.5 shrink-0" />
-              INTAKE: {{ formatDate(enrollment.cohort.start_date) }}
-            </span>
-            <UBadge
-              :color="enrollment.status === 'completed' ? 'success' : enrollment.status === 'active' ? 'primary' : 'warning'"
-              variant="subtle"
-              size="xs"
-            >
-              {{ enrollment.status }}
-            </UBadge>
+            <!-- Content -->
+            <div class="flex-1 flex flex-col justify-between min-w-0">
+              <div>
+                <h3 class="font-bold text-lg leading-tight mb-2">
+                  {{ enrollment.cohort.academy.title }}
+                </h3>
+                <!-- Metadata: inline row -->
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted mb-3">
+                  <span v-if="enrollment.cohort.academy.duration" class="flex items-center gap-1">
+                    <UIcon name="i-lucide-clock" class="size-3.5 shrink-0" />
+                    {{ enrollment.cohort.academy.duration }}
+                  </span>
+                  <span v-if="enrollment.cohort.academy.format" class="flex items-center gap-1">
+                    <UIcon name="i-lucide-video" class="size-3.5 shrink-0" />
+                    {{ enrollment.cohort.academy.format }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <UIcon name="i-lucide-calendar" class="size-3.5 shrink-0" />
+                    INTAKE: {{ formatDate(enrollment.cohort.start_date) }}
+                  </span>
+                  <span v-if="enrollment.cohort.academy.certificate" class="flex items-center gap-1">
+                    <UIcon name="i-lucide-award" class="size-3.5 shrink-0" />
+                    Sertifikat
+                  </span>
+                </div>
+                <p v-if="enrollment.cohort.academy.description" class="text-sm text-muted line-clamp-2 leading-relaxed">
+                  {{ enrollment.cohort.academy.description }}
+                </p>
+              </div>
+              <div class="flex justify-end mt-3">
+                <span class="text-sm text-muted group-hover:text-gray-700 transition-colors">More Detail</span>
+              </div>
+            </div>
           </div>
-
-          <div class="flex justify-end">
-            <UButton
-              :to="`/dashboard/academy/${enrollment.cohort.id}`"
-              variant="link"
-              color="neutral"
-              size="sm"
-              class="text-muted"
-            >
-              More Detail
-            </UButton>
-          </div>
-        </div>
-      </div>
+        </UCard>
+      </NuxtLink>
     </div>
   </UCard>
 </template>

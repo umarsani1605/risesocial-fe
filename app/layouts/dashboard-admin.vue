@@ -59,11 +59,14 @@ const academyLinks = [
     onSelect: () => {
       open.value = false
     }
-  },
+  }
+] satisfies NavigationMenuItem[]
+
+const financeLinks = [
   {
-    label: 'Payments',
-    icon: 'i-lucide-credit-card',
-    to: '/admin/payments',
+    label: 'Transactions',
+    icon: 'i-lucide-receipt',
+    to: '/admin/transactions',
     onSelect: () => {
       open.value = false
     }
@@ -151,6 +154,15 @@ const programLinks = [
           orientation="vertical"
           tooltip
         />
+
+        <p
+          v-if="!collapsed"
+          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
+        >
+          Finance
+        </p>
+        <div v-else class="mt-3" />
+        <UNavigationMenu :collapsed="collapsed" :items="financeLinks" orientation="vertical" tooltip />
 
         <p
           v-if="!collapsed"
