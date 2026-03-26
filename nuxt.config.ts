@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxthub/core',
-    'nuxt-csurf'
+    'nuxt-csurf',
+    'nuxt-charts'
   ],
   
   imports: {

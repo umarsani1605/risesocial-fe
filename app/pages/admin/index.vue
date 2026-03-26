@@ -6,7 +6,7 @@ import type { AdminPayment } from '~/composables/useMockAdminData'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Dashboard',
-  navbarIcon: 'i-lucide-layout-dashboard',
+  navbarIcon: 'i-ph-squares-four-fill',
   middleware: 'admin'
 })
 
@@ -15,75 +15,79 @@ useSeoMeta({
   description: 'Dashboard for admin to manage the platform'
 })
 
-const { api } = useApi()
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 
-const [academyStats, cohortStats, userStats] = await Promise.all([
+const analytics = useAnalytics()
+const { api } = useApi()
+
+const [overviewData, academyStats] = await Promise.all([
+  useAsyncData('admin:analytics-overview', () => analytics.fetchOverview()),
   useAsyncData('admin:academies-count', () =>
     api<PaginatedResponse<unknown>>('/admin/academies', { params: { limit: 1 } })
-  ),
-  useAsyncData('admin:cohorts-count', () =>
-    api<PaginatedResponse<unknown>>('/admin/cohorts', { params: { limit: 1 } })
-  ),
-  useAsyncData('admin:users-count', () =>
-    api<PaginatedResponse<unknown>>('/admin/users', { params: { limit: 1 } })
   )
+])
+
+const overview = computed(() => overviewData.data.value)
+
+const statCards = computed<AnalyticsStat[]>(() => [
+  {
+    title: 'Total Revenue',
+    value: overview.value?.totalRevenue ?? 0,
+    icon: 'i-ph-currency-circle-dollar-fill',
+    trend: overview.value?.totalRevenueTrend,
+    trendLabel: 'vs last month',
+    color: 'text-success',
+    to: '/admin/analytics/revenue'
+  },
+  {
+    title: 'Total Users',
+    value: overview.value?.totalUsers ?? 0,
+    icon: 'i-ph-users-fill',
+    trend: overview.value?.totalUsersTrend,
+    trendLabel: 'vs last month',
+    color: 'text-blue-500',
+    to: '/admin/analytics/users'
+  },
+  {
+    title: 'Active Enrollments',
+    value: overview.value?.activeEnrollments ?? 0,
+    icon: 'i-ph-student-fill',
+    color: 'text-primary',
+    to: '/admin/analytics/academies'
+  },
+  {
+    title: 'Active Academies',
+    value: academyStats.data.value?.pagination?.total ?? overview.value?.totalAcademies ?? 0,
+    icon: 'i-ph-graduation-cap-fill',
+    color: 'text-purple-500',
+    to: '/admin/academies'
+  },
+  {
+    title: 'RYLS Registrations',
+    value: overview.value?.rylsRegistrations ?? 0,
+    icon: 'i-ph-medal-fill',
+    color: 'text-orange-500',
+    to: '/admin/analytics/programs'
+  },
+  {
+    title: 'Job Postings',
+    value: overview.value?.jobPostings ?? 0,
+    icon: 'i-ph-briefcase-fill',
+    color: 'text-teal-500',
+    to: '/admin/jobs'
+  }
 ])
 
 const { getPayments } = useMockAdminData()
 const recentPayments = getPayments().slice(0, 5)
 
-const stats = {
-  totalAcademies: computed(() => academyStats.data.value?.pagination?.total ?? 0),
-  totalCohorts: computed(() => cohortStats.data.value?.pagination?.total ?? 0),
-  totalStudents: computed(() => userStats.data.value?.pagination?.total ?? 0),
-  totalPayments: recentPayments.filter(p => p.status === 'Paid').length
-}
-
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 5 })
 
-const statCards = computed(() => [
-  {
-    title: 'Active Academies',
-    value: stats.totalAcademies.value,
-    icon: 'i-lucide-graduation-cap',
-    to: '/admin/academies',
-    color: 'text-primary'
-  },
-  {
-    title: 'Total Cohorts',
-    value: stats.totalCohorts.value,
-    icon: 'i-lucide-layout-list',
-    to: '/admin/cohorts',
-    color: 'text-blue-500'
-  },
-  {
-    title: 'Total Students',
-    value: stats.totalStudents.value,
-    icon: 'i-lucide-users',
-    to: '/admin/users',
-    color: 'text-green-500'
-  },
-  {
-    title: 'Paid Transactions',
-    value: stats.totalPayments,
-    icon: 'i-lucide-credit-card',
-    to: '/admin/payments',
-    color: 'text-orange-500'
-  }
-])
-
 const columns: TableColumn<AdminPayment>[] = [
-  {
-    accessorKey: 'invoiceNo',
-    header: 'No. Invoice'
-  },
-  {
-    accessorKey: 'studentName',
-    header: 'Name'
-  },
+  { accessorKey: 'invoiceNo', header: 'No. Invoice' },
+  { accessorKey: 'studentName', header: 'Name' },
   {
     accessorKey: 'academy',
     header: 'Academy',
@@ -99,47 +103,52 @@ const columns: TableColumn<AdminPayment>[] = [
         Expired: 'error'
       }
       const status = row.getValue('status') as string
-      return h(
-        UBadge,
-        { variant: 'subtle', color: colorMap[status] ?? 'neutral', class: 'capitalize' },
-        () => status
-      )
+      return h(UBadge, { variant: 'subtle', color: colorMap[status] ?? 'neutral', class: 'capitalize' }, () => status)
     }
   },
-  {
-    accessorKey: 'createdAt',
-    header: 'Created At'
-  },
+  { accessorKey: 'createdAt', header: 'Created At' },
   {
     id: 'actions',
-    cell: () =>
-      h(UButton, {
-        label: 'Detail',
-        size: 'xs',
-        color: 'primary',
-        variant: 'outline',
-        leadingIcon: 'i-lucide-chevrons-right'
-      })
+    cell: () => h(UButton, { label: 'Detail', size: 'xs', color: 'primary', variant: 'outline', leadingIcon: 'i-ph-caret-double-right-fill' })
   }
 ]
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-    <UCard
+  <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <AnalyticsStatCard
       v-for="stat in statCards"
       :key="stat.title"
-      class="ring-transparent shadow-none! border border-default transition-shadow"
-      :to="stat.to"
-    >
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm text-muted">{{ stat.title }}</p>
-          <p class="text-3xl font-bold mt-1">{{ stat.value }}</p>
-        </div>
-        <div class="size-16 flex items-center justify-center rounded-full bg-elevated">
-          <UIcon :name="stat.icon" class="size-6" :class="stat.color" />
-        </div>
+      :stat="stat"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+    <UCard class="ring-transparent shadow-none border border-default">
+      <template #header>
+        <p class="text-sm font-semibold">Revenue Trend (30d)</p>
+      </template>
+      <div class="h-20">
+        <LazyAnalyticsLineChart
+          v-if="overview?.revenueTrend?.length"
+          :data="overview.revenueTrend"
+          :mini="true"
+          :height="80"
+        />
+      </div>
+    </UCard>
+
+    <UCard class="ring-transparent shadow-none border border-default">
+      <template #header>
+        <p class="text-sm font-semibold">User Growth (30d)</p>
+      </template>
+      <div class="h-20">
+        <LazyAnalyticsLineChart
+          v-if="overview?.usersTrend?.length"
+          :data="overview.usersTrend"
+          :mini="true"
+          :height="80"
+        />
       </div>
     </UCard>
   </div>
@@ -151,9 +160,9 @@ const columns: TableColumn<AdminPayment>[] = [
         label="View All"
         color="neutral"
         variant="ghost"
-        trailing-icon="i-lucide-arrow-right"
+        trailing-icon="i-ph-arrow-right-fill"
         size="sm"
-        to="/admin/payments"
+        to="/admin/transactions"
       />
     </div>
 

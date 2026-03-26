@@ -43,6 +43,33 @@ const mainLinks = [
   }
 ] satisfies NavigationMenuItem[]
 
+const analyticsLinks = [
+  {
+    label: 'Revenue',
+    icon: 'i-ph-chart-line-duotone',
+    to: '/admin/analytics/revenue',
+    onSelect: () => { open.value = false }
+  },
+  {
+    label: 'Users',
+    icon: 'i-ph-users-three-duotone',
+    to: '/admin/analytics/users',
+    onSelect: () => { open.value = false }
+  },
+  {
+    label: 'Academies',
+    icon: 'i-ph-graduation-cap-duotone',
+    to: '/admin/analytics/academies',
+    onSelect: () => { open.value = false }
+  },
+  {
+    label: 'Programs',
+    icon: 'i-ph-medal-duotone',
+    to: '/admin/analytics/programs',
+    onSelect: () => { open.value = false }
+  }
+] satisfies NavigationMenuItem[]
+
 const academyLinks = [
   {
     label: 'All Academy',
@@ -141,6 +168,19 @@ const programLinks = [
 
       <template #default="{ collapsed }">
         <UNavigationMenu :collapsed="collapsed" :items="mainLinks" orientation="vertical" tooltip />
+        <p
+          v-if="!collapsed"
+          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
+        >
+          Analytics
+        </p>
+        <div v-else class="mt-3" />
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="analyticsLinks"
+          orientation="vertical"
+          tooltip
+        />
         <p
           v-if="!collapsed"
           class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
