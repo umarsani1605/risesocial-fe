@@ -53,7 +53,7 @@ const submitForm = () => {
           <div class="space-y-6">
             <div>
               <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-lucide-instagram" class="size-4 text-gray-700 shrink-0" />
+                <UIcon name="i-ph-instagram-logo-bold" class="size-4 text-gray-700 shrink-0" />
                 <h3 class="font-semibold text-gray-900">Instagram</h3>
               </div>
               <a
@@ -66,7 +66,7 @@ const submitForm = () => {
             </div>
             <div>
               <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-lucide-mail" class="size-4 text-gray-700 shrink-0" />
+                <UIcon name="i-ph-envelope-bold" class="size-4 text-gray-700 shrink-0" />
                 <h3 class="font-semibold text-gray-900">Email</h3>
               </div>
               <a
@@ -78,7 +78,7 @@ const submitForm = () => {
             </div>
             <div>
               <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-lucide-map-pin" class="size-4 text-gray-700 shrink-0" />
+                <UIcon name="i-ph-map-pin-bold" class="size-4 text-gray-700 shrink-0" />
                 <h3 class="font-semibold text-gray-900">Address</h3>
               </div>
               <p class="pl-8 text-gray-600">Bandung, West Java 40286, ID</p>

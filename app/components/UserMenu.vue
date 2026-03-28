@@ -25,17 +25,17 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   avatar: user.value.avatar
 }], [{
   label: 'Profile',
-  icon: 'i-lucide-user'
+  icon: 'i-ph-user-bold'
 }, {
   label: 'Billing',
-  icon: 'i-lucide-credit-card'
+  icon: 'i-ph-credit-card-bold'
 }, {
   label: 'Settings',
-  icon: 'i-lucide-settings',
+  icon: 'i-ph-gear-bold',
   to: '/admin/settings'
 }], [{
   label: 'Theme',
-  icon: 'i-lucide-palette',
+  icon: 'i-ph-palette-bold',
   children: [{
     label: 'Primary',
     slot: 'chip',
@@ -79,10 +79,10 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   }]
 }, {
   label: 'Appearance',
-  icon: 'i-lucide-sun-moon',
+  icon: 'i-ph-sun-horizon-bold',
   children: [{
     label: 'Light',
-    icon: 'i-lucide-sun',
+    icon: 'i-ph-sun-bold',
     type: 'checkbox',
     checked: colorMode.value === 'light',
     onSelect(e: Event) {
@@ -92,7 +92,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     }
   }, {
     label: 'Dark',
-    icon: 'i-lucide-moon',
+    icon: 'i-ph-moon-bold',
     type: 'checkbox',
     checked: colorMode.value === 'dark',
     onUpdateChecked(checked: boolean) {
@@ -106,7 +106,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   }]
 }], [{
   label: 'Templates',
-  icon: 'i-lucide-layout-template',
+  icon: 'i-ph-layout-bold',
   children: [{
     label: 'Starter',
     to: 'https://starter-template.nuxt.dev/'
@@ -137,17 +137,17 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   }]
 }], [{
   label: 'Documentation',
-  icon: 'i-lucide-book-open',
+  icon: 'i-ph-book-open-bold',
   to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
   target: '_blank'
 }, {
   label: 'GitHub repository',
-  icon: 'i-simple-icons-github',
+  icon: 'i-ph-github-logo-bold',
   to: 'https://github.com/nuxt-ui-templates/dashboard',
   target: '_blank'
 }, {
   label: 'Log out',
-  icon: 'i-lucide-log-out'
+  icon: 'i-ph-sign-out-bold'
 }]]))
 </script>
 
@@ -161,7 +161,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       v-bind="{
         ...user,
         label: collapsed ? undefined : user?.name,
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
+        trailingIcon: collapsed ? undefined : 'i-ph-caret-up-down-bold'
       }"
       color="neutral"
       variant="ghost"

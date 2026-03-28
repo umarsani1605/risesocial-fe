@@ -104,15 +104,15 @@ const isLoading = computed(() => status.value === 'pending')
                 </h3>
                 <div class="flex flex-wrap items-center gap-2 lg:gap-4 text-xs sm:text-sm">
                   <UBadge color="neutral" variant="soft" class="rounded-lg">
-                    <UIcon name="i-lucide-tag" class="size-3 lg:size-4 mr-1" />
+                    <UIcon name="i-ph-tag-bold" class="size-3 lg:size-4 mr-1" />
                     {{ academy.category }}
                   </UBadge>
                   <UBadge color="neutral" variant="soft" class="rounded-lg">
-                    <UIcon name="i-lucide-clock" class="size-3 lg:size-4 mr-1" />
+                    <UIcon name="i-ph-clock-bold" class="size-3 lg:size-4 mr-1" />
                     {{ academy.duration }}
                   </UBadge>
                   <UBadge color="neutral" variant="soft" class="rounded-lg">
-                    <UIcon name="i-lucide-video" class="size-3 lg:size-4 mr-1" />
+                    <UIcon name="i-ph-video-bold" class="size-3 lg:size-4 mr-1" />
                     {{ academy.format }}
                   </UBadge>
                 </div>

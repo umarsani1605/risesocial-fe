@@ -25,7 +25,7 @@ const handleClick = () => {
           loading="lazy"
         />
         <div v-else class="size-full bg-gray-100 rounded-full flex items-center justify-center">
-          <UIcon name="i-lucide-building-2" class="size-8 text-gray-400" />
+          <UIcon name="i-ph-buildings-bold" class="size-8 text-gray-400" />
         </div>
       </div>
       <div class="flex-1 flex flex-col justify-between min-w-0 overflow-hidden">
@@ -48,12 +48,12 @@ const handleClick = () => {
           </UBadge>
           <div class="flex gap-2 text-gray-500 text-sm mt-auto">
             <div class="flex items-center min-w-0 shrink-0">
-              <UIcon name="i-lucide-calendar" class="size-4 mr-2 shrink-0" />
+              <UIcon name="i-ph-calendar-bold" class="size-4 mr-2 shrink-0" />
               <span v-if="job.valid_until" class="text-xs whitespace-nowrap">Deadline: {{ formatDate(job.valid_until) }}</span>
               <span v-else class="text-xs whitespace-nowrap text-muted">No deadline</span>
             </div>
             <div class="flex items-center min-w-0 flex-1">
-              <UIcon name="i-lucide-map-pin" class="size-4 mr-2 shrink-0" />
+              <UIcon name="i-ph-map-pin-bold" class="size-4 mr-2 shrink-0" />
               <span class="line-clamp-1 text-xs">
                 {{ locationText }}
               </span>

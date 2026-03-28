@@ -112,7 +112,7 @@ const onPay = async () => {
       v-if="paymentError"
       color="error"
       variant="subtle"
-      icon="i-lucide-info"
+      icon="i-ph-info-bold"
       title="Payment Error"
       :description="paymentError"
     />
@@ -149,7 +149,7 @@ const onPay = async () => {
           v-if="paymentStatus === 'paid'"
           color="success"
           variant="subtle"
-          icon="i-lucide-check-circle"
+          icon="i-ph-check-circle-bold"
           title="Payment Successful"
           :description="`You are now enrolled in ${academy.title}`"
         />
@@ -158,7 +158,7 @@ const onPay = async () => {
           v-else-if="paymentStatus === 'pending'"
           color="warning"
           variant="subtle"
-          icon="i-lucide-clock"
+          icon="i-ph-clock-bold"
           title="Payment Pending"
           description="Please complete your payment to finish enrollment"
         />

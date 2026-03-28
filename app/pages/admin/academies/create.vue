@@ -6,7 +6,6 @@ import { academyFormSchema } from '@/schemas/academy'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Add Academy',
-  navbarIcon: 'i-lucide-graduation-cap',
   middleware: 'admin'
 })
 
@@ -61,9 +60,9 @@ async function onSave() {
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0' }">
+  <AdminCard :ui="{ body: 'p-0' }">
     <div class="flex items-center gap-2 mb-4">
-      <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/admin/academies" />
+      <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/academies" />
       <h2 class="text-xl font-semibold">Add New Academy</h2>
     </div>
 
@@ -111,7 +110,7 @@ async function onSave() {
                 <h3 class="text-lg font-semibold">{{ section.label }}</h3>
                 <div class="border border-default rounded-lg overflow-hidden">
                   <div class="flex flex-col items-center justify-center gap-2 py-16">
-                    <UIcon name="i-lucide-lock" class="size-5 text-dimmed mb-2" />
+                    <UIcon name="i-ph-lock-bold" class="size-5 text-dimmed mb-2" />
                     <p class="text-sm text-muted">
                       Save basic information first to manage {{ section.label.toLowerCase() }}.
                     </p>
@@ -127,7 +126,7 @@ async function onSave() {
       <template v-for="slot in ['syllabus', 'cohorts', 'students', 'mentors']" #[slot] :key="slot">
         <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
           <div class="py-16 flex flex-col items-center gap-3 text-center">
-            <UIcon name="i-lucide-lock" class="size-8 text-muted" />
+            <UIcon name="i-ph-lock-bold" class="size-8 text-muted" />
             <p class="font-medium">Save the basic information first</p>
             <p class="text-sm text-muted">
               Fill in and save the Information tab before managing this section.
@@ -142,5 +141,5 @@ async function onSave() {
         </UScrollArea>
       </template>
     </UTabs>
-  </UCard>
+  </AdminCard>
 </template>

@@ -34,10 +34,10 @@ const items = computed<DropdownMenuItem[][]>(() => {
     }
   })), [{
     label: 'Create team',
-    icon: 'i-lucide-circle-plus'
+    icon: 'i-ph-plus-circle-bold'
   }, {
     label: 'Manage teams',
-    icon: 'i-lucide-cog'
+    icon: 'i-ph-gear-bold'
   }]]
 })
 </script>
@@ -52,7 +52,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
       v-bind="{
         ...selectedTeam,
         label: collapsed ? undefined : selectedTeam?.label,
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
+        trailingIcon: collapsed ? undefined : 'i-ph-caret-up-down-bold'
       }"
       color="neutral"
       variant="ghost"

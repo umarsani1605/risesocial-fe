@@ -61,7 +61,7 @@ async function onFileChange() {
     >
       <template #leading>
         <UAvatar
-          :icon="error ? 'i-lucide-alert-circle' : loading ? 'i-lucide-loader-circle' : 'i-lucide-image'"
+          :icon="error ? 'i-ph-warning-circle-bold' : loading ? 'i-ph-spinner-bold' : 'i-ph-image-bold'"
           size="xl"
           :ui="{ icon: [loading && 'animate-spin', error && 'text-error'] }"
         />

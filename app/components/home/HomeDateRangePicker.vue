@@ -85,7 +85,7 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
     <UButton
       color="neutral"
       variant="ghost"
-      icon="i-lucide-calendar"
+      icon="i-ph-calendar-bold"
       class="data-[state=open]:bg-elevated group"
     >
       <span class="truncate">
@@ -104,7 +104,7 @@ const selectRange = (range: { days?: number, months?: number, years?: number }) 
 
       <template #trailing>
         <UIcon
-          name="i-lucide-chevron-down"
+          name="i-ph-caret-down-bold"
           class="shrink-0 text-dimmed size-5 group-data-[state=open]:rotate-180 transition-transform duration-200"
         />
       </template>

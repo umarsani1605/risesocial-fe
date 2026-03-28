@@ -93,7 +93,7 @@ const columns: TableColumn<AcademyTestimonial>[] = [
             class="size-8 rounded-full object-cover"
           />
           <div v-else class="size-8 rounded-full bg-elevated flex items-center justify-center">
-            <UIcon name="i-lucide-user" class="size-4 text-muted" />
+            <UIcon name="i-ph-user-bold" class="size-4 text-muted" />
           </div>
         </template>
         <template #actions-cell="{ row }">
@@ -102,7 +102,7 @@ const columns: TableColumn<AcademyTestimonial>[] = [
               size="sm"
               color="primary"
               variant="outline"
-              leading-icon="i-lucide-pencil"
+              leading-icon="i-ph-pencil-simple-bold"
               label="Edit"
               @click="openEdit(row.original)"
             />
@@ -110,7 +110,7 @@ const columns: TableColumn<AcademyTestimonial>[] = [
               size="sm"
               color="error"
               variant="outline"
-              leading-icon="i-lucide-trash-2"
+              leading-icon="i-ph-trash-simple-bold"
               label="Delete"
               @click="confirmRemove(row.original)"
             />

@@ -2,13 +2,16 @@
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminAcademy } from '@/types'
-import { ACADEMY_STATUS_FILTER_OPTIONS, ACADEMY_DURATION_OPTIONS, ACADEMY_FORMAT_OPTIONS } from '@/constants/academy'
+import {
+  ACADEMY_STATUS_FILTER_OPTIONS,
+  ACADEMY_DURATION_OPTIONS,
+  ACADEMY_FORMAT_OPTIONS
+} from '@/constants/academy'
 import { academyCreateSchema } from '@/schemas/academy'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'All Academy',
-  navbarIcon: 'i-lucide-graduation-cap',
   middleware: 'admin'
 })
 
@@ -41,7 +44,10 @@ async function onCreateAcademy() {
   fd.append('certificate', 'false')
   fd.append('portfolio', 'false')
   try {
-    const res = await api<ApiResponse<{ slug: string }>>('/admin/academies', { method: 'POST', body: fd })
+    const res = await api<ApiResponse<{ slug: string }>>('/admin/academies', {
+      method: 'POST',
+      body: fd
+    })
     toast.add({ title: 'Academy created', color: 'success' })
     createModalOpen.value = false
     await navigateTo(`/admin/academies/${res.data.slug}/edit`)
@@ -153,7 +159,7 @@ const columns: TableColumn<AdminAcademy>[] = [
   },
   {
     id: 'actions',
-    size: 150,
+    size: 190,
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-2' }, [
         h(UButton, {
@@ -161,7 +167,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           size: 'sm',
           color: 'primary',
           variant: 'outline',
-          leadingIcon: 'ph:pencil-simple-bold',
+          leadingIcon: 'i-ph-pencil-simple-bold',
           to: `/admin/academies/${row.original.slug}/edit`
         }),
         h(UButton, {
@@ -169,7 +175,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           size: 'sm',
           color: 'error',
           variant: 'outline',
-          leadingIcon: 'i-lucide-trash-2',
+          leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })
       ])
@@ -178,67 +184,117 @@ const columns: TableColumn<AdminAcademy>[] = [
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0!' }">
-    <div class="flex flex-wrap items-center justify-between gap-2 p-4">
-      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-        <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." class="w-full sm:w-56" />
-        <div class="flex w-full sm:w-auto gap-2">
-          <USelect v-model="categoryFilter" :items="categoryOptions" class="flex-1 sm:flex-none sm:w-40" />
-          <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
+  <AdminTableCard>
+    <template #toolbar>
+      <div class="flex flex-wrap items-center justify-between">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <UInput
+            v-model="search"
+            icon="i-ph-magnifying-glass-bold"
+            placeholder="Search..."
+            class="w-full sm:w-56"
+          />
+          <div class="flex w-full sm:w-auto gap-2">
+            <USelect
+              v-model="categoryFilter"
+              :items="categoryOptions"
+              class="flex-1 sm:flex-none sm:w-40"
+            />
+            <USelect
+              v-model="statusFilter"
+              :items="statusOptions"
+              class="flex-1 sm:flex-none sm:w-36"
+            />
+          </div>
         </div>
+        <UButton
+          label="Add New"
+          icon="i-ph-plus-bold"
+          color="primary"
+          @click="createModalOpen = true"
+        />
       </div>
-      <UButton label="Add New" icon="i-lucide-plus" color="primary" @click="createModalOpen = true" />
-    </div>
+    </template>
 
-    <div class="overflow-x-auto">
-      <UTable
-        ref="table"
-        v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-        :data="filteredData"
-        :columns="columns"
-      />
-    </div>
+    <UTable
+      ref="table"
+      v-model:pagination="pagination"
+      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+      :data="filteredData"
+      :columns="columns"
+    />
 
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4">
-      <p class="text-sm text-muted">
-        {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
-        {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} shown.
-      </p>
-      <UPagination
-        :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-        :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-        :total="table?.tableApi?.getFilteredRowModel().rows.length"
-        size="sm"
-        variant="ghost"
-        @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-      />
-    </div>
-  </UCard>
+    <template #footer>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+        <p class="text-sm text-muted">
+          {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
+          {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} shown.
+        </p>
+        <UPagination
+          :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+          :total="table?.tableApi?.getFilteredRowModel().rows.length"
+          size="sm"
+          variant="ghost"
+          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+        />
+      </div>
+    </template>
+  </AdminTableCard>
 
   <UModal v-model:open="createModalOpen" title="Add New Academy" :ui="{ footer: 'justify-end' }">
     <template #body>
-      <UForm ref="createFormRef" :schema="academyCreateSchema" :state="createForm" class="space-y-4" @submit="onCreateAcademy">
+      <UForm
+        ref="createFormRef"
+        :schema="academyCreateSchema"
+        :state="createForm"
+        class="space-y-4"
+        @submit="onCreateAcademy"
+      >
         <UFormField name="title" label="Title" required>
           <UInput v-model="createForm.title" placeholder="Academy title" class="w-full" />
         </UFormField>
         <UFormField name="description" label="Description" required>
-          <UTextarea v-model="createForm.description" placeholder="Academy description" :rows="3" class="w-full" />
+          <UTextarea
+            v-model="createForm.description"
+            placeholder="Academy description"
+            :rows="3"
+            class="w-full"
+          />
         </UFormField>
         <UFormField name="duration" label="Duration" required>
-          <USelect v-model="createForm.duration" :items="ACADEMY_DURATION_OPTIONS" placeholder="Select duration" class="w-full" />
+          <USelect
+            v-model="createForm.duration"
+            :items="ACADEMY_DURATION_OPTIONS"
+            placeholder="Select duration"
+            class="w-full"
+          />
         </UFormField>
         <UFormField name="format" label="Format" required>
-          <USelect v-model="createForm.format" :items="ACADEMY_FORMAT_OPTIONS" placeholder="Select format" class="w-full" />
+          <USelect
+            v-model="createForm.format"
+            :items="ACADEMY_FORMAT_OPTIONS"
+            placeholder="Select format"
+            class="w-full"
+          />
         </UFormField>
         <UFormField name="category" label="Category" required>
-          <UInput v-model="createForm.category" placeholder="e.g. Carbon Accounting" class="w-full" />
+          <UInput
+            v-model="createForm.category"
+            placeholder="e.g. Carbon Accounting"
+            class="w-full"
+          />
         </UFormField>
       </UForm>
     </template>
     <template #footer>
       <UButton label="Cancel" color="neutral" variant="outline" @click="createModalOpen = false" />
-      <UButton label="Create" color="primary" :loading="isCreating" @click="createFormRef?.submit()" />
+      <UButton
+        label="Create"
+        color="primary"
+        :loading="isCreating"
+        @click="createFormRef?.submit()"
+      />
     </template>
   </UModal>
 

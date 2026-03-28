@@ -8,15 +8,14 @@ import {
   PRODUCT_TYPE_ITEMS,
   PRODUCT_TYPE_LABEL,
   PAYMENT_METHOD_LABEL,
-  PROVIDER_LABEL,
+  PROVIDER_LABEL
 } from '@/constants/transaction'
 import { SCHOLARSHIP_TYPES } from '@/utils/ryls'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Transactions',
-  navbarIcon: 'i-lucide-receipt',
-  middleware: 'admin',
+  middleware: 'admin'
 })
 
 const { api } = useApi()
@@ -39,12 +38,13 @@ const queryParams = computed(() => ({
   limit: 10,
   ...(search.value && { search: search.value }),
   ...(statusFilter.value !== 'all' && { status: statusFilter.value }),
-  ...(typeFilter.value !== 'all' && { product_type: typeFilter.value }),
+  ...(typeFilter.value !== 'all' && { product_type: typeFilter.value })
 }))
 
-const { data: txData, refresh } = await useAsyncData(
+const { data: txData } = await useAsyncData(
   'admin-transactions',
-  () => api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: queryParams.value }),
+  () =>
+    api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: queryParams.value }),
   { watch: [queryParams] }
 )
 
@@ -61,6 +61,16 @@ function resetFilters() {
 // ── Table ─────────────────────────────────────────────────────────────────────
 
 const UButton = resolveComponent('UButton')
+const UBadge = resolveComponent('UBadge')
+
+const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'info'> = {
+  paid: 'success',
+  pending: 'warning',
+  failed: 'error',
+  expired: 'error',
+  cancelled: 'neutral',
+  refunded: 'info'
+}
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 
@@ -68,8 +78,7 @@ const columns: TableColumn<AdminTransaction>[] = [
   {
     accessorKey: 'transaction_code',
     header: 'Transaction Code',
-    cell: ({ row }) =>
-      h('span', { class: 'font-mono text-sm' }, row.getValue('transaction_code')),
+    cell: ({ row }) => h('span', { class: 'font-mono text-sm' }, row.getValue('transaction_code'))
   },
   {
     id: 'customer',
@@ -79,37 +88,44 @@ const columns: TableColumn<AdminTransaction>[] = [
       return h('div', { class: 'text-sm space-y-0.5' }, [
         h('div', tx.customer_name),
         h('div', { class: 'text-muted' }, tx.customer_email),
-        tx.customer_phone ? h('div', { class: 'text-muted' }, tx.customer_phone) : null,
+        tx.customer_phone ? h('div', { class: 'text-muted' }, tx.customer_phone) : null
       ])
-    },
+    }
   },
   {
     accessorKey: 'product_type',
     header: 'Product Type',
     cell: ({ row }) => {
-      const label = PRODUCT_TYPE_LABEL[row.getValue('product_type') as string] ?? row.getValue('product_type')
-      return h('span', { class: 'text-sm truncate max-w-40 block', title: label as string }, label)
-    },
+      const tx = row.original
+      const label = PRODUCT_TYPE_LABEL[tx.product_type] ?? tx.product_type
+      return h('div', { class: 'text-sm space-y-0.5 max-w-48' }, [
+        h('span', { class: 'font-medium block truncate', title: label }, label),
+        tx.product_name
+          ? h(
+              'span',
+              { class: 'text-muted text-sm block truncate', title: tx.product_name },
+              tx.product_name
+            )
+          : null
+      ])
+    }
   },
   {
     accessorKey: 'amount',
     header: 'Amount',
-    cell: ({ row }) =>
-      h('span', { class: 'text-sm' }, formatPrice(row.getValue('amount'))),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) =>
-      h('span', { class: 'text-sm' }, TRANSACTION_STATUS_LABEL[row.getValue('status') as string] ?? row.getValue('status')),
+    cell: ({ row }) => h('span', { class: 'text-sm' }, formatPrice(row.getValue('amount')))
   },
   {
     accessorKey: 'provider',
     header: 'Provider',
     cell: ({ row }) => {
       const provider = row.getValue('provider') as string | null
-      return h('span', { class: 'text-sm' }, provider ? (PROVIDER_LABEL[provider] ?? provider) : '—')
-    },
+      return h(
+        'span',
+        { class: 'text-sm' },
+        provider ? (PROVIDER_LABEL[provider] ?? provider) : '—'
+      )
+    }
   },
   {
     accessorKey: 'payment_method',
@@ -118,26 +134,35 @@ const columns: TableColumn<AdminTransaction>[] = [
       const method = row.getValue('payment_method') as string | null
       const label = method ? (PAYMENT_METHOD_LABEL[method] ?? method) : '—'
       return h('span', { class: 'text-sm' }, label)
-    },
+    }
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string
+      const label = status.charAt(0).toUpperCase() + status.slice(1)
+      return h(UBadge, { variant: 'subtle', color: STATUS_COLOR[status] ?? 'neutral' }, () => label)
+    }
   },
   {
     accessorKey: 'created_at',
     header: 'Date',
-    cell: ({ row }) =>
-      h('span', { class: 'text-sm' }, formatDate(row.getValue('created_at'))),
+    cell: ({ row }) => h('span', { class: 'text-sm' }, formatDatetime(row.getValue('created_at')))
   },
   {
     id: 'actions',
-    size: 80,
+    size: 120,
     cell: ({ row }) =>
       h(UButton, {
         label: 'Detail',
         color: 'primary',
         variant: 'outline',
         size: 'sm',
-        onClick: () => openDetail(row.original.id),
-      }),
-  },
+        leadingIcon: 'i-ph-magnifying-glass-bold',
+        onClick: () => openDetail(row.original.id)
+      })
+  }
 ]
 
 // ── Slideover ─────────────────────────────────────────────────────────────────
@@ -167,8 +192,11 @@ function getScholarshipLabel(type: string) {
 function formatDateTime(dt: string | null) {
   if (!dt) return '—'
   return new Date(dt).toLocaleString('en-US', {
-    day: 'numeric', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })
 }
 
@@ -180,10 +208,13 @@ const detailRows = computed(() => {
     { label: 'Amount', value: formatPrice(d.amount) },
     { label: 'Status', value: TRANSACTION_STATUS_LABEL[d.status] ?? d.status },
     { label: 'Provider', value: PROVIDER_LABEL[d.provider] ?? d.provider },
-    { label: 'Payment Method', value: d.payment_method ? (PAYMENT_METHOD_LABEL[d.payment_method] ?? d.payment_method) : '—' },
+    {
+      label: 'Payment Method',
+      value: d.payment_method ? (PAYMENT_METHOD_LABEL[d.payment_method] ?? d.payment_method) : '—'
+    },
     { label: 'Created At', value: formatDateTime(d.created_at) },
     { label: 'Paid At', value: formatDateTime(d.paid_at) },
-    { label: 'Expired At', value: formatDateTime(d.expired_at) },
+    { label: 'Expired At', value: formatDateTime(d.expired_at) }
   ]
 })
 
@@ -197,22 +228,22 @@ const customerRows = computed(() => {
     { label: 'Address', value: c.address ?? '—' },
     { label: 'City', value: c.city ?? '—' },
     { label: 'Postal Code', value: c.postal_code ?? '—' },
-    { label: 'Country Code', value: c.country_code ?? '—' },
+    { label: 'Country Code', value: c.country_code ?? '—' }
   ]
 })
 
-const itemsTotal = computed(() =>
-  detail.value?.product_details.items.reduce((sum, i) => sum + i.total_price, 0) ?? 0
+const itemsTotal = computed(
+  () => detail.value?.product_details.items.reduce((sum, i) => sum + i.total_price, 0) ?? 0
 )
 </script>
 
 <template>
-  <UCard :ui="{ root: 'overflow-scroll', body: 'p-0! border-none' }">
-    <template #header>
+  <AdminTableCard>
+    <template #toolbar>
       <div class="flex flex-wrap items-center gap-2">
         <UInput
           v-model="searchInput"
-          icon="i-lucide-search"
+          icon="i-ph-magnifying-glass-bold"
           placeholder="Search code, name, or email"
           class="w-full sm:w-72"
         />
@@ -223,58 +254,59 @@ const itemsTotal = computed(() =>
           label="Reset"
           color="neutral"
           variant="ghost"
-          icon="i-lucide-x"
+          icon="i-ph-x-bold"
           @click="resetFilters"
         />
       </div>
     </template>
 
-    <div class="overflow-x-auto">
-      <UTable
-        ref="table"
-        v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-        :data="transactions"
-        :columns="columns"
-        :ui="{ td: 'align-top' }"
-        class="px-4 sm:px-6"
-      />
-    </div>
+    <UTable
+      ref="table"
+      v-model:pagination="pagination"
+      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+      :data="transactions"
+      :columns="columns"
+      :ui="{ td: 'align-top' }"
+      class="px-4 sm:px-6"
+    />
 
     <template #footer>
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
         <p class="text-sm text-muted">
           {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
           {{ meta?.total ?? 0 }} transactions
         </p>
         <UPagination
-          v-if="meta && meta.totalPages > 1"
           v-model:page="page"
           :total="meta.total"
           :items-per-page="meta.limit"
           variant="ghost"
+          size="sm"
         />
       </div>
     </template>
-  </UCard>
+  </AdminTableCard>
 
   <!-- Detail Slideover -->
-  <USlideover v-model:open="isSlideoverOpen" title="Transaction Detail" side="right" :ui="{ content: 'max-w-xl' }">
+  <USlideover
+    v-model:open="isSlideoverOpen"
+    title="Transaction Detail"
+    side="right"
+    :ui="{ content: 'max-w-xl' }"
+  >
     <template #body>
       <div v-if="isLoadingDetail" class="flex items-center justify-center py-16">
-        <UIcon name="i-lucide-loader" class="size-6 animate-spin text-muted" />
+        <UIcon name="i-ph-spinner-bold" class="size-6 animate-spin text-muted" />
       </div>
 
       <div v-else-if="detail" class="space-y-6">
         <!-- Section 1: Transaction Details -->
         <div>
-          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">Transaction Details</p>
+          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">
+            Transaction Details
+          </p>
           <div class="space-y-2">
-            <div
-              v-for="row in detailRows"
-              :key="row.label"
-              class="grid grid-cols-2 gap-2 text-sm"
-            >
+            <div v-for="row in detailRows" :key="row.label" class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">{{ row.label }}</span>
               <span>{{ row.value }}</span>
             </div>
@@ -285,7 +317,9 @@ const itemsTotal = computed(() =>
 
         <!-- Section 2: Customer Details -->
         <div>
-          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">Customer Details</p>
+          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">
+            Customer Details
+          </p>
           <div class="space-y-2">
             <!-- User link row -->
             <div class="grid grid-cols-2 gap-2 text-sm">
@@ -298,7 +332,7 @@ const itemsTotal = computed(() =>
                 class="text-primary hover:underline flex items-center gap-1"
               >
                 {{ detail.customer_details.user_name }}
-                <UIcon name="i-lucide-external-link" class="size-3" />
+                <UIcon name="i-ph-arrow-square-out-bold" class="size-3" />
               </NuxtLink>
             </div>
             <!-- Other customer rows -->
@@ -317,7 +351,9 @@ const itemsTotal = computed(() =>
 
         <!-- Section 3: Product Details -->
         <div>
-          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">Product Details</p>
+          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">
+            Product Details
+          </p>
 
           <!-- Invoice table -->
           <table class="w-full text-sm mb-4">
@@ -351,7 +387,9 @@ const itemsTotal = computed(() =>
 
           <!-- Academy Enrollment sub-section -->
           <div v-if="detail.product_details.enrollment" class="space-y-2">
-            <p class="text-xs font-semibold text-muted uppercase tracking-wide">Academy Enrollment</p>
+            <p class="text-xs font-semibold text-muted uppercase tracking-wide">
+              Academy Enrollment
+            </p>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Cohort ID</span>
               <span>{{ detail.product_details.enrollment.cohort_id }}</span>
@@ -364,14 +402,16 @@ const itemsTotal = computed(() =>
                 class="text-primary hover:underline flex items-center gap-1"
               >
                 {{ detail.product_details.enrollment.cohort_name }}
-                <UIcon name="i-lucide-external-link" class="size-3" />
+                <UIcon name="i-ph-arrow-square-out-bold" class="size-3" />
               </NuxtLink>
             </div>
           </div>
 
           <!-- RYLS Registration sub-section -->
           <div v-if="detail.product_details.ryls_registration" class="space-y-2">
-            <p class="text-xs font-semibold text-muted uppercase tracking-wide">RYLS Registration</p>
+            <p class="text-xs font-semibold text-muted uppercase tracking-wide">
+              RYLS Registration
+            </p>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Registration ID</span>
               <span>{{ detail.product_details.ryls_registration.id }}</span>
@@ -384,12 +424,14 @@ const itemsTotal = computed(() =>
                 class="text-primary hover:underline flex items-center gap-1"
               >
                 {{ detail.product_details.ryls_registration.full_name }}
-                <UIcon name="i-lucide-external-link" class="size-3" />
+                <UIcon name="i-ph-arrow-square-out-bold" class="size-3" />
               </NuxtLink>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Scholarship Type</span>
-              <span>{{ getScholarshipLabel(detail.product_details.ryls_registration.scholarship_type) }}</span>
+              <span>{{
+                getScholarshipLabel(detail.product_details.ryls_registration.scholarship_type)
+              }}</span>
             </div>
           </div>
         </div>

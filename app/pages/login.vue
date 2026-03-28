@@ -100,7 +100,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           <UAlert
             v-if="errorMessage"
             color="error"
-            icon="i-lucide-info"
+            icon="i-ph-info-bold"
             variant="subtle"
             :description="errorMessage"
             :ui="{

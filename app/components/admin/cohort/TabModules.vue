@@ -11,16 +11,17 @@ const emit = defineEmits<{
   'delete-module': [moduleId: number]
 }>()
 
-const openModules = ref<Set<number>>(
-  new Set(props.modules.slice(0, 1).map(m => m.id))
-)
+const openModules = ref<Set<number>>(new Set(props.modules.slice(0, 1).map((m) => m.id)))
 
 // Keep openModules in sync when modules are refreshed from parent
-watch(() => props.modules, (newModules) => {
-  if (openModules.value.size === 0 && newModules.length > 0) {
-    openModules.value = new Set(newModules.slice(0, 1).map(m => m.id))
+watch(
+  () => props.modules,
+  (newModules) => {
+    if (openModules.value.size === 0 && newModules.length > 0) {
+      openModules.value = new Set(newModules.slice(0, 1).map((m) => m.id))
+    }
   }
-})
+)
 
 function toggleModule(id: number) {
   if (openModules.value.has(id)) openModules.value.delete(id)
@@ -33,34 +34,50 @@ function isOpen(id: number) {
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat('id-ID', {
-    day: 'numeric', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   }).format(new Date(iso))
 }
 
 function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: string } {
-  if (att.type === 'external_link') return { bg: 'bg-blue-500', icon: 'i-lucide-link' }
-  if (att.type === 'embed_video')   return { bg: 'bg-red-500',  icon: 'i-lucide-video' }
+  if (att.type === 'external_link') return { bg: 'bg-blue-500', icon: 'i-ph-link-bold' }
+  if (att.type === 'embed_video') return { bg: 'bg-red-500', icon: 'i-ph-video-bold' }
 
-  const ext = (att.file_mime?.split('/').pop() ?? att.file_path?.split('.').pop() ?? '').toLowerCase()
+  const ext = (
+    att.file_mime?.split('/').pop() ??
+    att.file_path?.split('.').pop() ??
+    ''
+  ).toLowerCase()
   const byExt: Record<string, { bg: string; icon: string }> = {
-    pdf:   { bg: 'bg-red-500',    icon: 'i-lucide-file-text' },
-    msword: { bg: 'bg-blue-500',  icon: 'i-lucide-file-text' },
-    doc:   { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
-    docx:  { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
-    'vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'bg-blue-500', icon: 'i-lucide-file-text' },
-    ppt:   { bg: 'bg-orange-500', icon: 'i-lucide-file' },
-    pptx:  { bg: 'bg-orange-500', icon: 'i-lucide-file' },
-    'vnd.openxmlformats-officedocument.presentationml.presentation': { bg: 'bg-orange-500', icon: 'i-lucide-file' },
-    xls:   { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
-    xlsx:  { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
-    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'bg-green-600', icon: 'i-lucide-table-2' },
-    jpeg:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
-    jpg:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
-    png:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
-    webp:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    pdf: { bg: 'bg-red-500', icon: 'i-ph-file-text-bold' },
+    msword: { bg: 'bg-blue-500', icon: 'i-ph-file-text-bold' },
+    doc: { bg: 'bg-blue-500', icon: 'i-ph-file-text-bold' },
+    docx: { bg: 'bg-blue-500', icon: 'i-ph-file-text-bold' },
+    'vnd.openxmlformats-officedocument.wordprocessingml.document': {
+      bg: 'bg-blue-500',
+      icon: 'i-ph-file-text-bold'
+    },
+    ppt: { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
+    pptx: { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
+    'vnd.openxmlformats-officedocument.presentationml.presentation': {
+      bg: 'bg-orange-500',
+      icon: 'i-ph-file-bold'
+    },
+    xls: { bg: 'bg-green-600', icon: 'i-ph-table-bold' },
+    xlsx: { bg: 'bg-green-600', icon: 'i-ph-table-bold' },
+    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
+      bg: 'bg-green-600',
+      icon: 'i-ph-table-bold'
+    },
+    jpeg: { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
+    jpg: { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
+    png: { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
+    webp: { bg: 'bg-purple-500', icon: 'i-ph-image-bold' }
   }
-  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-lucide-file' }
+  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-ph-file-bold' }
 }
 </script>
 
@@ -69,9 +86,8 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
     <div class="flex justify-end mb-4">
       <UButton
         label="Add Module"
-        icon="i-lucide-plus"
+        icon="i-ph-plus-bold"
         color="primary"
-        size="sm"
         @click="emit('add-module')"
       />
     </div>
@@ -80,7 +96,7 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
       v-if="modules.length === 0"
       class="flex flex-col items-center justify-center py-16 text-muted text-sm"
     >
-      <UIcon name="i-lucide-book-open" class="size-10 mb-3 opacity-30" />
+      <UIcon name="i-ph-book-open-bold" class="size-10 mb-3 opacity-30" />
       No modules yet. Click "Add Module" to get started.
     </div>
 
@@ -116,7 +132,7 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
             {{ formatDate(module.session_timestamp) }}
           </span>
           <UIcon
-            :name="isOpen(module.id) ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'"
+            :name="isOpen(module.id) ? 'i-ph-caret-down-bold' : 'i-ph-caret-right-bold'"
             class="size-4 text-muted"
           />
         </div>
@@ -130,32 +146,44 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
 
           <div class="space-y-2">
             <div v-if="module.session_timestamp" class="flex items-start gap-3 text-sm">
-              <UIcon name="i-lucide-calendar" class="size-4 text-muted mt-0.5 shrink-0" />
+              <UIcon name="i-ph-calendar-bold" class="size-4 text-muted mt-0.5 shrink-0" />
               <span>{{ formatDate(module.session_timestamp) }}</span>
             </div>
             <div v-if="module.meeting_link" class="flex items-start gap-3 text-sm">
-              <UIcon name="i-lucide-video" class="size-4 text-muted mt-0.5 shrink-0" />
+              <UIcon name="i-ph-video-bold" class="size-4 text-muted mt-0.5 shrink-0" />
               <div class="flex flex-col sm:flex-row items-start gap-1 sm:gap-3 min-w-0">
                 <span class="text-muted font-medium sm:w-28 sm:shrink-0">Meeting Link</span>
-                <a :href="module.meeting_link" target="_blank" class="text-primary hover:underline break-all">
+                <a
+                  :href="module.meeting_link"
+                  target="_blank"
+                  class="text-primary hover:underline break-all"
+                >
                   {{ module.meeting_link }}
                 </a>
               </div>
             </div>
             <div v-if="module.attendance_link" class="flex items-start gap-3 text-sm">
-              <UIcon name="i-lucide-user-check" class="size-4 text-muted mt-0.5 shrink-0" />
+              <UIcon name="i-ph-user-check-bold" class="size-4 text-muted mt-0.5 shrink-0" />
               <div class="flex flex-col sm:flex-row items-start gap-1 sm:gap-3 min-w-0">
                 <span class="text-muted font-medium sm:w-28 sm:shrink-0">Attendance Link</span>
-                <a :href="module.attendance_link" target="_blank" class="text-primary hover:underline break-all">
+                <a
+                  :href="module.attendance_link"
+                  target="_blank"
+                  class="text-primary hover:underline break-all"
+                >
                   {{ module.attendance_link }}
                 </a>
               </div>
             </div>
             <div v-if="module.assignment_link" class="flex items-start gap-3 text-sm">
-              <UIcon name="i-lucide-file-text" class="size-4 text-muted mt-0.5 shrink-0" />
+              <UIcon name="i-ph-file-text-bold" class="size-4 text-muted mt-0.5 shrink-0" />
               <div class="flex flex-col sm:flex-row items-start gap-1 sm:gap-3 min-w-0">
                 <span class="text-muted font-medium sm:w-28 sm:shrink-0">Assignment Link</span>
-                <a :href="module.assignment_link" target="_blank" class="text-primary hover:underline break-all">
+                <a
+                  :href="module.assignment_link"
+                  target="_blank"
+                  class="text-primary hover:underline break-all"
+                >
                   {{ module.assignment_link }}
                 </a>
               </div>
@@ -164,7 +192,7 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
 
           <div v-if="module.attachments.length">
             <p class="text-xs text-muted mb-2 flex items-center gap-1.5">
-              <UIcon name="i-lucide-paperclip" class="size-3.5" />
+              <UIcon name="i-ph-paperclip-bold" class="size-3.5" />
               Attachments
             </p>
             <div class="flex flex-wrap gap-2">
@@ -181,7 +209,9 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
                 >
                   <UIcon :name="getAttachmentStyle(att).icon" class="size-4" />
                 </div>
-                <span class="text-sm pr-3 pl-2 max-w-32 truncate">{{ att.label || att.url || att.file_path }}</span>
+                <span class="text-sm pr-3 pl-2 max-w-32 truncate">{{
+                  att.label || att.url || att.file_path
+                }}</span>
               </a>
             </div>
           </div>
@@ -190,16 +220,14 @@ function getAttachmentStyle(att: AdminCohortAttachment): { bg: string; icon: str
         <div class="flex justify-end gap-2 border-t border-default p-2.5">
           <UButton
             label="Delete"
-            icon="i-lucide-trash-2"
-            size="sm"
+            icon="i-ph-trash-simple-bold"
             color="neutral"
             variant="outline"
             @click.stop="emit('delete-module', module.id)"
           />
           <UButton
             label="Edit Module"
-            icon="i-lucide-pencil"
-            size="sm"
+            icon="i-ph-pencil-simple-bold"
             color="primary"
             variant="outline"
             @click.stop="emit('edit-module', module)"

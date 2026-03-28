@@ -95,7 +95,7 @@ function handleKeyDown(event: KeyboardEvent) {
   >
     <UTooltip text="Link">
       <UButton
-        icon="i-lucide-link"
+        icon="i-ph-link-bold"
         color="neutral"
         active-color="primary"
         variant="ghost"
@@ -118,7 +118,7 @@ function handleKeyDown(event: KeyboardEvent) {
       >
         <div class="flex items-center mr-0.5">
           <UButton
-            icon="i-lucide-corner-down-left"
+            icon="i-ph-arrow-bend-down-left-bold"
             variant="ghost"
             size="sm"
             :disabled="!url && !active"
@@ -132,7 +132,7 @@ function handleKeyDown(event: KeyboardEvent) {
           />
 
           <UButton
-            icon="i-lucide-external-link"
+            icon="i-ph-arrow-square-out-bold"
             color="neutral"
             variant="ghost"
             size="sm"
@@ -142,7 +142,7 @@ function handleKeyDown(event: KeyboardEvent) {
           />
 
           <UButton
-            icon="i-lucide-trash"
+            icon="i-ph-trash-bold"
             color="neutral"
             variant="ghost"
             size="sm"

@@ -30,7 +30,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   >
     <UButton
       label="New customer"
-      icon="i-lucide-plus"
+      icon="i-ph-plus-bold"
     />
 
     <template #body>

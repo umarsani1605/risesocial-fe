@@ -14,21 +14,21 @@ const featuresData: FeatureItem[] = [
     id: 1,
     title: '25% Increase in Youth Income',
     description: 'Strengthening financial independence and livelihood opportunities.',
-    icon: 'i-lucide-trending-up'
+    icon: 'i-ph-trend-up-bold'
   },
   {
     id: 2,
     title: 'Improved Productivity of Young People',
     description:
       'Enabling them to contribute actively to local economic and social development.',
-    icon: 'i-lucide-zap'
+    icon: 'i-ph-lightning-bold'
   },
   {
     id: 3,
     title: 'Creation of Sustainable Local Businesses',
     description:
       'Built and managed by youth as "local heroes" who continue to drive change in their communities.',
-    icon: 'i-lucide-store'
+    icon: 'i-ph-storefront-bold'
   }
 ]
 </script>

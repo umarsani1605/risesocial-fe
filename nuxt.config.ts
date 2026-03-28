@@ -5,11 +5,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/image',
     '@nuxt/ui',
-    '@nuxt/content',
     '@vueuse/nuxt',
     'nuxt-og-image',
-    '@nuxt/a11y',
-    '@nuxt/hints',
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxthub/core',
@@ -58,15 +55,6 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-07-11',
 
-  nitro: {
-    prerender: {
-      routes: [
-        '/'
-      ],
-      crawlLinks: true
-    }
-  },
-
   hub: {
     blob: true
   },
@@ -74,15 +62,9 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-        '@nuxt/ui > prosemirror-state',
-        'yjs',
-        'y-partykit/provider'
+        '@nuxt/ui > prosemirror-state'
       ]
     }
-  },
-  
-  a11y: {
-    enabled: false,
   },
 
   eslint: {

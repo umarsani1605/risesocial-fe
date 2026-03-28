@@ -37,7 +37,7 @@
     <UButton
       label="SaaS"
       variant="subtle"
-      trailing-icon="i-lucide-chevron-down"
+      trailing-icon="i-ph-caret-down-bold"
       size="xs"
       class="-mb-[6px] font-semibold rounded-full truncate"
       :class="[open && 'bg-primary/15']"

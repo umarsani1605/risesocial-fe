@@ -208,6 +208,7 @@ export interface AdminTransaction {
   customer_email: string
   customer_phone: string | null
   product_type: string
+  product_name: string | null
   amount: number
   currency: string
   status: string

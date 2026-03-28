@@ -91,7 +91,7 @@ useSeoMeta({
   <UPageSection :ui="{ container: 'gap-0!' }">
     <div class="my-2 hidden lg:block mb-6">
       <UButton variant="ghost" color="neutral" @click="router.push('/opportunities')">
-        <UIcon name="i-lucide-arrow-left" class="mr-2 size-4" />
+        <UIcon name="i-ph-arrow-left-bold" class="mr-2 size-4" />
         Back to Job Opportunities
       </UButton>
     </div>
@@ -130,7 +130,7 @@ useSeoMeta({
               <div class="flex gap-3 flex-wrap">
                 <UButton
                   color="primary"
-                  icon="i-lucide-send"
+                  icon="i-ph-paper-plane-tilt-bold"
                   class="whitespace-nowrap"
                   size="lg"
                   :disabled="!job.external_url"
@@ -143,15 +143,15 @@ useSeoMeta({
 
             <div class="flex flex-wrap gap-4 lg:gap-6 mb-4">
               <div v-if="job.valid_until" class="flex items-center">
-                <UIcon name="i-lucide-calendar" class="mr-2 size-4 shrink-0" />
+                <UIcon name="i-ph-calendar-bold" class="mr-2 size-4 shrink-0" />
                 <span class="text-sm whitespace-nowrap">Deadline: {{ formatDate(job.valid_until) }}</span>
               </div>
               <div class="flex items-center">
-                <UIcon name="i-lucide-map-pin" class="mr-2 size-4 shrink-0" />
+                <UIcon name="i-ph-map-pin-bold" class="mr-2 size-4 shrink-0" />
                 <span class="text-sm">{{ locationString }}</span>
               </div>
               <div v-if="job.salary_raw" class="flex items-center">
-                <UIcon name="i-lucide-banknote" class="mr-2 size-4 shrink-0" />
+                <UIcon name="i-ph-money-bold" class="mr-2 size-4 shrink-0" />
                 <span class="text-sm">{{ job.salary_raw }}</span>
               </div>
             </div>
@@ -182,23 +182,23 @@ useSeoMeta({
                 loading="lazy"
               />
             </div>
-            <UIcon v-else name="i-lucide-building-2" class="size-8 text-primary" />
+            <UIcon v-else name="i-ph-buildings-bold" class="size-8 text-primary" />
             <h3 class="font-bold text-lg">{{ job.company?.name }}</h3>
           </div>
 
           <div class="space-y-4 mb-4">
             <div class="flex items-center">
-              <UIcon name="i-lucide-map-pin" class="mr-3 size-4 shrink-0" />
+              <UIcon name="i-ph-map-pin-bold" class="mr-3 size-4 shrink-0" />
               <span class="text-sm">{{ locationString }}</span>
             </div>
 
             <div v-if="job.company?.industry" class="flex items-center">
-              <UIcon name="i-lucide-briefcase" class="mr-3 size-4 shrink-0" />
+              <UIcon name="i-ph-briefcase-bold" class="mr-3 size-4 shrink-0" />
               <span class="text-sm">{{ job.company.industry }}</span>
             </div>
 
             <div v-if="job.company?.website_url" class="flex items-center">
-              <UIcon name="i-lucide-globe" class="mr-3 size-4 shrink-0" />
+              <UIcon name="i-ph-globe-bold" class="mr-3 size-4 shrink-0" />
               <ULink
                 :to="job.company.website_url"
                 target="_blank"

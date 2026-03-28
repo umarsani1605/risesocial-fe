@@ -2,7 +2,6 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Revenue Analytics',
-  navbarIcon: 'i-ph-chart-line-fill',
   middleware: 'admin'
 })
 
@@ -17,14 +16,19 @@ const dateRange = ref<AnalyticsDateRange>({
 })
 
 const [revenueTrendData, revenueBreakdownData, paymentStatusData] = await Promise.all([
-  useAsyncData('analytics:revenue-trend', () => analytics.fetchRevenueTrend(dateRange.value.period)),
+  useAsyncData('analytics:revenue-trend', () =>
+    analytics.fetchRevenueTrend(dateRange.value.period)
+  ),
   useAsyncData('analytics:revenue-breakdown', () => analytics.fetchRevenueBreakdown()),
   useAsyncData('analytics:payment-status', () => analytics.fetchPaymentStatusBreakdown())
 ])
 
-watch(() => dateRange.value.period, async () => {
-  await revenueTrendData.refresh()
-})
+watch(
+  () => dateRange.value.period,
+  async () => {
+    await revenueTrendData.refresh()
+  }
+)
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
@@ -35,19 +39,19 @@ const statCards = computed<AnalyticsStat[]>(() => [
   },
   {
     title: 'Paid Transactions',
-    value: paymentStatusData.data.value?.find(d => d.name === 'Paid')?.value ?? 0,
+    value: paymentStatusData.data.value?.find((d) => d.name === 'Paid')?.value ?? 0,
     icon: 'i-ph-check-circle-fill',
     color: 'text-success'
   },
   {
     title: 'Pending',
-    value: paymentStatusData.data.value?.find(d => d.name === 'Pending')?.value ?? 0,
+    value: paymentStatusData.data.value?.find((d) => d.name === 'Pending')?.value ?? 0,
     icon: 'i-ph-clock-fill',
     color: 'text-warning'
   },
   {
     title: 'Expired',
-    value: paymentStatusData.data.value?.find(d => d.name === 'Expired')?.value ?? 0,
+    value: paymentStatusData.data.value?.find((d) => d.name === 'Expired')?.value ?? 0,
     icon: 'i-ph-x-circle-fill',
     color: 'text-error'
   }

@@ -65,23 +65,23 @@ const tabItems: TabsItem[] = [
           </div>
           <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
             <span v-if="cohort.academy.duration" class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-calendar" class="size-4 shrink-0" />
+              <UIcon name="i-ph-calendar-bold" class="size-4 shrink-0" />
               {{ cohort.academy.duration }}
             </span>
             <span v-else class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-calendar" class="size-4 shrink-0" />
+              <UIcon name="i-ph-calendar-bold" class="size-4 shrink-0" />
               {{ formatDate(cohort.start_date) }} – {{ formatDate(cohort.end_date) }}
             </span>
             <span v-if="cohort.academy.certificate" class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-award" class="size-4 shrink-0" />
+              <UIcon name="i-ph-medal-bold" class="size-4 shrink-0" />
               Certificate
             </span>
             <span v-if="cohort.academy.portfolio" class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-briefcase" class="size-4 shrink-0" />
+              <UIcon name="i-ph-briefcase-bold" class="size-4 shrink-0" />
               Portfolio
             </span>
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-users" class="size-4 shrink-0" />
+              <UIcon name="i-ph-users-bold" class="size-4 shrink-0" />
               {{ cohort.current_students }} students
             </span>
           </div>
@@ -101,14 +101,14 @@ const tabItems: TabsItem[] = [
     <UCard v-if="cohort.status === 'COMPLETED'">
       <div class="flex items-center gap-4">
         <div class="shrink-0 size-16 rounded-lg bg-primary/10 flex items-center justify-center">
-          <UIcon name="i-lucide-trophy" class="size-8 text-primary" />
+          <UIcon name="i-ph-trophy-bold" class="size-8 text-primary" />
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-semibold text-base">Congratulation, you have completed this academy!</p>
           <p class="text-sm text-muted mt-0.5">Keep learning and applying sustainability practices to make positive impact!</p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <UButton variant="outline" color="primary" leading-icon="i-lucide-award">
+          <UButton variant="outline" color="primary" leading-icon="i-ph-medal-bold">
             View Certificate
           </UButton>
           <UButton variant="ghost" color="primary" :to="`/academy/${cohort.academy.slug}`">

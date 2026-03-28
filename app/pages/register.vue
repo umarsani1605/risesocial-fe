@@ -126,7 +126,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           </div>
         </template>
         <template #validation>
-          <UAlert v-if="error" color="error" icon="i-lucide-info" title="Error signing in" />
+          <UAlert v-if="error" color="error" icon="i-ph-info-bold" title="Error signing in" />
         </template>
         <template #footer>
           Already have an account?

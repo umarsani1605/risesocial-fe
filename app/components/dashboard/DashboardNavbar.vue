@@ -14,14 +14,14 @@ const userMenuItems: DropdownMenuItem[][] = [
   [
     {
       label: 'Settings',
-      icon: 'i-lucide-settings',
+      icon: 'i-ph-gear-bold',
       to: '/dashboard/setting'
     }
   ],
   [
     {
       label: 'Logout',
-      icon: 'i-lucide-log-out',
+      icon: 'i-ph-sign-out-bold',
       onSelect: () => logout()
     }
   ]
@@ -59,7 +59,7 @@ const userMenuItems: DropdownMenuItem[][] = [
         >
           <UAvatar :src="user?.avatar" :alt="fullName" :text="initials" size="sm" color="primary" />
           <span class="text-sm font-medium hidden sm:block">{{ fullName }}</span>
-          <UIcon name="i-lucide-chevron-down" class="size-4 text-muted hidden sm:block" />
+          <UIcon name="i-ph-caret-down-bold" class="size-4 text-muted hidden sm:block" />
         </button>
       </UDropdownMenu>
     </template>

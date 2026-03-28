@@ -7,7 +7,7 @@ export function useEditorSuggestions<T extends EditorCustomHandlers>(_customHand
   }, {
     kind: 'aiContinue',
     label: 'Continue writing',
-    icon: 'i-lucide-sparkles'
+    icon: 'i-ph-sparkle-bold'
   }], [{
     type: 'label',
     label: 'Style'
@@ -33,7 +33,7 @@ export function useEditorSuggestions<T extends EditorCustomHandlers>(_customHand
   }, {
     kind: 'bulletList',
     label: 'Bullet List',
-    icon: 'i-lucide-list'
+    icon: 'i-ph-list-bold'
   }, {
     kind: 'orderedList',
     label: 'Numbered List',
@@ -64,7 +64,7 @@ export function useEditorSuggestions<T extends EditorCustomHandlers>(_customHand
   }, {
     kind: 'imageUpload',
     label: 'Image',
-    icon: 'i-lucide-image'
+    icon: 'i-ph-image-bold'
   }, {
     kind: 'table',
     label: 'Table',

@@ -141,7 +141,7 @@ const formatPaymentMethod = (method: string | null) => {
         v-if="hasFetched && !isLoading && transactions.length === 0"
         class="text-center py-12 text-muted"
       >
-        <UIcon name="i-lucide-receipt" class="size-12 mb-4 mx-auto" />
+        <UIcon name="i-ph-receipt-bold" class="size-12 mb-4 mx-auto" />
         <p>No transactions found</p>
       </div>
     </div>
@@ -151,7 +151,7 @@ const formatPaymentMethod = (method: string | null) => {
       <template #content>
         <div class="p-6 space-y-4">
           <div v-if="detailLoading" class="flex justify-center py-8">
-            <UIcon name="i-lucide-loader-2" class="size-8 animate-spin text-primary" />
+            <UIcon name="i-ph-spinner-bold" class="size-8 animate-spin text-primary" />
           </div>
           <template v-else-if="selectedTransaction">
             <div class="flex items-center justify-between">

@@ -91,7 +91,7 @@ const columns: TableColumn<AdminCohort>[] = [
           <div class="flex items-center gap-2 justify-end">
             <UButton
               label="Detail"
-              trailing-icon="i-lucide-chevrons-right"
+              trailing-icon="i-ph-caret-double-right-bold"
               size="sm"
               color="neutral"
               variant="outline"

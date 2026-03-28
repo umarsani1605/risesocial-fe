@@ -102,7 +102,7 @@ const columns: TableColumn<AcademyInstructor>[] = [
               size="sm"
               color="primary"
               variant="outline"
-              leading-icon="i-lucide-pencil"
+              leading-icon="i-ph-pencil-simple-bold"
               label="Edit"
               @click="openEdit(row.original)"
             />
@@ -110,7 +110,7 @@ const columns: TableColumn<AcademyInstructor>[] = [
               size="sm"
               color="error"
               variant="outline"
-              leading-icon="i-lucide-trash-2"
+              leading-icon="i-ph-trash-simple-bold"
               label="Delete"
               @click="confirmRemove(row.original)"
             />

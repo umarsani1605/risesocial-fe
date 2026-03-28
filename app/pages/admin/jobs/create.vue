@@ -5,7 +5,6 @@ import { jobCreateSchema } from '@/schemas/job'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Create Job',
-  navbarIcon: 'i-lucide-plus',
   middleware: 'admin'
 })
 
@@ -47,33 +46,26 @@ async function onSave() {
     await api('/admin/jobs', { method: 'POST', body })
     toast.add({ title: 'Job created', color: 'success' })
     await navigateTo('/admin/jobs')
-  }
-  catch (error: any) {
+  } catch (error: any) {
     toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
-  }
-  finally {
+  } finally {
     isSaving.value = false
   }
 }
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0' }">
+  <AdminCard :ui="{ body: 'p-0' }">
     <!-- Page Header -->
     <UForm :schema="jobCreateSchema" :state="form" @submit="onSave">
-      <div class="flex flex-wrap items-center justify-between gap-2 p-4">
+      <div class="flex flex-wrap items-center justify-between">
         <div class="flex items-center gap-2">
-          <UButton
-            icon="i-lucide-arrow-left"
-            color="neutral"
-            variant="ghost"
-            to="/admin/jobs"
-          />
+          <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/jobs" />
           <h2 class="text-xl font-semibold">Create Job</h2>
         </div>
         <UButton
           type="submit"
-          icon="i-lucide-save"
+          icon="i-ph-floppy-disk-bold"
           label="Save Job"
           color="primary"
           :loading="isSaving"
@@ -134,9 +126,14 @@ async function onSave() {
         </div>
 
         <UFormField name="description" label="Description" required>
-          <UTextarea v-model="form.description" placeholder="Job description..." :rows="8" class="w-full" />
+          <UTextarea
+            v-model="form.description"
+            placeholder="Job description..."
+            :rows="8"
+            class="w-full"
+          />
         </UFormField>
       </div>
     </UForm>
-  </UCard>
+  </AdminCard>
 </template>

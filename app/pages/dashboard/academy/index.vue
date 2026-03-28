@@ -27,7 +27,7 @@ const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.coh
     </template>
 
     <div v-if="enrollments.length === 0" class="text-center py-8">
-      <UIcon name="i-lucide-graduation-cap" class="size-12 text-muted mx-auto mb-3" />
+      <UIcon name="i-ph-graduation-cap-bold" class="size-12 text-muted mx-auto mb-3" />
       <p class="font-medium mb-1">No programs yet</p>
       <p class="text-sm text-muted mb-4">Explore our academy programs and start learning</p>
       <UButton to="/academy" color="primary" variant="outline" size="sm">
@@ -55,7 +55,7 @@ const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.coh
                 loading="lazy"
               />
               <div v-else class="w-full h-full flex items-center justify-center">
-                <UIcon name="i-lucide-image" class="size-8 text-gray-400" />
+                <UIcon name="i-ph-image-bold" class="size-8 text-gray-400" />
               </div>
             </div>
 
@@ -68,19 +68,19 @@ const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.coh
                 <!-- Metadata: inline row -->
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted mb-3">
                   <span v-if="enrollment.cohort.academy.duration" class="flex items-center gap-1">
-                    <UIcon name="i-lucide-clock" class="size-3.5 shrink-0" />
+                    <UIcon name="i-ph-clock-bold" class="size-3.5 shrink-0" />
                     {{ enrollment.cohort.academy.duration }}
                   </span>
                   <span v-if="enrollment.cohort.academy.format" class="flex items-center gap-1">
-                    <UIcon name="i-lucide-video" class="size-3.5 shrink-0" />
+                    <UIcon name="i-ph-video-bold" class="size-3.5 shrink-0" />
                     {{ enrollment.cohort.academy.format }}
                   </span>
                   <span class="flex items-center gap-1">
-                    <UIcon name="i-lucide-calendar" class="size-3.5 shrink-0" />
+                    <UIcon name="i-ph-calendar-bold" class="size-3.5 shrink-0" />
                     INTAKE: {{ formatDate(enrollment.cohort.start_date) }}
                   </span>
                   <span v-if="enrollment.cohort.academy.certificate" class="flex items-center gap-1">
-                    <UIcon name="i-lucide-award" class="size-3.5 shrink-0" />
+                    <UIcon name="i-ph-medal-bold" class="size-3.5 shrink-0" />
                     Sertifikat
                   </span>
                 </div>

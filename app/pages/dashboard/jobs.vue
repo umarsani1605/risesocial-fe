@@ -27,7 +27,7 @@ const savedJobs = ref<Job[]>([])
       </template>
 
       <div v-if="savedJobs.length === 0" class="flex flex-col items-center justify-center py-12 gap-3 text-center">
-        <UIcon name="i-lucide-bookmark" class="size-12 text-muted" />
+        <UIcon name="i-ph-bookmark-bold" class="size-12 text-muted" />
         <p class="font-medium">No saved jobs</p>
         <p class="text-sm text-muted">Save jobs that interest you to see them here</p>
         <UButton variant="outline" size="sm" color="neutral" to="/opportunities">

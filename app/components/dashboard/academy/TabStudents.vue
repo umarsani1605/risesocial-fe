@@ -15,7 +15,7 @@ function initials(s: Student) {
 <template>
   <div class="pt-2 min-h-[400px]">
     <div v-if="students.length === 0" class="flex flex-col items-center justify-center py-16 text-muted text-sm">
-      <UIcon name="i-lucide-users" class="size-10 mb-3 opacity-30" />
+      <UIcon name="i-ph-users-bold" class="size-10 mb-3 opacity-30" />
       No students enrolled yet.
     </div>
 

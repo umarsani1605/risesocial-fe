@@ -3,6 +3,7 @@ const props = defineProps<{
   data: CategoryBreakdown[]
   title?: string
   height?: number
+  colors?: string[]
 }>()
 
 // DonutChart expects data as number[] and categories as Record<string, BulletLegendItemInterface>
@@ -10,7 +11,10 @@ const donutData = computed(() => props.data.map(d => d.value))
 
 const donutCategories = computed(() =>
   Object.fromEntries(
-    props.data.map(d => [d.name, { name: d.name, color: d.color }])
+    props.data.map((d, i) => [
+      d.name,
+      { name: d.name, color: resolveChartColor(props.colors?.[i]) ?? d.color }
+    ])
   )
 )
 

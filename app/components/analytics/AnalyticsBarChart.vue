@@ -3,15 +3,16 @@ const props = defineProps<{
   data: CategoryBreakdown[]
   title?: string
   height?: number
+  color?: string
 }>()
 
 const chartData = computed(() =>
   props.data.map(d => ({ name: d.name, value: d.value }))
 )
 
-const categories: Record<string, { name: string }> = {
-  value: { name: 'Value' }
-}
+const categories = computed(() => ({
+  value: { name: 'Value', color: resolveChartColor(props.color) }
+}))
 
 const yFormatter = (value: number) => {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`

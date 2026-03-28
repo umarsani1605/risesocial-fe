@@ -161,7 +161,7 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
               class="w-full [&_input::-webkit-calendar-picker-indicator]:opacity-0 [&_input::-webkit-calendar-picker-indicator]:absolute [&_input::-webkit-calendar-picker-indicator]:right-3 [&_input::-webkit-calendar-picker-indicator]:w-4 [&_input::-webkit-calendar-picker-indicator]:h-4 [&_input::-webkit-calendar-picker-indicator]:cursor-pointer"
             />
             <UIcon
-              name="i-lucide-calendar-days"
+              name="i-ph-calendar-dots-bold"
               class="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted pointer-events-none"
             />
           </div>

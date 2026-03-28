@@ -14,21 +14,21 @@ const userMenuItems: DropdownMenuItem[][] = [
   [
     {
       label: 'Back to Home',
-      icon: 'i-lucide-home',
+      icon: 'i-ph-house-duotone',
       to: '/'
     }
   ],
   [
     {
       label: 'Settings',
-      icon: 'i-lucide-settings',
+      icon: 'i-ph-gear-duotone',
       to: '/dashboard/setting'
     }
   ],
   [
     {
       label: 'Logout',
-      icon: 'i-lucide-log-out',
+      icon: 'i-ph-sign-out-duotone',
       onSelect: () => logout()
     }
   ]
@@ -63,7 +63,7 @@ const userMenuItems: DropdownMenuItem[][] = [
             class="rounded-full"
           />
           <span class="hidden sm:block text-sm font-medium">{{ fullName }}</span>
-          <UIcon name="i-lucide-chevron-down" class="hidden sm:block size-4 text-muted" />
+          <UIcon name="i-ph-caret-down-duotone" class="hidden sm:block size-4 text-muted" />
         </button>
       </UDropdownMenu>
     </template>

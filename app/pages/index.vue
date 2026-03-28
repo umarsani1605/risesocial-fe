@@ -19,13 +19,13 @@ const featuresItems = [
   {
     title: 'Proposal & CV Builder',
     description: "Need help to write your own resume and grants proposal? We've got your back!",
-    icon: 'i-lucide-file-text'
+    icon: 'i-ph-file-text-bold'
   },
   {
     title: 'Job Alert Emails',
     description:
       'Ensure you never miss out on valuable green opportunities—stay informed and ahead.',
-    icon: 'i-lucide-mail'
+    icon: 'i-ph-envelope-bold'
   }
 ]
 
@@ -221,7 +221,7 @@ useSeoMeta({
           to="/opportunities"
           variant="light"
           size="lg"
-          trailing-icon="i-lucide-arrow-right"
+          trailing-icon="i-ph-arrow-right-bold"
           color="neutral"
         >
           See More Green Jobs
@@ -255,7 +255,7 @@ useSeoMeta({
               <div
                 class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center shrink-0 mt-0.5"
               >
-                <UIcon name="i-lucide-check" class="size-4 text-white" />
+                <UIcon name="i-ph-check-bold" class="size-4 text-white" />
               </div>
               <span class="text-left">{{ feature }}</span>
             </div>
@@ -265,7 +265,7 @@ useSeoMeta({
               to="/opportunities"
               color="secondary"
               size="xl"
-              trailing-icon="i-lucide-arrow-right"
+              trailing-icon="i-ph-arrow-right-bold"
               class="w-full justify-center"
             >
               Get Started Now

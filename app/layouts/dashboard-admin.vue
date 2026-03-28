@@ -11,21 +11,21 @@ const menuItems: DropdownMenuItem[][] = [
   [
     {
       label: 'Back to Home',
-      icon: 'i-lucide-home',
+      icon: 'i-ph-house-bold',
       to: '/'
     }
   ],
   [
     {
       label: 'Settings',
-      icon: 'i-lucide-settings',
+      icon: 'i-ph-gear-bold',
       to: '/dashboard/setting'
     }
   ],
   [
     {
       label: 'Logout',
-      icon: 'i-lucide-log-out',
+      icon: 'i-ph-sign-out-bold',
       onSelect: () => logout()
     }
   ]
@@ -34,7 +34,7 @@ const menuItems: DropdownMenuItem[][] = [
 const mainLinks = [
   {
     label: 'Dashboard',
-    icon: 'i-lucide-layout-dashboard',
+    icon: 'i-ph-squares-four-duotone',
     to: '/admin',
     exact: true,
     onSelect: () => {
@@ -48,32 +48,40 @@ const analyticsLinks = [
     label: 'Revenue',
     icon: 'i-ph-chart-line-duotone',
     to: '/admin/analytics/revenue',
-    onSelect: () => { open.value = false }
+    onSelect: () => {
+      open.value = false
+    }
   },
   {
     label: 'Users',
     icon: 'i-ph-users-three-duotone',
     to: '/admin/analytics/users',
-    onSelect: () => { open.value = false }
+    onSelect: () => {
+      open.value = false
+    }
   },
   {
     label: 'Academies',
     icon: 'i-ph-graduation-cap-duotone',
     to: '/admin/analytics/academies',
-    onSelect: () => { open.value = false }
+    onSelect: () => {
+      open.value = false
+    }
   },
   {
     label: 'Programs',
     icon: 'i-ph-medal-duotone',
     to: '/admin/analytics/programs',
-    onSelect: () => { open.value = false }
+    onSelect: () => {
+      open.value = false
+    }
   }
 ] satisfies NavigationMenuItem[]
 
 const academyLinks = [
   {
     label: 'All Academy',
-    icon: 'i-lucide-graduation-cap',
+    icon: 'i-ph-graduation-cap-duotone',
     to: '/admin/academies',
     onSelect: () => {
       open.value = false
@@ -81,7 +89,7 @@ const academyLinks = [
   },
   {
     label: 'Cohorts',
-    icon: 'i-lucide-layout-list',
+    icon: 'i-ph-list-dashes-duotone',
     to: '/admin/cohorts',
     onSelect: () => {
       open.value = false
@@ -92,7 +100,7 @@ const academyLinks = [
 const financeLinks = [
   {
     label: 'Transactions',
-    icon: 'i-lucide-receipt',
+    icon: 'i-ph-receipt-duotone',
     to: '/admin/transactions',
     onSelect: () => {
       open.value = false
@@ -103,7 +111,7 @@ const financeLinks = [
 const userLinks = [
   {
     label: 'All Users',
-    icon: 'i-lucide-users',
+    icon: 'i-ph-users-duotone',
     to: '/admin/users',
     onSelect: () => {
       open.value = false
@@ -111,7 +119,7 @@ const userLinks = [
   },
   {
     label: 'Administrator',
-    icon: 'i-lucide-shield',
+    icon: 'i-ph-shield-duotone',
     to: '/admin/administrators',
     onSelect: () => {
       open.value = false
@@ -122,7 +130,7 @@ const userLinks = [
 const jobLinks = [
   {
     label: 'All Jobs',
-    icon: 'i-lucide-briefcase',
+    icon: 'i-ph-briefcase-duotone',
     to: '/admin/jobs',
     onSelect: () => {
       open.value = false
@@ -133,7 +141,7 @@ const jobLinks = [
 const programLinks = [
   {
     label: 'Rise Young Leaders',
-    icon: 'i-lucide-medal',
+    icon: 'i-ph-medal-duotone',
     to: '/admin/programs',
     onSelect: () => {
       open.value = false
@@ -143,12 +151,13 @@ const programLinks = [
 </script>
 
 <template>
-  <UDashboardGroup unit="rem">
+  <UDashboardGroup unit="%">
     <UDashboardSidebar
       id="default"
       v-model:open="open"
-      collapsible
       resizable
+      collapsible
+      :default-size="14"
       class="bg-white"
       :ui="{ header: 'border-b border-default h-18!', footer: 'lg:border-t lg:border-default' }"
     >
@@ -161,84 +170,99 @@ const programLinks = [
               class="h-8 w-auto"
               :class="collapsed ? 'hidden' : 'block'"
             />
-            <UIcon v-if="collapsed" name="i-lucide-layers" class="size-7 text-primary" />
+            <NuxtImg
+              v-if="collapsed"
+              src="/images/logo_small.png"
+              alt="Rise Social"
+              class="h-8 w-auto"
+            />
           </NuxtLink>
         </div>
       </template>
 
       <template #default="{ collapsed }">
         <UNavigationMenu :collapsed="collapsed" :items="mainLinks" orientation="vertical" tooltip />
-        <p
-          v-if="!collapsed"
-          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
-        >
-          Analytics
-        </p>
-        <div v-else class="mt-3" />
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="analyticsLinks"
-          orientation="vertical"
-          tooltip
-        />
-        <p
-          v-if="!collapsed"
-          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
-        >
-          Academy
-        </p>
-        <div v-else class="mt-3" />
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="academyLinks"
-          orientation="vertical"
-          tooltip
-        />
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Academy
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="academyLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
 
-        <p
-          v-if="!collapsed"
-          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
-        >
-          Finance
-        </p>
-        <div v-else class="mt-3" />
-        <UNavigationMenu :collapsed="collapsed" :items="financeLinks" orientation="vertical" tooltip />
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Finance
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="financeLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
 
-        <p
-          v-if="!collapsed"
-          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
-        >
-          Users
-        </p>
-        <div v-else class="mt-3" />
-        <UNavigationMenu :collapsed="collapsed" :items="userLinks" orientation="vertical" tooltip />
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Users
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="userLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
 
-        <p
-          v-if="!collapsed"
-          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
-        >
-          Jobs
-        </p>
-        <div v-else class="mt-3" />
-        <UNavigationMenu :collapsed="collapsed" :items="jobLinks" orientation="vertical" tooltip />
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Jobs
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="jobLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
 
-        <p
-          v-if="!collapsed"
-          class="px-2.5 pt-4 pb-1 text-xs font-semibold text-muted uppercase tracking-wider"
-        >
-          Programs
-        </p>
-        <div v-else class="mt-3" />
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="programLinks"
-          orientation="vertical"
-          tooltip
-        />
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Programs
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="programLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
+
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Statistics
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="analyticsLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
       </template>
 
       <template #footer="{ collapsed }">
-        <UserMenu :collapsed="collapsed" />
+        <UDashboardSidebarCollapse
+          icon="i-ph-sidebar-simple-bold"
+          :label="collapsed ? '' : 'Collapse'"
+          :ui="{
+            base: 'text-dimmed'
+          }"
+        />
       </template>
     </UDashboardSidebar>
 
@@ -246,7 +270,7 @@ const programLinks = [
       v-if="!route.meta.noDashboardPanel"
       id="main"
       :ui="{
-        body: 'bg-slate-50 p-2 sm:p-5'
+        body: 'p-2 sm:p-5'
       }"
     >
       <template #header>
@@ -256,10 +280,6 @@ const programLinks = [
           :ui="{ right: 'gap-3' }"
           class="bg-white h-18!"
         >
-          <template #leading>
-            <UDashboardSidebarCollapse />
-          </template>
-
           <template #right>
             <UDropdownMenu :items="menuItems" :modal="false">
               <button
@@ -274,7 +294,7 @@ const programLinks = [
                   class="rounded-full"
                 />
                 <span class="hidden sm:block text-sm font-medium">{{ fullName }}</span>
-                <UIcon name="i-lucide-chevron-down" class="hidden sm:block size-4 text-muted" />
+                <UIcon name="i-ph-caret-down-duotone" class="hidden sm:block size-4 text-muted" />
               </button>
             </UDropdownMenu>
           </template>

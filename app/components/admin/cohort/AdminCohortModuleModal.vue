@@ -155,7 +155,6 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
         class="space-y-3"
         @submit="emit('submit')"
       >
-        <!-- Form fields: inline label + input -->
         <div class="flex gap-3">
           <label class="text-sm font-medium w-40 shrink-0 pt-2"
             >Title <span class="text-red-500">*</span></label
@@ -198,7 +197,6 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
           </UFormField>
         </div>
 
-        <!-- Attachment: inline label + tabs -->
         <div class="flex gap-3">
           <label class="text-sm font-medium w-40 shrink-0 pt-2">Attachment</label>
           <div class="flex-1 space-y-2">
@@ -219,9 +217,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
                     @click="(fileInputRef as HTMLInputElement)?.click()"
                   >
                     <UIcon
-                      :name="
-                        isAddingAttachment ? 'i-lucide-loader-circle' : 'i-lucide-upload-cloud'
-                      "
+                      :name="isAddingAttachment ? 'i-ph-spinner-bold' : 'i-ph-cloud-arrow-up-bold'"
                       class="size-6 text-muted"
                       :class="isAddingAttachment ? 'animate-spin' : ''"
                     />
@@ -237,8 +233,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
                   <UInput v-model="linkUrl" placeholder="https://..." class="flex-1" />
                   <UButton
                     label="Add Link"
-                    icon="i-lucide-plus"
-                    size="xs"
+                    icon="i-ph-plus-bold"
                     :loading="mode === 'edit' ? isAddingAttachment : false"
                     :disabled="!linkUrl"
                     @click="addLink"
@@ -264,10 +259,9 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
                   getPendingAttachmentName(att)
                 }}</span>
                 <UButton
-                  icon="i-lucide-x"
+                  icon="i-ph-x-bold"
                   color="neutral"
                   variant="ghost"
-                  size="xs"
                   class="mr-0.5 shrink-0"
                   @click="emit('removeAttachment', att.id)"
                 />
@@ -289,10 +283,9 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
                 </div>
                 <span class="flex-1 text-sm truncate px-2">{{ getRealAttachmentName(a) }}</span>
                 <UButton
-                  icon="i-lucide-x"
+                  icon="i-ph-x-bold"
                   color="neutral"
                   variant="ghost"
-                  size="xs"
                   class="mr-0.5 shrink-0"
                   :loading="isDeletingAttachment"
                   @click="emit('deleteAttachment', a.id)"

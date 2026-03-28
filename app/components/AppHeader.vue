@@ -17,21 +17,21 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: isAdmin.value ? 'Admin Panel' : 'Dashboard',
-      icon: isAdmin.value ? 'i-lucide-shield' : 'i-lucide-layout-dashboard',
+      icon: isAdmin.value ? 'i-ph-shield-bold' : 'i-ph-squares-four-bold',
       to: isAdmin.value ? '/admin' : '/dashboard'
     }
   ],
   [
     {
       label: 'Settings',
-      icon: 'i-lucide-settings',
+      icon: 'i-ph-gear-bold',
       to: '/dashboard/setting'
     }
   ],
   [
     {
       label: 'Logout',
-      icon: 'i-lucide-log-out',
+      icon: 'i-ph-sign-out-bold',
       onSelect: () => logout()
     }
   ]
@@ -70,14 +70,14 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
             class="rounded-full"
           />
           <span class="text-sm font-medium text-white">{{ fullName }}</span>
-          <UIcon name="i-lucide-chevron-down" class="size-4 text-white/60" />
+          <UIcon name="i-ph-caret-down-bold" class="size-4 text-white/60" />
         </button>
       </UDropdownMenu>
 
       <UButton
         v-else
         label="Login"
-        icon="i-lucide-user"
+        icon="i-ph-user-bold"
         color="neutral"
         variant="link"
         class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"
@@ -108,7 +108,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
         </div>
         <UButton
           :label="isAdmin ? 'Admin Panel' : 'Dashboard'"
-          :icon="isAdmin ? 'i-lucide-shield' : 'i-lucide-layout-dashboard'"
+          :icon="isAdmin ? 'i-ph-shield-bold' : 'i-ph-squares-four-bold'"
           color="neutral"
           variant="link"
           class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"
@@ -116,7 +116,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
         />
         <UButton
           label="Logout"
-          icon="i-lucide-log-out"
+          icon="i-ph-sign-out-bold"
           color="neutral"
           variant="link"
           class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"
@@ -127,7 +127,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
       <UButton
         v-else
         label="Login"
-        icon="i-lucide-user"
+        icon="i-ph-user-bold"
         color="neutral"
         variant="link"
         class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"

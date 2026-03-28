@@ -126,7 +126,7 @@ const onSave = async () => {
               variant="outline"
               color="neutral"
               size="sm"
-              leading-icon="i-lucide-image"
+              leading-icon="i-ph-image-bold"
               @click="onPickAvatar"
             >
               Change Avatar
@@ -135,7 +135,7 @@ const onSave = async () => {
               variant="outline"
               color="neutral"
               size="sm"
-              leading-icon="i-lucide-trash-2"
+              leading-icon="i-ph-trash-simple-bold"
               :disabled="!currentAvatar"
               @click="onRemoveAvatar"
             >

@@ -50,9 +50,10 @@ function generateTimeSeries(period: AnalyticsPeriod, baseValue: number, variance
     dates = eachDayOfInterval({ start, end })
   }
 
+  // One RNG instance per series so the sequence is pseudorandom across dates
+  const rng = seededRandom(period + baseValue)
   let currentValue = baseValue
-  dates.forEach((date, i) => {
-    const rng = seededRandom(format(date, 'yyyy-MM-dd') + i)
+  dates.forEach((date) => {
     const change = (rng() - 0.45) * variance
     currentValue = Math.max(0, currentValue + change)
     points.push({
@@ -66,30 +67,30 @@ function generateTimeSeries(period: AnalyticsPeriod, baseValue: number, variance
 
 export const useAnalyticsMock = () => {
   const getOverview = (): AnalyticsOverview => {
-    const revenueTrend = generateTimeSeries('30d', 2500000, 400000)
-    const usersTrend = generateTimeSeries('30d', 55, 5)
+    const revenueTrend = generateTimeSeries('30d', 5_000_000, 1_500_000)
+    const usersTrend = generateTimeSeries('30d', 18, 3)
     return {
       totalRevenue: 42500000,
       totalRevenueTrend: 12.5,
       totalUsers: 62,
       totalUsersTrend: 8.3,
-      activeEnrollments: 24,
-      totalAcademies: 7,
+      activeCohorts: 5,
+      activeCohortsTrend: 0,
       rylsRegistrations: 10,
-      jobPostings: 15,
+      rylsRegistrationsTrend: 25.0,
       revenueTrend,
       usersTrend
     }
   }
 
   const getRevenueTrend = (period: AnalyticsPeriod = '30d'): TimeSeriesPoint[] => {
-    return generateTimeSeries(period, 2500000, 500000)
+    return generateTimeSeries(period, 2500, 500)
   }
 
   const getRevenueBreakdown = (): CategoryBreakdown[] => {
     return academyNames.map((name) => {
       const rng = seededRandom(name)
-      return { name, value: Math.round(3000000 + rng() * 8000000) }
+      return { name, value: Math.round(3000 + rng() * 8000) }
     })
   }
 

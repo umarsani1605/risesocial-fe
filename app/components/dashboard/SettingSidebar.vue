@@ -2,10 +2,10 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const settingLinks: NavigationMenuItem[] = [
-  { label: 'Account', icon: 'i-lucide-user', to: '/dashboard/setting', exact: true },
-  { label: 'Notifications', icon: 'i-lucide-bell', to: '/dashboard/setting/notifications' },
-  { label: 'Security', icon: 'i-lucide-lock', to: '/dashboard/setting/security' },
-  { label: 'Invoices', icon: 'i-lucide-receipt', to: '/dashboard/setting/invoices' }
+  { label: 'Account', icon: 'i-ph-user-duotone', to: '/dashboard/setting', exact: true },
+  { label: 'Notifications', icon: 'i-ph-bell-duotone', to: '/dashboard/setting/notifications' },
+  { label: 'Security', icon: 'i-ph-lock-duotone', to: '/dashboard/setting/security' },
+  { label: 'Invoices', icon: 'i-ph-receipt-duotone', to: '/dashboard/setting/invoices' }
 ]
 </script>
 

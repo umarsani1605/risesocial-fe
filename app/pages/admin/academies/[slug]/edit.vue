@@ -6,7 +6,6 @@ import { academyFormSchema } from '@/schemas/academy'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Edit Academy',
-  navbarIcon: 'i-lucide-graduation-cap',
   middleware: 'admin'
 })
 
@@ -27,6 +26,15 @@ if (sourceError.value || !sourceData.value?.data) {
 const source = sourceData.value.data
 
 const pageTitle = ref(source.title)
+const academyTabItems = ACADEMY_TAB_ITEMS.map((item) => ({
+  ...item,
+  icon:
+    item.slot === 'information'
+      ? 'i-ph-info'
+      : item.slot === 'syllabus'
+        ? 'i-ph-book-open-text'
+        : 'i-ph-users-three'
+}))
 
 useSeoMeta({ title: `Edit Academy – ${source.title} | Rise Social` })
 
@@ -92,12 +100,12 @@ async function onSave() {
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0' }">
+  <AdminCard :ui="{ body: 'p-0' }">
     <template #header>
       <div class="flex items-center justify-between gap-3 px-1">
         <div class="flex items-center gap-3 min-w-0">
           <UButton
-            icon="i-lucide-arrow-left"
+            icon="i-ph-arrow-left-bold"
             color="neutral"
             variant="ghost"
             to="/admin/academies"
@@ -106,7 +114,7 @@ async function onSave() {
         </div>
         <UButton
           label="View Public Page"
-          trailing-icon="i-lucide-external-link"
+          trailing-icon="i-ph-arrow-square-out-bold"
           color="neutral"
           variant="ghost"
         />
@@ -114,7 +122,7 @@ async function onSave() {
     </template>
 
     <UTabs
-      :items="ACADEMY_TAB_ITEMS"
+      :items="academyTabItems"
       variant="link"
       color="primary"
       :unmount-on-hide="false"
@@ -137,6 +145,7 @@ async function onSave() {
                     type="submit"
                     label="Save"
                     color="primary"
+                    leading-icon="i-ph-floppy-disk-bold"
                     :loading="loading"
                     :disabled="loading"
                   />
@@ -192,5 +201,5 @@ async function onSave() {
         </UScrollArea>
       </template>
     </UTabs>
-  </UCard>
+  </AdminCard>
 </template>

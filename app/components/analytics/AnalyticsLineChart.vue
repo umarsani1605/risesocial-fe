@@ -6,17 +6,24 @@ const props = defineProps<{
   title?: string
   height?: number
   mini?: boolean
+  color?: string
+  xLabel?: string
+  yLabel?: string
 }>()
 
 const chartData = computed(() =>
-  props.data.map(p => ({
-    date: props.mini ? p.date.slice(5) : format(new Date(p.date), 'MMM d'),
+  props.data.map((p) => ({
+    date: props.mini ? p.date.slice(5) : format(new Date(p.date), 'd MMM'),
     value: p.value
   }))
 )
 
-const categories: Record<string, { name: string }> = {
-  value: { name: 'Value' }
+const categories = computed(() => ({
+  value: { name: props.yLabel ?? 'Value', color: resolveChartColor(props.color) }
+}))
+
+const xFormatter = (tick: number): string => {
+  return chartData.value[tick]?.date ?? String(tick)
 }
 
 const yFormatter = (value: number) => {
@@ -24,13 +31,14 @@ const yFormatter = (value: number) => {
   if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
   return String(value)
 }
+
+const tooltipTitleFormatter = (data: Record<string, unknown>) => {
+  return String(data.date ?? '')
+}
 </script>
 
 <template>
-  <UCard
-    v-if="!mini"
-    class="ring-transparent shadow-none border border-default"
-  >
+  <UCard v-if="!mini" class="shadow-none!">
     <template v-if="title" #header>
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>
@@ -39,14 +47,20 @@ const yFormatter = (value: number) => {
         :data="chartData"
         :categories="categories"
         :height="height ?? 280"
+        :x-formatter="xFormatter"
         :y-formatter="yFormatter"
+        :tooltip-title-formatter="tooltipTitleFormatter"
+        :hide-legend="true"
+        :x-num-ticks="6"
+        :x-label="xLabel"
+        :y-label="yLabel"
         class="w-full h-full"
       />
     </div>
   </UCard>
 
   <div v-else :style="{ height: `${height ?? 80}px` }">
-    <LineChart
+    <AreaChart
       :data="chartData"
       :categories="categories"
       :height="height ?? 80"

@@ -25,10 +25,10 @@ interface AnalyticsOverview {
   totalRevenueTrend: number
   totalUsers: number
   totalUsersTrend: number
-  activeEnrollments: number
-  totalAcademies: number
+  activeCohorts: number
+  activeCohortsTrend: number
   rylsRegistrations: number
-  jobPostings: number
+  rylsRegistrationsTrend: number
   revenueTrend: TimeSeriesPoint[]   // 30d mini chart
   usersTrend: TimeSeriesPoint[]     // 30d mini chart
 }

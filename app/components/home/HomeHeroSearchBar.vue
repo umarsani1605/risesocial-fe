@@ -27,7 +27,7 @@ function handleSearch() {
     <div class="flex flex-col lg:flex-row lg:gap-0">
       <div class="lg:flex-1 flex justify-center items-center relative">
         <div class="flex items-center w-full h-12 px-4">
-          <UIcon name="i-lucide-map-pin" class="size-5 text-gray-400 mr-3 shrink-0" />
+          <UIcon name="i-ph-map-pin-bold" class="size-5 text-gray-400 mr-3 shrink-0" />
           <USelect
             v-model="selectedLocation"
             :items="locationOptions"
@@ -47,7 +47,7 @@ function handleSearch() {
 
       <div class="lg:flex-2 flex justify-start items-center relative">
         <div class="flex items-center w-full h-12 px-4">
-          <UIcon name="i-lucide-search" class="size-5 text-gray-400 mr-3 shrink-0" />
+          <UIcon name="i-ph-magnifying-glass-bold" class="size-5 text-gray-400 mr-3 shrink-0" />
           <UInput
             v-model="searchQuery"
             type="text"
@@ -67,7 +67,7 @@ function handleSearch() {
           class="w-full lg:w-auto justify-center gap-2"
           @click="handleSearch"
         >
-          <UIcon name="i-lucide-search" class="size-5" />
+          <UIcon name="i-ph-magnifying-glass-bold" class="size-5" />
           Find Jobs
         </UButton>
       </div>

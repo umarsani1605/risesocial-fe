@@ -51,28 +51,28 @@ function formatSessionTime(iso: string) {
 }
 
 function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: string } {
-  if (att.type === 'external_link') return { bg: 'bg-blue-500',   icon: 'i-lucide-link' }
-  if (att.type === 'embed_video')   return { bg: 'bg-red-500',    icon: 'i-lucide-video' }
+  if (att.type === 'external_link') return { bg: 'bg-blue-500',   icon: 'i-ph-link-bold' }
+  if (att.type === 'embed_video')   return { bg: 'bg-red-500',    icon: 'i-ph-video-bold' }
 
   const ext = (att.file_mime?.split('/').pop() ?? att.file_path?.split('.').pop() ?? '').toLowerCase()
   const byExt: Record<string, { bg: string; icon: string }> = {
-    pdf:   { bg: 'bg-red-500',    icon: 'i-lucide-file-text' },
-    msword: { bg: 'bg-blue-500',  icon: 'i-lucide-file-text' },
-    doc:   { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
-    docx:  { bg: 'bg-blue-500',   icon: 'i-lucide-file-text' },
-    'vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'bg-blue-500', icon: 'i-lucide-file-text' },
-    ppt:   { bg: 'bg-orange-500', icon: 'i-lucide-file' },
-    pptx:  { bg: 'bg-orange-500', icon: 'i-lucide-file' },
-    'vnd.openxmlformats-officedocument.presentationml.presentation': { bg: 'bg-orange-500', icon: 'i-lucide-file' },
-    xls:   { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
-    xlsx:  { bg: 'bg-green-600',  icon: 'i-lucide-table-2' },
-    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'bg-green-600', icon: 'i-lucide-table-2' },
-    jpeg:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
-    jpg:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
-    png:   { bg: 'bg-purple-500', icon: 'i-lucide-image' },
-    webp:  { bg: 'bg-purple-500', icon: 'i-lucide-image' },
+    pdf:   { bg: 'bg-red-500',    icon: 'i-ph-file-text-bold' },
+    msword: { bg: 'bg-blue-500',  icon: 'i-ph-file-text-bold' },
+    doc:   { bg: 'bg-blue-500',   icon: 'i-ph-file-text-bold' },
+    docx:  { bg: 'bg-blue-500',   icon: 'i-ph-file-text-bold' },
+    'vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'bg-blue-500', icon: 'i-ph-file-text-bold' },
+    ppt:   { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
+    pptx:  { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
+    'vnd.openxmlformats-officedocument.presentationml.presentation': { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
+    xls:   { bg: 'bg-green-600',  icon: 'i-ph-table-bold' },
+    xlsx:  { bg: 'bg-green-600',  icon: 'i-ph-table-bold' },
+    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'bg-green-600', icon: 'i-ph-table-bold' },
+    jpeg:  { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
+    jpg:   { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
+    png:   { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
+    webp:  { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
   }
-  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-lucide-file' }
+  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-ph-file-bold' }
 }
 </script>
 
@@ -111,7 +111,7 @@ function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: st
             {{ formatSessionTime(module.session_timestamp) }}
           </span>
           <UIcon
-            :name="isModuleOpen(module.id) ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+            :name="isModuleOpen(module.id) ? 'i-ph-caret-up-bold' : 'i-ph-caret-down-bold'"
             class="size-4 text-muted"
           />
         </div>
@@ -152,7 +152,7 @@ function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: st
               size="md"
               variant="outline"
               color="primary"
-              leading-icon="i-lucide-clipboard-list"
+              leading-icon="i-ph-clipboard-text-bold"
               :to="module.assignment_link"
               target="_blank"
             >
@@ -163,7 +163,7 @@ function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: st
               size="md"
               variant="outline"
               color="primary"
-              leading-icon="i-lucide-user-check"
+              leading-icon="i-ph-user-check-bold"
               :to="module.attendance_link"
               target="_blank"
             >
@@ -176,7 +176,7 @@ function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: st
               v-if="module.meeting_link"
               size="md"
               color="primary"
-              leading-icon="i-lucide-video"
+              leading-icon="i-ph-video-bold"
               :to="module.meeting_link"
               target="_blank"
             >
@@ -188,7 +188,7 @@ function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: st
     </div>
 
     <div v-if="visibleModules.length === 0" class="text-center py-12 text-muted">
-      <UIcon name="i-lucide-book-open" class="size-10 mx-auto mb-3" />
+      <UIcon name="i-ph-book-open-bold" class="size-10 mx-auto mb-3" />
       <p class="text-sm">No modules available yet</p>
     </div>
   </div>

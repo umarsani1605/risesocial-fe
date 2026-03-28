@@ -12,13 +12,15 @@ export const TRANSACTION_STATUS_LABEL: Record<string, string> = Object.fromEntri
 )
 
 export const PRODUCT_TYPE_ITEMS = [
-  { label: 'Academy', value: 'academy_enrollment' },
-  { label: 'Rise Young Leaders Scholarship', value: 'Rise Young Leaders Scholarship' },
+  { label: 'Rise Academy', value: 'academy_enrollment' },
+  { label: 'RYLS Registration', value: 'ryls_registration' },
 ]
 
-export const PRODUCT_TYPE_LABEL: Record<string, string> = Object.fromEntries(
-  PRODUCT_TYPE_ITEMS.map((i) => [i.value, i.label])
-)
+export const PRODUCT_TYPE_LABEL: Record<string, string> = {
+  ...Object.fromEntries(PRODUCT_TYPE_ITEMS.map((i) => [i.value, i.label])),
+  // legacy value from older backend versions
+  'Rise Young Leaders Scholarship': 'RYLS Registration',
+}
 
 export const PAYMENT_METHOD_LABEL: Record<string, string> = {
   bca_va: 'BCA Virtual Account',

@@ -16,10 +16,9 @@ export const cohortCreatePageSchema = z.object({
 export const cohortEditSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
-  status: z.enum(['not_started', 'on_going', 'completed', 'cancelled']).optional(),
+  status: z.enum(['not_started', 'ongoing', 'completed']).optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
-  max_students: z.number().optional(),
 })
 
 export const moduleFormSchema = z.object({

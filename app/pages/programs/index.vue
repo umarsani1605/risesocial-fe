@@ -161,7 +161,7 @@ const testimonialsItems = [
           </p>
           <UButton :to="program.link" color="secondary" size="lg" block>
             Start Now
-            <UIcon name="i-lucide-arrow-right" class="size-4" />
+            <UIcon name="i-ph-arrow-right-bold" class="size-4" />
           </UButton>
         </UCard>
       </div>

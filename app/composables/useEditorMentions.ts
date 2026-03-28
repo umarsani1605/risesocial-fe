@@ -1,5 +1,10 @@
 import type { EditorMentionMenuItem } from '@nuxt/ui'
-import type { CollaborationUser } from './useEditorCollaboration'
+
+interface CollaborationUser {
+  name: string
+  color: string
+  avatar?: string
+}
 
 const FALLBACK_USERS = [{
   label: 'benjamincanac',

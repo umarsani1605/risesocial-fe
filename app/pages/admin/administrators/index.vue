@@ -5,7 +5,6 @@ import type { TableColumn } from '@nuxt/ui'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Administrators',
-  navbarIcon: 'i-lucide-shield',
   middleware: 'admin'
 })
 
@@ -209,7 +208,7 @@ const columns: TableColumn<AdminUser>[] = [
   },
   {
     id: 'actions',
-    size: 160,
+    size: 190,
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-2' }, [
         h(UButton, {
@@ -217,7 +216,7 @@ const columns: TableColumn<AdminUser>[] = [
           size: 'sm',
           color: 'primary',
           variant: 'outline',
-          leadingIcon: 'ph:pencil-simple-bold',
+          leadingIcon: 'i-ph-pencil-simple-bold',
           onClick: () => openEdit(row.original)
         }),
         h(UButton, {
@@ -225,7 +224,7 @@ const columns: TableColumn<AdminUser>[] = [
           size: 'sm',
           color: 'error',
           variant: 'outline',
-          leadingIcon: 'i-lucide-trash-2',
+          leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })
       ])
@@ -234,42 +233,44 @@ const columns: TableColumn<AdminUser>[] = [
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0!' }">
-    <div class="flex flex-wrap items-center justify-between gap-2 p-4">
-      <UInput
-        v-model="search"
-        icon="i-lucide-search"
-        placeholder="Search name or email..."
-        class="w-full sm:w-64"
-      />
-      <UButton label="Add New" icon="i-lucide-plus" color="primary" @click="openCreate" />
-    </div>
+  <AdminTableCard>
+    <template #toolbar>
+      <div class="flex flex-wrap items-center justify-between">
+        <UInput
+          v-model="search"
+          icon="i-ph-magnifying-glass-bold"
+          placeholder="Search name or email..."
+          class="w-full sm:w-64"
+        />
+        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+      </div>
+    </template>
 
-    <div class="overflow-x-auto">
-      <UTable
-        ref="table"
-        v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-        :data="filteredData"
-        :columns="columns"
-      />
-    </div>
+    <UTable
+      ref="table"
+      v-model:pagination="pagination"
+      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+      :data="filteredData"
+      :columns="columns"
+    />
 
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4">
-      <p class="text-sm text-muted">
-        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-        {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
-      </p>
-      <UPagination
-        :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-        :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-        :total="table?.tableApi?.getFilteredRowModel().rows.length"
-        size="sm"
-        variant="ghost"
-        @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-      />
-    </div>
-  </UCard>
+    <template #footer>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+        <p class="text-sm text-muted">
+          {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
+          {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+        </p>
+        <UPagination
+          :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+          :total="table?.tableApi?.getFilteredRowModel().rows.length"
+          size="sm"
+          variant="ghost"
+          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+        />
+      </div>
+    </template>
+  </AdminTableCard>
 
   <AdminUserFormModal
     v-model:open="isCreateOpen"

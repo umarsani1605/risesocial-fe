@@ -5,7 +5,6 @@ import { jobEditSchema } from '@/schemas/job'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Edit Job',
-  navbarIcon: 'i-lucide-pencil',
   middleware: 'admin'
 })
 
@@ -14,9 +13,8 @@ const toast = useToast()
 const { api } = useApi()
 
 const jobId = Number(route.params.id)
-const { data: jobData, error: jobError } = await useAsyncData(
-  `admin:job:${jobId}`,
-  () => api<ApiResponse<Job>>(`/admin/jobs/${jobId}`)
+const { data: jobData, error: jobError } = await useAsyncData(`admin:job:${jobId}`, () =>
+  api<ApiResponse<Job>>(`/admin/jobs/${jobId}`)
 )
 
 if (jobError.value || !jobData.value?.data) {
@@ -60,33 +58,26 @@ async function onSave() {
     }
     await api(`/admin/jobs/${jobId}`, { method: 'PUT', body })
     toast.add({ title: 'Job saved', color: 'success' })
-  }
-  catch (error: any) {
+  } catch (error: any) {
     toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
-  }
-  finally {
+  } finally {
     isSaving.value = false
   }
 }
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0' }">
+  <AdminCard :ui="{ body: 'p-0' }">
     <!-- Page Header -->
     <UForm :schema="jobEditSchema" :state="form" @submit="onSave">
-      <div class="flex flex-wrap items-center justify-between gap-2 p-4">
+      <div class="flex flex-wrap items-center justify-between">
         <div class="flex items-center gap-2">
-          <UButton
-            icon="i-lucide-arrow-left"
-            color="neutral"
-            variant="ghost"
-            to="/admin/jobs"
-          />
+          <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/jobs" />
           <h2 class="text-xl font-semibold">Edit Job</h2>
         </div>
         <UButton
           type="submit"
-          icon="i-lucide-save"
+          icon="i-ph-floppy-disk-bold"
           label="Save Job"
           color="primary"
           :loading="isSaving"
@@ -147,9 +138,14 @@ async function onSave() {
         </div>
 
         <UFormField name="description" label="Description" required>
-          <UTextarea v-model="form.description" placeholder="Job description..." :rows="8" class="w-full" />
+          <UTextarea
+            v-model="form.description"
+            placeholder="Job description..."
+            :rows="8"
+            class="w-full"
+          />
         </UFormField>
       </div>
     </UForm>
-  </UCard>
+  </AdminCard>
 </template>

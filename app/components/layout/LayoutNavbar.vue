@@ -120,7 +120,7 @@ onUnmounted(() => {
             <UButton
               variant="ghost"
               class="text-white hover:bg-white/5"
-              icon="i-lucide-user"
+              icon="i-ph-user-bold"
             >
               Login / Register
             </UButton>
@@ -131,7 +131,7 @@ onUnmounted(() => {
             <UButton
               variant="ghost"
               size="sm"
-              icon="i-lucide-menu"
+              icon="i-ph-list-bold"
               @click="toggleMobileMenu"
               class="text-white hover:bg-white/5"
             />
@@ -170,7 +170,7 @@ onUnmounted(() => {
               <UButton
                 color="primary"
                 class="w-full"
-                icon="i-lucide-user"
+                icon="i-ph-user-bold"
               >
                 Login / Register
               </UButton>

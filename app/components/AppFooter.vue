@@ -20,7 +20,7 @@
               </p>
             </div>
             <div class="hidden lg:flex h-full items-center justify-start lg:justify-center gap-2">
-              <UIcon name="i-lucide-map-pin" class="size-4 text-primary" />
+              <UIcon name="i-ph-map-pin-bold" class="size-4 text-primary" />
               <span class="text-sm sm:text-base">Indonesia</span>
             </div>
           </div>
@@ -28,7 +28,7 @@
             <div
               class="flex-2 flex h-full lg:hidden items-center justify-start lg:justify-center gap-2"
             >
-              <UIcon name="i-lucide-map-pin" class="size-4 text-primary" />
+              <UIcon name="i-ph-map-pin-bold" class="size-4 text-primary" />
               <span class="text-sm sm:text-base">Indonesia</span>
             </div>
             <div
@@ -89,7 +89,7 @@ const socialMediaData = [
     id: 'instagram',
     name: 'Instagram',
     url: 'https://www.instagram.com/risesocial_/',
-    icon: 'i-lucide-instagram',
+    icon: 'i-ph-instagram-logo-bold',
     ariaLabel: 'Follow us on Instagram'
   },
   {

@@ -1,5 +1,11 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
+  // "extends" lets the IDE pick up module/target/paths for .vue files
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    // override "preserve" (TS 5.4+) → ESNext so IDE JSON schema doesn't complain
+    "module": "ESNext"
+  },
   "files": [],
   "references": [
     { "path": "./.nuxt/tsconfig.app.json" },

@@ -420,7 +420,7 @@ const pricingBenefits = {
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-6xl mx-auto">
           <div class="md:col-span-6 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
-              <UIcon name="i-lucide-users" class="size-6! text-white" />
+              <UIcon name="i-ph-users-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-bold">Target Audience</h3>
             <p class="text-sm">Aspiring young leaders, volunteers, and professionals in the social and environmental sectors.</p>
@@ -428,7 +428,7 @@ const pricingBenefits = {
 
           <div class="md:col-span-6 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
-              <UIcon name="i-lucide-heart-handshake" class="size-6! text-white" />
+              <UIcon name="i-ph-handshake-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Advocacy Focus</h3>
             <p class="text-sm">Your passion lies in sustainability, youth empowerment, climate leadership, or community development.</p>
@@ -436,7 +436,7 @@ const pricingBenefits = {
 
           <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
-              <UIcon name="i-lucide-graduation-cap" class="size-6! text-white" />
+              <UIcon name="i-ph-graduation-cap-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Eligibility</h3>
             <p class="text-sm">Open to university students and early-career professionals.</p>
@@ -444,7 +444,7 @@ const pricingBenefits = {
 
           <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
-              <UIcon name="i-lucide-calendar" class="size-6! text-white" />
+              <UIcon name="i-ph-calendar-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Age Requirement</h3>
             <p class="text-sm">Applicants must be 19 - 35 years old at the time of application.</p>
@@ -452,7 +452,7 @@ const pricingBenefits = {
 
           <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
-              <UIcon name="i-lucide-globe" class="size-6! text-white" />
+              <UIcon name="i-ph-globe-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Nationality</h3>
             <p class="text-sm">Open to all nationalities, across Southeast Asia and beyond.</p>
@@ -687,7 +687,7 @@ const pricingBenefits = {
               </p>
               <div class="flex flex-col sm:flex-row justify-center gap-4 py-2 w-full sm:w-auto">
                 <UButton variant="outline" size="lg" class="w-full sm:w-auto justify-center" @click="handleGuidebookButton()">
-                  <UIcon name="i-lucide-download" class="w-4 h-4" />
+                  <UIcon name="i-ph-download-simple-bold" class="w-4 h-4" />
                   Guidebook
                 </UButton>
                 <UButton size="lg" class="w-full sm:w-auto justify-center" @click="handleRegisterButton('How to Apply')">
@@ -715,7 +715,7 @@ const pricingBenefits = {
             <div class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-sky-400 to-sky-400 text-white rounded-xl w-12 h-12">
-                  <UIcon name="i-lucide-sparkles" class="size-6!" />
+                  <UIcon name="i-ph-sparkle-bold" class="size-6!" />
                 </span>
                 <h3 class="text-2xl font-bold text-gray-900">2 Fully Funded ($10)</h3>
               </div>
@@ -727,7 +727,7 @@ const pricingBenefits = {
               </div>
               <ul class="space-y-3 text-gray-600 ml-2">
                 <li v-for="benefit in pricingBenefits.fullyFunded" :key="benefit" class="flex items-start">
-                  <UIcon name="i-lucide-check-circle" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
               </ul>
@@ -742,7 +742,7 @@ const pricingBenefits = {
             <div class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-sky-400 to-sky-400 text-white rounded-xl w-12 h-12">
-                  <UIcon name="i-lucide-rocket" class="size-6!" />
+                  <UIcon name="i-ph-rocket-bold" class="size-6!" />
                 </span>
                 <h3 class="text-2xl font-bold text-gray-900">15 Partial Funded</h3>
               </div>
@@ -754,14 +754,14 @@ const pricingBenefits = {
               </div>
               <ul class="space-y-3 text-gray-600 ml-2 mb-4">
                 <li v-for="benefit in pricingBenefits.partialFunded" :key="benefit" class="flex items-start">
-                  <UIcon name="i-lucide-check-circle" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
                 <div class="py-2">
                   <p class="text-base text-gray-800 font-semibold">With upgrade ($650):</p>
                 </div>
                 <li v-for="benefit in pricingBenefits.partialFundedUpgrade" :key="benefit" class="flex items-start">
-                  <UIcon name="i-lucide-check-circle" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
               </ul>
@@ -776,7 +776,7 @@ const pricingBenefits = {
             <div class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-sky-400 to-sky-400 text-white rounded-xl w-12 h-12">
-                  <UIcon name="i-lucide-trophy" class="size-6!" />
+                  <UIcon name="i-ph-trophy-bold" class="size-6!" />
                 </span>
                 <h3 class="text-2xl font-bold text-gray-900">10 Self Funded ($800)</h3>
               </div>
@@ -788,7 +788,7 @@ const pricingBenefits = {
               </div>
               <ul class="space-y-3 text-gray-600 ml-2">
                 <li v-for="benefit in pricingBenefits.selfFunded" :key="benefit" class="flex items-start">
-                  <UIcon name="i-lucide-check-circle" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
               </ul>
@@ -847,7 +847,7 @@ const pricingBenefits = {
               aria-label="Previous image"
               @click="lightboxPrev"
             >
-              <UIcon name="i-lucide-chevron-left" class="size-6" />
+              <UIcon name="i-ph-caret-left-bold" class="size-6" />
             </button>
 
             <NuxtImg
@@ -863,7 +863,7 @@ const pricingBenefits = {
               aria-label="Next image"
               @click="lightboxNext"
             >
-              <UIcon name="i-lucide-chevron-right" class="size-6" />
+              <UIcon name="i-ph-caret-right-bold" class="size-6" />
             </button>
 
             <button
@@ -872,7 +872,7 @@ const pricingBenefits = {
               aria-label="Close lightbox"
               @click="lightboxOpen = false"
             >
-              <UIcon name="i-lucide-x" class="size-5" />
+              <UIcon name="i-ph-x-bold" class="size-5" />
             </button>
           </div>
         </template>

@@ -88,7 +88,7 @@ const columns: TableColumn<AcademyFeature>[] = [
       <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
         <template #icon-cell="{ row }">
           <div class="flex items-center gap-1.5">
-            <UIcon :name="`i-lucide-${row.original.icon}`" class="size-4 text-muted" />
+            <UIcon :name="`i-ph-${row.original.icon}-fill`" class="size-4 text-muted" />
             <span class="text-muted">{{ row.original.icon }}</span>
           </div>
         </template>
@@ -98,7 +98,7 @@ const columns: TableColumn<AcademyFeature>[] = [
               size="sm"
               color="primary"
               variant="outline"
-              leading-icon="i-lucide-pencil"
+              leading-icon="i-ph-pencil-simple-bold"
               label="Edit"
               @click="openEdit(row.original)"
             />
@@ -106,7 +106,7 @@ const columns: TableColumn<AcademyFeature>[] = [
               size="sm"
               color="error"
               variant="outline"
-              leading-icon="i-lucide-trash-2"
+              leading-icon="i-ph-trash-simple-bold"
               label="Delete"
               @click="confirmRemove(row.original)"
             />

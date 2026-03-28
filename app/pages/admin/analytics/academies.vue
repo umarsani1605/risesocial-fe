@@ -2,7 +2,6 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Academy Analytics',
-  navbarIcon: 'i-ph-graduation-cap-fill',
   middleware: 'admin'
 })
 
@@ -31,7 +30,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
   },
   {
     title: 'Completion Rate',
-    value: `${completionData.data.value?.find(d => d.name === 'Completed')?.value ?? 0}%`,
+    value: `${completionData.data.value?.find((d) => d.name === 'Completed')?.value ?? 0}%`,
     icon: 'i-ph-check-circle-fill',
     color: 'text-success'
   },

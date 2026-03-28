@@ -31,7 +31,7 @@ useSeoMeta({
 })
 
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
-  { label: 'Home', icon: 'i-lucide-home', to: '/' },
+  { label: 'Home', icon: 'i-ph-house-bold', to: '/' },
   { label: 'Rise Sustainability Academy', to: '/academy' },
   { label: academy.value.title }
 ])
@@ -106,23 +106,23 @@ function nextTestimonial() {
           </h1>
           <div class="flex flex-wrap items-center gap-4 md:gap-6 text-white/90 text-sm">
             <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-clock" class="size-4" />
+              <UIcon name="i-ph-clock-bold" class="size-4" />
               <span>{{ academy.duration }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-book-open" class="size-4" />
+              <UIcon name="i-ph-book-open-bold" class="size-4" />
               <span>{{ academy.format }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-tag" class="size-4" />
+              <UIcon name="i-ph-tag-bold" class="size-4" />
               <span>{{ academy.category }}</span>
             </div>
             <div v-if="academy.certificate" class="flex items-center gap-2">
-              <UIcon name="i-lucide-award" class="size-4" />
+              <UIcon name="i-ph-medal-bold" class="size-4" />
               <span>Certificate</span>
             </div>
             <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-briefcase" class="size-4" />
+              <UIcon name="i-ph-briefcase-bold" class="size-4" />
               <span>Portfolio</span>
             </div>
           </div>
@@ -258,7 +258,7 @@ function nextTestimonial() {
                     <UButton
                       color="neutral"
                       variant="outline"
-                      icon="i-lucide-chevron-left"
+                      icon="i-ph-caret-left-bold"
                       size="sm"
                       class="rounded-full"
                       @click="prevTestimonial"
@@ -266,7 +266,7 @@ function nextTestimonial() {
                     <UButton
                       color="neutral"
                       variant="outline"
-                      icon="i-lucide-chevron-right"
+                      icon="i-ph-caret-right-bold"
                       size="sm"
                       class="rounded-full"
                       @click="nextTestimonial"
@@ -346,7 +346,7 @@ function nextTestimonial() {
                       class="w-full h-full object-cover"
                     />
                     <div v-else class="flex flex-col items-center justify-center text-gray-400">
-                      <UIcon name="i-lucide-image" class="size-12 mb-2" />
+                      <UIcon name="i-ph-image-bold" class="size-12 mb-2" />
                       <span class="text-sm">No Image</span>
                     </div>
                   </div>

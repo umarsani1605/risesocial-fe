@@ -14,7 +14,6 @@ const form = defineModel<{
   status: AdminCohortDetail['status']
   start_date: string
   end_date: string
-  max_students: number
 }>('form', { required: true })
 
 const emit = defineEmits<{
@@ -33,7 +32,13 @@ function close() {
 <template>
   <UModal v-model:open="open" title="Edit Cohort Info" :ui="{ footer: 'justify-end' }">
     <template #body>
-      <UForm ref="editInfoForm" :schema="cohortEditSchema" :state="form" class="space-y-4" @submit="emit('submit')">
+      <UForm
+        ref="editInfoForm"
+        :schema="cohortEditSchema"
+        :state="form"
+        class="space-y-4"
+        @submit="emit('submit')"
+      >
         <UFormField name="name" label="Name">
           <UInput v-model="form.name" placeholder="Cohort Name" class="w-full" />
         </UFormField>
@@ -56,9 +61,6 @@ function close() {
             <UInput v-model="form.end_date" type="date" class="w-full" />
           </UFormField>
         </div>
-        <UFormField label="Max Students">
-          <UInput v-model.number="form.max_students" type="number" placeholder="0" class="w-full" />
-        </UFormField>
       </UForm>
     </template>
     <template #footer>

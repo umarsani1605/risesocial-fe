@@ -10,21 +10,21 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
 
   const toolbarItems: EditorToolbarItem<T>[][] = [[{
     kind: 'undo',
-    icon: 'i-lucide-undo',
+    icon: 'i-ph-arrow-u-up-left-bold',
     tooltip: { text: 'Undo' }
   }, {
     kind: 'redo',
-    icon: 'i-lucide-redo',
+    icon: 'i-ph-arrow-u-up-right-bold',
     tooltip: { text: 'Redo' }
   }], [{
     kind: 'imageUpload',
     label: 'Add',
-    icon: 'i-lucide-image',
+    icon: 'i-ph-image-bold',
     tooltip: { text: 'Add image' }
   }]]
 
   const bubbleToolbarItems = computed(() => [[{
-    icon: 'i-lucide-sparkles',
+    icon: 'i-ph-sparkle-bold',
     label: 'Improve',
     activeColor: 'neutral',
     activeVariant: 'ghost',
@@ -55,7 +55,7 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
     }, {
       kind: 'aiSummarize',
       label: 'Summarize',
-      icon: 'i-lucide-list'
+      icon: 'i-ph-list-bold'
     }, {
       label: 'Translate',
       icon: 'i-lucide-languages',
@@ -79,7 +79,7 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
     }]
   }], [{
     label: 'Turn into',
-    trailingIcon: 'i-lucide-chevron-down',
+    trailingIcon: 'i-ph-caret-down-bold',
     activeColor: 'neutral',
     activeVariant: 'ghost',
     tooltip: { text: 'Turn into' },
@@ -119,7 +119,7 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
     }, {
       kind: 'bulletList',
       label: 'Bullet List',
-      icon: 'i-lucide-list'
+      icon: 'i-ph-list-bold'
     }, {
       kind: 'orderedList',
       label: 'Ordered List',
@@ -164,10 +164,10 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
     tooltip: { text: 'Code' }
   }], [{
     slot: 'link' as const,
-    icon: 'i-lucide-link'
+    icon: 'i-ph-link-bold'
   }, {
     kind: 'imageUpload',
-    icon: 'i-lucide-image',
+    icon: 'i-ph-image-bold',
     tooltip: { text: 'Image' }
   }]] satisfies EditorToolbarItem<T>[][])
 
@@ -175,12 +175,12 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
     const node = editor.state.doc.nodeAt(editor.state.selection.from)
 
     return [[{
-      icon: 'i-lucide-download',
+      icon: 'i-ph-download-simple-bold',
       to: node?.attrs?.src,
       download: true,
       tooltip: { text: 'Download' }
     }, {
-      icon: 'i-lucide-refresh-cw',
+      icon: 'i-ph-arrow-clockwise-bold',
       tooltip: { text: 'Replace' },
       onClick: () => {
         const { state } = editor
@@ -194,7 +194,7 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
         }
       }
     }], [{
-      icon: 'i-lucide-trash',
+      icon: 'i-ph-trash-bold',
       tooltip: { text: 'Delete' },
       onClick: () => {
         const { state } = editor
@@ -248,7 +248,7 @@ export function useEditorToolbar<T extends EditorCustomHandlers>(_customHandlers
         editor.chain().focus().deleteColumn().run()
       }
     }], [{
-      icon: 'i-lucide-trash',
+      icon: 'i-ph-trash-bold',
       tooltip: { text: 'Delete table' },
       onClick: () => {
         editor.chain().focus().deleteTable().run()

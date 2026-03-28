@@ -256,7 +256,7 @@ const onSubmit = async () => {
             class="flex items-center gap-2"
             @click="openPayPal"
           >
-            <UIcon name="i-lucide-external-link" class="size-6" />
+            <UIcon name="i-ph-arrow-square-out-bold" class="size-6" />
             Open PayPal
           </UButton>
           <div v-if="paypalClicked" class="space-y-2">
@@ -304,7 +304,7 @@ const onSubmit = async () => {
             class="flex items-center gap-2"
             @click="createMidtransTransaction"
           >
-            <UIcon name="i-lucide-credit-card" class="size-6" />
+            <UIcon name="i-ph-credit-card-bold" class="size-6" />
             {{ isMidtransProcessing ? 'Processing...' : 'Create Invoice' }}
           </UButton>
           <ClientOnly>

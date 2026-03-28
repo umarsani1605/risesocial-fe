@@ -94,7 +94,7 @@ const programs = [
           </div>
         </template>
         <div v-if="enrollments.length === 0" class="flex flex-col items-center justify-center py-10 text-center gap-2">
-          <UIcon name="i-lucide-graduation-cap" class="size-10 text-muted" />
+          <UIcon name="i-ph-graduation-cap-bold" class="size-10 text-muted" />
           <p class="text-sm text-muted">No enrolled programs yet</p>
           <UButton to="/academy" color="primary" variant="outline" size="sm" class="mt-1">
             Explore Academy
@@ -119,7 +119,7 @@ const programs = [
               <p class="text-base font-medium mb-1 line-clamp-1">{{ enrollment.cohort.academy.title }}</p>
               <p class="text-sm text-muted line-clamp-1">{{ enrollment.cohort.name }}</p>
               <div class="flex items-center gap-2 mt-1">
-                <UIcon name="i-lucide-calendar" class="size-3.5 text-muted shrink-0" />
+                <UIcon name="i-ph-calendar-bold" class="size-3.5 text-muted shrink-0" />
                 <span class="text-xs text-muted">{{ formatDate(enrollment.cohort.start_date) }}</span>
                 <UBadge
                   :color="enrollment.status === 'completed' ? 'success' : enrollment.status === 'active' ? 'primary' : 'warning'"
@@ -150,7 +150,7 @@ const programs = [
           </div>
         </template>
         <div class="flex flex-col items-center justify-center py-12 text-center gap-3">
-          <UIcon name="i-lucide-bookmark" class="size-12 text-muted" />
+          <UIcon name="i-ph-bookmark-bold" class="size-12 text-muted" />
           <p class="text-sm text-muted">No saved jobs</p>
         </div>
       </UCard>

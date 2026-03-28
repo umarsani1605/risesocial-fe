@@ -2,17 +2,12 @@
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminCohort, AdminAcademy } from '@/types'
-import {
-  COHORT_STATUS_LABEL,
-  COHORT_STATUS_COLOR,
-  COHORT_STATUS_ITEMS
-} from '@/constants/cohort'
+import { COHORT_STATUS_LABEL, COHORT_STATUS_COLOR, COHORT_STATUS_ITEMS } from '@/constants/cohort'
 import { cohortCreatePageSchema } from '@/schemas/cohort'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Cohorts',
-  navbarIcon: 'i-lucide-layout-list',
   middleware: 'admin'
 })
 
@@ -35,7 +30,7 @@ const search = ref('')
 const academyFilter = ref('all')
 const statusFilter = ref('all')
 
-const idFilter = computed(() => route.query.id ? Number(route.query.id) : null)
+const idFilter = computed(() => (route.query.id ? Number(route.query.id) : null))
 
 const academyOptions = computed(() => [
   { label: 'All Academy', value: 'all' },
@@ -114,14 +109,14 @@ const columns: TableColumn<AdminCohort>[] = [
   },
   {
     id: 'actions',
-    size: 100,
+    size: 120,
     cell: ({ row }) =>
       h(UButton, {
         label: 'Detail',
         color: 'primary',
         variant: 'outline',
         size: 'sm',
-        leadingIcon: 'i-lucide-chevrons-right',
+        icon: 'i-ph-caret-double-right-bold',
         to: `/admin/cohorts/${row.original.id}`
       })
   }
@@ -166,36 +161,44 @@ async function onAddCohort() {
 </script>
 
 <template>
-  <UCard :ui="{ root: 'overflow-scroll', body: 'p-0! border-none' }">
-    <template #header>
-      <div class="flex flex-wrap items-center justify-between gap-2">
+  <AdminTableCard>
+    <template #toolbar>
+      <div class="flex flex-wrap items-center justify-between">
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <UInput
             v-model="search"
-            icon="i-lucide-search"
+            icon="i-ph-magnifying-glass-bold"
             placeholder="Search name, description, or academy"
             class="w-full sm:w-80"
           />
           <div class="flex w-full sm:w-auto gap-2">
-            <USelect v-model="academyFilter" :items="academyOptions" class="flex-1 sm:flex-none sm:w-44" />
-            <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
+            <USelect
+              v-model="academyFilter"
+              :items="academyOptions"
+              class="flex-1 sm:flex-none sm:w-44"
+            />
+            <USelect
+              v-model="statusFilter"
+              :items="statusOptions"
+              class="flex-1 sm:flex-none sm:w-36"
+            />
           </div>
         </div>
-        <UButton label="Add New" icon="i-lucide-plus" color="primary" @click="isAddOpen = true" />
+        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="isAddOpen = true" />
       </div>
     </template>
-    <div class="overflow-x-auto">
-      <UTable
-        ref="table"
-        v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-        :data="filteredData"
-        :columns="columns"
-        class="px-4 sm:px-6"
-      />
-    </div>
+
+    <UTable
+      ref="table"
+      v-model:pagination="pagination"
+      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+      :data="filteredData"
+      :columns="columns"
+      class="px-4 sm:px-6"
+    />
+
     <template #footer>
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
         <p class="text-sm text-muted">
           {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
           {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} data shown.
@@ -209,11 +212,17 @@ async function onAddCohort() {
         />
       </div>
     </template>
-  </UCard>
+  </AdminTableCard>
 
   <UModal v-model:open="isAddOpen" title="Add New Cohort" :ui="{ footer: 'justify-end' }">
     <template #body>
-      <UForm ref="addCohortForm" :schema="cohortCreatePageSchema" :state="addForm" class="space-y-5" @submit="onAddCohort">
+      <UForm
+        ref="addCohortForm"
+        :schema="cohortCreatePageSchema"
+        :state="addForm"
+        class="space-y-5"
+        @submit="onAddCohort"
+      >
         <UFormField name="academy_id" label="Academy" required>
           <USelectMenu
             v-model="addForm.academy_id"

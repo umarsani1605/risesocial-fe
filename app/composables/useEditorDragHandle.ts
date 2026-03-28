@@ -22,7 +22,7 @@ export function useEditorDragHandle<T extends EditorCustomHandlers>(customHandle
           { kind: 'heading', level: 2, label: 'Heading 2', icon: 'i-lucide-heading-2' },
           { kind: 'heading', level: 3, label: 'Heading 3', icon: 'i-lucide-heading-3' },
           { kind: 'heading', level: 4, label: 'Heading 4', icon: 'i-lucide-heading-4' },
-          { kind: 'bulletList', label: 'Bullet List', icon: 'i-lucide-list' },
+          { kind: 'bulletList', label: 'Bullet List', icon: 'i-ph-list-bold' },
           { kind: 'orderedList', label: 'Ordered List', icon: 'i-lucide-list-ordered' },
           { kind: 'taskList', label: 'Task List', icon: 'i-lucide-list-check' },
           { kind: 'blockquote', label: 'Blockquote', icon: 'i-lucide-text-quote' },
@@ -41,7 +41,7 @@ export function useEditorDragHandle<T extends EditorCustomHandlers>(customHandle
       const node = pos !== undefined ? editor.state.doc.nodeAt(pos) : null
       return [{
         label: 'Download image',
-        icon: 'i-lucide-download',
+        icon: 'i-ph-download-simple-bold',
         to: node?.attrs?.src,
         download: true
       }]
@@ -104,7 +104,7 @@ export function useEditorDragHandle<T extends EditorCustomHandlers>(customHandle
         kind: 'duplicate',
         pos: selectedNode.value?.pos,
         label: 'Duplicate',
-        icon: 'i-lucide-copy'
+        icon: 'i-ph-copy-bold'
       },
       {
         label: 'Copy to clipboard',
@@ -137,7 +137,7 @@ export function useEditorDragHandle<T extends EditorCustomHandlers>(customHandle
         kind: 'delete',
         pos: selectedNode.value?.pos,
         label: 'Delete',
-        icon: 'i-lucide-trash'
+        icon: 'i-ph-trash-bold'
       }
     ]], customHandlers) as DropdownMenuItem[][]
   }

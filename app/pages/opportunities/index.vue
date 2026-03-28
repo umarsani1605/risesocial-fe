@@ -100,7 +100,7 @@ useSeoMeta({
       <!-- Mobile: drawer trigger -->
       <div class="lg:hidden">
         <UButton variant="outline" block @click="isFilterOpen = true">
-          <UIcon name="i-lucide-filter" class="size-4 mr-2" />
+          <UIcon name="i-ph-funnel-bold" class="size-4 mr-2" />
           Show Filters
           <UBadge v-if="hasActiveFilters" color="primary" class="ml-2">Active</UBadge>
         </UButton>
@@ -110,7 +110,7 @@ useSeoMeta({
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold">Filter Jobs</h3>
               <UButton variant="ghost" size="sm" square @click="isFilterOpen = false">
-                <UIcon name="i-lucide-x" class="size-5" />
+                <UIcon name="i-ph-x-bold" class="size-5" />
               </UButton>
             </div>
 
@@ -118,7 +118,7 @@ useSeoMeta({
               <UInput
                 v-model="pendingFilters.search"
                 placeholder="Job title, company..."
-                icon="i-lucide-search"
+                icon="i-ph-magnifying-glass-bold"
                 class="w-full"
               />
             </UFormField>
@@ -157,7 +157,7 @@ useSeoMeta({
               <UInput
                 v-model="pendingFilters.company"
                 placeholder="Company name..."
-                icon="i-lucide-building-2"
+                icon="i-ph-buildings-bold"
                 class="w-full"
               />
             </UFormField>
@@ -168,11 +168,11 @@ useSeoMeta({
 
             <div class="space-y-3 pt-2">
               <UButton color="primary" block @click="handleApplyFilters(true)">
-                <UIcon name="i-lucide-search" class="mr-2 size-4" />
+                <UIcon name="i-ph-magnifying-glass-bold" class="mr-2 size-4" />
                 Apply Filters
               </UButton>
               <UButton v-if="hasActiveFilters" variant="outline" block @click="handleClearFilters">
-                <UIcon name="i-lucide-x" class="mr-2 size-4" />
+                <UIcon name="i-ph-x-bold" class="mr-2 size-4" />
                 Clear All
               </UButton>
             </div>
@@ -188,7 +188,7 @@ useSeoMeta({
               <UInput
                 v-model="pendingFilters.search"
                 placeholder="Job title, company..."
-                icon="i-lucide-search"
+                icon="i-ph-magnifying-glass-bold"
                 class="w-full"
                 @keyup.enter="handleApplyFilters()"
               />
@@ -229,7 +229,7 @@ useSeoMeta({
               <UInput
                 v-model="pendingFilters.company"
                 placeholder="Company name..."
-                icon="i-lucide-building-2"
+                icon="i-ph-buildings-bold"
                 class="w-full"
                 @keyup.enter="handleApplyFilters()"
               />
@@ -242,12 +242,12 @@ useSeoMeta({
               </div>
             </UFormField>
 
-            <UButton icon="i-lucide-search" block @click="handleApplyFilters()">
+            <UButton icon="i-ph-magnifying-glass-bold" block @click="handleApplyFilters()">
               Search Jobs
             </UButton>
 
             <UButton v-if="hasActiveFilters" variant="outline" block @click="handleClearFilters">
-              <UIcon name="i-lucide-x" class="size-4 mr-2" />
+              <UIcon name="i-ph-x-bold" class="size-4 mr-2" />
               Clear All Filters
             </UButton>
           </div>
@@ -257,16 +257,16 @@ useSeoMeta({
       <!-- Job list -->
       <div class="col-span-1 lg:col-span-3">
         <div v-if="isLoading" class="text-center py-12">
-          <UIcon name="i-lucide-loader-2" class="size-8 text-muted mx-auto mb-4 animate-spin" />
+          <UIcon name="i-ph-spinner-bold" class="size-8 text-muted mx-auto mb-4 animate-spin" />
           <p class="text-muted">Loading job opportunities...</p>
         </div>
 
         <div v-else-if="jobsResult.data.length === 0" class="text-center py-12">
-          <UIcon name="i-lucide-search-x" class="size-16 text-muted mx-auto mb-4" />
+          <UIcon name="i-ph-magnifying-glass-minus-bold" class="size-16 text-muted mx-auto mb-4" />
           <h3 class="text-xl font-semibold mb-2">No jobs found</h3>
           <p class="text-muted mb-4">Try adjusting your search criteria or clear all filters</p>
           <UButton variant="outline" @click="handleClearFilters">
-            <UIcon name="i-lucide-refresh-cw" class="mr-2 size-4" />
+            <UIcon name="i-ph-arrow-clockwise-bold" class="mr-2 size-4" />
             Clear all filters
           </UButton>
         </div>

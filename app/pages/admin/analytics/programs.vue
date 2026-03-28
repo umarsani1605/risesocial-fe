@@ -2,7 +2,6 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Program Analytics',
-  navbarIcon: 'i-ph-medal-fill',
   middleware: 'admin'
 })
 
@@ -19,12 +18,17 @@ const dateRange = ref<AnalyticsDateRange>({
 const [rylsTrendData, scholarshipData, jobPostingData] = await Promise.all([
   useAsyncData('analytics:ryls-trend', () => analytics.fetchRylsTrend(dateRange.value.period)),
   useAsyncData('analytics:scholarship-breakdown', () => analytics.fetchScholarshipBreakdown()),
-  useAsyncData('analytics:job-postings', () => analytics.fetchJobPostingStats(dateRange.value.period))
+  useAsyncData('analytics:job-postings', () =>
+    analytics.fetchJobPostingStats(dateRange.value.period)
+  )
 ])
 
-watch(() => dateRange.value.period, async () => {
-  await Promise.all([rylsTrendData.refresh(), jobPostingData.refresh()])
-})
+watch(
+  () => dateRange.value.period,
+  async () => {
+    await Promise.all([rylsTrendData.refresh(), jobPostingData.refresh()])
+  }
+)
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
@@ -35,7 +39,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
   },
   {
     title: 'Fully Funded',
-    value: scholarshipData.data.value?.find(d => d.name === 'Fully Funded')?.value ?? 0,
+    value: scholarshipData.data.value?.find((d) => d.name === 'Fully Funded')?.value ?? 0,
     icon: 'i-ph-star-fill',
     color: 'text-warning'
   },
@@ -72,7 +76,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
         :height="280"
       />
       <LazyAnalyticsBarChart
-        :data="jobPostingData.data.value?.map(p => ({ name: p.date, value: p.value })) ?? []"
+        :data="jobPostingData.data.value?.map((p) => ({ name: p.date, value: p.value })) ?? []"
         title="Job Postings"
         :height="280"
       />

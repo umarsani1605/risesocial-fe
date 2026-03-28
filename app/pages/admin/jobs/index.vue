@@ -6,7 +6,6 @@ import type { Job } from '@/types'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Jobs Management',
-  navbarIcon: 'i-lucide-briefcase',
   middleware: 'admin'
 })
 
@@ -104,6 +103,11 @@ const rateLimitText = computed(() => {
   const req = rateLimit.value?.requests
   const jobs = rateLimit.value?.jobs
   return `Requests: ${req?.remaining ?? '–'}/${req?.limit ?? '–'} · Jobs: ${jobs?.remaining ?? '–'}/${jobs?.limit ?? '–'}`
+})
+
+const syncDateText = computed(() => {
+  const lastUpdated = rateLimit.value?.last_updated
+  return lastUpdated ? `Next Sync: ${formatDatetime(lastUpdated)}` : '–'
 })
 
 const activeFilterCount = computed(
@@ -271,7 +275,11 @@ const columns: TableColumn<Job>[] = [
     header: 'Location',
     cell: ({ row }) => {
       const l = row.original.location
-      const loc = formatLocation(l ? { city: l.city ?? undefined, region: l.region ?? undefined, country: l.country } : undefined)
+      const loc = formatLocation(
+        l
+          ? { city: l.city ?? undefined, region: l.region ?? undefined, country: l.country }
+          : undefined
+      )
       return h('span', { class: 'text-sm truncate block', title: loc }, loc)
     }
   },
@@ -295,26 +303,7 @@ const columns: TableColumn<Job>[] = [
               rel: 'noopener noreferrer',
               class: 'text-primary text-sm hover:underline'
             },
-            'Link'
-          )
-        : h('span', { class: 'text-muted text-sm' }, '–')
-    }
-  },
-  {
-    id: 'linkedin',
-    header: 'LinkedIn',
-    cell: ({ row }) => {
-      const url = row.original.company.linkedin_url
-      return url
-        ? h(
-            'a',
-            {
-              href: url,
-              target: '_blank',
-              rel: 'noopener noreferrer',
-              class: 'text-primary text-sm hover:underline'
-            },
-            'Link'
+            url
           )
         : h('span', { class: 'text-muted text-sm' }, '–')
     }
@@ -381,21 +370,23 @@ const columns: TableColumn<Job>[] = [
   },
   {
     id: 'actions',
-    header: 'Actions',
+    size: 190,
     cell: ({ row }) =>
-      h('div', { class: 'flex items-center gap-1' }, [
+      h('div', { class: 'flex items-center gap-2' }, [
         h(UButton, {
-          icon: 'i-lucide-square-pen',
-          size: 'xs',
-          color: 'neutral',
-          variant: 'ghost',
+          label: 'Edit',
+          size: 'sm',
+          color: 'primary',
+          variant: 'outline',
+          leadingIcon: 'i-ph-pencil-simple-bold',
           to: `/admin/jobs/${row.original.id}/edit`
         }),
         h(UButton, {
-          icon: 'i-lucide-trash-2',
-          size: 'xs',
+          label: 'Delete',
+          size: 'sm',
           color: 'error',
-          variant: 'ghost',
+          variant: 'outline',
+          leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => openDeleteConfirm(row.original)
         })
       ])
@@ -404,202 +395,179 @@ const columns: TableColumn<Job>[] = [
 </script>
 
 <template>
-  <UCard :ui="{ body: 'p-0!' }">
-    <!-- Toolbar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 p-4">
-      <!-- Left: Search + Filters -->
-      <div class="flex flex-wrap items-center gap-2">
-        <UInput
-          v-model="search"
-          icon="i-lucide-search"
-          placeholder="Search title or company..."
-          class="w-full sm:w-56"
-        />
+  <AdminTableCard>
+    <template #toolbar>
+      <div class="flex flex-wrap items-center justify-between">
+        <!-- Left: Search + Filters -->
+        <div class="flex flex-wrap items-center gap-2">
+          <UInput
+            v-model="search"
+            icon="i-ph-magnifying-glass-bold"
+            placeholder="Search title or company..."
+            class="w-full sm:w-56"
+          />
 
-        <UPopover v-model:open="filterPopoverOpen">
-          <UButton
-            label="Filters"
-            leading-icon="i-lucide-sliders-horizontal"
-            color="neutral"
-            variant="outline"
-            size="sm"
-          >
-            <template v-if="activeFilterCount > 0" #trailing>
-              <span
-                class="size-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center"
-              >
-                {{ activeFilterCount }}
-              </span>
-            </template>
-          </UButton>
-
-          <template #content>
-            <div class="p-4 w-72 space-y-4">
-              <h4 class="font-medium text-sm">Filter Jobs</h4>
-
-              <UFormField label="Job Type">
-                <USelect
-                  v-model="filterEmploymentType"
-                  :items="jobTypeOptions"
-                  placeholder="All Types"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField label="Experience Level">
-                <USelect
-                  v-model="filterSeniorityLevel"
-                  :items="experienceLevelOptions"
-                  placeholder="All Levels"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField label="Remote Work">
-                <USelect
-                  v-model="filterIsRemote"
-                  :items="remoteFilterOptions"
-                  placeholder="All"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <UFormField label="Country">
-                <USelect
-                  v-model="filterCountry"
-                  :items="uniqueCountries"
-                  placeholder="All Countries"
-                  class="w-full"
-                />
-              </UFormField>
-
-              <div class="flex gap-2 pt-1">
-                <UButton
-                  label="Apply"
-                  color="primary"
-                  size="sm"
-                  class="flex-1"
-                  @click="applyFilters"
-                />
-                <UButton
-                  label="Clear"
-                  color="neutral"
-                  variant="outline"
-                  size="sm"
-                  class="flex-1"
-                  @click="clearFilters"
-                />
-              </div>
-            </div>
-          </template>
-        </UPopover>
-      </div>
-
-      <!-- Right: Add Job + Sync button group -->
-      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-        <UButton
-          label="Add Job"
-          icon="i-lucide-plus"
-          color="primary"
-          size="sm"
-          to="/admin/jobs/create"
-        />
-
-        <div class="hidden sm:block h-4 w-px bg-default" />
-        <UTooltip :text="rateLimitText">
-          <div class="flex items-center gap-1.5 cursor-default select-none">
-            <UIcon name="i-lucide-info" class="size-4 text-muted" />
-            <span class="text-sm text-muted">Rate Limit</span>
-          </div>
-        </UTooltip>
-
-        <div class="hidden sm:block h-4 w-px bg-default" />
-
-        <div class="flex items-center gap-1.5 cursor-default select-none">
-          <UIcon name="i-lucide-calendar" class="size-4 text-muted" />
-          <span class="text-sm text-muted">{{ syncDate }}</span>
-        </div>
-
-        <div class="hidden sm:block h-4 w-px bg-default" />
-
-        <!-- Sync Job + Settings button group -->
-        <div class="inline-flex rounded-lg overflow-hidden">
-          <UPopover v-model:open="confirmSyncOpen">
-            <button
-              class="flex items-center gap-2 bg-primary hover:bg-primary-500 active:bg-primary-600 px-3.5 py-2 text-white text-sm font-medium transition-colors disabled:opacity-60"
-              :disabled="isSyncing"
+          <UPopover v-model:open="filterPopoverOpen">
+            <UButton
+              label="Filters"
+              leading-icon="i-ph-sliders-horizontal-bold"
+              color="neutral"
+              variant="outline"
             >
-              <UIcon
-                name="i-lucide-refresh-cw"
-                class="size-4"
-                :class="{ 'animate-spin': isSyncing }"
-              />
-              {{ isSyncing ? 'Syncing...' : 'Sync Job' }}
-            </button>
+              <template v-if="activeFilterCount > 0" #trailing>
+                <span
+                  class="size-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center"
+                >
+                  {{ activeFilterCount }}
+                </span>
+              </template>
+            </UButton>
 
             <template #content>
-              <div class="p-4 w-56 space-y-3">
-                <p class="text-sm">Perform manual job sync?</p>
-                <div class="flex justify-end gap-2">
-                  <UButton
-                    label="No"
-                    color="neutral"
-                    variant="outline"
-                    size="sm"
-                    @click="confirmSyncOpen = false"
+              <div class="p-4 w-72 space-y-4">
+                <h4 class="font-medium text-sm">Filter Jobs</h4>
+
+                <UFormField label="Job Type">
+                  <USelect
+                    v-model="filterEmploymentType"
+                    :items="jobTypeOptions"
+                    placeholder="All Types"
+                    class="w-full"
                   />
-                  <UButton label="Yes" color="primary" size="sm" @click="onConfirmSync" />
+                </UFormField>
+
+                <UFormField label="Experience Level">
+                  <USelect
+                    v-model="filterSeniorityLevel"
+                    :items="experienceLevelOptions"
+                    placeholder="All Levels"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <UFormField label="Remote Work">
+                  <USelect
+                    v-model="filterIsRemote"
+                    :items="remoteFilterOptions"
+                    placeholder="All"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <UFormField label="Country">
+                  <USelect
+                    v-model="filterCountry"
+                    :items="uniqueCountries"
+                    placeholder="All Countries"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <div class="flex gap-2 pt-1">
+                  <UButton
+                    label="Apply"
+                    color="primary"
+                    size="sm"
+                    class="flex-1"
+                    block
+                    @click="applyFilters"
+                  />
+                  <UButton
+                    label="Clear"
+                    color="white"
+                    size="sm"
+                    class="flex-1"
+                    block
+                    @click="clearFilters"
+                  />
                 </div>
               </div>
             </template>
           </UPopover>
+        </div>
 
-          <div class="w-px bg-primary-600 self-stretch" />
+        <!-- Right: Add Job + Sync button group -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div class="hidden sm:block h-4 w-px bg-default" />
+          <UTooltip :text="rateLimitText">
+            <div class="flex items-center gap-1.5 cursor-default select-none">
+              <UIcon name="i-ph-info-bold" class="size-4 text-muted" />
+              <span class="text-sm text-muted">Rate Limit Info</span>
+            </div>
+          </UTooltip>
 
-          <button
-            class="bg-primary hover:bg-primary-500 active:bg-primary-600 px-2.5 text-white transition-colors"
-            @click="syncSettingsOpen = true"
-          >
-            <UIcon name="i-lucide-settings" class="size-4" />
-          </button>
+          <div class="hidden sm:block h-4 w-px bg-default" />
+
+          <UTooltip :text="syncDateText">
+            <div class="flex items-center gap-1.5 cursor-default select-none">
+              <UIcon name="i-ph-calendar-bold" class="size-4 text-muted" />
+              <span class="text-sm text-muted">{{ syncDate }}</span>
+            </div>
+          </UTooltip>
+
+          <div class="hidden sm:block h-4 w-px bg-default" />
+
+          <!-- Sync Job + Settings button group -->
+          <UFieldGroup>
+            <UPopover v-model:open="confirmSyncOpen">
+              <UButton
+                color="primary"
+                leading-icon="i-ph-arrow-clockwise-bold"
+                :label="isSyncing ? 'Syncing...' : 'Sync Job'"
+                :disabled="isSyncing"
+                :ui="{ leadingIcon: isSyncing ? 'animate-spin' : '' }"
+              />
+
+              <template #content>
+                <div class="p-4 w-56 space-y-3">
+                  <p class="text-sm">Perform manual job sync?</p>
+                  <div class="flex justify-end gap-2">
+                    <UButton
+                      label="No"
+                      color="neutral"
+                      variant="outline"
+                      size="sm"
+                      @click="confirmSyncOpen = false"
+                    />
+                    <UButton label="Yes" color="primary" size="sm" @click="onConfirmSync" />
+                  </div>
+                </div>
+              </template>
+            </UPopover>
+
+            <UButton color="primary" icon="i-ph-gear-bold" @click="syncSettingsOpen = true" />
+          </UFieldGroup>
+          <UButton label="Add Job" icon="i-ph-plus-bold" color="primary" to="/admin/jobs/create" />
         </div>
       </div>
-    </div>
+    </template>
 
-    <!-- Table -->
-    <div class="overflow-x-auto">
-      <UTable
-        ref="table"
-        v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-        :data="filteredData"
-        :columns="columns"
-        :ui="{
-          base: 'border-separate border-spacing-0',
-          thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-          tbody: '[&>tr]:last:[&>td]:border-b-0',
-          th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r whitespace-nowrap',
-          td: 'border-b border-default max-w-[200px]'
-        }"
-      />
-    </div>
+    <UTable
+      ref="table"
+      v-model:pagination="pagination"
+      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+      :data="filteredData"
+      :columns="columns"
+    />
 
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4">
-      <p class="text-sm text-muted">
-        Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
-        {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
-        {{ filteredData.length }} entries
-      </p>
-      <UPagination
-        :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-        :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-        :total="table?.tableApi?.getFilteredRowModel().rows.length"
-        size="sm"
-        variant="ghost"
-        @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-      />
-    </div>
-  </UCard>
+    <template #footer>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+        <p class="text-sm text-muted">
+          Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
+          {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
+          {{ filteredData.length }} entries
+        </p>
+        <UPagination
+          :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+          :total="table?.tableApi?.getFilteredRowModel().rows.length"
+          size="sm"
+          variant="ghost"
+          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+        />
+      </div>
+    </template>
+  </AdminTableCard>
 
   <!-- Delete Confirmation Modal -->
   <UModal
@@ -630,7 +598,7 @@ const columns: TableColumn<Job>[] = [
   <UModal
     v-model:open="syncSettingsOpen"
     title="LinkedIn Job Sync Settings"
-    description="Current sync filter configuration. These settings are managed on the server."
+    description="Configure default parameters for LinkedIn job search. If a filter is empty, no filter will be applied."
     :ui="{ content: 'max-w-3xl', footer: 'justify-end' }"
   >
     <template #body>
@@ -699,8 +667,7 @@ const columns: TableColumn<Job>[] = [
     <template #footer>
       <UButton
         label="Cancel"
-        color="neutral"
-        variant="outline"
+        color="white"
         :disabled="isSavingSettings"
         @click="onCloseSyncSettings"
       />

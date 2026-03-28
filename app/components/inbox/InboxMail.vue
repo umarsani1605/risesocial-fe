@@ -10,16 +10,16 @@ const emits = defineEmits(['close'])
 
 const dropdownItems = [[{
   label: 'Mark as unread',
-  icon: 'i-lucide-check-circle'
+  icon: 'i-ph-check-circle-bold'
 }, {
   label: 'Mark as important',
-  icon: 'i-lucide-triangle-alert'
+  icon: 'i-ph-warning-bold'
 }], [{
   label: 'Star thread',
-  icon: 'i-lucide-star'
+  icon: 'i-ph-star-bold'
 }, {
   label: 'Mute thread',
-  icon: 'i-lucide-circle-pause'
+  icon: 'i-ph-pause-circle-bold'
 }]]
 
 const toast = useToast()
@@ -36,7 +36,7 @@ function onSubmit() {
     toast.add({
       title: 'Email sent',
       description: 'Your email has been sent successfully',
-      icon: 'i-lucide-check-circle',
+      icon: 'i-ph-check-circle-bold',
       color: 'success'
     })
 
@@ -53,7 +53,7 @@ function onSubmit() {
     >
       <template #leading>
         <UButton
-          icon="i-lucide-x"
+          icon="i-ph-x-bold"
           color="neutral"
           variant="ghost"
           class="-ms-1.5"
@@ -64,7 +64,7 @@ function onSubmit() {
       <template #right>
         <UTooltip text="Archive">
           <UButton
-            icon="i-lucide-inbox"
+            icon="i-ph-tray-bold"
             color="neutral"
             variant="ghost"
           />
@@ -72,7 +72,7 @@ function onSubmit() {
 
         <UTooltip text="Reply">
           <UButton
-            icon="i-lucide-reply"
+            icon="i-ph-arrow-bend-up-left-bold"
             color="neutral"
             variant="ghost"
           />
@@ -80,7 +80,7 @@ function onSubmit() {
 
         <UDropdownMenu :items="dropdownItems">
           <UButton
-            icon="i-lucide-ellipsis-vertical"
+            icon="i-ph-dots-three-vertical-bold"
             color="neutral"
             variant="ghost"
           />
@@ -125,7 +125,7 @@ function onSubmit() {
       >
         <template #header>
           <UIcon
-            name="i-lucide-reply"
+            name="i-ph-arrow-bend-up-left-bold"
             class="size-5"
           />
 
@@ -153,7 +153,7 @@ function onSubmit() {
               <UButton
                 color="neutral"
                 variant="ghost"
-                icon="i-lucide-paperclip"
+                icon="i-ph-paperclip-bold"
               />
             </UTooltip>
 
@@ -168,7 +168,7 @@ function onSubmit() {
                 color="neutral"
                 :loading="loading"
                 label="Send"
-                icon="i-lucide-send"
+                icon="i-ph-paper-plane-tilt-bold"
               />
             </div>
           </div>

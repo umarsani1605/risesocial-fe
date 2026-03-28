@@ -96,7 +96,7 @@ async function save() {
           </template>
           <div class="flex items-center gap-3">
             <UInput v-model="form.icon" placeholder="video" class="flex-1" />
-            <UIcon v-if="form.icon" :name="`i-lucide-${form.icon}`" class="size-8 text-muted shrink-0" />
+            <UIcon v-if="form.icon" :name="`i-ph-${form.icon}-fill`" class="size-8 text-muted shrink-0" />
           </div>
         </UFormField>
         <UFormField name="order" label="Order">

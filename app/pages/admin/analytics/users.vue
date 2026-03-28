@@ -2,7 +2,6 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'User Analytics',
-  navbarIcon: 'i-ph-users-fill',
   middleware: 'admin'
 })
 
@@ -18,20 +17,26 @@ const dateRange = ref<AnalyticsDateRange>({
 
 const [userGrowthData, registrationsTrendData, userDistributionData] = await Promise.all([
   useAsyncData('analytics:user-growth', () => analytics.fetchUserGrowth(dateRange.value.period)),
-  useAsyncData('analytics:registrations-trend', () => analytics.fetchRegistrationsTrend(dateRange.value.period)),
+  useAsyncData('analytics:registrations-trend', () =>
+    analytics.fetchRegistrationsTrend(dateRange.value.period)
+  ),
   useAsyncData('analytics:user-distribution', () => analytics.fetchUserDistribution())
 ])
 
-watch(() => dateRange.value.period, async () => {
-  await Promise.all([userGrowthData.refresh(), registrationsTrendData.refresh()])
-})
+watch(
+  () => dateRange.value.period,
+  async () => {
+    await Promise.all([userGrowthData.refresh(), registrationsTrendData.refresh()])
+  }
+)
 
 const statCards = computed<AnalyticsStat[]>(() => {
   const lastPoint = userGrowthData.data.value?.at(-1)
   const firstPoint = userGrowthData.data.value?.[0]
-  const trend = firstPoint && lastPoint && firstPoint.value > 0
-    ? Math.round(((lastPoint.value - firstPoint.value) / firstPoint.value) * 100)
-    : 0
+  const trend =
+    firstPoint && lastPoint && firstPoint.value > 0
+      ? Math.round(((lastPoint.value - firstPoint.value) / firstPoint.value) * 100)
+      : 0
   return [
     {
       title: 'Total Users',

@@ -125,7 +125,7 @@ async function save() {
               class="size-16 rounded-full border-2 border-dashed border-default flex items-center justify-center cursor-pointer hover:bg-elevated/30 transition-colors"
               @click="avatarInputRef?.click()"
             >
-              <UIcon name="i-lucide-user" class="size-6 text-muted" />
+              <UIcon name="i-ph-user-bold" class="size-6 text-muted" />
             </div>
             <div v-else class="relative">
               <img :src="avatarPreview" class="size-16 rounded-full object-cover" />
@@ -133,7 +133,7 @@ async function save() {
                 class="absolute -top-1 -right-1 size-5 bg-white border border-default rounded-full flex items-center justify-center shadow-sm"
                 @click="removeAvatar"
               >
-                <UIcon name="i-lucide-x" class="size-3" />
+                <UIcon name="i-ph-x-bold" class="size-3" />
               </button>
             </div>
             <UButton

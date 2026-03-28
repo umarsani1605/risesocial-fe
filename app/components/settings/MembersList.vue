@@ -55,7 +55,7 @@ const items = [{
           :content="{ align: 'end' }"
         >
           <UButton
-            icon="i-lucide-ellipsis-vertical"
+            icon="i-ph-dots-three-vertical-bold"
             color="neutral"
             variant="ghost"
           />

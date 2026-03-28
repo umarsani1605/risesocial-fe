@@ -50,8 +50,9 @@ export default defineAppConfig({
     card: {
       slots: {
         root: ['rounded-xl shadow-subtle border-default'],
-        header: ['border-none'],
-        footer: ['border-none']
+        header: ['p-6! pb-0! border-none'],
+        body: ['border-none'],
+        footer: ['pt-0! border-none']
       }
     },
     carousel: {
@@ -92,6 +93,11 @@ export default defineAppConfig({
         }
       },
       compoundVariants: [
+        {
+          color: 'white',
+          variant: 'solid',
+          class: 'text-default bg-white hover:bg-gray-50 active:bg-gray-50 disabled:bg-white aria-disabled:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ring ring-default hover:ring-default/85 shadow-none'
+        },
         {
           color: 'primary',
           variant: 'solid',
@@ -221,6 +227,26 @@ export default defineAppConfig({
         size: 'lg'
       }
     },
+    inputTags: {
+      slots: {
+        base: ['transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600']
+      },
+      compoundVariants: [
+        {
+          color: 'primary',
+          variant: ['outline', 'subtle'],
+          class: 'has-focus-visible:ring-1 ring-slate-200'
+        },
+        {
+          color: 'neutral',
+          variant: ['outline', 'subtle'],
+          class: 'has-focus-visible:ring-1 ring-slate-200'
+        }
+      ],
+      defaultVariants: {
+        size: 'lg'
+      }
+    },
     textarea: {
       slots: {
         base: ['transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-600 read-only:bg-muted read-only:text-gray-600']
@@ -324,8 +350,9 @@ export default defineAppConfig({
     },
     table: {
       slots: {
-        root: ['px-4 py-2'],
-        base: ['outline outline-border rounded-md overflow-auto']
+        root: ['p-px!'],
+        base: ['outline outline-default rounded-md overflow-auto'],
+        separator: ['bg-gray-200']
       }
     },
     modal: {

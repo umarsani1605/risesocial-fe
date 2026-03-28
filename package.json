@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' nuxt build",
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -20,12 +20,9 @@
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.23",
     "@ai-sdk/vue": "^3.0.50",
-    "@iconify-json/lucide": "^1.2.87",
-    "@iconify-json/simple-icons": "^1.2.68",
+    "@iconify-json/ph": "^1.2.2",
     "@internationalized/date": "^3.10.1",
-    "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/content": "^3.11.0",
-    "@nuxt/hints": "1.0.0-alpha.6",
     "@nuxt/image": "^2.0.0",
     "@nuxt/scripts": "0.13.2",
     "@nuxt/test-utils": "^4.0.0",
@@ -34,8 +31,6 @@
     "@standard-schema/spec": "^1.1.0",
     "@tanstack/table-core": "^8.21.3",
     "@tiptap/core": "^3.17.1",
-    "@tiptap/extension-collaboration": "^3.17.1",
-    "@tiptap/extension-collaboration-caret": "^3.17.1",
     "@tiptap/extension-emoji": "^3.17.1",
     "@tiptap/extension-list": "^3.17.1",
     "@tiptap/extension-table": "^3.17.1",
@@ -44,7 +39,6 @@
     "@unhead/vue": "^2.1.2",
     "@unovis/ts": "^1.6.2",
     "@unovis/vue": "^1.6.2",
-    "@vercel/blob": "^2.0.1",
     "@vueuse/core": "^14.1.0",
     "@vueuse/nuxt": "^14.1.0",
     "ai": "^6.0.50",
@@ -58,8 +52,6 @@
     "shiki": "^3.21.0",
     "tailwindcss": "^4.1.18",
     "tiptap-extension-code-block-shiki": "^1.0.0",
-    "y-partykit": "^0.0.33",
-    "yjs": "^13.6.29",
     "zod": "^4.3.6"
   },
   "devDependencies": {

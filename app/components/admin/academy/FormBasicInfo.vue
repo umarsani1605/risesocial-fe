@@ -58,7 +58,7 @@ defineExpose({
         <UFileUpload
           v-model="imageFile"
           accept="image/png,image/jpeg"
-          icon="i-lucide-image"
+          icon="i-ph-image-bold"
           label="Click to upload or drag & drop"
           description="PNG or JPG (max. 2MB)"
           layout="list"

@@ -11,7 +11,6 @@ export function useAdminCohort(cohortId: string) {
 
   const detail = computed(() => cohortData.value?.data)
 
-  const isEditCohortOpen = ref(false)
   const isEditingCohort = ref(false)
 
   const editCohortForm = reactive({
@@ -20,18 +19,15 @@ export function useAdminCohort(cohortId: string) {
     status: 'not_started' as AdminCohortDetail['status'],
     start_date: '',
     end_date: '',
-    max_students: 0
   })
 
-  function openEditCohort() {
+  function hydrateEditForm() {
     if (!detail.value) return
     editCohortForm.name = detail.value.name
     editCohortForm.description = detail.value.description ?? ''
     editCohortForm.status = detail.value.status
     editCohortForm.start_date = detail.value.start_date?.split('T')[0] ?? ''
     editCohortForm.end_date = detail.value.end_date?.split('T')[0] ?? ''
-    editCohortForm.max_students = detail.value.max_students
-    isEditCohortOpen.value = true
   }
 
   async function onEditCohort() {
@@ -45,11 +41,9 @@ export function useAdminCohort(cohortId: string) {
           status: editCohortForm.status,
           start_date: editCohortForm.start_date,
           end_date: editCohortForm.end_date,
-          max_students: editCohortForm.max_students
         }
       })
       toast.add({ title: 'Cohort updated', color: 'success' })
-      isEditCohortOpen.value = false
       await refreshCohort()
     } catch (error: any) {
       toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
@@ -79,9 +73,8 @@ export function useAdminCohort(cohortId: string) {
     refreshCohort,
     // edit + delete cohort
     editCohortForm,
-    isEditCohortOpen,
     isEditingCohort,
-    openEditCohort,
+    hydrateEditForm,
     onEditCohort,
     isDeleteCohortOpen,
     isDeletingCohort,

@@ -209,9 +209,7 @@ const columns: TableColumn<SyllabusRow>[] = [
           <UButton
             v-if="row.original._kind === 'theme'"
             :icon="
-              expandedThemes.has(row.original.id)
-                ? 'i-lucide-chevron-down'
-                : 'i-lucide-chevron-right'
+              expandedThemes.has(row.original.id) ? 'i-ph-caret-down-bold' : 'i-ph-caret-right-bold'
             "
             color="neutral"
             variant="ghost"
@@ -261,7 +259,7 @@ const columns: TableColumn<SyllabusRow>[] = [
                 size="sm"
                 color="primary"
                 variant="outline"
-                leading-icon="i-lucide-pencil"
+                leading-icon="i-ph-pencil-simple-bold"
                 label="Edit"
                 @click="openEditTheme(row.original)"
               />
@@ -269,7 +267,7 @@ const columns: TableColumn<SyllabusRow>[] = [
                 size="sm"
                 color="error"
                 variant="outline"
-                leading-icon="i-lucide-trash-2"
+                leading-icon="i-ph-trash-simple-bold"
                 label="Delete"
                 @click="confirmDeleteTheme(row.original)"
               />
@@ -279,7 +277,7 @@ const columns: TableColumn<SyllabusRow>[] = [
                 size="sm"
                 color="primary"
                 variant="outline"
-                leading-icon="i-lucide-pencil"
+                leading-icon="i-ph-pencil-simple-bold"
                 label="Edit"
                 @click="openEditTopic(row.original)"
               />
@@ -287,7 +285,7 @@ const columns: TableColumn<SyllabusRow>[] = [
                 size="sm"
                 color="error"
                 variant="outline"
-                leading-icon="i-lucide-trash-2"
+                leading-icon="i-ph-trash-simple-bold"
                 label="Delete"
                 @click="confirmDeleteTopic(row.original)"
               />

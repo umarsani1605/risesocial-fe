@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
-import type { AdminPayment } from '~/composables/useMockAdminData'
+import type { AdminTransaction } from '@/types'
+import { PRODUCT_TYPE_LABEL, PAYMENT_METHOD_LABEL, PROVIDER_LABEL } from '@/constants/transaction'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Dashboard',
-  navbarIcon: 'i-ph-squares-four-fill',
   middleware: 'admin'
 })
 
@@ -16,25 +15,21 @@ useSeoMeta({
 })
 
 const UBadge = resolveComponent('UBadge')
-const UButton = resolveComponent('UButton')
 
-const analytics = useAnalytics()
 const { api } = useApi()
+const analytics = useAnalytics()
 
-const [overviewData, academyStats] = await Promise.all([
-  useAsyncData('admin:analytics-overview', () => analytics.fetchOverview()),
-  useAsyncData('admin:academies-count', () =>
-    api<PaginatedResponse<unknown>>('/admin/academies', { params: { limit: 1 } })
-  )
-])
+const { data: overviewData } = await useAsyncData('admin:analytics-overview', () =>
+  analytics.fetchOverview()
+)
 
-const overview = computed(() => overviewData.data.value)
+const overview = computed(() => overviewData.value)
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'Total Revenue',
     value: overview.value?.totalRevenue ?? 0,
-    icon: 'i-ph-currency-circle-dollar-fill',
+    icon: 'i-ph-currency-circle-dollar-bold',
     trend: overview.value?.totalRevenueTrend,
     trendLabel: 'vs last month',
     color: 'text-success',
@@ -43,156 +38,175 @@ const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'Total Users',
     value: overview.value?.totalUsers ?? 0,
-    icon: 'i-ph-users-fill',
+    icon: 'i-ph-users-bold',
     trend: overview.value?.totalUsersTrend,
     trendLabel: 'vs last month',
     color: 'text-blue-500',
     to: '/admin/analytics/users'
   },
   {
-    title: 'Active Enrollments',
-    value: overview.value?.activeEnrollments ?? 0,
-    icon: 'i-ph-student-fill',
-    color: 'text-primary',
-    to: '/admin/analytics/academies'
-  },
-  {
-    title: 'Active Academies',
-    value: academyStats.data.value?.pagination?.total ?? overview.value?.totalAcademies ?? 0,
-    icon: 'i-ph-graduation-cap-fill',
+    title: 'Active Cohorts',
+    value: overview.value?.activeCohorts ?? 0,
+    icon: 'i-ph-chalkboard-teacher-bold',
+    trend: overview.value?.activeCohortsTrend,
+    trendLabel: 'vs last month',
     color: 'text-purple-500',
-    to: '/admin/academies'
+    to: '/admin/cohorts'
   },
   {
     title: 'RYLS Registrations',
     value: overview.value?.rylsRegistrations ?? 0,
-    icon: 'i-ph-medal-fill',
+    icon: 'i-ph-medal-bold',
+    trend: overview.value?.rylsRegistrationsTrend,
+    trendLabel: 'vs last month',
     color: 'text-orange-500',
     to: '/admin/analytics/programs'
-  },
-  {
-    title: 'Job Postings',
-    value: overview.value?.jobPostings ?? 0,
-    icon: 'i-ph-briefcase-fill',
-    color: 'text-teal-500',
-    to: '/admin/jobs'
   }
 ])
 
-const { getPayments } = useMockAdminData()
-const recentPayments = getPayments().slice(0, 5)
+const { data: txData } = await useAsyncData('admin:recent-transactions', () =>
+  api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: { limit: 5, page: 1 } })
+)
 
-const table = useTemplateRef('table')
-const pagination = ref({ pageIndex: 0, pageSize: 5 })
+const recentTransactions = computed(() => txData.value?.data ?? [])
 
-const columns: TableColumn<AdminPayment>[] = [
-  { accessorKey: 'invoiceNo', header: 'No. Invoice' },
-  { accessorKey: 'studentName', header: 'Name' },
+const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'info'> = {
+  paid: 'success',
+  pending: 'warning',
+  failed: 'error',
+  expired: 'error',
+  cancelled: 'neutral',
+  refunded: 'info'
+}
+
+const columns: TableColumn<AdminTransaction>[] = [
   {
-    accessorKey: 'academy',
-    header: 'Academy',
-    cell: ({ row }) => h('span', { class: 'text-primary' }, row.getValue('academy'))
+    accessorKey: 'transaction_code',
+    header: 'Transaction Code',
+    cell: ({ row }) => h('span', { class: 'font-mono text-sm' }, row.getValue('transaction_code'))
+  },
+  {
+    id: 'customer',
+    header: 'Customer',
+    cell: ({ row }) => {
+      const tx = row.original
+      return h('div', { class: 'text-sm space-y-0.5' }, [
+        h('div', tx.customer_name),
+        h('div', { class: 'text-muted' }, tx.customer_email),
+        tx.customer_phone ? h('div', { class: 'text-muted' }, tx.customer_phone) : null
+      ])
+    }
+  },
+  {
+    accessorKey: 'product_type',
+    header: 'Product Type',
+    cell: ({ row }) => {
+      const tx = row.original
+      const label = PRODUCT_TYPE_LABEL[tx.product_type] ?? tx.product_type
+      return h('div', { class: 'text-sm space-y-0.5 max-w-48' }, [
+        h('span', { class: 'font-medium block truncate', title: label }, label),
+        tx.product_name
+          ? h(
+              'span',
+              { class: 'text-muted text-sm block truncate', title: tx.product_name },
+              tx.product_name
+            )
+          : null
+      ])
+    }
+  },
+  {
+    accessorKey: 'amount',
+    header: 'Amount',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, formatPrice(row.getValue('amount')))
   },
   {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const colorMap: Record<string, 'success' | 'warning' | 'error'> = {
-        Paid: 'success',
-        Pending: 'warning',
-        Expired: 'error'
-      }
       const status = row.getValue('status') as string
-      return h(UBadge, { variant: 'subtle', color: colorMap[status] ?? 'neutral', class: 'capitalize' }, () => status)
+      const label = status.charAt(0).toUpperCase() + status.slice(1)
+      return h(UBadge, { variant: 'subtle', color: STATUS_COLOR[status] ?? 'neutral' }, () => label)
     }
   },
-  { accessorKey: 'createdAt', header: 'Created At' },
   {
-    id: 'actions',
-    cell: () => h(UButton, { label: 'Detail', size: 'xs', color: 'primary', variant: 'outline', leadingIcon: 'i-ph-caret-double-right-fill' })
+    accessorKey: 'provider',
+    header: 'Provider',
+    cell: ({ row }) => {
+      const provider = row.getValue('provider') as string | null
+      return h(
+        'span',
+        { class: 'text-sm' },
+        provider ? (PROVIDER_LABEL[provider] ?? provider) : '—'
+      )
+    }
+  },
+  {
+    accessorKey: 'payment_method',
+    header: 'Method',
+    cell: ({ row }) => {
+      const method = row.getValue('payment_method') as string | null
+      return h(
+        'span',
+        { class: 'text-sm' },
+        method ? (PAYMENT_METHOD_LABEL[method] ?? method) : '—'
+      )
+    }
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'Date',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, formatDatetime(row.getValue('created_at')))
   }
 ]
 </script>
 
 <template>
-  <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-    <AnalyticsStatCard
-      v-for="stat in statCards"
-      :key="stat.title"
-      :stat="stat"
-    />
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+    <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-    <UCard class="ring-transparent shadow-none border border-default">
-      <template #header>
-        <p class="text-sm font-semibold">Revenue Trend (30d)</p>
-      </template>
-      <div class="h-20">
-        <LazyAnalyticsLineChart
-          v-if="overview?.revenueTrend?.length"
-          :data="overview.revenueTrend"
-          :mini="true"
-          :height="80"
-        />
-      </div>
-    </UCard>
-
-    <UCard class="ring-transparent shadow-none border border-default">
-      <template #header>
-        <p class="text-sm font-semibold">User Growth (30d)</p>
-      </template>
-      <div class="h-20">
-        <LazyAnalyticsLineChart
-          v-if="overview?.usersTrend?.length"
-          :data="overview.usersTrend"
-          :mini="true"
-          :height="80"
-        />
-      </div>
-    </UCard>
+    <LazyAnalyticsAreaChart
+      v-if="overview?.revenueTrend?.length"
+      :data="overview.revenueTrend"
+      title="Revenue Trend (30d)"
+      color="primary"
+      y-label="Revenue"
+      :height="300"
+    />
+    <LazyAnalyticsAreaChart
+      v-if="overview?.usersTrend?.length"
+      :data="overview.usersTrend"
+      title="User Growth (30d)"
+      color="primary"
+      y-label="Users"
+      :height="300"
+    />
   </div>
 
-  <div class="mt-6">
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="text-base font-semibold">Recent Payments</h2>
-      <UButton
-        label="View All"
-        color="neutral"
-        variant="ghost"
-        trailing-icon="i-ph-arrow-right-fill"
-        size="sm"
-        to="/admin/transactions"
-      />
-    </div>
-
-    <UCard :ui="{ body: 'p-0' }">
-      <UTable
-        ref="table"
-        v-model:pagination="pagination"
-        :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-        :data="recentPayments"
-        :columns="columns"
-        :ui="{
-          base: 'table-fixed border-separate border-spacing-0',
-          thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-          tbody: '[&>tr]:last:[&>td]:border-b-0',
-          th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-          td: 'border-b border-default'
-        }"
-      />
-      <div class="flex items-center justify-between px-4 py-3 border-t border-default">
-        <p class="text-sm text-muted">
-          {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-          {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
-        </p>
-        <UPagination
-          :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-          :total="table?.tableApi?.getFilteredRowModel().rows.length"
-          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+  <div class="mt-2">
+    <AdminCard>
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-semibold">Recent Transactions</h2>
+          <UButton
+            label="View All"
+            color="neutral"
+            variant="ghost"
+            trailing-icon="i-ph-arrow-right-bold"
+            to="/admin/transactions"
+          />
+        </div>
+      </template>
+      <div class="overflow-x-auto">
+        <UTable
+          :data="recentTransactions"
+          :columns="columns"
+          :ui="{ td: 'align-top' }"
+          class="px-4 sm:px-6"
         />
       </div>
-    </UCard>
+    </AdminCard>
   </div>
 </template>

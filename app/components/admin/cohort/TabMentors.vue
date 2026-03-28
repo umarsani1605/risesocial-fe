@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
+import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
 import type { AdminCohortMentor } from '~/types/cohort'
 
-defineProps<{
+const props = defineProps<{
   mentors: AdminCohortMentor[]
 }>()
 
@@ -16,7 +16,7 @@ function rowMenu(mentorId: number): DropdownMenuItem[][] {
     [
       {
         label: 'Remove',
-        icon: 'i-lucide-user-x',
+        icon: 'i-ph-user-x-bold',
         color: 'error',
         onSelect: () => emit('remove', mentorId)
       }
@@ -25,8 +25,44 @@ function rowMenu(mentorId: number): DropdownMenuItem[][] {
 }
 
 function initials(mentor: AdminCohortMentor) {
-  return mentor.name.split(' ').map(n => n[0] ?? '').join('').toUpperCase().slice(0, 2) || '?'
+  return (
+    mentor.name
+      .split(' ')
+      .map((n) => n[0] ?? '')
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || '?'
+  )
 }
+
+const columns: TableColumn<AdminCohortMentor>[] = [
+  {
+    id: 'no',
+    header: '#',
+    size: 48,
+    cell: ({ row }) => String(row.index + 1)
+  },
+  {
+    id: 'name',
+    header: 'Name',
+    cell: ({ row }) => row.original.name
+  },
+  {
+    id: 'email',
+    header: 'Email',
+    cell: ({ row }) => row.original.email ?? '-'
+  },
+  {
+    id: 'phone',
+    header: 'Phone',
+    cell: ({ row }) => row.original.phone ?? '-'
+  },
+  {
+    id: 'actions',
+    header: '',
+    size: 56
+  }
+]
 </script>
 
 <template>
@@ -35,9 +71,8 @@ function initials(mentor: AdminCohortMentor) {
     <div class="flex justify-end mb-4">
       <UButton
         label="Invite Mentor"
-        icon="i-lucide-user-plus"
+        icon="i-ph-user-plus-bold"
         color="primary"
-        size="sm"
         @click="emit('invite')"
       />
     </div>
@@ -46,59 +81,50 @@ function initials(mentor: AdminCohortMentor) {
       v-if="mentors.length === 0"
       class="flex flex-col items-center justify-center py-16 text-muted text-sm"
     >
-      <UIcon name="i-lucide-user-round" class="size-10 mb-3 opacity-30" />
+      <UIcon name="i-ph-user-circle-bold" class="size-10 mb-3 opacity-30" />
       No mentors assigned yet.
     </div>
 
     <div v-else class="rounded-lg border border-default overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-elevated/50">
-              <th class="text-left px-4 py-2.5 text-xs font-semibold text-muted w-10">#</th>
-              <th class="text-left px-4 py-2.5 text-xs font-semibold text-muted">Name</th>
-              <th class="hidden md:table-cell text-left px-4 py-2.5 text-xs font-semibold text-muted">Email</th>
-              <th class="hidden md:table-cell text-left px-4 py-2.5 text-xs font-semibold text-muted">Phone</th>
-              <th class="w-10" />
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(mentor, i) in mentors"
-              :key="mentor.id"
-              class="border-t border-default hover:bg-elevated/30 transition-colors"
-            >
-              <td class="px-4 py-3.5 text-muted">{{ i + 1 }}</td>
-              <td class="px-4 py-3.5">
-                <div class="flex items-center gap-2.5">
-                  <UAvatar
-                    :src="mentor.avatar ?? undefined"
-                    :text="initials(mentor)"
-                    size="xs"
-                    color="primary"
-                  />
-                  <div>
-                    <p class="font-medium">{{ mentor.name }}</p>
-                    <p v-if="mentor.job_title" class="text-xs text-muted">{{ mentor.job_title }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="hidden md:table-cell px-4 py-3.5 text-muted">{{ mentor.email ?? '-' }}</td>
-              <td class="hidden md:table-cell px-4 py-3.5 text-muted">{{ mentor.phone ?? '-' }}</td>
-              <td class="px-4 py-3.5 text-right">
-                <UDropdownMenu :items="rowMenu(mentor.id)">
-                  <UButton
-                    icon="i-lucide-ellipsis-vertical"
-                    color="neutral"
-                    variant="ghost"
-                    size="sm"
-                  />
-                </UDropdownMenu>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <UTable :data="props.mentors" :columns="columns">
+        <template #name-cell="{ row }">
+          <div class="flex items-center gap-2.5">
+            <UAvatar
+              :src="row.original.avatar ?? undefined"
+              :text="initials(row.original)"
+              size="xs"
+              color="primary"
+            />
+            <div>
+              <p class="font-medium">{{ row.original.name }}</p>
+              <p v-if="row.original.job_title" class="text-xs text-muted">
+                {{ row.original.job_title }}
+              </p>
+            </div>
+          </div>
+        </template>
+
+        <template #email-cell="{ row }">
+          <span class="hidden md:block text-muted">{{ row.original.email ?? '-' }}</span>
+        </template>
+
+        <template #phone-cell="{ row }">
+          <span class="hidden md:block text-muted">{{ row.original.phone ?? '-' }}</span>
+        </template>
+
+        <template #actions-cell="{ row }">
+          <div class="text-right">
+            <UDropdownMenu :items="rowMenu(row.original.id)">
+              <UButton
+                icon="i-ph-dots-three-vertical-bold"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+              />
+            </UDropdownMenu>
+          </div>
+        </template>
+      </UTable>
     </div>
   </div>
 </template>
