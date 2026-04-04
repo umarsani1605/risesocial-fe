@@ -33,9 +33,11 @@ const typeOptions = [{ label: 'All Types', value: 'all' }, ...PRODUCT_TYPE_ITEMS
 
 // ── Data Fetching ─────────────────────────────────────────────────────────────
 
+const limit = ref(10)
+
 const queryParams = computed(() => ({
   page: page.value,
-  limit: 10,
+  limit: limit.value,
   ...(search.value && { search: search.value }),
   ...(statusFilter.value !== 'all' && { status: statusFilter.value }),
   ...(typeFilter.value !== 'all' && { product_type: typeFilter.value })
@@ -73,6 +75,7 @@ const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' |
 }
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const columnPinning = ref({ right: ['actions'] })
 
 const columns: TableColumn<AdminTransaction>[] = [
   {
@@ -152,7 +155,7 @@ const columns: TableColumn<AdminTransaction>[] = [
   },
   {
     id: 'actions',
-    size: 120,
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h(UButton, {
         label: 'Detail',
@@ -263,6 +266,7 @@ const itemsTotal = computed(
     <UTable
       ref="table"
       v-model:pagination="pagination"
+      v-model:column-pinning="columnPinning"
       :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
       :data="transactions"
       :columns="columns"
@@ -271,18 +275,34 @@ const itemsTotal = computed(
     />
 
     <template #footer>
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <p class="text-sm text-muted">
-          {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
-          {{ meta?.total ?? 0 }} transactions
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-muted shrink-0">
+          Showing {{ (page - 1) * limit + 1 }} to {{ Math.min(page * limit, meta?.total ?? 0) }} of
+          {{ meta?.total ?? 0 }} entries
         </p>
-        <UPagination
-          v-model:page="page"
-          :total="meta.total"
-          :items-per-page="meta.limit"
-          variant="ghost"
-          size="sm"
-        />
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <USelect
+              :model-value="limit"
+              :items="[10, 25, 50, 100]"
+              size="sm"
+              class="w-20"
+              @update:model-value="
+                (val: number) => {
+                  limit = Number(val)
+                  page = 1
+                }
+              "
+            />
+          </div>
+          <UPagination
+            v-model:page="page"
+            :total="meta?.total ?? 0"
+            :items-per-page="limit"
+            variant="ghost"
+            size="sm"
+          />
+        </div>
       </div>
     </template>
   </AdminTableCard>
@@ -292,19 +312,17 @@ const itemsTotal = computed(
     v-model:open="isSlideoverOpen"
     title="Transaction Detail"
     side="right"
-    :ui="{ content: 'max-w-xl' }"
+    :ui="{ content: 'max-w-xl', body: 'p-0!' }"
   >
     <template #body>
       <div v-if="isLoadingDetail" class="flex items-center justify-center py-16">
         <UIcon name="i-ph-spinner-bold" class="size-6 animate-spin text-muted" />
       </div>
 
-      <div v-else-if="detail" class="space-y-6">
+      <div v-else-if="detail">
         <!-- Section 1: Transaction Details -->
-        <div>
-          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">
-            Transaction Details
-          </p>
+        <div class="p-6">
+          <p class="text-xs font-bold uppercase tracking-wide mb-4">Transaction Details</p>
           <div class="space-y-2">
             <div v-for="row in detailRows" :key="row.label" class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">{{ row.label }}</span>
@@ -316,10 +334,8 @@ const itemsTotal = computed(
         <USeparator />
 
         <!-- Section 2: Customer Details -->
-        <div>
-          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">
-            Customer Details
-          </p>
+        <div class="p-6">
+          <p class="text-xs font-bold uppercase tracking-wide mb-4">Customer Details</p>
           <div class="space-y-2">
             <!-- User link row -->
             <div class="grid grid-cols-2 gap-2 text-sm">
@@ -350,46 +366,35 @@ const itemsTotal = computed(
         <USeparator />
 
         <!-- Section 3: Product Details -->
-        <div>
-          <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-3">
-            Product Details
-          </p>
+        <div class="p-6">
+          <p class="text-xs font-bold uppercase tracking-wide mb-4">Product Details</p>
+          <div class="space-y-2">
+            <!-- User link row -->
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Product Name</span>
+              <span>{{ detail.product_details.items[0]?.product_name }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Quantity</span>
+              <span>{{ detail.product_details.items[0]?.quantity }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Unit Price</span>
+              <span>{{ formatPrice(detail.product_details.items[0]?.unit_price ?? 0) }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Total</span>
+              <span>{{ formatPrice(detail.product_details.items[0]?.total_price ?? 0) }}</span>
+            </div>
+          </div>
+        </div>
 
-          <!-- Invoice table -->
-          <table class="w-full text-sm mb-4">
-            <thead>
-              <tr class="border-b border-default">
-                <th class="text-left py-2 font-medium text-muted">Product</th>
-                <th class="text-center py-2 font-medium text-muted w-12">Qty</th>
-                <th class="text-right py-2 font-medium text-muted">Unit Price</th>
-                <th class="text-right py-2 font-medium text-muted">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="item in detail.product_details.items"
-                :key="item.id"
-                class="border-b border-default"
-              >
-                <td class="py-2">{{ item.product_name }}</td>
-                <td class="py-2 text-center">{{ item.quantity }}</td>
-                <td class="py-2 text-right">{{ formatPrice(item.unit_price) }}</td>
-                <td class="py-2 text-right">{{ formatPrice(item.total_price) }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3" class="pt-3 text-right font-medium text-muted">Total</td>
-                <td class="pt-3 text-right font-medium">{{ formatPrice(itemsTotal) }}</td>
-              </tr>
-            </tfoot>
-          </table>
+        <USeparator />
 
+        <div class="p-6">
           <!-- Academy Enrollment sub-section -->
           <div v-if="detail.product_details.enrollment" class="space-y-2">
-            <p class="text-xs font-semibold text-muted uppercase tracking-wide">
-              Academy Enrollment
-            </p>
+            <p class="text-xs font-bold uppercase tracking-wide mb-4">Academy Enrollment</p>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Cohort ID</span>
               <span>{{ detail.product_details.enrollment.cohort_id }}</span>
@@ -409,9 +414,7 @@ const itemsTotal = computed(
 
           <!-- RYLS Registration sub-section -->
           <div v-if="detail.product_details.ryls_registration" class="space-y-2">
-            <p class="text-xs font-semibold text-muted uppercase tracking-wide">
-              RYLS Registration
-            </p>
+            <p class="text-xs font-bold uppercase tracking-wide mb-4">RYLS Registration</p>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Registration ID</span>
               <span>{{ detail.product_details.ryls_registration.id }}</span>

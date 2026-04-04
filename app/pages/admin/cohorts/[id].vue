@@ -66,33 +66,26 @@ const headerMenuItems: DropdownMenuItem[][] = [
 </script>
 
 <template>
-  <AdminCard>
-    <template #header>
-      <div class="flex items-center justify-between gap-3 px-1">
-        <div class="flex items-center gap-3 min-w-0">
-          <UButton
-            icon="i-ph-arrow-left-bold"
-            color="neutral"
-            variant="ghost"
-            to="/admin/cohorts"
-          />
-          <h1 class="text-base font-semibold text-highlighted truncate">
-            {{ cohort.detail?.name }}
-          </h1>
-        </div>
-
-        <div class="flex items-center gap-1">
-          <UButton
-            label="Save Cohort"
-            color="primary"
-            icon="i-ph-floppy-disk"
-            :loading="cohort.isEditingCohort"
-            :disabled="cohort.isEditingCohort"
-            @click="formRef?.submit()"
-          />
-        </div>
+  <div class="space-y-6">
+    <div class="flex items-center justify-between gap-3 px-1">
+      <div class="flex items-center gap-3 min-w-0">
+        <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/cohorts" />
+        <h1 class="text-base font-semibold text-highlighted truncate">
+          {{ cohort.detail?.name }}
+        </h1>
       </div>
-    </template>
+
+      <div class="flex items-center gap-1">
+        <UButton
+          label="Save Cohort"
+          color="primary"
+          icon="i-ph-floppy-disk"
+          :loading="cohort.isEditingCohort"
+          :disabled="cohort.isEditingCohort"
+          @click="formRef?.submit()"
+        />
+      </div>
+    </div>
 
     <div class="pb-10">
       <UForm
@@ -146,7 +139,7 @@ const headerMenuItems: DropdownMenuItem[][] = [
         />
       </template>
     </UTabs>
-  </AdminCard>
+  </div>
 
   <AdminCohortModuleModal
     v-model:open="cohortModules.isAddModuleOpen"

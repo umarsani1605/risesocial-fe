@@ -194,7 +194,12 @@ const columns: TableColumn<SyllabusRow>[] = [
 <template>
   <div class="space-y-4">
     <div class="flex justify-end">
-      <UButton label="+ Add Theme" color="primary" @click="openAddTheme" />
+      <UButton
+        label="Add Theme"
+        color="primary"
+        leading-icon="i-ph-plus-bold"
+        @click="openAddTheme"
+      />
     </div>
 
     <div class="p-px overflow-x-auto">
@@ -252,7 +257,8 @@ const columns: TableColumn<SyllabusRow>[] = [
                 size="sm"
                 color="primary"
                 variant="outline"
-                label="+ Add Topic"
+                label="Add Topic"
+                leading-icon="i-ph-plus-bold"
                 @click="openAddTopic(row.original.id)"
               />
               <UButton

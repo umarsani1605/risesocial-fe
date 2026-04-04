@@ -35,6 +35,7 @@ const UBadge = resolveComponent('UBadge')
 
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const columnPinning = ref({ right: ['actions'] })
 
 const route = useRoute()
 
@@ -304,10 +305,11 @@ const columns: TableColumn<RylsRegistration>[] = [
   },
   {
     id: 'actions',
-    size: 120,
+    header: () => h('div', 'Actions'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h(UButton, {
-        label: 'View',
+        label: 'Detail',
         size: 'sm',
         color: 'primary',
         variant: 'outline',
@@ -352,177 +354,189 @@ const columns: TableColumn<RylsRegistration>[] = [
             />
           </div>
         </div>
-        <UButton
-          label="Export Excel"
-          leading-icon="i-ph-download-simple-bold"
-          color="primary"
-          variant="outline"
-        />
+        <UButton label="Export Excel" leading-icon="i-ph-download-simple-bold" color="primary" />
       </div>
     </template>
 
     <UTable
       ref="table"
       v-model:pagination="pagination"
+      v-model:column-pinning="columnPinning"
       :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
       :data="filteredData"
       :columns="columns"
     />
 
     <template #footer>
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <p class="text-sm text-muted">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-muted shrink-0">
           Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
           {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
           {{ filteredData.length }} entries
         </p>
-        <UPagination
-          :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-          :total="table?.tableApi?.getFilteredRowModel().rows.length"
-          size="sm"
-          variant="ghost"
-          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-        />
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <USelect
+              :model-value="pagination.pageSize"
+              :items="[10, 25, 50, 100]"
+              size="sm"
+              class="w-20"
+              @update:model-value="
+                (val: number) => {
+                  pagination.pageSize = Number(val)
+                  pagination.pageIndex = 0
+                }
+              "
+            />
+          </div>
+          <UPagination
+            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+            :total="table?.tableApi?.getFilteredRowModel().rows.length"
+            size="sm"
+            variant="ghost"
+            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+          />
+        </div>
       </div>
     </template>
   </AdminTableCard>
 
-  <!-- Registration Detail Modal -->
-  <UModal
+  <!-- Registration Detail Slideover -->
+  <USlideover
     v-model:open="isDetailOpen"
-    title="Registration Details"
-    :ui="{ content: 'max-w-2xl' }"
-    scrollable
+    title="Registration Detail"
+    side="right"
+    :ui="{ content: 'max-w-xl', body: 'p-0!' }"
   >
-    <template v-if="selectedRegistration" #body>
-      <div class="space-y-6">
-        <!-- Personal Information -->
-        <div>
-          <h3 class="font-semibold mb-4">Personal Information</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-            <div>
-              <p class="text-xs text-muted mb-0.5">Full Name</p>
-              <p class="text-sm font-medium">{{ selectedRegistration.full_name }}</p>
+    <template #body>
+      <div v-if="selectedRegistration">
+        <!-- Section 1: Personal Information -->
+        <div class="p-6">
+          <p class="text-xs font-bold uppercase tracking-wide mb-4">Personal Information</p>
+          <div class="space-y-2">
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Full Name</span>
+              <span class="font-medium">{{ selectedRegistration.full_name }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Email</p>
-              <p class="text-sm">{{ selectedRegistration.email }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Email</span>
+              <span>{{ selectedRegistration.email }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">WhatsApp</p>
-              <p class="text-sm">{{ selectedRegistration.whatsapp }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">WhatsApp</span>
+              <span>{{ selectedRegistration.whatsapp ?? '–' }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Gender</p>
-              <p class="text-sm">
-                {{ selectedRegistration.gender === 'FEMALE' ? 'Female' : 'Male' }}
-              </p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Gender</span>
+              <span>{{ selectedRegistration.gender === 'FEMALE' ? 'Female' : 'Male' }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Date of Birth</p>
-              <p class="text-sm">{{ formatDate(selectedRegistration.date_of_birth) }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Date of Birth</span>
+              <span>{{ formatDate(selectedRegistration.date_of_birth) }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Residence</p>
-              <p class="text-sm">{{ selectedRegistration.residence }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Residence</span>
+              <span>{{ selectedRegistration.residence ?? '–' }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Nationality</p>
-              <p class="text-sm capitalize">{{ selectedRegistration.nationality }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Nationality</span>
+              <span class="capitalize">{{ selectedRegistration.nationality }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Second Nationality</p>
-              <p
-                class="text-sm"
-                :class="selectedRegistration.second_nationality ? '' : 'text-muted'"
-              >
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Second Nationality</span>
+              <span :class="selectedRegistration.second_nationality ? '' : 'text-muted'">
                 {{ selectedRegistration.second_nationality ?? '–' }}
-              </p>
+              </span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Institution</p>
-              <p class="text-sm">{{ selectedRegistration.institution }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Institution</span>
+              <span>{{ selectedRegistration.institution ?? '–' }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Discover Source</p>
-              <p class="text-sm">
-                {{ formatDiscoverSource(selectedRegistration.discover_source) }}
-              </p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Discover Source</span>
+              <span>{{ formatDiscoverSource(selectedRegistration.discover_source) }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Scholarship Type</p>
-              <p class="text-sm">
-                {{ formatScholarshipType(selectedRegistration.scholarship_type) }}
-              </p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Scholarship Type</span>
+              <span>{{ formatScholarshipType(selectedRegistration.scholarship_type) }}</span>
             </div>
-            <div>
-              <p class="text-xs text-muted mb-0.5">Registration Date</p>
-              <p class="text-sm">{{ formatRegistrationDate(selectedRegistration.created_at) }}</p>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Registration Date</span>
+              <span>{{ formatRegistrationDate(selectedRegistration.created_at) }}</span>
             </div>
           </div>
         </div>
 
         <USeparator />
 
-        <!-- Fully Funded Section -->
-        <div v-if="selectedRegistration.scholarship_type === 'FULLY_FUNDED'">
-          <h3 class="font-semibold mb-4">Fully Funded</h3>
-          <div>
-            <p class="text-xs text-muted mb-1">Essay Topic</p>
-            <p
-              class="text-sm"
-              :class="selectedRegistration.fully_funded_submission?.essay_topic ? '' : 'text-muted'"
-            >
-              {{ selectedRegistration.fully_funded_submission?.essay_topic ?? 'Not provided' }}
-            </p>
-          </div>
-        </div>
-
-        <USeparator />
-
-        <!-- Payment Information -->
-        <template v-for="payment in selectedRegistration.payments.slice(0, 1)" :key="payment.id">
-          <div>
-            <h3 class="font-semibold mb-4">Payment Information</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-              <div>
-                <p class="text-xs text-muted mb-0.5">Payment Type</p>
-                <p class="text-sm font-medium">{{ formatPaymentType(payment.type) }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-muted mb-0.5">Payment Status</p>
-                <p class="text-sm font-medium capitalize">
-                  {{ payment.status?.toLowerCase() ?? '–' }}
-                </p>
-              </div>
-              <div>
-                <p class="text-xs text-muted mb-0.5">Amount</p>
-                <p class="text-sm font-medium">{{ formatAmount(payment.amount) }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-muted mb-0.5">Payment Date</p>
-                <p class="text-sm">
-                  {{ payment.paid_at ? new Date(payment.paid_at).toLocaleString('en-US') : '–' }}
-                </p>
-              </div>
-              <div>
-                <p class="text-xs text-muted mb-0.5">Payment Proof</p>
-                <template v-if="payment.payment_proof">
-                  <UButton
-                    icon="i-ph-download-simple-bold"
-                    label="Download"
-                    size="xs"
-                    color="neutral"
-                    variant="outline"
-                  />
-                </template>
-                <p v-else class="text-sm text-muted">–</p>
+        <!-- Section 2: Fully Funded -->
+        <template v-if="selectedRegistration.scholarship_type === 'FULLY_FUNDED'">
+          <div class="p-6">
+            <p class="text-xs font-bold uppercase tracking-wide mb-4">Fully Funded</p>
+            <div class="space-y-2">
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <span class="text-muted">Essay Topic</span>
+                <span
+                  :class="
+                    selectedRegistration.fully_funded_submission?.essay_topic ? '' : 'text-muted'
+                  "
+                >
+                  {{ selectedRegistration.fully_funded_submission?.essay_topic ?? 'Not provided' }}
+                </span>
               </div>
             </div>
           </div>
+          <USeparator />
         </template>
+
+        <!-- Section 3: Payment Information -->
+        <div v-if="selectedRegistration.payments?.[0]" class="p-6">
+          <p class="text-xs font-bold uppercase tracking-wide mb-4">Payment Information</p>
+          <div class="space-y-2">
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Payment Type</span>
+              <span class="font-medium">{{
+                formatPaymentType(selectedRegistration.payments[0].type)
+              }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Payment Status</span>
+              <span class="capitalize">{{
+                selectedRegistration.payments[0].status?.toLowerCase() ?? '–'
+              }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Amount</span>
+              <span class="font-medium">{{
+                formatAmount(selectedRegistration.payments[0].amount)
+              }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Payment Date</span>
+              <span>{{
+                selectedRegistration.payments[0].paid_at
+                  ? new Date(selectedRegistration.payments[0].paid_at).toLocaleString('en-US')
+                  : '–'
+              }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <span class="text-muted">Payment Proof</span>
+              <span v-if="!selectedRegistration.payments[0].payment_proof" class="text-muted"
+                >–</span
+              >
+              <UButton
+                v-else
+                icon="i-ph-download-simple-bold"
+                label="Download"
+                size="xs"
+                color="neutral"
+                variant="outline"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </template>
-  </UModal>
+  </USlideover>
 </template>

@@ -99,6 +99,7 @@ const UButton = resolveComponent('UButton')
 
 const table = useTemplateRef('table')
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
+const columnPinning = ref({ right: ['actions'] })
 
 const search = ref('')
 const categoryFilter = ref('all')
@@ -159,7 +160,8 @@ const columns: TableColumn<AdminAcademy>[] = [
   },
   {
     id: 'actions',
-    size: 190,
+    header: () => h('div', 'Actions'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-2' }, [
         h(UButton, {
@@ -219,25 +221,43 @@ const columns: TableColumn<AdminAcademy>[] = [
     <UTable
       ref="table"
       v-model:pagination="pagination"
+      v-model:column-pinning="columnPinning"
       :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
       :data="filteredData"
       :columns="columns"
     />
 
     <template #footer>
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <p class="text-sm text-muted">
-          {{ table?.tableApi?.getPaginationRowModel().rows.length ?? 0 }} of
-          {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} shown.
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-muted shrink-0">
+          Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
+          {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
+          {{ filteredData.length }} entries
         </p>
-        <UPagination
-          :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-          :total="table?.tableApi?.getFilteredRowModel().rows.length"
-          size="sm"
-          variant="ghost"
-          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-        />
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <USelect
+              :model-value="pagination.pageSize"
+              :items="[10, 25, 50, 100]"
+              size="sm"
+              class="w-20"
+              @update:model-value="
+                (val: number) => {
+                  pagination.pageSize = Number(val)
+                  pagination.pageIndex = 0
+                }
+              "
+            />
+          </div>
+          <UPagination
+            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+            :total="table?.tableApi?.getFilteredRowModel().rows.length"
+            size="sm"
+            variant="ghost"
+            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+          />
+        </div>
       </div>
     </template>
   </AdminTableCard>

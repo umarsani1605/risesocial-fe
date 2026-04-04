@@ -69,8 +69,31 @@ const columns: TableColumn<AcademyInstructor>[] = [
   { accessorKey: 'order', header: 'Order' },
   { id: 'avatar', header: '' },
   { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'job_title', header: 'Job Title' },
-  { accessorKey: 'description', header: 'Description' },
+  {
+    accessorKey: 'job_title',
+    header: 'Job Title',
+    meta: { class: { th: 'w-[160px]' } },
+    cell: ({ row }) =>
+      h(
+        'span',
+        { class: 'truncate block text-sm', title: row.getValue('job_title') },
+        row.getValue('job_title')
+      )
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    meta: { class: { th: 'max-w-[650px]' } },
+    cell: ({ row }) =>
+      h(
+        'span',
+        {
+          class: 'line-clamp-2 whitespace-normal text-sm text-muted',
+          title: row.getValue('description')
+        },
+        row.getValue('description')
+      )
+  },
   {
     id: 'actions',
     header: () => h('div', 'Actions'),
@@ -86,7 +109,12 @@ const columns: TableColumn<AcademyInstructor>[] = [
       <UButton label="+ Add" color="primary" @click="openAdd" />
     </div>
     <div class="p-px overflow-x-auto">
-      <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
+      <UTable
+        :data="items"
+        :columns="columns"
+        :ui="{ base: 'table-fixed' }"
+        class="px-0 overflow-visible"
+      >
         <template #avatar-cell="{ row }">
           <UAvatar
             :src="row.original.avatar_url ?? undefined"

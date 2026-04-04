@@ -65,8 +65,33 @@ async function remove() {
 
 const columns: TableColumn<AcademyFaq>[] = [
   { accessorKey: 'order', header: 'Order' },
-  { accessorKey: 'question', header: 'Question' },
-  { accessorKey: 'answer', header: 'Answer' },
+  {
+    accessorKey: 'question',
+    header: 'Question',
+    cell: ({ row }) =>
+      h(
+        'span',
+        {
+          class: 'line-clamp-2 whitespace-normal text-sm font-medium',
+          title: row.getValue('question')
+        },
+        row.getValue('question')
+      )
+  },
+  {
+    accessorKey: 'answer',
+    header: 'Answer',
+    meta: { class: { th: 'max-w-[650px]' } },
+    cell: ({ row }) =>
+      h(
+        'span',
+        {
+          class: 'line-clamp-2 whitespace-normal text-sm text-muted',
+          title: row.getValue('answer')
+        },
+        row.getValue('answer')
+      )
+  },
   {
     id: 'actions',
     header: () => h('div', 'Actions'),
@@ -79,10 +104,15 @@ const columns: TableColumn<AcademyFaq>[] = [
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">FAQs</h3>
-      <UButton label="+ Add" color="primary" @click="openAdd" />
+      <UButton label="Add" color="primary" @click="openAdd" />
     </div>
     <div class="p-px overflow-x-auto">
-      <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
+      <UTable
+        :data="items"
+        :columns="columns"
+        :ui="{ base: 'table-fixed' }"
+        class="px-0 overflow-visible"
+      >
         <template #actions-cell="{ row }">
           <div class="flex items-center gap-2 justify-end">
             <UButton

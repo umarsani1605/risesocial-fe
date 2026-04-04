@@ -31,123 +31,108 @@ const menuItems: DropdownMenuItem[][] = [
   ]
 ]
 
-const mainLinks = [
+function isActive(to: string, exact = false) {
+  return exact ? route.path === to : route.path.startsWith(to)
+}
+
+const mainLinks = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Dashboard',
     icon: 'i-ph-squares-four-duotone',
     to: '/admin',
-    exact: true,
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin', true),
+    onSelect: () => { open.value = false }
+  },
+  {
+    label: 'Transactions',
+    icon: 'i-ph-receipt-duotone',
+    to: '/admin/transactions',
+    active: isActive('/admin/transactions'),
+    onSelect: () => { open.value = false }
+  },
+  {
+    label: 'Rise Young Leaders',
+    icon: 'i-ph-medal-duotone',
+    to: '/admin/programs',
+    active: isActive('/admin/programs'),
+    onSelect: () => { open.value = false }
   }
-] satisfies NavigationMenuItem[]
+])
 
-const analyticsLinks = [
+const analyticsLinks = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Revenue',
     icon: 'i-ph-chart-line-duotone',
     to: '/admin/analytics/revenue',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/analytics/revenue'),
+    onSelect: () => { open.value = false }
   },
   {
     label: 'Users',
     icon: 'i-ph-users-three-duotone',
     to: '/admin/analytics/users',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/analytics/users'),
+    onSelect: () => { open.value = false }
   },
   {
     label: 'Academies',
     icon: 'i-ph-graduation-cap-duotone',
     to: '/admin/analytics/academies',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/analytics/academies'),
+    onSelect: () => { open.value = false }
   },
   {
     label: 'Programs',
     icon: 'i-ph-medal-duotone',
     to: '/admin/analytics/programs',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/analytics/programs'),
+    onSelect: () => { open.value = false }
   }
-] satisfies NavigationMenuItem[]
+])
 
-const academyLinks = [
+const academyLinks = computed<NavigationMenuItem[]>(() => [
   {
     label: 'All Academy',
     icon: 'i-ph-graduation-cap-duotone',
     to: '/admin/academies',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/academies'),
+    onSelect: () => { open.value = false }
   },
   {
     label: 'Cohorts',
     icon: 'i-ph-list-dashes-duotone',
     to: '/admin/cohorts',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/cohorts'),
+    onSelect: () => { open.value = false }
   }
-] satisfies NavigationMenuItem[]
+])
 
-const financeLinks = [
-  {
-    label: 'Transactions',
-    icon: 'i-ph-receipt-duotone',
-    to: '/admin/transactions',
-    onSelect: () => {
-      open.value = false
-    }
-  }
-] satisfies NavigationMenuItem[]
-
-const userLinks = [
+const userLinks = computed<NavigationMenuItem[]>(() => [
   {
     label: 'All Users',
     icon: 'i-ph-users-duotone',
     to: '/admin/users',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/users'),
+    onSelect: () => { open.value = false }
   },
   {
     label: 'Administrator',
     icon: 'i-ph-shield-duotone',
     to: '/admin/administrators',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/administrators'),
+    onSelect: () => { open.value = false }
   }
-] satisfies NavigationMenuItem[]
+])
 
-const jobLinks = [
+const jobLinks = computed<NavigationMenuItem[]>(() => [
   {
     label: 'All Jobs',
     icon: 'i-ph-briefcase-duotone',
     to: '/admin/jobs',
-    onSelect: () => {
-      open.value = false
-    }
+    active: isActive('/admin/jobs'),
+    onSelect: () => { open.value = false }
   }
-] satisfies NavigationMenuItem[]
-
-const programLinks = [
-  {
-    label: 'Rise Young Leaders',
-    icon: 'i-ph-medal-duotone',
-    to: '/admin/programs',
-    onSelect: () => {
-      open.value = false
-    }
-  }
-] satisfies NavigationMenuItem[]
+])
 </script>
 
 <template>
@@ -159,7 +144,11 @@ const programLinks = [
       collapsible
       :default-size="14"
       class="bg-white"
-      :ui="{ header: 'border-b border-default h-18!', footer: 'lg:border-t lg:border-default' }"
+      :ui="{
+        header: 'border-b border-default h-18!',
+        body: 'py-8',
+        footer: 'lg:border-t lg:border-default'
+      }"
     >
       <template #header="{ collapsed }">
         <div class="flex items-center h-14 w-full" :class="collapsed ? 'justify-center' : 'px-1'">
@@ -181,7 +170,17 @@ const programLinks = [
       </template>
 
       <template #default="{ collapsed }">
-        <UNavigationMenu :collapsed="collapsed" :items="mainLinks" orientation="vertical" tooltip />
+        <div>
+          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
+            Main
+          </p>
+          <UNavigationMenu
+            :collapsed="collapsed"
+            :items="mainLinks"
+            orientation="vertical"
+            tooltip
+          />
+        </div>
         <div>
           <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
             Academy
@@ -189,18 +188,6 @@ const programLinks = [
           <UNavigationMenu
             :collapsed="collapsed"
             :items="academyLinks"
-            orientation="vertical"
-            tooltip
-          />
-        </div>
-
-        <div>
-          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
-            Finance
-          </p>
-          <UNavigationMenu
-            :collapsed="collapsed"
-            :items="financeLinks"
             orientation="vertical"
             tooltip
           />
@@ -225,18 +212,6 @@ const programLinks = [
           <UNavigationMenu
             :collapsed="collapsed"
             :items="jobLinks"
-            orientation="vertical"
-            tooltip
-          />
-        </div>
-
-        <div>
-          <p v-if="!collapsed" class="px-2.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
-            Programs
-          </p>
-          <UNavigationMenu
-            :collapsed="collapsed"
-            :items="programLinks"
             orientation="vertical"
             tooltip
           />
@@ -270,7 +245,7 @@ const programLinks = [
       v-if="!route.meta.noDashboardPanel"
       id="main"
       :ui="{
-        body: 'p-2 sm:p-5'
+        body: 'p-2 sm:p-6 pb-0 overflow-y-hidden'
       }"
     >
       <template #header>

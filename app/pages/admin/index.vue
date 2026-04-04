@@ -29,37 +29,37 @@ const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'Total Revenue',
     value: overview.value?.totalRevenue ?? 0,
-    icon: 'i-ph-currency-circle-dollar-bold',
+    icon: 'solar:wallet-money-bold-duotone',
     trend: overview.value?.totalRevenueTrend,
-    trendLabel: 'vs last month',
-    color: 'text-success',
+    trendLabel: 'vs last week',
+    color: 'green',
     to: '/admin/analytics/revenue'
   },
   {
     title: 'Total Users',
     value: overview.value?.totalUsers ?? 0,
-    icon: 'i-ph-users-bold',
+    icon: 'solar:users-group-rounded-bold-duotone',
     trend: overview.value?.totalUsersTrend,
-    trendLabel: 'vs last month',
-    color: 'text-blue-500',
+    trendLabel: 'vs last week',
+    color: 'blue',
     to: '/admin/analytics/users'
   },
   {
     title: 'Active Cohorts',
     value: overview.value?.activeCohorts ?? 0,
-    icon: 'i-ph-chalkboard-teacher-bold',
+    icon: 'solar:square-academic-cap-2-bold-duotone',
     trend: overview.value?.activeCohortsTrend,
-    trendLabel: 'vs last month',
-    color: 'text-purple-500',
+    trendLabel: 'vs last week',
+    color: 'purple',
     to: '/admin/cohorts'
   },
   {
     title: 'RYLS Registrations',
     value: overview.value?.rylsRegistrations ?? 0,
-    icon: 'i-ph-medal-bold',
+    icon: 'solar:medal-ribbon-star-bold-duotone',
     trend: overview.value?.rylsRegistrationsTrend,
-    trendLabel: 'vs last month',
-    color: 'text-orange-500',
+    trendLabel: 'vs last week',
+    color: 'orange',
     to: '/admin/analytics/programs'
   }
 ])
@@ -162,51 +162,51 @@ const columns: TableColumn<AdminTransaction>[] = [
 </script>
 
 <template>
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
-    <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
-  </div>
+  <div class="flex flex-col gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+    </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-    <LazyAnalyticsAreaChart
-      v-if="overview?.revenueTrend?.length"
-      :data="overview.revenueTrend"
-      title="Revenue Trend (30d)"
-      color="primary"
-      y-label="Revenue"
-      :height="300"
-    />
-    <LazyAnalyticsAreaChart
-      v-if="overview?.usersTrend?.length"
-      :data="overview.usersTrend"
-      title="User Growth (30d)"
-      color="primary"
-      y-label="Users"
-      :height="300"
-    />
-  </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <LazyAnalyticsAreaChart
+        v-if="overview?.revenueTrend?.length"
+        :data="overview.revenueTrend"
+        title="Revenue Trend (30d)"
+        color="primary"
+        :height="300"
+      />
+      <LazyAnalyticsAreaChart
+        v-if="overview?.usersTrend?.length"
+        :data="overview.usersTrend"
+        title="User Growth (30d)"
+        color="primary"
+        :height="300"
+      />
+    </div>
 
-  <div class="mt-2">
-    <AdminCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-semibold">Recent Transactions</h2>
-          <UButton
-            label="View All"
-            color="neutral"
-            variant="ghost"
-            trailing-icon="i-ph-arrow-right-bold"
-            to="/admin/transactions"
+    <div class="mt-2">
+      <AdminCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-semibold">Recent Transactions</h2>
+            <UButton
+              label="View All"
+              color="neutral"
+              variant="ghost"
+              trailing-icon="i-ph-arrow-right-bold"
+              to="/admin/transactions"
+            />
+          </div>
+        </template>
+        <div class="overflow-x-auto">
+          <UTable
+            :data="recentTransactions"
+            :columns="columns"
+            :ui="{ td: 'align-top' }"
+            class="px-4 sm:px-6"
           />
         </div>
-      </template>
-      <div class="overflow-x-auto">
-        <UTable
-          :data="recentTransactions"
-          :columns="columns"
-          :ui="{ td: 'align-top' }"
-          class="px-4 sm:px-6"
-        />
-      </div>
-    </AdminCard>
+      </AdminCard>
+    </div>
   </div>
 </template>

@@ -37,7 +37,9 @@ defineExpose({
     <!-- Left column -->
     <div class="space-y-5">
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Title <span class="text-error">*</span></span>
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2"
+          >Title <span class="text-error">*</span></span
+        >
         <UFormField name="title" class="flex-1">
           <UInput v-model="form.title" placeholder="Academy title" class="w-full" />
         </UFormField>
@@ -99,7 +101,7 @@ defineExpose({
           <UInput v-model="form.category" placeholder="Category" class="w-full" />
         </UFormField>
       </div>
-      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+      <!-- <div class="flex flex-col md:flex-row gap-1 md:gap-4">
         <span class="text-sm md:w-28 md:shrink-0 md:p-2">Status</span>
         <UFormField name="status" class="flex-1">
           <USelect
@@ -109,7 +111,7 @@ defineExpose({
             class="w-full"
           />
         </UFormField>
-      </div>
+      </div> -->
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
         <span class="text-sm md:w-28 md:shrink-0 md:p-2">Certificate</span>
         <USelect
@@ -127,6 +129,10 @@ defineExpose({
           placeholder="Select option"
           class="flex-1"
         />
+      </div>
+      <div class="flex flex-col md:flex-row gap-1 md:gap-4">
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Meta Pixel ID</span>
+        <UInput v-model="form.meta_pixel_id" placeholder="Meta Pixel ID" class="flex-1" />
       </div>
     </div>
   </div>

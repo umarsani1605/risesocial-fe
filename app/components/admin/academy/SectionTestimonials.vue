@@ -69,7 +69,17 @@ const columns: TableColumn<AcademyTestimonial>[] = [
   { accessorKey: 'order', header: 'Order' },
   { accessorKey: 'avatar_url', header: 'Avatar' },
   { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'comment', header: 'Comment' },
+  {
+    accessorKey: 'comment',
+    header: 'Comment',
+    meta: { class: { th: 'max-w-[650px]' } },
+    cell: ({ row }) =>
+      h(
+        'span',
+        { class: 'line-clamp-2 whitespace-normal text-sm', title: row.getValue('comment') },
+        row.getValue('comment')
+      )
+  },
   {
     id: 'actions',
     header: () => h('div', 'Actions'),
@@ -82,10 +92,15 @@ const columns: TableColumn<AcademyTestimonial>[] = [
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">Testimonials</h3>
-      <UButton label="+ Add" color="primary" @click="openAdd" />
+      <UButton label="Add" color="primary" @click="openAdd" />
     </div>
     <div class="p-px overflow-x-auto">
-      <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
+      <UTable
+        :data="items"
+        :columns="columns"
+        :ui="{ base: 'table-fixed' }"
+        class="px-0 overflow-visible"
+      >
         <template #avatar_url-cell="{ row }">
           <img
             v-if="row.original.avatar_url"

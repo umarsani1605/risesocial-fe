@@ -86,7 +86,7 @@ const columns: TableColumn<AcademyPricing>[] = [
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">Pricing</h3>
-      <UButton label="+ Add" color="primary" @click="openAdd" />
+      <UButton label="Add" color="primary" @click="openAdd" />
     </div>
     <div class="p-px overflow-x-auto">
       <UTable :data="items" :columns="columns" class="px-0 overflow-visible">

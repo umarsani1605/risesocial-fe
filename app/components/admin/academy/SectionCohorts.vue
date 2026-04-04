@@ -37,7 +37,7 @@ const columns: TableColumn<AdminCohort>[] = [
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
   },
   { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'description', header: 'Description' },
+  { accessorKey: 'description', header: 'Description', meta: { class: { th: 'max-w-[250px]' } } },
   {
     accessorKey: 'enrollment_count',
     header: 'Students',
@@ -59,7 +59,12 @@ const columns: TableColumn<AdminCohort>[] = [
 <template>
   <div class="space-y-4">
     <div class="flex justify-end">
-      <UButton label="+ Add Cohort" color="primary" @click="isModalOpen = true" />
+      <UButton
+        label="Add Cohort"
+        color="primary"
+        leading-icon="i-ph-plus-bold"
+        @click="isModalOpen = true"
+      />
     </div>
 
     <div class="p-px overflow-x-auto">
@@ -91,9 +96,8 @@ const columns: TableColumn<AdminCohort>[] = [
           <div class="flex items-center gap-2 justify-end">
             <UButton
               label="Detail"
-              trailing-icon="i-ph-caret-double-right-bold"
+              icon="i-ph-caret-double-right-bold"
               size="sm"
-              color="neutral"
               variant="outline"
               :to="`/admin/cohorts/${row.original.id}`"
             />
