@@ -7,7 +7,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Edit Academy',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 const route = useRoute()
@@ -27,19 +27,33 @@ if (sourceError.value || !sourceData.value?.data) {
 const source = sourceData.value.data
 
 const pageTitle = ref(source.title)
+const currentStatus = ref(source.status as 'DRAFT' | 'ACTIVE' | 'ARCHIVED')
 
-const headerMenuItems: DropdownMenuItem[][] = [
+const isArchiveConfirmOpen = ref(false)
+const isArchiving = ref(false)
+const isDeleteOpen = ref(false)
+const isDeleting = ref(false)
+
+const headerMenuItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: 'Archive Academy',
-      icon: 'i-ph-box-arrow-down-bold'
+      icon: 'i-ph-box-arrow-down-bold',
+      disabled: currentStatus.value === 'ARCHIVED',
+      onSelect: () => {
+        isArchiveConfirmOpen.value = true
+      }
     },
     {
       label: 'Delete Academy',
-      icon: 'i-ph-trash-bold'
+      icon: 'i-ph-trash-bold',
+      color: 'error' as const,
+      onSelect: () => {
+        isDeleteOpen.value = true
+      }
     }
   ]
-]
+])
 
 const academyTabItems = ACADEMY_TAB_ITEMS.map((item) => ({
   ...item,
@@ -94,6 +108,12 @@ onMounted(() => {
   onUnmounted(() => container.removeEventListener('scroll', updateActive))
 })
 
+const saveButtonLabel = computed(() => {
+  if (currentStatus.value === 'DRAFT') return 'Save Academy'
+  if (currentStatus.value === 'ACTIVE') return 'Update Academy'
+  return 'Open Archived'
+})
+
 const tocItems = computed(() =>
   [
     { id: 'section-basic', label: 'Basic Information' },
@@ -115,35 +135,41 @@ const form = reactive({
   duration: source.duration ?? '',
   format: source.format ?? '',
   category: source.category ?? '',
-  status: source.status as 'ACTIVE' | 'ARCHIVED',
   certificate: source.certificate ? 'Yes' : 'No',
   portfolio: source.portfolio ? 'Yes' : 'No',
   meta_pixel_id: source.meta_pixel_id ?? ''
 })
 
 const formRef = useTemplateRef('formRef')
-const loading = ref(false)
+const isHeaderSaving = ref(false)
+const isSectionSaving = ref(false)
 
-async function onSave() {
-  loading.value = true
+type AcademyStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
+
+async function onSave(
+  targetStatus: AcademyStatus,
+  loadingRef: Ref<boolean>,
+  successMessage: string
+) {
+  loadingRef.value = true
   const imageFile = formRef.value?.imageFile
   if (imageFile) {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(imageFile.type)) {
       toast.add({ title: 'Image must be JPG, PNG, or WebP', color: 'error' })
-      loading.value = false
+      loadingRef.value = false
       return
     }
     if (imageFile.size > 2 * 1024 * 1024) {
       toast.add({ title: 'Image must be under 2MB', color: 'error' })
-      loading.value = false
+      loadingRef.value = false
       return
     }
   }
   const fd = new FormData()
   fd.append('title', form.title)
   if (form.description) fd.append('description', form.description)
-  fd.append('status', form.status)
+  fd.append('status', targetStatus)
   fd.append('certificate', String(form.certificate === 'Yes'))
   fd.append('portfolio', String(form.portfolio === 'Yes'))
   if (form.duration) fd.append('duration', form.duration)
@@ -157,23 +183,58 @@ async function onSave() {
       body: fd
     })
     pageTitle.value = form.title
-
-    toast.add({ title: 'Academy saved', color: 'success' })
+    currentStatus.value = targetStatus
+    toast.add({ title: successMessage, color: 'success' })
     if (res.data.slug !== academySlug) {
       await navigateTo(`/admin/academies/${res.data.slug}/edit`, { replace: true })
     }
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
-    loading.value = false
+    loadingRef.value = false
+  }
+}
+
+const isSwitchingToDraft = ref(false)
+
+async function onHeaderSave() {
+  await onSave('ACTIVE', isHeaderSaving, saveButtonLabel.value)
+}
+
+async function onSectionSave() {
+  await onSave(currentStatus.value, isSectionSaving, 'Academy saved')
+}
+
+async function onSwitchToDraft() {
+  await onSave('DRAFT', isSwitchingToDraft, 'Academy switched to draft')
+}
+
+async function onArchive() {
+  await onSave('ARCHIVED', isArchiving, 'Academy archived')
+  isArchiveConfirmOpen.value = false
+  if (currentStatus.value === 'ARCHIVED') {
+    await navigateTo('/admin/academies')
+  }
+}
+
+async function onDelete() {
+  isDeleting.value = true
+  try {
+    await api(`/admin/academies/${source.id}`, { method: 'DELETE' })
+    toast.add({ title: 'Academy deleted', color: 'success' })
+    await navigateTo('/admin/academies')
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isDeleting.value = false
+    isDeleteOpen.value = false
   }
 }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex items-center justify-between gap-4 px-1">
+  <div class="flex flex-col flex-1 min-h-0">
+    <div class="flex items-center justify-between gap-4 px-1 shrink-0 mb-6">
       <div class="flex items-center gap-4 min-w-0">
         <UButton
           icon="i-ph-arrow-left-bold"
@@ -182,119 +243,188 @@ async function onSave() {
           to="/admin/academies"
         />
         <h2 class="text-xl font-semibold truncate">Edit {{ pageTitle }}</h2>
-        <UBadge color="primary" variant="subtle" size="lg" label="Draft" />
+        <UBadge
+          :color="
+            currentStatus === 'ACTIVE'
+              ? 'success'
+              : currentStatus === 'ARCHIVED'
+                ? 'neutral'
+                : 'primary'
+          "
+          variant="subtle"
+          size="lg"
+          :label="
+            currentStatus === 'ACTIVE'
+              ? 'Active'
+              : currentStatus === 'ARCHIVED'
+                ? 'Archived'
+                : 'Draft'
+          "
+        />
       </div>
       <div class="flex items-center justify-center gap-4">
         <UButton
+          v-if="currentStatus === 'ACTIVE'"
           label="View Public Page"
           icon="i-ph-arrow-square-out-bold"
           size="sm"
           color="neutral"
-          variant="ghost"
+          variant="link"
+          :to="`/academy/${academySlug}`"
+          target="_blank"
         />
-        <UButton label="Switch to Draft" color="neutral" variant="light" />
         <UButton
-          type="submit"
-          label="Update Academy"
+          v-if="currentStatus === 'ACTIVE'"
+          label="Switch to Draft"
+          color="neutral"
+          variant="light"
+          :loading="isSwitchingToDraft"
+          :disabled="isSwitchingToDraft"
+          @click="onSwitchToDraft"
+        />
+        <UButton
+          :label="saveButtonLabel"
           color="primary"
-          :loading="loading"
-          :disabled="loading"
+          :loading="isHeaderSaving"
+          :disabled="isHeaderSaving"
+          @click="onHeaderSave"
         />
         <UDropdownMenu :items="headerMenuItems">
-          <UButton icon="i-ph-dots-three-vertical-bold" size="lg" color="neutral" variant="ghost" />
+          <UButton icon="i-ph-dots-three-vertical-bold" color="neutral" variant="light" />
         </UDropdownMenu>
       </div>
     </div>
-  </div>
 
-  <UTabs
-    :items="academyTabItems"
-    variant="link"
-    color="primary"
-    :unmount-on-hide="false"
-    :ui="{
-      list: 'p-0!',
-      trigger: 'px-3 sm:px-6 whitespace-nowrap'
-    }"
-  >
-    <template #information>
-      <div class="relative flex h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]">
-        <div ref="scrollContainerRef" class="flex-1 overflow-y-auto py-6">
-          <div class="pr-64 space-y-6">
-            <div class="absolute w-56 top-0 right-4 shrink-0 overflow-y-auto">
-              <div class="border border-default rounded-lg mt-6 p-4">
-                <UNavigationMenu orientation="vertical" :items="tocItems" />
-              </div>
-            </div>
-            <div id="section-basic" class="space-y-6 border border-default rounded-lg p-6">
-              <UForm :schema="academyFormSchema" :state="form" @submit="onSave">
-                <div class="flex items-center justify-between mb-6">
-                  <h3 class="text-lg font-semibold">Basic Information</h3>
-                  <UButton
-                    type="submit"
-                    label="Save"
-                    color="primary"
-                    :loading="loading"
-                    :disabled="loading"
-                  />
+    <UTabs
+      :items="academyTabItems"
+      variant="link"
+      color="primary"
+      :unmount-on-hide="false"
+      :ui="{
+        root: 'flex-1 min-h-0',
+        list: 'p-0! shrink-0',
+        content: 'flex-1 min-h-0',
+        trigger: 'px-3 sm:px-6 whitespace-nowrap'
+      }"
+    >
+      <template #information>
+        <div class="relative flex h-full">
+          <div ref="scrollContainerRef" class="flex-1 overflow-y-auto py-6">
+            <div class="pr-64 space-y-6">
+              <div class="absolute w-56 top-0 right-4 shrink-0 overflow-y-auto">
+                <div class="border border-default rounded-lg mt-6 p-4">
+                  <UNavigationMenu orientation="vertical" :items="tocItems" />
                 </div>
-                <AdminAcademyFormBasicInfo
-                  ref="formRef"
-                  v-model="form"
-                  :initial-image-url="source.image_url"
-                />
-              </UForm>
-            </div>
+              </div>
+              <div id="section-basic" class="space-y-6 border border-default rounded-lg p-6">
+                <UForm :schema="academyFormSchema" :state="form" @submit="onSectionSave">
+                  <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold">Basic Information</h3>
+                    <UButton
+                      type="submit"
+                      label="Save"
+                      color="primary"
+                      :loading="isSectionSaving"
+                      :disabled="isSectionSaving"
+                    />
+                  </div>
+                  <AdminAcademyFormBasicInfo
+                    ref="formRef"
+                    v-model="form"
+                    :initial-image-url="source.image_url"
+                  />
+                </UForm>
+              </div>
 
-            <div id="section-pricing" class="space-y-6 border border-default rounded-lg p-6">
-              <AdminAcademySectionPricing
-                :academy-id="source.id"
-                :initial-data="source.pricing ?? []"
-              />
-            </div>
-            <div id="section-features" class="space-y-6 border border-default rounded-lg p-6">
-              <AdminAcademySectionFeatures
-                :academy-id="source.id"
-                :initial-data="source.features ?? []"
-              />
-            </div>
-            <div id="section-instructors" class="space-y-6 border border-default rounded-lg p-6">
-              <AdminAcademySectionInstructors
-                :academy-id="source.id"
-                :initial-data="source.instructors ?? []"
-              />
-            </div>
-            <div id="section-testimonials" class="space-y-6 border border-default rounded-lg p-6">
-              <AdminAcademySectionTestimonials
-                :academy-id="source.id"
-                :initial-data="source.testimonials ?? []"
-              />
-            </div>
-            <div id="section-faqs" class="space-y-6 border border-default rounded-lg p-6">
-              <AdminAcademySectionFaqs :academy-id="source.id" :initial-data="source.faqs ?? []" />
+              <div id="section-pricing" class="space-y-6 border border-default rounded-lg p-6">
+                <AdminAcademySectionPricing
+                  :academy-id="source.id"
+                  :initial-data="source.pricing ?? []"
+                />
+              </div>
+              <div id="section-features" class="space-y-6 border border-default rounded-lg p-6">
+                <AdminAcademySectionFeatures
+                  :academy-id="source.id"
+                  :initial-data="source.features ?? []"
+                />
+              </div>
+              <div id="section-instructors" class="space-y-6 border border-default rounded-lg p-6">
+                <AdminAcademySectionInstructors
+                  :academy-id="source.id"
+                  :initial-data="source.instructors ?? []"
+                />
+              </div>
+              <div id="section-testimonials" class="space-y-6 border border-default rounded-lg p-6">
+                <AdminAcademySectionTestimonials
+                  :academy-id="source.id"
+                  :initial-data="source.testimonials ?? []"
+                />
+              </div>
+              <div id="section-faqs" class="space-y-6 border border-default rounded-lg p-6">
+                <AdminAcademySectionFaqs
+                  :academy-id="source.id"
+                  :initial-data="source.faqs ?? []"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </template>
+      </template>
 
-    <template #syllabus>
-      <div class="relative flex h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]">
-        <div class="flex-1 overflow-y-auto py-6 pr-4">
-          <AdminAcademySectionSyllabus
-            :academy-id="source.id"
-            :initial-data="source.themes ?? []"
-          />
+      <template #syllabus>
+        <div class="relative flex h-full">
+          <div class="flex-1 overflow-y-auto py-6 pr-4">
+            <AdminAcademySectionSyllabus
+              :academy-id="source.id"
+              :initial-data="source.themes ?? []"
+            />
+          </div>
         </div>
-      </div>
-    </template>
+      </template>
 
-    <template #cohorts>
-      <div class="relative flex h-[calc(100dvh-14rem)] sm:h-[calc(100dvh-12rem)]">
-        <div class="flex-1 overflow-y-auto py-6 pr-4">
-          <AdminAcademySectionCohorts :academy-id="source.id" />
+      <template #cohorts>
+        <div class="relative flex h-full">
+          <div class="flex-1 overflow-y-auto py-6 pr-4">
+            <AdminAcademySectionCohorts :academy-id="source.id" />
+          </div>
         </div>
-      </div>
-    </template>
-  </UTabs>
+      </template>
+    </UTabs>
+
+    <UModal
+      v-model:open="isArchiveConfirmOpen"
+      title="Archive Academy"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <p class="text-sm">
+          Are you sure you want to archive
+          <span class="font-semibold">{{ pageTitle }}</span
+          >? It will no longer be visible to the public.
+        </p>
+      </template>
+      <template #footer>
+        <UButton
+          label="Cancel"
+          color="neutral"
+          variant="outline"
+          :disabled="isArchiving"
+          @click="isArchiveConfirmOpen = false"
+        />
+        <UButton
+          label="Archive"
+          :loading="isArchiving"
+          :disabled="isArchiving"
+          @click="onArchive"
+        />
+      </template>
+    </UModal>
+
+    <AdminConfirmDeleteModal
+      v-model:open="isDeleteOpen"
+      :item-name="pageTitle"
+      :loading="isDeleting"
+      @confirm="onDelete"
+    />
+  </div>
 </template>

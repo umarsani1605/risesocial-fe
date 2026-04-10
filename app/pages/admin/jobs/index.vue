@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
-import type { Job } from '@/types'
+import type { Job, RateLimitData } from '@/types'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Jobs Management',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'Jobs Management - Rise Social' })
-
-interface RateLimitData {
-  requests: { remaining: number; limit: number; reset: number }
-  jobs: { remaining: number; limit: number; reset: number }
-  last_updated: string
-}
 
 const { api } = useApi()
 const { data: rawJobs, refresh: refreshJobs } = await useAsyncData('admin:jobs', () =>
@@ -30,9 +23,6 @@ const rateLimit = computed(() => rateLimitRaw.value?.data)
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 
-const table = useTemplateRef('table')
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const columnPinning = ref({ right: ['actions'] })
 const search = ref('')
 const toast = useToast()
 
@@ -47,6 +37,8 @@ const appliedEmploymentType = ref<string | undefined>(undefined)
 const appliedSeniorityLevel = ref<string | undefined>(undefined)
 const appliedIsRemote = ref<string | undefined>(undefined)
 const appliedCountry = ref<string | undefined>(undefined)
+
+const dataTableRef = ref()
 
 const filterPopoverOpen = ref(false)
 const confirmSyncOpen = ref(false)
@@ -175,9 +167,8 @@ async function onConfirmSync() {
     await refreshJobs()
     await refreshRateLimit()
     toast.add({ title: 'Sync completed successfully.', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'Sync failed'
-    toast.add({ title: message, color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error, 'Sync failed'), color: 'error' })
   } finally {
     isSyncing.value = false
   }
@@ -192,9 +183,8 @@ async function onSaveSyncSettings() {
     })
     toast.add({ title: 'Sync settings saved', color: 'success' })
     syncSettingsOpen.value = false
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isSavingSettings.value = false
   }
@@ -216,9 +206,8 @@ async function onConfirmDelete() {
     await api(`/admin/jobs/${deleteTarget.value.id}`, { method: 'DELETE' })
     toast.add({ title: `Job "${deleteTarget.value.title}" deleted`, color: 'success' })
     await refreshJobs()
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     confirmDeleteOpen.value = false
     deleteTarget.value = null
@@ -226,17 +215,10 @@ async function onConfirmDelete() {
   }
 }
 
-// ── Options ───────────────────────────────────────────────────────────────────
-const remoteFilterOptions = [
-  { label: 'Yes', value: 'yes' },
-  { label: 'No', value: 'no' }
-]
 
 const syncDate = computed(() => {
   const d = rateLimit.value?.last_updated
-  return d
-    ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-    : '–'
+  return d ? formatDateLong(d) : '–'
 })
 
 // ── Table columns ─────────────────────────────────────────────────────────────
@@ -248,7 +230,7 @@ const columns: TableColumn<Job>[] = [
       h(
         'span',
         { class: 'text-muted' },
-        row.index + 1 + pagination.value.pageIndex * pagination.value.pageSize
+        row.index + 1 + (dataTableRef.value?.pagination?.pageIndex ?? 0) * (dataTableRef.value?.pagination?.pageSize ?? 10)
       )
   },
   {
@@ -397,7 +379,7 @@ const columns: TableColumn<Job>[] = [
 </script>
 
 <template>
-  <AdminTableCard>
+  <AdminDataTable ref="dataTableRef" :data="filteredData" :columns="columns" pinned-shadow>
     <template #toolbar>
       <div class="flex flex-wrap items-center justify-between">
         <!-- Left: Search + Filters -->
@@ -409,83 +391,17 @@ const columns: TableColumn<Job>[] = [
             class="w-full sm:w-56"
           />
 
-          <UPopover v-model:open="filterPopoverOpen">
-            <UButton
-              label="Filters"
-              leading-icon="i-ph-sliders-horizontal-bold"
-              color="neutral"
-              variant="outline"
-            >
-              <template v-if="activeFilterCount > 0" #trailing>
-                <span
-                  class="size-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center"
-                >
-                  {{ activeFilterCount }}
-                </span>
-              </template>
-            </UButton>
-
-            <template #content>
-              <div class="p-4 w-72 space-y-4">
-                <h4 class="font-medium text-sm">Filter Jobs</h4>
-
-                <UFormField label="Job Type">
-                  <USelect
-                    v-model="filterEmploymentType"
-                    :items="jobTypeOptions"
-                    placeholder="All Types"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField label="Experience Level">
-                  <USelect
-                    v-model="filterSeniorityLevel"
-                    :items="experienceLevelOptions"
-                    placeholder="All Levels"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField label="Remote Work">
-                  <USelect
-                    v-model="filterIsRemote"
-                    :items="remoteFilterOptions"
-                    placeholder="All"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField label="Country">
-                  <USelect
-                    v-model="filterCountry"
-                    :items="uniqueCountries"
-                    placeholder="All Countries"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <div class="flex gap-2 pt-1">
-                  <UButton
-                    label="Apply"
-                    color="primary"
-                    size="sm"
-                    class="flex-1"
-                    block
-                    @click="applyFilters"
-                  />
-                  <UButton
-                    label="Clear"
-                    color="white"
-                    size="sm"
-                    class="flex-1"
-                    block
-                    @click="clearFilters"
-                  />
-                </div>
-              </div>
-            </template>
-          </UPopover>
+          <AdminJobsFiltersPopover
+            v-model:open="filterPopoverOpen"
+            v-model:employment-type="filterEmploymentType"
+            v-model:seniority-level="filterSeniorityLevel"
+            v-model:is-remote="filterIsRemote"
+            v-model:country="filterCountry"
+            :active-filter-count="activeFilterCount"
+            :unique-countries="uniqueCountries"
+            @apply="applyFilters"
+            @clear="clearFilters"
+          />
         </div>
 
         <!-- Right: Add Job + Sync button group -->
@@ -543,160 +459,20 @@ const columns: TableColumn<Job>[] = [
         </div>
       </div>
     </template>
+  </AdminDataTable>
 
-    <UTable
-      ref="table"
-      v-model:pagination="pagination"
-      v-model:column-pinning="columnPinning"
-      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-      :data="filteredData"
-      :columns="columns"
-    />
-
-    <template #footer>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-sm text-muted shrink-0">
-          Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
-          {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
-          {{ filteredData.length }} entries
-        </p>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <USelect
-              :model-value="pagination.pageSize"
-              :items="[10, 25, 50, 100]"
-              size="sm"
-              class="w-20"
-              @update:model-value="
-                (val: number) => {
-                  pagination.pageSize = Number(val)
-                  pagination.pageIndex = 0
-                }
-              "
-            />
-          </div>
-          <UPagination
-            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-            :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            size="sm"
-            variant="ghost"
-            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-          />
-        </div>
-      </div>
-    </template>
-  </AdminTableCard>
-
-  <!-- Delete Confirmation Modal -->
-  <UModal
+  <AdminConfirmDeleteModal
     v-model:open="confirmDeleteOpen"
-    title="Delete Job"
-    :description="`Are you sure you want to delete &quot;${deleteTarget?.title}&quot;? This action cannot be undone.`"
-    :ui="{ footer: 'justify-end' }"
-  >
-    <template #footer>
-      <UButton
-        label="Cancel"
-        color="neutral"
-        variant="outline"
-        :disabled="isDeleting"
-        @click="confirmDeleteOpen = false"
-      />
-      <UButton
-        label="Delete"
-        color="error"
-        :loading="isDeleting"
-        :disabled="isDeleting"
-        @click="onConfirmDelete"
-      />
-    </template>
-  </UModal>
+    :item-name="deleteTarget?.title"
+    :loading="isDeleting"
+    @confirm="onConfirmDelete"
+  />
 
-  <!-- LinkedIn Sync Settings Modal -->
-  <UModal
+  <AdminJobsSyncSettingsModal
     v-model:open="syncSettingsOpen"
-    title="LinkedIn Job Sync Settings"
-    description="Configure default parameters for LinkedIn job search. If a filter is empty, no filter will be applied."
-    :ui="{ content: 'max-w-3xl', footer: 'justify-end' }"
-  >
-    <template #body>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <UFormField label="Job title keywords">
-          <UInputTags
-            v-model="syncFilters.advanced_title_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Locations">
-          <UInputTags
-            v-model="syncFilters.location_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Description keywords">
-          <UInputTags
-            v-model="syncFilters.description_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Job types">
-          <USelectMenu
-            v-model="syncFilters.type_filter"
-            :items="jobTypeOptions"
-            value-key="value"
-            multiple
-            placeholder="Select job types..."
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Company description keywords">
-          <UInputTags
-            v-model="syncFilters.organization_description_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Company specialties">
-          <UInputTags
-            v-model="syncFilters.organization_specialties_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Industries">
-          <UInputTags
-            v-model="syncFilters.industry_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField label="Seniority levels">
-          <UInputTags
-            v-model="syncFilters.seniority_filter"
-            placeholder="Type and press enter"
-            class="w-full"
-          />
-        </UFormField>
-      </div>
-    </template>
-    <template #footer>
-      <UButton
-        label="Cancel"
-        color="white"
-        :disabled="isSavingSettings"
-        @click="onCloseSyncSettings"
-      />
-      <UButton
-        label="Save Settings"
-        color="primary"
-        :loading="isSavingSettings"
-        :disabled="isSavingSettings"
-        @click="onSaveSyncSettings"
-      />
-    </template>
-  </UModal>
+    v-model:sync-filters="syncFilters"
+    :loading="isSavingSettings"
+    @save="onSaveSyncSettings"
+    @cancel="onCloseSyncSettings"
+  />
 </template>

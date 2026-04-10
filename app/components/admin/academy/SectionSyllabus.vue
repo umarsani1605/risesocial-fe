@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AcademyTheme } from '@/types'
+import type { AcademyTheme, SyllabusRow } from '@/types'
 import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
@@ -11,15 +11,6 @@ const { api } = useApi()
 const toast = useToast()
 
 const themes = ref<AcademyTheme[]>(structuredClone(props.initialData))
-
-interface SyllabusRow {
-  id: number
-  _kind: 'theme' | 'topic'
-  order: number
-  title: string
-  description: string
-  theme_id?: number
-}
 
 // Use reactive Set so .has()/.add()/.delete() trigger computed recomputation
 const expandedThemes = reactive(new Set<number>(themes.value[0] ? [themes.value[0].id] : []))
@@ -164,8 +155,8 @@ async function executeDelete() {
     }
     await refresh()
     isDeleteModalOpen.value = false
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isDeleting.value = false
   }

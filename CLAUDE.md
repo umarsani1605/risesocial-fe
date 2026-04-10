@@ -44,9 +44,8 @@ async function onSave() {
   try {
     await api('/endpoint', { method: 'POST', body: ... })
     toast.add({ title: 'Saved', color: 'success' })
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     loading.value = false
   }
@@ -172,3 +171,33 @@ pnpm typecheck   # vue-tsc --noEmit
 pnpm lint        # eslint app/**
 pnpm test        # vitest
 ```
+
+---
+
+## Design Context
+
+### Users
+Mixed audience of Indonesian youth (18-30) and global young professionals — browsed casually on both mobile and desktop. Users are early-career or pre-career, seeking jobs, courses, and programs that can genuinely change their trajectory. They are aspirational but not elite — they want to feel like they belong in professional spaces, not intimidated by them.
+
+### Brand Personality
+**Energetic, bold, youthful.** Rise Social is a career launchpad with momentum — not a polished corporate tool, not a playful toy. Think of it like a premium sneaker brand applied to career development: clean and refined in execution, but unmistakably alive. The brand should feel like a mentor who's also young, sharp, and genuinely excited about what's possible.
+
+Brand colors:
+- **Rise Orange** (`#fe5b11`) — primary accent, used sparingly for energy and emphasis
+- **Deep Teal** (`#1bb1a0`) — secondary, trust and calm contrast
+
+### Aesthetic Direction
+**Clean & refined with a bold typographic voice.** Generous white space, disciplined grid, no decoration for its own sake — but typography and color do the heavy lifting. Light mode. No dark surfaces, no neon glows. The brand orange appears at moments of importance: CTAs, active states, progress indicators.
+
+### Design Principles
+1. **Restraint earns attention.** Use the brand orange like punctuation — rarely, deliberately, with meaning.
+2. **Space is structure.** Generous padding and clear hierarchy make the interface feel trustworthy, not cramped.
+3. **Typography carries the personality.** Visual interest from type choices and weight contrast, not decorative shapes.
+4. **Mobile-first, then expand.** Layout decisions start from the smallest viewport.
+5. **Confidence without exclusion.** Aspirational but never intimidating — the user should feel like they're leveling up.
+
+### Anti-References
+- Generic LinkedIn: cold, corporate, interchangeable
+- Dark mode SaaS aesthetic: cyan/purple glow — wrong emotional register
+- Overly playful: bubbly, cartoon-like, loses professional credibility
+- Typical edtech (Coursera/Udemy): template-heavy, stock photos, rating stars everywhere

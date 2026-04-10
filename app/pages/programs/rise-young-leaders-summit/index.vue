@@ -813,7 +813,7 @@ const pricingBenefits = {
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <div
             v-for="(image, index) in galleryImages"
-            :key="index"
+            :key="image"
             class="aspect-[5/3] overflow-hidden rounded-lg cursor-pointer"
             @click="showLightbox(index)"
           >

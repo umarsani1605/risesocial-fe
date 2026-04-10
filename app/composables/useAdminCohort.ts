@@ -45,8 +45,8 @@ export function useAdminCohort(cohortId: string) {
       })
       toast.add({ title: 'Cohort updated', color: 'success' })
       await refreshCohort()
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isEditingCohort.value = false
     }
@@ -61,8 +61,8 @@ export function useAdminCohort(cohortId: string) {
       await api(`/admin/cohorts/${cohortId}`, { method: 'DELETE' })
       toast.add({ title: 'Cohort deleted', color: 'success' })
       await navigateTo('/admin/cohorts')
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isDeletingCohort.value = false
     }

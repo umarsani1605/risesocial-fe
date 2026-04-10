@@ -2,13 +2,15 @@
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel } from '@tanstack/table-core'
-import type { Row } from '@tanstack/table-core'
+import type { Row, Column } from '@tanstack/table-core'
 import type { User } from '~/types'
 
 definePageMeta({
   layout: 'dashboard-admin',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
+
+useSeoMeta({ title: 'Customers - Rise Social' })
 
 const UAvatar = resolveComponent('UAvatar')
 const UButton = resolveComponent('UButton')
@@ -210,7 +212,7 @@ const email = computed({
 
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10
+  pageSize: DEFAULT_PAGE_SIZE
 })
 </script>
 
@@ -258,8 +260,8 @@ const pagination = ref({
         :items="
           table?.tableApi
             ?.getAllColumns()
-            .filter((column: any) => column.getCanHide())
-            .map((column: any) => ({
+            .filter((column: Column<User, unknown>) => column.getCanHide())
+            .map((column: Column<User, unknown>) => ({
               label: upperFirst(column.id),
               type: 'checkbox' as const,
               checked: column.getIsVisible(),

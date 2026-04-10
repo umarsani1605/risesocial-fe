@@ -10,7 +10,7 @@ const toast = useToast()
 const { fetchTransactions, fetchTransactionDetail, isLoading } = useTransactionHistory()
 
 const page = ref(1)
-const limit = 10
+const limit = DEFAULT_PAGE_SIZE
 const statusFilter = ref<string | undefined>(undefined)
 const transactions = ref<UserTransaction[]>([])
 const totalPages = ref(0)
@@ -32,13 +32,6 @@ const columns: TableColumn<UserTransaction>[] = [
   { accessorKey: 'status', header: 'Status' },
   { accessorKey: 'payment_method', header: 'Method' }
 ]
-
-const statusColor: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
-  paid: 'success',
-  pending: 'warning',
-  failed: 'error',
-  expired: 'neutral'
-}
 
 const loadTransactions = async () => {
   try {
@@ -121,7 +114,7 @@ const formatPaymentMethod = (method: string | null) => {
         <template #status-cell="{ row }">
           <UBadge
             :label="row.original.status"
-            :color="statusColor[row.original.status] ?? 'neutral'"
+            :color="TRANSACTION_STATUS_COLOR[row.original.status] ?? 'neutral'"
             variant="subtle"
             class="capitalize"
           />
@@ -160,8 +153,8 @@ const formatPaymentMethod = (method: string | null) => {
             <div>
               <h3 class="font-semibold mb-2">Items</h3>
               <div
-                v-for="(item, i) in selectedTransaction.items"
-                :key="i"
+                v-for="item in selectedTransaction.items"
+                :key="`${item.product_name}-${item.total_price}`"
                 class="flex justify-between text-sm py-1"
               >
                 <span class="text-muted">{{ item.product_name }}</span>

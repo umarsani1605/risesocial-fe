@@ -45,3 +45,12 @@ export const PROVIDER_LABEL: Record<string, string> = {
   midtrans: 'Midtrans',
   paypal_manual: 'PayPal Manual',
 }
+
+export const TRANSACTION_STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'info'> = {
+  paid: 'success',
+  pending: 'warning',
+  failed: 'error',
+  expired: 'error',
+  cancelled: 'neutral',
+  refunded: 'info'
+}

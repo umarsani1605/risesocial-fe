@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Administrators',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'Administrators - Rise Social' })
@@ -20,9 +19,6 @@ const { data: rawUsers, refresh } = await useAsyncData('admin:administrators', (
 const UButton = resolveComponent('UButton')
 const UAvatar = resolveComponent('UAvatar')
 
-const table = useTemplateRef('table')
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const columnPinning = ref({ right: ['actions'] })
 const search = ref('')
 
 const filteredData = computed(() => {
@@ -60,10 +56,6 @@ function openCreate() {
 }
 
 async function onCreate() {
-  if (createForm.password !== createForm.confirmPassword) {
-    toast.add({ title: 'Passwords do not match', color: 'error' })
-    return
-  }
   isCreating.value = true
   try {
     await api('/admin/users', {
@@ -79,8 +71,8 @@ async function onCreate() {
     toast.add({ title: 'Administrator created', color: 'success' })
     isCreateOpen.value = false
     await refresh()
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isCreating.value = false
   }
@@ -111,10 +103,6 @@ function openEdit(user: AdminUser) {
 
 async function onSave() {
   if (!editingUser.value) return
-  if (editForm.password !== editForm.confirmPassword) {
-    toast.add({ title: 'Passwords do not match', color: 'error' })
-    return
-  }
   isSaving.value = true
   try {
     await api(`/admin/users/${editingUser.value.id}`, {
@@ -129,8 +117,8 @@ async function onSave() {
     toast.add({ title: 'Administrator updated', color: 'success' })
     isEditOpen.value = false
     await refresh()
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isSaving.value = false
   }
@@ -158,22 +146,11 @@ async function executeDelete() {
     isDeleteOpen.value = false
     deleteTarget.value = null
     await refresh()
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isDeleting.value = false
   }
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
 }
 
 const columns: TableColumn<AdminUser>[] = [
@@ -205,7 +182,7 @@ const columns: TableColumn<AdminUser>[] = [
   {
     accessorKey: 'created_at',
     header: 'Created',
-    cell: ({ row }) => h('span', { class: 'text-muted' }, formatDate(row.getValue('created_at')))
+    cell: ({ row }) => h('span', { class: 'text-muted' }, formatDatetime(row.getValue('created_at')))
   },
   {
     id: 'actions',
@@ -235,62 +212,16 @@ const columns: TableColumn<AdminUser>[] = [
 </script>
 
 <template>
-  <AdminTableCard>
-    <template #toolbar>
-      <div class="flex flex-wrap items-center justify-between">
-        <UInput
-          v-model="search"
-          icon="i-ph-magnifying-glass-bold"
-          placeholder="Search name or email..."
-          class="w-full sm:w-64"
-        />
-        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
-      </div>
+  <AdminDataTable
+    v-model:search="search"
+    :data="filteredData"
+    :columns="columns"
+    search-placeholder="Search name or email..."
+  >
+    <template #toolbar-right>
+      <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
     </template>
-
-    <UTable
-      ref="table"
-      v-model:pagination="pagination"
-      v-model:column-pinning="columnPinning"
-      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-      :data="filteredData"
-      :columns="columns"
-    />
-
-    <template #footer>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-sm text-muted shrink-0">
-          Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
-          {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
-          {{ filteredData.length }} entries
-        </p>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <USelect
-              :model-value="pagination.pageSize"
-              :items="[10, 25, 50, 100]"
-              size="sm"
-              class="w-20"
-              @update:model-value="
-                (val: number) => {
-                  pagination.pageSize = Number(val)
-                  pagination.pageIndex = 0
-                }
-              "
-            />
-          </div>
-          <UPagination
-            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-            :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            size="sm"
-            variant="ghost"
-            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-          />
-        </div>
-      </div>
-    </template>
-  </AdminTableCard>
+  </AdminDataTable>
 
   <AdminUserFormModal
     v-model:open="isCreateOpen"

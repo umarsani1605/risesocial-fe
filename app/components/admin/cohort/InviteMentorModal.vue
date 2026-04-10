@@ -35,7 +35,7 @@ function close() {
         <UFormField name="name" label="Name">
           <UInput v-model="form.name" placeholder="Mentor Name" class="w-full" />
         </UFormField>
-        <UFormField label="Job Title">
+        <UFormField name="jobTitle" label="Job Title">
           <UInput
             v-model="form.jobTitle"
             placeholder="e.g. Senior Consultant"

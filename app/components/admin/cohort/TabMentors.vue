@@ -85,46 +85,44 @@ const columns: TableColumn<AdminCohortMentor>[] = [
       No mentors assigned yet.
     </div>
 
-    <div v-else class="rounded-lg border border-default overflow-hidden">
-      <UTable :data="props.mentors" :columns="columns">
-        <template #name-cell="{ row }">
-          <div class="flex items-center gap-2.5">
-            <UAvatar
-              :src="row.original.avatar ?? undefined"
-              :text="initials(row.original)"
-              size="xs"
-              color="primary"
+    <UTable v-else :data="props.mentors" :columns="columns">
+      <template #name-cell="{ row }">
+        <div class="flex items-center gap-2.5">
+          <UAvatar
+            :src="row.original.avatar ?? undefined"
+            :text="initials(row.original)"
+            size="xs"
+            color="primary"
+          />
+          <div>
+            <p class="font-medium">{{ row.original.name }}</p>
+            <p v-if="row.original.job_title" class="text-xs text-muted">
+              {{ row.original.job_title }}
+            </p>
+          </div>
+        </div>
+      </template>
+
+      <template #email-cell="{ row }">
+        <span class="hidden md:block text-muted">{{ row.original.email ?? '-' }}</span>
+      </template>
+
+      <template #phone-cell="{ row }">
+        <span class="hidden md:block text-muted">{{ row.original.phone ?? '-' }}</span>
+      </template>
+
+      <template #actions-cell="{ row }">
+        <div class="text-right">
+          <UDropdownMenu :items="rowMenu(row.original.id)">
+            <UButton
+              icon="i-ph-dots-three-vertical-bold"
+              color="neutral"
+              variant="ghost"
+              size="sm"
             />
-            <div>
-              <p class="font-medium">{{ row.original.name }}</p>
-              <p v-if="row.original.job_title" class="text-xs text-muted">
-                {{ row.original.job_title }}
-              </p>
-            </div>
-          </div>
-        </template>
-
-        <template #email-cell="{ row }">
-          <span class="hidden md:block text-muted">{{ row.original.email ?? '-' }}</span>
-        </template>
-
-        <template #phone-cell="{ row }">
-          <span class="hidden md:block text-muted">{{ row.original.phone ?? '-' }}</span>
-        </template>
-
-        <template #actions-cell="{ row }">
-          <div class="text-right">
-            <UDropdownMenu :items="rowMenu(row.original.id)">
-              <UButton
-                icon="i-ph-dots-three-vertical-bold"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-              />
-            </UDropdownMenu>
-          </div>
-        </template>
-      </UTable>
-    </div>
+          </UDropdownMenu>
+        </div>
+      </template>
+    </UTable>
   </div>
 </template>

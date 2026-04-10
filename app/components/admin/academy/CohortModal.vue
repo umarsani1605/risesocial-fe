@@ -41,8 +41,8 @@ async function save() {
     emit('update:open', false)
     emit('saved')
     toast.add({ title: 'Cohort created', color: 'success' })
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     loading.value = false
   }
@@ -61,7 +61,7 @@ async function save() {
         <UFormField name="name" label="Name" required>
           <UInput v-model="form.name" placeholder="Cohort Name" class="w-full" />
         </UFormField>
-        <UFormField label="Description">
+        <UFormField name="description" label="Description">
           <UTextarea v-model="form.description" placeholder="Cohort Description" :rows="3" class="w-full" />
         </UFormField>
       </UForm>

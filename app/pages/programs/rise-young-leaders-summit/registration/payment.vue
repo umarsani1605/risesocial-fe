@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default' })
 
+useSeoMeta({ title: 'RYLS Payment - Rise Social' })
 useHead({ bodyAttrs: { class: 'ryls-blue-theme' } })
 
 const store = useRylsRegistration()

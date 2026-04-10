@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminCohort, AdminAcademy } from '@/types'
 import { COHORT_STATUS_LABEL, COHORT_STATUS_COLOR, COHORT_STATUS_ITEMS } from '@/constants/cohort'
-import { cohortCreatePageSchema } from '@/schemas/cohort'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Cohorts',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
+
+useSeoMeta({ title: 'Cohorts - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
@@ -62,9 +62,6 @@ const filteredData = computed(() => {
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 
-const table = useTemplateRef('table')
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const columnPinning = ref({ right: ['actions'] })
 
 const columns: TableColumn<AdminCohort>[] = [
   {
@@ -131,8 +128,6 @@ const addForm = reactive<{ academy_id: number | undefined; name: string; descrip
   name: '',
   description: ''
 })
-const addFormRef = useTemplateRef('addCohortForm')
-
 const academySelectItems = computed(() =>
   academies.value.map((a) => ({ label: a.title, value: a.id }))
 )
@@ -154,8 +149,8 @@ async function onAddCohort() {
     addForm.name = ''
     addForm.description = ''
     await refresh()
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isAdding.value = false
   }
@@ -163,124 +158,30 @@ async function onAddCohort() {
 </script>
 
 <template>
-  <AdminTableCard>
-    <template #toolbar>
-      <div class="flex flex-wrap items-center justify-between">
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <UInput
-            v-model="search"
-            icon="i-ph-magnifying-glass-bold"
-            placeholder="Search name, description, or academy"
-            class="w-full sm:w-80"
-          />
-          <div class="flex w-full sm:w-auto gap-2">
-            <USelect
-              v-model="academyFilter"
-              :items="academyOptions"
-              class="flex-1 sm:flex-none sm:w-44"
-            />
-            <USelect
-              v-model="statusFilter"
-              :items="statusOptions"
-              class="flex-1 sm:flex-none sm:w-36"
-            />
-          </div>
-        </div>
-        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="isAddOpen = true" />
+  <AdminDataTable
+    v-model:search="search"
+    :data="filteredData"
+    :columns="columns"
+    search-placeholder="Search name, description, or academy"
+    search-class="w-full sm:w-80"
+    table-class="px-4 sm:px-6"
+  >
+    <template #toolbar-left>
+      <div class="flex w-full sm:w-auto gap-2">
+        <USelect v-model="academyFilter" :items="academyOptions" class="flex-1 sm:flex-none sm:w-44" />
+        <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
       </div>
     </template>
-
-    <UTable
-      ref="table"
-      v-model:pagination="pagination"
-      v-model:column-pinning="columnPinning"
-      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-      :data="filteredData"
-      :columns="columns"
-      class="px-4 sm:px-6"
-    />
-
-    <template #footer>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-sm text-muted shrink-0">
-          Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
-          {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
-          {{ filteredData.length }} entries
-        </p>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <USelect
-              :model-value="pagination.pageSize"
-              :items="[10, 25, 50, 100]"
-              size="sm"
-              class="w-20"
-              @update:model-value="
-                (val: number) => {
-                  pagination.pageSize = Number(val)
-                  pagination.pageIndex = 0
-                }
-              "
-            />
-          </div>
-          <UPagination
-            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-            :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            size="sm"
-            variant="ghost"
-            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-          />
-        </div>
-      </div>
+    <template #toolbar-right>
+      <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="isAddOpen = true" />
     </template>
-  </AdminTableCard>
+  </AdminDataTable>
 
-  <UModal v-model:open="isAddOpen" title="Add New Cohort" :ui="{ footer: 'justify-end' }">
-    <template #body>
-      <UForm
-        ref="addCohortForm"
-        :schema="cohortCreatePageSchema"
-        :state="addForm"
-        class="space-y-5"
-        @submit="onAddCohort"
-      >
-        <UFormField name="academy_id" label="Academy" required>
-          <USelectMenu
-            v-model="addForm.academy_id"
-            value-key="value"
-            :items="academySelectItems"
-            placeholder="Select Academy"
-            class="w-full"
-          />
-        </UFormField>
-        <UFormField name="name" label="Name" required>
-          <UInput v-model="addForm.name" placeholder="Cohort Name" class="w-full" />
-        </UFormField>
-        <UFormField label="Description">
-          <UTextarea
-            v-model="addForm.description"
-            placeholder="Cohort Description"
-            :rows="4"
-            class="w-full"
-          />
-        </UFormField>
-      </UForm>
-    </template>
-    <template #footer>
-      <UButton
-        label="Cancel"
-        color="neutral"
-        variant="outline"
-        :disabled="isAdding"
-        @click="isAddOpen = false"
-      />
-      <UButton
-        label="Add Cohort"
-        color="primary"
-        :loading="isAdding"
-        :disabled="isAdding"
-        @click="addFormRef?.submit()"
-      />
-    </template>
-  </UModal>
+  <AdminCohortCreateModal
+    v-model:open="isAddOpen"
+    v-model:form="addForm"
+    :loading="isAdding"
+    :academy-items="academySelectItems"
+    @submit="onAddCohort"
+  />
 </template>

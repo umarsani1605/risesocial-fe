@@ -5,7 +5,7 @@ import { jobEditSchema } from '@/schemas/job'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Edit Job',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 const route = useRoute()
@@ -58,8 +58,8 @@ async function onSave() {
     }
     await api(`/admin/jobs/${jobId}`, { method: 'PUT', body })
     toast.add({ title: 'Job saved', color: 'success' })
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isSaving.value = false
   }

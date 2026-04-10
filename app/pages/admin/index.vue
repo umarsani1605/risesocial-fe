@@ -6,7 +6,7 @@ import { PRODUCT_TYPE_LABEL, PAYMENT_METHOD_LABEL, PROVIDER_LABEL } from '@/cons
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Dashboard',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({
@@ -70,15 +70,6 @@ const { data: txData } = await useAsyncData('admin:recent-transactions', () =>
 
 const recentTransactions = computed(() => txData.value?.data ?? [])
 
-const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'info'> = {
-  paid: 'success',
-  pending: 'warning',
-  failed: 'error',
-  expired: 'error',
-  cancelled: 'neutral',
-  refunded: 'info'
-}
-
 const columns: TableColumn<AdminTransaction>[] = [
   {
     accessorKey: 'transaction_code',
@@ -126,7 +117,11 @@ const columns: TableColumn<AdminTransaction>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string
       const label = status.charAt(0).toUpperCase() + status.slice(1)
-      return h(UBadge, { variant: 'subtle', color: STATUS_COLOR[status] ?? 'neutral' }, () => label)
+      return h(
+        UBadge,
+        { variant: 'subtle', color: TRANSACTION_STATUS_COLOR[status] ?? 'neutral' },
+        () => label
+      )
     }
   },
   {

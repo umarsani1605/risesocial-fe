@@ -3,7 +3,6 @@ import type { AcademyForm } from '@/types'
 import {
   ACADEMY_DURATION_OPTIONS,
   ACADEMY_FORMAT_OPTIONS,
-  ACADEMY_STATUS_OPTIONS,
   ACADEMY_YES_NO_OPTIONS
 } from '@/constants/academy'
 
@@ -101,17 +100,7 @@ defineExpose({
           <UInput v-model="form.category" placeholder="Category" class="w-full" />
         </UFormField>
       </div>
-      <!-- <div class="flex flex-col md:flex-row gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Status</span>
-        <UFormField name="status" class="flex-1">
-          <USelect
-            v-model="form.status"
-            :items="ACADEMY_STATUS_OPTIONS"
-            placeholder="Select status"
-            class="w-full"
-          />
-        </UFormField>
-      </div> -->
+      <!-- Status is managed via header action buttons, not this form -->
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
         <span class="text-sm md:w-28 md:shrink-0 md:p-2">Certificate</span>
         <USelect

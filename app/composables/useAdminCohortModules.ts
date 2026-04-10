@@ -103,8 +103,8 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
       } else {
         isAddModuleOpen.value = false
       }
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isAddingModule.value = false
     }
@@ -199,8 +199,8 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
       }
       isEditModuleOpen.value = false
       await refreshCohort()
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isEditingModule.value = false
     }
@@ -216,8 +216,8 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
       )
       moduleAttachments.value = moduleAttachments.value.filter(a => a.id !== attachmentId)
       toast.add({ title: 'Attachment deleted', color: 'success' })
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isDeletingAttachment.value = false
     }
@@ -242,8 +242,8 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
       toast.add({ title: 'Module deleted', color: 'success' })
       isDeleteModuleOpen.value = false
       await refreshCohort()
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isDeletingModule.value = false
     }

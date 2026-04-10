@@ -42,7 +42,7 @@ function close() {
         <UFormField name="name" label="Name">
           <UInput v-model="form.name" placeholder="Cohort Name" class="w-full" />
         </UFormField>
-        <UFormField label="Description">
+        <UFormField name="description" label="Description">
           <UTextarea
             v-model="form.description"
             placeholder="Cohort Description"
@@ -50,14 +50,14 @@ function close() {
             class="w-full"
           />
         </UFormField>
-        <UFormField label="Status">
+        <UFormField name="status" label="Status">
           <USelect v-model="form.status" :items="COHORT_STATUS_ITEMS" class="w-full" />
         </UFormField>
         <div class="grid grid-cols-2 gap-3">
-          <UFormField label="Start Date">
+          <UFormField name="start_date" label="Start Date">
             <UInput v-model="form.start_date" type="date" class="w-full" />
           </UFormField>
-          <UFormField label="End Date">
+          <UFormField name="end_date" label="End Date">
             <UInput v-model="form.end_date" type="date" class="w-full" />
           </UFormField>
         </div>

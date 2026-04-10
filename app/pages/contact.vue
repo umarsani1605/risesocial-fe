@@ -19,7 +19,6 @@ const form = reactive({
 const toast = useToast()
 
 const submitForm = () => {
-  console.log('Form submitted:', form)
   form.name = ''
   form.email = ''
   form.subject = ''

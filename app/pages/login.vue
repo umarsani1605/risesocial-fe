@@ -7,6 +7,8 @@ definePageMeta({
   middleware: 'guest'
 })
 
+useSeoMeta({ title: 'Login - Rise Social' })
+
 const errorMessage = ref('')
 const isLoading = ref(false)
 
@@ -56,8 +58,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     } else {
       await navigateTo('/dashboard')
     }
-  } catch (e: any) {
-    errorMessage.value = e?.data?.message ?? 'An error occurred'
+  } catch (e: unknown) {
+    errorMessage.value = getApiErrorMessage(e)
   } finally {
     isLoading.value = false
   }
@@ -75,7 +77,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       <UAuthForm
         :schema="schema"
         :fields="fields"
-        title="Masuk ke Akun"
+        title="Login to Your Account"
         class="w-90"
         :submit="{
           label: 'Continue',

@@ -21,8 +21,8 @@ async function fetchCohorts() {
       `/admin/cohorts?academy_id=${props.academyId}`
     )
     items.value = res.data
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'Failed to load cohorts', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error, 'Failed to load cohorts'), color: 'error' })
   } finally {
     loading.value = false
   }

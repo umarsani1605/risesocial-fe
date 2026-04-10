@@ -2,7 +2,7 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'User Analytics',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'User Analytics - Rise Social' })

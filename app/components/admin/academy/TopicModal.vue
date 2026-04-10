@@ -67,8 +67,8 @@ async function save() {
     } else {
       emit('update:open', false)
     }
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     loading.value = false
   }

@@ -6,8 +6,10 @@ import type { Mail } from '~/types'
 definePageMeta({
   layout: 'dashboard-admin',
   noDashboardPanel: true,
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
+
+useSeoMeta({ title: 'Inbox - Rise Social' })
 
 const tabItems = [
   {

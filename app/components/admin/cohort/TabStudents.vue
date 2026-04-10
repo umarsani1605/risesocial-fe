@@ -81,43 +81,41 @@ const columns: TableColumn<AdminCohortEnrollment>[] = [
       No students enrolled yet.
     </div>
 
-    <div v-else class="rounded-lg border border-default overflow-hidden">
-      <UTable :data="props.enrollments" :columns="columns">
-        <template #name-cell="{ row }">
-          <div class="flex items-center gap-2.5">
-            <UAvatar
-              :src="row.original.user.avatar ?? undefined"
-              :text="initials(row.original)"
-              size="xs"
-              color="primary"
+    <UTable v-else :data="props.enrollments" :columns="columns">
+      <template #name-cell="{ row }">
+        <div class="flex items-center gap-2.5">
+          <UAvatar
+            :src="row.original.user.avatar ?? undefined"
+            :text="initials(row.original)"
+            size="xs"
+            color="primary"
+          />
+          <span class="font-medium">
+            {{ row.original.user.first_name }} {{ row.original.user.last_name }}
+          </span>
+        </div>
+      </template>
+
+      <template #email-cell="{ row }">
+        <span class="hidden md:block text-muted">{{ row.original.user.email }}</span>
+      </template>
+
+      <template #phone-cell="{ row }">
+        <span class="hidden md:block text-muted">{{ row.original.user.phone ?? '-' }}</span>
+      </template>
+
+      <template #actions-cell="{ row }">
+        <div class="text-right">
+          <UDropdownMenu :items="rowMenu(row.original.id)">
+            <UButton
+              icon="i-ph-dots-three-vertical-bold"
+              color="neutral"
+              variant="ghost"
+              size="sm"
             />
-            <span class="font-medium">
-              {{ row.original.user.first_name }} {{ row.original.user.last_name }}
-            </span>
-          </div>
-        </template>
-
-        <template #email-cell="{ row }">
-          <span class="hidden md:block text-muted">{{ row.original.user.email }}</span>
-        </template>
-
-        <template #phone-cell="{ row }">
-          <span class="hidden md:block text-muted">{{ row.original.user.phone ?? '-' }}</span>
-        </template>
-
-        <template #actions-cell="{ row }">
-          <div class="text-right">
-            <UDropdownMenu :items="rowMenu(row.original.id)">
-              <UButton
-                icon="i-ph-dots-three-vertical-bold"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-              />
-            </UDropdownMenu>
-          </div>
-        </template>
-      </UTable>
-    </div>
+          </UDropdownMenu>
+        </div>
+      </template>
+    </UTable>
   </div>
 </template>

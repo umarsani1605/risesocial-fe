@@ -57,6 +57,15 @@ export interface AcademyFaq {
   order: number
 }
 
+export interface SyllabusRow {
+  id: number
+  _kind: 'theme' | 'topic'
+  order: number
+  title: string
+  description: string
+  theme_id?: number
+}
+
 // ── Main types ────────────────────────────────────────────────────────────────
 
 export interface Academy {

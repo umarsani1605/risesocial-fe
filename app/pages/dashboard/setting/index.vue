@@ -92,8 +92,8 @@ const onSave = async () => {
     await api('/users/account', { method: 'PUT', body: fd })
     toast.add({ title: 'Account updated', color: 'success' })
   }
-  catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   }
   finally {
     isSubmitting.value = false
@@ -147,11 +147,11 @@ const onSave = async () => {
       </UFormField>
 
       <UForm ref="accountForm" :schema="userAccountSchema" :state="form" class="grid grid-cols-1 gap-4 max-w-lg" @submit="onSave">
-        <UFormField label="First name" required>
+        <UFormField name="first_name" label="First name" required>
           <UInput v-model="form.first_name" placeholder="John" class="w-full" />
         </UFormField>
 
-        <UFormField label="Last name" required>
+        <UFormField name="last_name" label="Last name" required>
           <UInput v-model="form.last_name" placeholder="Doe" class="w-full" />
         </UFormField>
 
@@ -159,11 +159,11 @@ const onSave = async () => {
           <UInput v-model="form.email" type="email" placeholder="john@example.com" class="w-full" />
         </UFormField>
 
-        <UFormField label="Phone">
+        <UFormField name="phone" label="Phone">
           <UInput v-model="form.phone" placeholder="+62" class="w-full" />
         </UFormField>
 
-        <UFormField label="Gender">
+        <UFormField name="gender" label="Gender">
           <USelect
             v-model="form.gender"
             :items="genderOptions"
@@ -174,27 +174,27 @@ const onSave = async () => {
           />
         </UFormField>
 
-        <UFormField label="Country">
+        <UFormField name="country" label="Country">
           <UInput v-model="form.country" placeholder="Indonesia" class="w-full" />
         </UFormField>
 
-        <UFormField label="Province">
+        <UFormField name="province" label="Province">
           <UInput v-model="form.province" placeholder="Jawa Barat" class="w-full" />
         </UFormField>
 
-        <UFormField label="City">
+        <UFormField name="city" label="City">
           <UInput v-model="form.city" placeholder="Bandung" class="w-full" />
         </UFormField>
 
-        <UFormField label="Last Education">
+        <UFormField name="last_education" label="Last Education">
           <UInput v-model="form.last_education" placeholder="S1 Computer Science" class="w-full" />
         </UFormField>
 
-        <UFormField label="Current Job">
+        <UFormField name="current_job" label="Current Job">
           <UInput v-model="form.current_job" placeholder="Software Engineer" class="w-full" />
         </UFormField>
 
-        <UFormField label="Current Company">
+        <UFormField name="current_company" label="Current Company">
           <UInput v-model="form.current_company" placeholder="Rise Social" class="w-full" />
         </UFormField>
       </UForm>

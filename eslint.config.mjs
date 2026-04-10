@@ -15,7 +15,7 @@ export default withNuxt([
       'no-debugger': 'error',
       'no-extra-boolean-cast': 'error',
       'no-unreachable': 'error',
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
 
       // Vue specific
       'vue/no-multiple-template-root': 'off', // Vue 3 supports fragments (multiple root elements)

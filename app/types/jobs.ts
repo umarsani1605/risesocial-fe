@@ -61,6 +61,13 @@ export interface JobCompanyDetail {
   _count: { jobs: number }
 }
 
+/** Rate limit data from LinkedIn sync */
+export interface RateLimitData {
+  requests: { remaining: number; limit: number; reset: number }
+  jobs: { remaining: number; limit: number; reset: number }
+  last_updated: string
+}
+
 /** Body untuk POST /admin/jobs dan PUT /admin/jobs/:id */
 export interface AdminJobForm {
   title: string

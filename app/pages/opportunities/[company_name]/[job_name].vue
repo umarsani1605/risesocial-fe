@@ -77,7 +77,7 @@ const parsedDescription = computed(() => {
 
 const handleApply = () => {
   if (job.value?.external_url) {
-    window.open(job.value.external_url, '_blank')
+    window.open(job.value.external_url, '_blank', 'noopener,noreferrer')
   }
 }
 

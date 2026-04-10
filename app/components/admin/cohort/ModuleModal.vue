@@ -2,18 +2,21 @@
 import type { TabsItem } from '@nuxt/ui'
 import { moduleFormSchema } from '@/schemas/cohort'
 import type { PendingAttachment, AdminCohortAttachment } from '~/types/cohort'
+import { ATTACHMENT_MAP, getAttachmentStyle } from '~/utils/attachment'
 
 const {
   mode,
   loading,
   pendingAttachments = [],
   attachments = [],
+  isAddingAttachment = false,
   isDeletingAttachment = false
 } = defineProps<{
   mode: 'add' | 'edit'
   loading: boolean
   pendingAttachments?: PendingAttachment[]
   attachments?: AdminCohortAttachment[]
+  isAddingAttachment?: boolean
   isDeletingAttachment?: boolean
 }>()
 
@@ -88,52 +91,15 @@ function addLink() {
   linkUrl.value = ''
 }
 
-// Badge helpers
-function getPendingBadgeInfo(att: PendingAttachment) {
-  if (att.type === 'file' && att.file) {
-    const ext = att.file.name.split('.').pop()?.toLowerCase() ?? ''
-    const map: Record<string, { text: string; color: string }> = {
-      pdf: { text: 'PDF', color: 'bg-red-500' },
-      doc: { text: 'DOCX', color: 'bg-blue-500' },
-      docx: { text: 'DOCX', color: 'bg-blue-500' },
-      ppt: { text: 'PPTX', color: 'bg-orange-500' },
-      pptx: { text: 'PPTX', color: 'bg-orange-500' },
-      xls: { text: 'XLSX', color: 'bg-green-600' },
-      xlsx: { text: 'XLSX', color: 'bg-green-600' }
-    }
-    return map[ext] ?? { text: ext.toUpperCase().slice(0, 4) || 'FILE', color: 'bg-gray-500' }
-  }
-  return { text: 'LINK', color: 'bg-blue-500' }
+function resolveStyle(att: PendingAttachment | AdminCohortAttachment) {
+  if (att.type === 'external_link') return ATTACHMENT_MAP['external_link']!
+  if (att.type === 'embed_video') return ATTACHMENT_MAP['embed_video']!
+  if ('file' in att && att.file) return getAttachmentStyle({ file_path: att.file.name })
+  return getAttachmentStyle(att as AdminCohortAttachment)
 }
 
 function getPendingAttachmentName(att: PendingAttachment) {
   return att.label || att.url || att.file?.name || 'Attachment'
-}
-
-function getRealBadgeInfo(a: AdminCohortAttachment) {
-  if (a.type === 'embed_video') return { text: 'VIDEO', color: 'bg-red-500' }
-  if (a.type === 'external_link') return { text: 'LINK', color: 'bg-blue-500' }
-  const ext = (a.file_mime?.split('/').pop() ?? a.file_path?.split('.').pop() ?? '').toLowerCase()
-  const map: Record<string, { text: string; color: string }> = {
-    pdf: { text: 'PDF', color: 'bg-red-500' },
-    msword: { text: 'DOCX', color: 'bg-blue-500' },
-    doc: { text: 'DOCX', color: 'bg-blue-500' },
-    docx: { text: 'DOCX', color: 'bg-blue-500' },
-    'vnd.openxmlformats-officedocument.wordprocessingml.document': {
-      text: 'DOCX',
-      color: 'bg-blue-500'
-    },
-    ppt: { text: 'PPTX', color: 'bg-orange-500' },
-    pptx: { text: 'PPTX', color: 'bg-orange-500' },
-    'vnd.openxmlformats-officedocument.presentationml.presentation': {
-      text: 'PPTX',
-      color: 'bg-orange-500'
-    },
-    xls: { text: 'XLSX', color: 'bg-green-600' },
-    xlsx: { text: 'XLSX', color: 'bg-green-600' },
-    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { text: 'XLSX', color: 'bg-green-600' }
-  }
-  return map[ext] ?? { text: 'FILE', color: 'bg-gray-500' }
 }
 
 function getRealAttachmentName(a: AdminCohortAttachment) {
@@ -165,7 +131,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
         </div>
         <div class="flex gap-3">
           <label class="text-sm font-medium w-40 shrink-0 pt-2">Description</label>
-          <UFormField class="flex-1">
+          <UFormField name="description" class="flex-1">
             <UTextarea
               v-model="form.description"
               placeholder="Module Description"
@@ -236,6 +202,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
                     icon="i-ph-plus-bold"
                     :loading="mode === 'edit' ? isAddingAttachment : false"
                     :disabled="!linkUrl"
+                    size="sm"
                     @click="addLink"
                   />
                 </div>
@@ -244,84 +211,52 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
 
             <!-- Pending queue (add & edit) -->
             <div v-if="pendingAttachments.length" class="space-y-1.5">
-              <div
+              <AdminCohortAttachmentItem
                 v-for="att in pendingAttachments"
                 :key="att.id"
-                class="flex items-center rounded-lg overflow-hidden border border-default"
-              >
-                <div
-                  class="flex items-center justify-center w-10 h-9 text-white text-[10px] font-bold shrink-0"
-                  :class="getPendingBadgeInfo(att).color"
-                >
-                  {{ getPendingBadgeInfo(att).text }}
-                </div>
-                <span class="flex-1 text-sm truncate px-2">{{
-                  getPendingAttachmentName(att)
-                }}</span>
-                <UButton
-                  icon="i-ph-x-bold"
-                  color="neutral"
-                  variant="ghost"
-                  class="mr-0.5 shrink-0"
-                  @click="emit('removeAttachment', att.id)"
-                />
-              </div>
+                :name="getPendingAttachmentName(att)"
+                :color="resolveStyle(att).color"
+                :icon="resolveStyle(att).icon"
+                removable
+                flexible
+                @remove="emit('removeAttachment', att.id)"
+              />
             </div>
 
             <!-- Existing attachments from API (edit only) -->
             <div v-if="attachments.length" class="space-y-1.5">
-              <div
+              <AdminCohortAttachmentItem
                 v-for="a in attachments"
                 :key="a.id"
-                class="flex items-center rounded-lg overflow-hidden border border-default"
-              >
-                <div
-                  class="flex items-center justify-center w-10 h-9 text-white text-[10px] font-bold shrink-0"
-                  :class="getRealBadgeInfo(a).color"
-                >
-                  {{ getRealBadgeInfo(a).text }}
-                </div>
-                <span class="flex-1 text-sm truncate px-2">{{ getRealAttachmentName(a) }}</span>
-                <UButton
-                  icon="i-ph-x-bold"
-                  color="neutral"
-                  variant="ghost"
-                  class="mr-0.5 shrink-0"
-                  :loading="isDeletingAttachment"
-                  @click="emit('deleteAttachment', a.id)"
-                />
-              </div>
+                :href="a.file_url ?? undefined"
+                :name="getRealAttachmentName(a)"
+                :color="resolveStyle(a).color"
+                :icon="resolveStyle(a).icon"
+                removable
+                flexible
+                :remove-loading="isDeletingAttachment"
+                @remove="emit('deleteAttachment', a.id)"
+              />
             </div>
           </div>
         </div>
 
-        <!-- Status: inline label + segmented -->
         <div class="flex gap-3 items-center">
           <label class="text-sm font-medium w-40 shrink-0">Status</label>
-          <div class="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl flex-1">
-            <button
-              type="button"
-              class="flex-1 py-1.5 text-sm font-medium rounded-lg transition-colors"
-              :class="
-                publishStatus === 'draft'
-                  ? 'bg-white dark:bg-gray-700 shadow-sm text-default'
-                  : 'text-muted'
-              "
-              @click="publishStatus = 'draft'"
-            >
-              Draft
-            </button>
-            <button
-              type="button"
-              class="flex-1 py-1.5 text-sm font-medium rounded-lg transition-colors"
-              :class="
-                publishStatus === 'published' ? 'bg-primary text-white shadow-sm' : 'text-muted'
-              "
-              @click="publishStatus = 'published'"
-            >
-              Published
-            </button>
-          </div>
+          <URadioGroup
+            v-model="publishStatus"
+            :items="[
+              { label: 'Draft', value: 'draft' },
+              { label: 'Published', value: 'published' }
+            ]"
+            variant="table"
+            indicator="hidden"
+            orientation="horizontal"
+            size="sm"
+            color="primary"
+            class="flex-1"
+            :ui="{ item: 'flex-1' }"
+          />
         </div>
       </UForm>
     </template>

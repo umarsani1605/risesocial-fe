@@ -7,7 +7,9 @@ definePageMeta({
   middleware: 'guest'
 })
 
-const error = ref(false)
+useSeoMeta({ title: 'Register - Rise Social' })
+
+const errorMessage = ref('')
 const isLoading = ref(false)
 
 const { api } = useApi()
@@ -71,7 +73,7 @@ type Schema = z.output<typeof schema>
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     isLoading.value = true
-    error.value = false
+    errorMessage.value = ''
     const res = await api<ApiResponse<{ token: string, user: UserProfile }>>('/auth/register', {
       method: 'POST',
       body: {
@@ -84,8 +86,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     setSession(res.data.token, res.data.user)
     await navigateTo('/dashboard')
   }
-  catch {
-    error.value = true
+  catch (e: unknown) {
+    errorMessage.value = getApiErrorMessage(e)
   }
   finally {
     isLoading.value = false
@@ -104,7 +106,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       <UAuthForm
         :schema="schema"
         :fields="fields"
-        title="Masuk ke Akun"
+        title="Create an Account"
         class="w-full"
         :submit="{
           label: 'Register',
@@ -126,7 +128,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           </div>
         </template>
         <template #validation>
-          <UAlert v-if="error" color="error" icon="i-ph-info-bold" title="Error signing in" />
+          <UAlert
+            v-if="errorMessage"
+            color="error"
+            icon="i-ph-info-bold"
+            variant="subtle"
+            :description="errorMessage"
+            :ui="{ icon: 'size-5' }"
+          />
         </template>
         <template #footer>
           Already have an account?

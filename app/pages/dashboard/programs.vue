@@ -1,9 +1,9 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'dashboard-user' })
+definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
 useSeoMeta({
   title: 'Programs - Rise Social',
-  description: 'Kelola program yang diikuti dan temukan program-program baru Rise Social'
+  description: 'Manage your enrolled programs and discover new programs from Rise Social'
 })
 
 const programs = [

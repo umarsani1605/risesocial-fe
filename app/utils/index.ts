@@ -35,6 +35,35 @@ export function formatDatetime(dateString: string): string {
   }
 }
 
+export function formatDateLong(dateString: string): string {
+  if (!dateString) return 'N/A'
+  try {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
+export function formatDatetimeLong(dateString: string): string {
+  if (!dateString) return 'N/A'
+  try {
+    return new Date(dateString).toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
 export function formatLocation(location?: { city?: string; region?: string; country?: string }): string {
   if (!location) return 'Location not specified'
   return [location.city, location.region, location.country].filter(Boolean).join(', ') || 'Location not specified'
@@ -75,4 +104,8 @@ export function formatPrice(price: number): string {
     currency: 'IDR',
     minimumFractionDigits: 0
   }).format(price)
+}
+
+export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
+  return (error as Record<string, any>)?.data?.message ?? fallback
 }

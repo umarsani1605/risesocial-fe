@@ -24,8 +24,8 @@ async function onChangePassword() {
     form.repeatPassword = ''
     toast.add({ title: 'Password updated', color: 'success' })
   }
-  catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   }
   finally {
     isSubmitting.value = false

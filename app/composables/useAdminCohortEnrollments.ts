@@ -19,8 +19,8 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
         `/admin/cohorts/${cohortId}/enrollments`
       )
       enrollments.value = res.data
-    } catch (error: any) {
-      toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
     } finally {
       isLoadingEnrollments.value = false
     }
@@ -34,10 +34,6 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
 
   function openInviteStudentModal() {
     isInviteStudentOpen.value = true
-  }
-
-  function closeInviteStudentModal() {
-    isInviteStudentOpen.value = false
   }
 
   async function submitInviteStudent() {
@@ -61,10 +57,6 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
 
   function openInviteMentorModal() {
     isInviteMentorOpen.value = true
-  }
-
-  function closeInviteMentorModal() {
-    isInviteMentorOpen.value = false
   }
 
   async function submitInviteMentor() {

@@ -5,7 +5,7 @@ import { jobCreateSchema } from '@/schemas/job'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Create Job',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'Create Job | Rise Social' })
@@ -46,8 +46,8 @@ async function onSave() {
     await api('/admin/jobs', { method: 'POST', body })
     toast.add({ title: 'Job created', color: 'success' })
     await navigateTo('/admin/jobs')
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isSaving.value = false
   }

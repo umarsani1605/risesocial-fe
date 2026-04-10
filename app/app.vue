@@ -61,20 +61,10 @@ provide('navigation', navigation)
 
 <template>
   <UApp>
-    <NuxtLoadingIndicator />
+    <NuxtLoadingIndicator color="var(--color-orange-400)" />
 
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-
-    <ClientOnly>
-      <LazyUContentSearch
-        :files="files"
-        shortcut="meta_k"
-        :navigation="navigation"
-        :links="links"
-        :fuse="{ resultLimit: 42 }"
-      />
-    </ClientOnly>
   </UApp>
 </template>

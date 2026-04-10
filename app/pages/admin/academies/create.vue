@@ -6,7 +6,7 @@ import { academyFormSchema } from '@/schemas/academy'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Add Academy',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'Add New Academy | Rise Social' })
@@ -50,9 +50,8 @@ async function onSave() {
     })
     toast.add({ title: 'Academy created', color: 'success' })
     await navigateTo(`/admin/academies/${res.data.slug}/edit`)
-  } catch (error: any) {
-    const message = error?.data?.message ?? 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     loading.value = false
   }

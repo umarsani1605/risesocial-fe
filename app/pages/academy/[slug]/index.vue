@@ -23,6 +23,10 @@ if (academyError.value || !academyData.value?.data) {
   throw createError({ statusCode: 404, statusMessage: 'Academy not found' })
 }
 
+if (academyData.value.data.status !== 'ACTIVE') {
+  throw createError({ statusCode: 404, statusMessage: 'Academy not found' })
+}
+
 const academy = computed(() => academyData.value!.data)
 
 useSeoMeta({

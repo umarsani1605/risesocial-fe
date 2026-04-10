@@ -35,13 +35,11 @@
   /* Utilities Colors */
   --color-background-page: #f8fafc;
   --color-sidebar-foreground: #52525b;
-  --color-border: #ebeff4;
 }
 
 :root {
   --ui-primary: var(--color-rise-orange-400);
   --ui-secondary: var(--color-deep-teal-800);
-  --ui-border: #eef2f6;
   --ui-header-height: 5rem;
 }
 

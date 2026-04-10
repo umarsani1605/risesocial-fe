@@ -30,8 +30,8 @@ async function saveSettings() {
     await api('/users/notification-preferences', { method: 'PUT', body: { ...prefs } })
     toast.add({ title: 'Notification preferences saved', color: 'success' })
   }
-  catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   }
   finally {
     isSaving.value = false

@@ -4,6 +4,7 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({ layout: 'default' })
 
+useSeoMeta({ title: 'RYLS Registration - Rise Social' })
 useHead({ bodyAttrs: { class: 'ryls-blue-theme' } })
 
 const store = useRylsRegistration()

@@ -16,7 +16,6 @@ export const cohortCreatePageSchema = z.object({
 export const cohortEditSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
-  status: z.enum(['not_started', 'ongoing', 'completed']).optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
 })

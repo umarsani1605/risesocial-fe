@@ -6,7 +6,6 @@ export const academyFormSchema = z.object({
   duration: z.string().min(1, 'Duration is required'),
   format: z.string().min(1, 'Format is required'),
   category: z.string().min(1, 'Category is required'),
-  status: z.enum(['DRAFT', 'ACTIVE', 'ARCHIVED'], { error: 'Status is required' }),
 })
 
 export const academyCreateSchema = z.object({

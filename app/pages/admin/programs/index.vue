@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
+import { SCHOLARSHIP_TYPE_LABEL, DISCOVER_SOURCE_LABEL, PAYMENT_TYPE_LABEL } from '@/constants/ryls'
 
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Rise Young Leaders',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'Rise Young Leaders Scholarship - Rise Social' })
@@ -33,9 +33,6 @@ const rylsNationalityOptions = computed(() => {
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 
-const table = useTemplateRef('table')
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const columnPinning = ref({ right: ['actions'] })
 
 const route = useRoute()
 
@@ -44,6 +41,8 @@ const scholarshipFilter = ref('all')
 const genderFilter = ref('all')
 const nationalityFilter = ref('all')
 const paymentTypeFilter = ref('all')
+
+const dataTableRef = ref()
 
 const selectedRegistration = ref<RylsRegistration | null>(null)
 const isDetailOpen = ref(false)
@@ -103,58 +102,6 @@ const filteredData = computed(() => {
   return result
 })
 
-// ── Helpers ───────────────────────────────────────────────────────
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
-function formatRegistrationDate(dateStr: string) {
-  if (!dateStr) return '–'
-  return new Date(dateStr).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-function formatScholarshipType(type: string) {
-  return type === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded'
-}
-
-function formatDiscoverSource(source: string) {
-  const map: Record<string, string> = {
-    FRIENDS: 'Friends/Colleagues',
-    SOCIAL_MEDIA: 'Social Media',
-    OTHER_INSTAGRAM: 'Instagram',
-    WEBSITE: 'Website',
-    LINKEDIN: 'LinkedIn'
-  }
-  return map[source] ?? source
-}
-
-function formatPaymentType(type: string) {
-  const map: Record<string, string> = {
-    PAYPAL: 'PayPal',
-    BANK_TRANSFER: 'Bank Transfer',
-    MIDTRANS: 'Midtrans'
-  }
-  return map[type] ?? type
-}
-
-function formatAmount(amount: number) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0
-  }).format(amount)
-}
-
 function openDetail(reg: RylsRegistration) {
   selectedRegistration.value = reg
   isDetailOpen.value = true
@@ -169,7 +116,7 @@ const columns: TableColumn<RylsRegistration>[] = [
       h(
         'span',
         { class: 'text-muted' },
-        row.index + 1 + pagination.value.pageIndex * pagination.value.pageSize
+        row.index + 1 + (dataTableRef.value?.pagination?.pageIndex ?? 0) * (dataTableRef.value?.pagination?.pageSize ?? 10)
       )
   },
   {
@@ -225,7 +172,11 @@ const columns: TableColumn<RylsRegistration>[] = [
     id: 'discover_source',
     header: 'Discover Source',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm' }, formatDiscoverSource(row.original.discover_source))
+      h(
+        'span',
+        { class: 'text-sm' },
+        DISCOVER_SOURCE_LABEL[row.original.discover_source] ?? row.original.discover_source
+      )
   },
   {
     id: 'scholarship_type',
@@ -239,7 +190,7 @@ const columns: TableColumn<RylsRegistration>[] = [
           color: 'primary',
           class: 'whitespace-nowrap'
         },
-        () => formatScholarshipType(type)
+        () => SCHOLARSHIP_TYPE_LABEL[type] ?? type
       )
     }
   },
@@ -249,7 +200,11 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      return h('span', { class: 'text-sm whitespace-nowrap' }, formatPaymentType(payment.type))
+      return h(
+        'span',
+        { class: 'text-sm whitespace-nowrap' },
+        PAYMENT_TYPE_LABEL[payment.type] ?? payment.type
+      )
     }
   },
   {
@@ -290,18 +245,14 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      return h('span', { class: 'text-sm whitespace-nowrap' }, formatAmount(payment.amount))
+      return h('span', { class: 'text-sm whitespace-nowrap' }, formatPrice(payment.amount))
     }
   },
   {
     id: 'registered_at',
     header: 'Registration Date',
     cell: ({ row }) =>
-      h(
-        'span',
-        { class: 'text-sm whitespace-nowrap' },
-        formatRegistrationDate(row.original.created_at)
-      )
+      h('span', { class: 'text-sm whitespace-nowrap' }, formatDatetime(row.original.created_at))
   },
   {
     id: 'actions',
@@ -321,222 +272,30 @@ const columns: TableColumn<RylsRegistration>[] = [
 </script>
 
 <template>
-  <AdminTableCard>
-    <template #toolbar>
-      <div class="flex flex-wrap items-center justify-between">
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <UInput
-            v-model="search"
-            icon="i-ph-magnifying-glass-bold"
-            placeholder="Search name or email..."
-            class="w-full sm:w-52"
-          />
-          <div class="flex flex-wrap w-full sm:w-auto gap-2">
-            <USelect
-              v-model="scholarshipFilter"
-              :items="scholarshipOptions"
-              class="flex-1 sm:flex-none sm:w-36"
-            />
-            <USelect
-              v-model="genderFilter"
-              :items="genderOptions"
-              class="flex-1 sm:flex-none sm:w-32"
-            />
-            <USelect
-              v-model="nationalityFilter"
-              :items="rylsNationalityOptions"
-              class="flex-1 sm:flex-none sm:w-36"
-            />
-            <USelect
-              v-model="paymentTypeFilter"
-              :items="paymentTypeOptions"
-              class="flex-1 sm:flex-none sm:w-36"
-            />
-          </div>
-        </div>
-        <UButton label="Export Excel" leading-icon="i-ph-download-simple-bold" color="primary" />
-      </div>
-    </template>
-
-    <UTable
-      ref="table"
-      v-model:pagination="pagination"
-      v-model:column-pinning="columnPinning"
-      :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
-      :data="filteredData"
-      :columns="columns"
-    />
-
-    <template #footer>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-sm text-muted shrink-0">
-          Showing {{ pagination.pageIndex * pagination.pageSize + 1 }} to
-          {{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredData.length) }} of
-          {{ filteredData.length }} entries
-        </p>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <USelect
-              :model-value="pagination.pageSize"
-              :items="[10, 25, 50, 100]"
-              size="sm"
-              class="w-20"
-              @update:model-value="
-                (val: number) => {
-                  pagination.pageSize = Number(val)
-                  pagination.pageIndex = 0
-                }
-              "
-            />
-          </div>
-          <UPagination
-            :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-            :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            size="sm"
-            variant="ghost"
-            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
-          />
-        </div>
-      </div>
-    </template>
-  </AdminTableCard>
-
-  <!-- Registration Detail Slideover -->
-  <USlideover
-    v-model:open="isDetailOpen"
-    title="Registration Detail"
-    side="right"
-    :ui="{ content: 'max-w-xl', body: 'p-0!' }"
+  <AdminDataTable
+    ref="dataTableRef"
+    v-model:search="search"
+    :data="filteredData"
+    :columns="columns"
+    search-placeholder="Search name or email..."
+    search-class="w-full sm:w-52"
+    pinned-shadow
   >
-    <template #body>
-      <div v-if="selectedRegistration">
-        <!-- Section 1: Personal Information -->
-        <div class="p-6">
-          <p class="text-xs font-bold uppercase tracking-wide mb-4">Personal Information</p>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Full Name</span>
-              <span class="font-medium">{{ selectedRegistration.full_name }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Email</span>
-              <span>{{ selectedRegistration.email }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">WhatsApp</span>
-              <span>{{ selectedRegistration.whatsapp ?? '–' }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Gender</span>
-              <span>{{ selectedRegistration.gender === 'FEMALE' ? 'Female' : 'Male' }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Date of Birth</span>
-              <span>{{ formatDate(selectedRegistration.date_of_birth) }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Residence</span>
-              <span>{{ selectedRegistration.residence ?? '–' }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Nationality</span>
-              <span class="capitalize">{{ selectedRegistration.nationality }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Second Nationality</span>
-              <span :class="selectedRegistration.second_nationality ? '' : 'text-muted'">
-                {{ selectedRegistration.second_nationality ?? '–' }}
-              </span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Institution</span>
-              <span>{{ selectedRegistration.institution ?? '–' }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Discover Source</span>
-              <span>{{ formatDiscoverSource(selectedRegistration.discover_source) }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Scholarship Type</span>
-              <span>{{ formatScholarshipType(selectedRegistration.scholarship_type) }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Registration Date</span>
-              <span>{{ formatRegistrationDate(selectedRegistration.created_at) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <USeparator />
-
-        <!-- Section 2: Fully Funded -->
-        <template v-if="selectedRegistration.scholarship_type === 'FULLY_FUNDED'">
-          <div class="p-6">
-            <p class="text-xs font-bold uppercase tracking-wide mb-4">Fully Funded</p>
-            <div class="space-y-2">
-              <div class="grid grid-cols-2 gap-2 text-sm">
-                <span class="text-muted">Essay Topic</span>
-                <span
-                  :class="
-                    selectedRegistration.fully_funded_submission?.essay_topic ? '' : 'text-muted'
-                  "
-                >
-                  {{ selectedRegistration.fully_funded_submission?.essay_topic ?? 'Not provided' }}
-                </span>
-              </div>
-            </div>
-          </div>
-          <USeparator />
-        </template>
-
-        <!-- Section 3: Payment Information -->
-        <div v-if="selectedRegistration.payments?.[0]" class="p-6">
-          <p class="text-xs font-bold uppercase tracking-wide mb-4">Payment Information</p>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Payment Type</span>
-              <span class="font-medium">{{
-                formatPaymentType(selectedRegistration.payments[0].type)
-              }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Payment Status</span>
-              <span class="capitalize">{{
-                selectedRegistration.payments[0].status?.toLowerCase() ?? '–'
-              }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Amount</span>
-              <span class="font-medium">{{
-                formatAmount(selectedRegistration.payments[0].amount)
-              }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Payment Date</span>
-              <span>{{
-                selectedRegistration.payments[0].paid_at
-                  ? new Date(selectedRegistration.payments[0].paid_at).toLocaleString('en-US')
-                  : '–'
-              }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Payment Proof</span>
-              <span v-if="!selectedRegistration.payments[0].payment_proof" class="text-muted"
-                >–</span
-              >
-              <UButton
-                v-else
-                icon="i-ph-download-simple-bold"
-                label="Download"
-                size="xs"
-                color="neutral"
-                variant="outline"
-              />
-            </div>
-          </div>
-        </div>
+    <template #toolbar-left>
+      <div class="flex flex-wrap w-full sm:w-auto gap-2">
+        <USelect v-model="scholarshipFilter" :items="scholarshipOptions" class="flex-1 sm:flex-none sm:w-36" />
+        <USelect v-model="genderFilter" :items="genderOptions" class="flex-1 sm:flex-none sm:w-32" />
+        <USelect v-model="nationalityFilter" :items="rylsNationalityOptions" class="flex-1 sm:flex-none sm:w-36" />
+        <USelect v-model="paymentTypeFilter" :items="paymentTypeOptions" class="flex-1 sm:flex-none sm:w-36" />
       </div>
     </template>
-  </USlideover>
+    <template #toolbar-right>
+      <UButton label="Export Excel" leading-icon="i-ph-download-simple-bold" color="primary" />
+    </template>
+  </AdminDataTable>
+
+  <AdminProgramsRegistrationDetailSlideover
+    v-model:open="isDetailOpen"
+    :registration="selectedRegistration"
+  />
 </template>

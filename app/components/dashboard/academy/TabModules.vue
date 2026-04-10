@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CohortModule, CohortModuleAttachment, ModuleSessionStatus } from '@/types'
+import type { CohortModule, ModuleSessionStatus } from '@/types'
 
 const props = defineProps<{
   modules: CohortModule[]
@@ -40,7 +40,7 @@ const sessionStatusConfig: Record<
 
 function formatSessionTime(iso: string) {
   const d = new Date(iso)
-  const date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  const date = formatDateLong(iso)
   const time = d.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -50,30 +50,6 @@ function formatSessionTime(iso: string) {
   return `${date}, ${time}`
 }
 
-function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: string } {
-  if (att.type === 'external_link') return { bg: 'bg-blue-500',   icon: 'i-ph-link-bold' }
-  if (att.type === 'embed_video')   return { bg: 'bg-red-500',    icon: 'i-ph-video-bold' }
-
-  const ext = (att.file_mime?.split('/').pop() ?? att.file_path?.split('.').pop() ?? '').toLowerCase()
-  const byExt: Record<string, { bg: string; icon: string }> = {
-    pdf:   { bg: 'bg-red-500',    icon: 'i-ph-file-text-bold' },
-    msword: { bg: 'bg-blue-500',  icon: 'i-ph-file-text-bold' },
-    doc:   { bg: 'bg-blue-500',   icon: 'i-ph-file-text-bold' },
-    docx:  { bg: 'bg-blue-500',   icon: 'i-ph-file-text-bold' },
-    'vnd.openxmlformats-officedocument.wordprocessingml.document': { bg: 'bg-blue-500', icon: 'i-ph-file-text-bold' },
-    ppt:   { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
-    pptx:  { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
-    'vnd.openxmlformats-officedocument.presentationml.presentation': { bg: 'bg-orange-500', icon: 'i-ph-file-bold' },
-    xls:   { bg: 'bg-green-600',  icon: 'i-ph-table-bold' },
-    xlsx:  { bg: 'bg-green-600',  icon: 'i-ph-table-bold' },
-    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': { bg: 'bg-green-600', icon: 'i-ph-table-bold' },
-    jpeg:  { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
-    jpg:   { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
-    png:   { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
-    webp:  { bg: 'bg-purple-500', icon: 'i-ph-image-bold' },
-  }
-  return byExt[ext] ?? { bg: 'bg-gray-500', icon: 'i-ph-file-bold' }
-}
 </script>
 
 <template>
@@ -133,7 +109,7 @@ function getAttachmentStyle(att: CohortModuleAttachment): { bg: string; icon: st
             >
               <div
                 class="flex items-center justify-center size-12 text-white shrink-0"
-                :class="getAttachmentStyle(attachment).bg"
+                :class="getAttachmentStyle(attachment).color"
               >
                 <UIcon :name="getAttachmentStyle(attachment).icon" class="size-4" />
               </div>

@@ -245,7 +245,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() => [
       v-if="!route.meta.noDashboardPanel"
       id="main"
       :ui="{
-        body: 'p-2 sm:p-6 pb-0 overflow-y-hidden'
+        body: 'p-2 sm:p-6 pb-0'
       }"
     >
       <template #header>

@@ -2,7 +2,7 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Academy Analytics',
-  middleware: 'admin'
+  middleware: ['auth', 'admin']
 })
 
 useSeoMeta({ title: 'Academy Analytics - Rise Social' })

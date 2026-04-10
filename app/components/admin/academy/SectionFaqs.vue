@@ -56,8 +56,8 @@ async function remove() {
     await refresh()
     isDeleteModalOpen.value = false
     toast.add({ title: 'FAQ deleted', color: 'success' })
-  } catch (error: any) {
-    toast.add({ title: error?.data?.message ?? 'An error occurred', color: 'error' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
     isDeleting.value = false
   }
