@@ -3,7 +3,7 @@ definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
 useSeoMeta({
   title: 'Programs - Rise Social',
-  description: 'Manage your enrolled programs and discover new programs from Rise Social'
+  description: 'Discover and explore Rise Social programs'
 })
 
 const programs = [
@@ -12,7 +12,8 @@ const programs = [
     title: 'Rise Young Leaders Summit',
     image: '/images/rise_young_leader.png',
     link: '/programs/rise-young-leaders-summit',
-    description: 'Rise Young Leaders Summit is an annual program to improve youth capacity for young people aged 16-25 in various topics.'
+    description:
+      'Rise Young Leaders Summit Japan 2026 is an international forum by Rise Social to empower young changemakers to gain insight into global challenges, connect sustainability with economic growth, and turn bold ideas into real, impactful projects. Brings together future leaders, innovators, and sustainability advocates from across the globe to collaborate, learn, and lead.'
   },
   {
     id: 2,
@@ -20,7 +21,7 @@ const programs = [
     image: '/images/rise_educator.png',
     link: '/academy',
     description:
-      'Rise Sustainability Academy is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic.'
+      'Rise Sustainability Academy is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic. This program is for young professional, career switchers, sustainability and green workers to improve their knowledge and skills in this topic, equipped with Portfolio program with our hiring partners.'
   },
   {
     id: 3,
@@ -28,46 +29,38 @@ const programs = [
     image: '/images/programs/rise-and-thrive/rise_and_thrive_1.jpeg',
     link: '/programs/rise-and-thrive',
     description:
-      'Our program is designed to empower youth by equipping them with the skills, mindset, and opportunities to transform local resources into sustainable economic ventures.'
+      'Our program is designed to empower youth by equipping them with the skills, mindset, and opportunities to transform local resources into sustainable economic ventures. By fostering innovation, entrepreneurship, and community leadership, the initiative not only boosts income and productivity among young people but also cultivates a generation of changemakers who create lasting impact through locally driven businesses.'
   }
 ]
 </script>
 
 <template>
-  <UCard>
+  <UCard class="h-full border border-default/50" :ui="{ header: 'p-0!', body: 'p-6! pt-4!' }">
     <template #header>
-      <h1 class="font-semibold text-lg">Programs</h1>
-    </template>
-
-    <div class="space-y-4">
-      <div
-        v-for="program in programs"
-        :key="program.id"
-        class="flex flex-col sm:flex-row items-start gap-4 p-4 border border-default rounded-lg hover:border-gray-300 transition-colors"
-      >
-        <!-- Image -->
-        <div class="w-full sm:w-24 md:w-36 aspect-video sm:aspect-square rounded-md overflow-hidden bg-gray-100 shrink-0">
-          <NuxtImg
-            :src="program.image"
-            :alt="program.title"
-            class="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
-
-        <!-- Info -->
-        <div class="flex-1 min-w-0">
-          <h3 class="font-semibold mb-2">{{ program.title }}</h3>
-          <p class="text-sm text-muted leading-relaxed line-clamp-3 mb-3">
-            {{ program.description }}
-          </p>
-          <div class="flex justify-end">
-            <UButton variant="outline" size="sm" color="neutral" :to="program.link">
-              More Detail
-            </UButton>
+      <div class="flex flex-col items-stretch">
+        <div class="flex items-center justify-between gap-4 px-6 py-4 pb-0">
+          <div class="flex items-center gap-4">
+            <div
+              class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+            >
+              <UIcon name="i-ph-rocket-launch-fill" class="size-4" />
+            </div>
+            <h2 class="font-bold text-xl text-slate-800">Programs</h2>
           </div>
         </div>
+        <USeparator class="mt-4" :ui="{ border: 'border-slate-100' }" />
       </div>
+    </template>
+
+    <div class="flex flex-col gap-4">
+      <DashboardProgramCard
+        v-for="program in programs"
+        :key="program.id"
+        :title="program.title"
+        :image="program.image"
+        :link="program.link"
+        :description="program.description"
+      />
     </div>
   </UCard>
 </template>

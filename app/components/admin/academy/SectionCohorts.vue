@@ -96,9 +96,9 @@ const columns: TableColumn<AdminCohort>[] = [
           <div class="flex items-center gap-2 justify-end">
             <UButton
               label="Detail"
-              icon="i-ph-caret-double-right-bold"
+              icon="i-ph-magnifying-glass-bold"
               size="sm"
-              variant="outline"
+              variant="light"
               :to="`/admin/cohorts/${row.original.id}`"
             />
           </div>

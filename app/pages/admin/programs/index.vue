@@ -33,7 +33,6 @@ const rylsNationalityOptions = computed(() => {
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 
-
 const route = useRoute()
 
 const search = ref('')
@@ -96,7 +95,7 @@ const filteredData = computed(() => {
   }
   if (paymentTypeFilter.value !== 'all') {
     result = result.filter((r) =>
-      r.payments.some((p: { type: string }) => p.type === paymentTypeFilter.value)
+      r.payments.some((p: { payment_method: string }) => p.payment_method === paymentTypeFilter.value)
     )
   }
   return result
@@ -116,7 +115,10 @@ const columns: TableColumn<RylsRegistration>[] = [
       h(
         'span',
         { class: 'text-muted' },
-        row.index + 1 + (dataTableRef.value?.pagination?.pageIndex ?? 0) * (dataTableRef.value?.pagination?.pageSize ?? 10)
+        row.index +
+          1 +
+          (dataTableRef.value?.pagination?.pageIndex ?? 0) *
+            (dataTableRef.value?.pagination?.pageSize ?? 10)
       )
   },
   {
@@ -200,11 +202,21 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      return h(
-        'span',
-        { class: 'text-sm whitespace-nowrap' },
-        PAYMENT_TYPE_LABEL[payment.type] ?? payment.type
-      )
+      const method = payment.payment_method
+      const logoMap: Record<string, string> = {
+        MIDTRANS: '/images/payment-logo/midtrans.png',
+        PAYPAL: '/images/payment-logo/paypal.png',
+      }
+      const logo = logoMap[method]
+      if (logo) {
+        return h('img', {
+          src: logo,
+          alt: PAYMENT_TYPE_LABEL[method] ?? method,
+          title: PAYMENT_TYPE_LABEL[method] ?? method,
+          class: 'h-5 object-contain'
+        })
+      }
+      return h('span', { class: 'text-sm whitespace-nowrap' }, PAYMENT_TYPE_LABEL[method] ?? method)
     }
   },
   {
@@ -213,7 +225,7 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      if (payment.type === 'PAYPAL' && payment.payment_proof) {
+      if ((payment.payment_method === 'PAYPAL' || payment.payment_method === 'BANK_TRANSFER') && payment.payment_proof) {
         return h(
           'a',
           {
@@ -226,16 +238,6 @@ const columns: TableColumn<RylsRegistration>[] = [
           ]
         )
       }
-      if (payment.type === 'BANK_TRANSFER' && payment.payment_proof) {
-        return h(
-          'a',
-          {
-            href: '#',
-            class: 'flex items-center gap-1 text-primary text-sm hover:underline'
-          },
-          [h('span', { class: 'i-ph-arrow-square-out-bold size-3' }), h('span', {}, 'Bank Proof')]
-        )
-      }
       return h('span', { class: 'text-muted text-sm' }, '–')
     }
   },
@@ -245,7 +247,7 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      return h('span', { class: 'text-sm whitespace-nowrap' }, formatPrice(payment.amount))
+      return h('span', { class: 'text-sm whitespace-nowrap' }, formatPrice(payment.transaction?.amount))
     }
   },
   {
@@ -263,7 +265,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         label: 'Detail',
         size: 'sm',
         color: 'primary',
-        variant: 'outline',
+        variant: 'light',
         leadingIcon: 'i-ph-magnifying-glass-bold',
         onClick: () => openDetail(row.original)
       })
@@ -283,10 +285,26 @@ const columns: TableColumn<RylsRegistration>[] = [
   >
     <template #toolbar-left>
       <div class="flex flex-wrap w-full sm:w-auto gap-2">
-        <USelect v-model="scholarshipFilter" :items="scholarshipOptions" class="flex-1 sm:flex-none sm:w-36" />
-        <USelect v-model="genderFilter" :items="genderOptions" class="flex-1 sm:flex-none sm:w-32" />
-        <USelect v-model="nationalityFilter" :items="rylsNationalityOptions" class="flex-1 sm:flex-none sm:w-36" />
-        <USelect v-model="paymentTypeFilter" :items="paymentTypeOptions" class="flex-1 sm:flex-none sm:w-36" />
+        <USelect
+          v-model="scholarshipFilter"
+          :items="scholarshipOptions"
+          class="flex-1 sm:flex-none sm:w-36"
+        />
+        <USelect
+          v-model="genderFilter"
+          :items="genderOptions"
+          class="flex-1 sm:flex-none sm:w-32"
+        />
+        <USelect
+          v-model="nationalityFilter"
+          :items="rylsNationalityOptions"
+          class="flex-1 sm:flex-none sm:w-36"
+        />
+        <USelect
+          v-model="paymentTypeFilter"
+          :items="paymentTypeOptions"
+          class="flex-1 sm:flex-none sm:w-36"
+        />
       </div>
     </template>
     <template #toolbar-right>

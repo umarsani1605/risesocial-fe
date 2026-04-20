@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import type { CohortModule, ModuleSessionStatus } from '@/types'
+import { useNow } from '@vueuse/core'
+import type { CohortModule } from '@/types'
 
 const props = defineProps<{
   modules: CohortModule[]
 }>()
 
-const visibleModules = computed(() =>
-  props.modules.filter((m) => m.session_status !== 'hidden' && m.is_published)
-)
+const now = useNow({ interval: 60_000 })
 
-const openModules = ref<Set<number>>(new Set(visibleModules.value.slice(0, 3).map((m) => m.id)))
+function getStatus(module: CohortModule) {
+  return computeModuleStatus(module, now.value)
+}
+
+const visibleModules = computed(() => props.modules.filter((m) => m.is_published))
+
+const openModules = ref<Set<number>>(new Set())
 
 function toggleModule(id: number) {
   if (openModules.value.has(id)) {
@@ -19,12 +24,20 @@ function toggleModule(id: number) {
   }
 }
 
-function isModuleOpen(id: number) {
-  return openModules.value.has(id)
+const isAnyOpen = computed(() => openModules.value.size > 0)
+
+function toggleAll() {
+  if (isAnyOpen.value) {
+    openModules.value = new Set()
+  } else {
+    openModules.value = new Set(visibleModules.value.map((m) => m.id))
+  }
 }
 
+defineExpose({ isAnyOpen, toggleAll })
+
 const sessionStatusConfig: Record<
-  ModuleSessionStatus,
+  'upcoming' | 'live' | 'completed',
   {
     label: string
     color: 'success' | 'error' | 'warning'
@@ -34,134 +47,112 @@ const sessionStatusConfig: Record<
 > = {
   completed: { label: 'Completed', color: 'success', variant: 'soft' },
   live: { label: 'Live Now', color: 'error', variant: 'soft', dot: true },
-  upcoming: { label: 'Up Coming', color: 'warning', variant: 'soft' },
-  hidden: { label: 'Hidden', color: 'warning', variant: 'soft' }
+  upcoming: { label: 'Up Coming', color: 'warning', variant: 'soft' }
 }
 
-function formatSessionTime(iso: string) {
-  const d = new Date(iso)
-  const date = formatDateLong(iso)
-  const time = d.toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZoneName: 'short'
-  })
-  return `${date}, ${time}`
+function formatSessionTime(module: CohortModule) {
+  if (!module.session_start_time) return null
+  const date = formatDateLong(module.session_start_time)
+  const start = formatTime(module.session_start_time)
+  const end = module.session_end_time ? ` – ${formatTime(module.session_end_time)}` : ''
+  return `${date}, ${start}${end} WIB`
 }
-
 </script>
 
 <template>
-  <div class="space-y-3 pt-2 min-h-[600px]">
-    <div
+  <div class="space-y-6 pt-2 min-h-[600px]">
+    <SharedAccordionItem
       v-for="module in visibleModules"
+      :id="`module-${module.order}`"
       :key="module.id"
-      class="border border-default rounded-lg overflow-hidden"
+      :is-open="openModules.has(module.id)"
+      @toggle="toggleModule(module.id)"
     >
-      <button
-        type="button"
-        class="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-elevated/50 transition-colors"
-        @click="toggleModule(module.id)"
-      >
+      <template #header>
         <span
-          class="flex items-center justify-center size-7 rounded-full bg-primary text-white text-sm font-bold shrink-0"
+          class="flex items-center justify-center size-7 rounded-full border border-slate-200 bg-slate-50 text-slate-500 group-hover:border-slate-200 transition-colors text-sm font-bold shrink-0"
+          :class="
+            getStatus(module) === 'completed' ? 'bg-primary! text-white! border-transparent!' : ''
+          "
         >
           {{ module.order }}
         </span>
         <div class="flex flex-1 items-center gap-2 min-w-0 flex-wrap">
           <span class="font-medium text-base leading-snug">{{ module.title }}</span>
-          <UBadge
-            v-if="module.session_status"
-            :label="sessionStatusConfig[module.session_status].label"
-            :color="sessionStatusConfig[module.session_status].color"
-            :variant="sessionStatusConfig[module.session_status].variant"
-          >
-            <template v-if="sessionStatusConfig[module.session_status].dot" #leading>
-              <span class="size-1.5 rounded-full bg-red-500 animate-pulse inline-block mr-1" />
-            </template>
-          </UBadge>
         </div>
-        <div class="flex items-center gap-3 shrink-0">
-          <span v-if="module.session_timestamp" class="hidden sm:block text-sm text-muted">
-            {{ formatSessionTime(module.session_timestamp) }}
-          </span>
-          <UIcon
-            :name="isModuleOpen(module.id) ? 'i-ph-caret-up-bold' : 'i-ph-caret-down-bold'"
-            class="size-4 text-muted"
-          />
-        </div>
-      </button>
+        <span v-if="module.session_start_time" class="hidden sm:block text-sm text-muted shrink-0">
+          {{ formatSessionTime(module) }}
+        </span>
+      </template>
 
-      <template v-if="isModuleOpen(module.id)">
-        <div class="border-t border-default px-4 py-4 space-y-4">
+      <template #body>
+        <div class="max-w-4xl space-y-4">
           <p v-if="module.description" class="text-sm text-muted leading-relaxed max-w-4xl">
             {{ module.description }}
           </p>
-
           <div v-if="module.attachments?.length" class="flex flex-wrap gap-2">
             <a
               v-for="attachment in module.attachments"
               :key="attachment.id"
               :href="attachment.type === 'file' ? attachment.file_url : attachment.url"
               target="_blank"
-              class="flex items-center gap-2 border border-default rounded-lg overflow-hidden hover:border-gray-300 transition-colors"
+              class="max-w-72 flex items-center gap-2 border border-default rounded-lg overflow-hidden hover:border-slate-200 hover:bg-slate-50 transition-colors"
             >
               <div
-                class="flex items-center justify-center size-12 text-white shrink-0"
-                :class="getAttachmentStyle(attachment).color"
+                class="flex items-center justify-center size-12 min-w-12 rounded-l-lg bg-white border-r border-slate-100"
+                :class="[getAttachmentStyle(attachment).foreground]"
               >
                 <UIcon :name="getAttachmentStyle(attachment).icon" class="size-4" />
               </div>
-              <span class="text-sm pr-3">{{ attachment.label }}</span>
+              <span class="truncate text-sm pr-3">{{ attachment.label }}</span>
             </a>
           </div>
         </div>
+      </template>
 
+      <template
+        v-if="module.meeting_link || module.assignment_link || module.attendance_link"
+        #footer
+      >
         <div
-          v-if="module.session_status === 'completed' || module.session_status === 'live'"
-          class="flex justify-end gap-2 border-t border-default p-2.5"
+          v-if="getStatus(module) === 'completed'"
+          class="flex items-center gap-1.5 text-sm text-muted px-1"
         >
-          <template v-if="module.session_status === 'completed'">
-            <UButton
-              v-if="module.assignment_link"
-              size="md"
-              variant="outline"
-              color="primary"
-              leading-icon="i-ph-clipboard-text-bold"
-              :to="module.assignment_link"
-              target="_blank"
-            >
-              Submit Assignment
-            </UButton>
-            <UButton
-              v-if="module.attendance_link"
-              size="md"
-              variant="outline"
-              color="primary"
-              leading-icon="i-ph-user-check-bold"
-              :to="module.attendance_link"
-              target="_blank"
-            >
-              Submit Attendance
-            </UButton>
-          </template>
-
-          <template v-else-if="module.session_status === 'live'">
-            <UButton
-              v-if="module.meeting_link"
-              size="md"
-              color="primary"
-              leading-icon="i-ph-video-bold"
-              :to="module.meeting_link"
-              target="_blank"
-            >
-              Join Class
-            </UButton>
-          </template>
+          <UIcon name="i-ph-check-circle-fill" class="size-4 text-success" />
+          Session Ended
+        </div>
+        <div v-else class="flex gap-2">
+          <UButton
+            v-if="module.meeting_link"
+            variant="dashboard"
+            leading-icon="i-ph-video-conference"
+            :to="getStatus(module) === 'live' ? module.meeting_link : undefined"
+            :disabled="getStatus(module) !== 'live'"
+            target="_blank"
+          >
+            Join Class
+          </UButton>
+          <UButton
+            v-if="module.attendance_link"
+            variant="light"
+            leading-icon="i-ph-note-pencil"
+            :disabled="getStatus(module) !== 'completed'"
+            target="_blank"
+          >
+            Attendance
+          </UButton>
+          <UButton
+            v-if="module.assignment_link"
+            variant="light"
+            leading-icon="i-ph-clipboard-text"
+            :disabled="getStatus(module) !== 'completed'"
+            target="_blank"
+          >
+            Assignment
+          </UButton>
         </div>
       </template>
-    </div>
+    </SharedAccordionItem>
 
     <div v-if="visibleModules.length === 0" class="text-center py-12 text-muted">
       <UIcon name="i-ph-book-open-bold" class="size-10 mx-auto mb-3" />

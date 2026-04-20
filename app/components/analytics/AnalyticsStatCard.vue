@@ -30,28 +30,37 @@ const trendColor = computed(() => ((props.stat.trend ?? 0) >= 0 ? 'success' : 'e
 </script>
 
 <template>
-  <UCard class="shadow-none!">
-    <div class="flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <div class="size-8 flex items-center justify-center rounded-lg" :class="iconColor.bg">
-          <UIcon :name="stat.icon" class="size-5" :class="iconColor.text" />
-        </div>
-        <p class="text-sm text-gray-400">{{ stat.title }}</p>
+  <UCard class="shadow-none!" :ui="{ body: 'p-4!' }">
+    <div class="flex gap-6">
+      <div
+        class="size-12 flex items-center justify-center rounded-xl border"
+        :class="iconColor.bg + ' ' + iconColor.border"
+      >
+        <UIcon :name="stat.icon" class="size-6" :class="iconColor.text" />
       </div>
-      <UButton :to="stat.to" variant="ghost" color="neutral" size="sm" class="p-2!">
-        <UIcon name="i-ph-arrow-up-right-bold" class="size-3.5" />
-      </UButton>
-    </div>
-
-    <!-- Value -->
-    <p class="text-3xl font-bold mt-3 truncate">{{ formattedValue }}</p>
-
-    <!-- Trend -->
-    <div v-if="trendPct || stat.trendLabel" class="flex items-center gap-2 mt-3">
-      <UBadge v-if="trendPct" :color="trendColor" variant="subtle" size="sm" class="rounded-full!">
-        {{ trendPct }}
-      </UBadge>
-      <p v-if="stat.trendLabel" class="text-sm text-gray-400 truncate">{{ stat.trendLabel }}</p>
+      <div class="flex flex-1 flex-col gap-2">
+        <div class="flex flex-1 items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <div class="text-sm text-gray-400">{{ stat.title }}</div>
+          </div>
+          <UButton :to="stat.to" variant="ghost" color="neutral" size="sm" class="p-2!">
+            <UIcon name="i-ph-arrow-up-right-bold" class="size-3.5" />
+          </UButton>
+        </div>
+        <p class="text-3xl font-bold truncate">{{ formattedValue }}</p>
+        <div v-if="trendPct || stat.trendLabel" class="flex items-center gap-2">
+          <UBadge
+            v-if="trendPct"
+            :color="trendColor"
+            variant="subtle"
+            size="sm"
+            class="rounded-full!"
+          >
+            {{ trendPct }}
+          </UBadge>
+          <p v-if="stat.trendLabel" class="text-sm text-gray-400 truncate">{{ stat.trendLabel }}</p>
+        </div>
+      </div>
     </div>
   </UCard>
 </template>

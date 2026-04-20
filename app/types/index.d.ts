@@ -89,7 +89,18 @@ export type { AdminCohortDetail, AdminCohortModule, AdminCohortAttachment, Admin
 
 // ── Cohort Types (User Dashboard) ────────────────────────────────────────────
 
-export type CohortStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED'
+export interface UpcomingSession {
+  id: number
+  type: 'session' | 'assignment'
+  title: string
+  link: string
+  cohort_id: number
+  session_start_time: string | null
+  session_end_time: string | null
+  assignment_deadline: string | null
+}
+
+export type CohortStatus = 'not_started' | 'ongoing' | 'completed'
 export type EnrollmentStatus = 'active' | 'pending' | 'completed'
 export type ModuleSessionStatus = 'upcoming' | 'live' | 'completed' | 'hidden'
 export interface CohortModuleAttachment {
@@ -110,12 +121,14 @@ export interface CohortModule {
   description: string | null
   order: number
   is_published: boolean
-  session_timestamp: string | null
+  session_start_time: string | null
+  session_end_time: string | null
   meeting_link: string | null
   attendance_link: string | null
+  assignment_title: string | null
   assignment_link: string | null
+  assignment_deadline: string | null
   attachments: CohortModuleAttachment[]
-  session_status?: ModuleSessionStatus
 }
 
 export interface CohortMentor {
@@ -156,6 +169,13 @@ export interface CohortEnrollment {
   cohort_id: number
   academy_id: number
   status: EnrollmentStatus
+  enrolled_at: string
+  completion_date: string | null
+  next_session: string | null
+  total_modules: number
+  completed_modules: number
+  has_certificate: boolean
+  certificate_url: string | null
   created_at: string
   cohort: {
     id: number

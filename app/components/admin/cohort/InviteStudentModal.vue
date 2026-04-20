@@ -29,7 +29,7 @@ function close() {
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
-      <UForm ref="inviteStudentForm" :schema="inviteStudentSchema" :state="state" @submit="emit('submit')">
+      <UForm ref="inviteStudentForm" :schema="inviteStudentSchema" :state="state" @submit="emit('submit')" :validate-on="['submit']">
         <UFormField name="email" label="Email">
           <UInput
             v-model="email"

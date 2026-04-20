@@ -102,8 +102,20 @@ defineProps<{
           <div class="space-y-2">
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Payment Type</span>
-              <span class="font-medium">{{
-                PAYMENT_TYPE_LABEL[registration.payments[0].type] ?? registration.payments[0].type
+              <img
+                v-if="registration.payments[0].payment_method === 'MIDTRANS'"
+                src="/images/payment-logo/midtrans.png"
+                alt="Midtrans"
+                class="h-5 object-contain"
+              />
+              <img
+                v-else-if="registration.payments[0].payment_method === 'PAYPAL'"
+                src="/images/payment-logo/paypal.png"
+                alt="PayPal"
+                class="h-5 object-contain"
+              />
+              <span v-else class="font-medium">{{
+                PAYMENT_TYPE_LABEL[registration.payments[0].payment_method] ?? registration.payments[0].payment_method
               }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
@@ -115,14 +127,14 @@ defineProps<{
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Amount</span>
               <span class="font-medium">{{
-                formatPrice(registration.payments[0].amount)
+                formatPrice(registration.payments[0].transaction?.amount)
               }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Payment Date</span>
               <span>{{
-                registration.payments[0].paid_at
-                  ? formatDatetime(registration.payments[0].paid_at)
+                registration.payments[0].transaction?.paid_at
+                  ? formatDatetime(registration.payments[0].transaction.paid_at)
                   : '–'
               }}</span>
             </div>

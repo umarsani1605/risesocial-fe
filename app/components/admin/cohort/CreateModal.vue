@@ -6,6 +6,8 @@ const form = defineModel<{
   academy_id: number | undefined
   name: string
   description: string
+  start_date: string
+  end_date: string
 }>('form', { required: true })
 
 defineProps<{
@@ -20,6 +22,7 @@ const formRef = useTemplateRef('formRef')
   <UModal v-model:open="open" title="Add New Cohort" :ui="{ footer: 'justify-end' }">
     <template #body>
       <UForm
+        :validate-on="['submit']"
         ref="formRef"
         :schema="cohortCreatePageSchema"
         :state="form"
@@ -45,6 +48,12 @@ const formRef = useTemplateRef('formRef')
             :rows="4"
             class="w-full"
           />
+        </UFormField>
+        <UFormField name="start_date" label="Start Date" required>
+          <UInput v-model="form.start_date" type="date" class="w-full" />
+        </UFormField>
+        <UFormField name="end_date" label="End Date" required>
+          <UInput v-model="form.end_date" type="date" class="w-full" />
         </UFormField>
       </UForm>
     </template>

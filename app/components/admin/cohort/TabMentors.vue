@@ -66,17 +66,7 @@ const columns: TableColumn<AdminCohortMentor>[] = [
 </script>
 
 <template>
-  <div class="pt-2 min-h-[400px]">
-    <!-- Invite button -->
-    <div class="flex justify-end mb-4">
-      <UButton
-        label="Invite Mentor"
-        icon="i-ph-user-plus-bold"
-        color="primary"
-        @click="emit('invite')"
-      />
-    </div>
-
+  <div class="pt-6 min-h-[400px]">
     <div
       v-if="mentors.length === 0"
       class="flex flex-col items-center justify-center py-16 text-muted text-sm"
@@ -91,8 +81,8 @@ const columns: TableColumn<AdminCohortMentor>[] = [
           <UAvatar
             :src="row.original.avatar ?? undefined"
             :text="initials(row.original)"
-            size="xs"
             color="primary"
+            class="bg-primary text-white text-sm rounded-full"
           />
           <div>
             <p class="font-medium">{{ row.original.name }}</p>

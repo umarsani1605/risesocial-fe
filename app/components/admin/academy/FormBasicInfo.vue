@@ -36,15 +36,17 @@ defineExpose({
     <!-- Left column -->
     <div class="space-y-5">
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2"
-          >Title <span class="text-error">*</span></span
-        >
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">
+          Title <span class="text-error">*</span>
+        </span>
         <UFormField name="title" class="flex-1">
           <UInput v-model="form.title" placeholder="Academy title" class="w-full" />
         </UFormField>
       </div>
       <div class="flex flex-col md:flex-row items-start gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2 md:pt-2">Description</span>
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2 md:pt-2">
+          Description <span class="text-error">*</span></span
+        >
         <UFormField name="description" class="flex-1 w-full">
           <UTextarea
             v-model="form.description"
@@ -55,7 +57,9 @@ defineExpose({
         </UFormField>
       </div>
       <div class="flex flex-col md:flex-row items-start gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2 md:pt-2">Cover Image</span>
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2 md:pt-2">
+          Cover Image <span class="text-error">*</span>
+        </span>
         <UFileUpload
           v-model="imageFile"
           accept="image/png,image/jpeg"
@@ -73,7 +77,9 @@ defineExpose({
     <!-- Right column -->
     <div class="space-y-5 mt-5 md:mt-0">
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Duration</span>
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">
+          Duration <span class="text-error">*</span>
+        </span>
         <UFormField name="duration" class="flex-1">
           <USelect
             v-model="form.duration"
@@ -84,7 +90,9 @@ defineExpose({
         </UFormField>
       </div>
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Format</span>
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">
+          Format <span class="text-error">*</span>
+        </span>
         <UFormField name="format" class="flex-1">
           <USelect
             v-model="form.format"
@@ -95,7 +103,9 @@ defineExpose({
         </UFormField>
       </div>
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
-        <span class="text-sm md:w-28 md:shrink-0 md:p-2">Category</span>
+        <span class="text-sm md:w-28 md:shrink-0 md:p-2">
+          Category <span class="text-error">*</span>
+        </span>
         <UFormField name="category" class="flex-1">
           <UInput v-model="form.category" placeholder="Category" class="w-full" />
         </UFormField>
@@ -121,7 +131,7 @@ defineExpose({
       </div>
       <div class="flex flex-col md:flex-row gap-1 md:gap-4">
         <span class="text-sm md:w-28 md:shrink-0 md:p-2">Meta Pixel ID</span>
-        <UInput v-model="form.meta_pixel_id" placeholder="Meta Pixel ID" class="flex-1" />
+        <UInput v-model="form.pixel_id" placeholder="Meta Pixel ID" class="flex-1" />
       </div>
     </div>
   </div>

@@ -53,14 +53,22 @@ const transactionCode = ref<string | null>(null)
 
 // Check if already enrolled
 onMounted(async () => {
+  let hasPendingPayment = false
   try {
     const result = await checkEnrollment(academy.value.id)
     if (result.enrolled) {
       toast.add({ title: 'You are already enrolled in this academy', color: 'info' })
       router.replace(`/academy/${academySlug}`)
+      return
     }
+    hasPendingPayment = result.hasPendingPayment ?? false
   } catch {
     // silently fail
+  }
+
+  if (!hasPendingPayment && academy.value.has_cohort === false) {
+    toast.add({ title: 'No enrollment batch available for this academy', color: 'warning' })
+    router.replace(`/academy/${academySlug}`)
   }
 })
 
@@ -133,9 +141,6 @@ const onPay = async () => {
           />
           <div class="flex-1">
             <p class="font-semibold leading-tight truncate">{{ academy.title }}</p>
-            <p v-if="academy.active_cohort" class="text-sm text-muted mt-0.5 truncate">
-              {{ academy.active_cohort.name }}
-            </p>
           </div>
           <div class="text-right shrink-0">
             <p class="font-semibold">{{ formatPrice(pricing!.discount_price) }}</p>

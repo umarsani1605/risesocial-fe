@@ -97,7 +97,7 @@ const columns: TableColumn<AcademyFeature>[] = [
             <UButton
               size="sm"
               color="primary"
-              variant="outline"
+              variant="light"
               leading-icon="i-ph-pencil-simple-bold"
               label="Edit"
               @click="openEdit(row.original)"
@@ -105,7 +105,7 @@ const columns: TableColumn<AcademyFeature>[] = [
             <UButton
               size="sm"
               color="error"
-              variant="outline"
+              variant="light"
               leading-icon="i-ph-trash-simple-bold"
               label="Delete"
               @click="confirmRemove(row.original)"

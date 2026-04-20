@@ -247,7 +247,7 @@ const columns: TableColumn<SyllabusRow>[] = [
               <UButton
                 size="sm"
                 color="primary"
-                variant="outline"
+                variant="light"
                 label="Add Topic"
                 leading-icon="i-ph-plus-bold"
                 @click="openAddTopic(row.original.id)"
@@ -255,7 +255,7 @@ const columns: TableColumn<SyllabusRow>[] = [
               <UButton
                 size="sm"
                 color="primary"
-                variant="outline"
+                variant="light"
                 leading-icon="i-ph-pencil-simple-bold"
                 label="Edit"
                 @click="openEditTheme(row.original)"
@@ -263,7 +263,7 @@ const columns: TableColumn<SyllabusRow>[] = [
               <UButton
                 size="sm"
                 color="error"
-                variant="outline"
+                variant="light"
                 leading-icon="i-ph-trash-simple-bold"
                 label="Delete"
                 @click="confirmDeleteTheme(row.original)"
@@ -273,7 +273,7 @@ const columns: TableColumn<SyllabusRow>[] = [
               <UButton
                 size="sm"
                 color="primary"
-                variant="outline"
+                variant="light"
                 leading-icon="i-ph-pencil-simple-bold"
                 label="Edit"
                 @click="openEditTopic(row.original)"
@@ -281,7 +281,7 @@ const columns: TableColumn<SyllabusRow>[] = [
               <UButton
                 size="sm"
                 color="error"
-                variant="outline"
+                variant="light"
                 leading-icon="i-ph-trash-simple-bold"
                 label="Delete"
                 @click="confirmDeleteTopic(row.original)"

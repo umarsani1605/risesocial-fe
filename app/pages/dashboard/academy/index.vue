@@ -12,17 +12,33 @@ const { api } = useApi()
 const { data: enrollmentsData } = await useAsyncData('dashboard:my-cohorts', () =>
   api<PaginatedResponse<CohortEnrollment>>('/cohorts/my')
 )
-const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.cohort) ?? [])
+const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, completed: 2 }
+
+const enrollments = computed(() =>
+  (enrollmentsData.value?.data.filter((e) => e.cohort) ?? []).sort(
+    (a, b) => (STATUS_ORDER[a.cohort.status] ?? 99) - (STATUS_ORDER[b.cohort.status] ?? 99)
+  )
+)
 </script>
 
 <template>
-  <UCard>
+  <UCard class="h-full border border-default/50" :ui="{ header: 'p-0!', body: 'p-6! pt-4!' }">
     <template #header>
-      <div class="flex items-center justify-between">
-        <h1 class="font-semibold text-lg">My Programs</h1>
-        <UButton variant="link" color="neutral" size="sm" to="/academy" class="text-muted">
-          View All Academy
-        </UButton>
+      <div class="flex flex-col items-stretch">
+        <div class="flex items-center justify-between gap-4 px-6 py-4 pb-0">
+          <div class="flex items-center gap-4">
+            <div
+              class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+            >
+              <UIcon name="i-ph-notebook-fill" class="size-4" />
+            </div>
+            <h2 class="font-bold text-xl text-slate-800">My Academy</h2>
+          </div>
+          <UButton variant="link" color="neutral" size="md" to="/academy" class="text-muted">
+            Explore All
+          </UButton>
+        </div>
+        <USeparator class="mt-4" :ui="{ border: 'border-slate-100' }" />
       </div>
     </template>
 
@@ -30,71 +46,15 @@ const enrollments = computed(() => enrollmentsData.value?.data.filter(e => e.coh
       <UIcon name="i-ph-graduation-cap-bold" class="size-12 text-muted mx-auto mb-3" />
       <p class="font-medium mb-1">No programs yet</p>
       <p class="text-sm text-muted mb-4">Explore our academy programs and start learning</p>
-      <UButton to="/academy" color="primary" variant="outline" size="sm">
-        Explore Academy
-      </UButton>
+      <UButton to="/academy" color="primary" variant="outline" size="sm"> Explore Academy </UButton>
     </div>
 
-    <div v-else class="space-y-4">
-      <NuxtLink
+    <div v-else class="flex flex-col gap-4">
+      <DashboardAcademyEnrollmentItem
         v-for="enrollment in enrollments"
         :key="enrollment.id"
-        :to="`/dashboard/academy/${enrollment.cohort.id}`"
-        class="block group"
-      >
-        <UCard :ui="{ root: 'shadow-sm' }">
-          <div class="flex gap-4 md:gap-6">
-            <!-- Image: small, left, rectangular -->
-            <div class="w-36 md:w-44 shrink-0 rounded-lg overflow-hidden bg-gray-100 aspect-video self-start">
-              <NuxtImg
-                v-if="enrollment.cohort.academy.image_url"
-                :src="enrollment.cohort.academy.image_url"
-                :alt="enrollment.cohort.academy.title"
-                class="w-full h-full object-cover"
-                format="webp"
-                loading="lazy"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <UIcon name="i-ph-image-bold" class="size-8 text-gray-400" />
-              </div>
-            </div>
-
-            <!-- Content -->
-            <div class="flex-1 flex flex-col justify-between min-w-0">
-              <div>
-                <h3 class="font-bold text-lg leading-tight mb-2">
-                  {{ enrollment.cohort.academy.title }}
-                </h3>
-                <!-- Metadata: inline row -->
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted mb-3">
-                  <span v-if="enrollment.cohort.academy.duration" class="flex items-center gap-1">
-                    <UIcon name="i-ph-clock-bold" class="size-3.5 shrink-0" />
-                    {{ enrollment.cohort.academy.duration }}
-                  </span>
-                  <span v-if="enrollment.cohort.academy.format" class="flex items-center gap-1">
-                    <UIcon name="i-ph-video-bold" class="size-3.5 shrink-0" />
-                    {{ enrollment.cohort.academy.format }}
-                  </span>
-                  <span class="flex items-center gap-1">
-                    <UIcon name="i-ph-calendar-bold" class="size-3.5 shrink-0" />
-                    INTAKE: {{ formatDate(enrollment.cohort.start_date) }}
-                  </span>
-                  <span v-if="enrollment.cohort.academy.certificate" class="flex items-center gap-1">
-                    <UIcon name="i-ph-medal-bold" class="size-3.5 shrink-0" />
-                    Sertifikat
-                  </span>
-                </div>
-                <p v-if="enrollment.cohort.academy.description" class="text-sm text-muted line-clamp-2 leading-relaxed">
-                  {{ enrollment.cohort.academy.description }}
-                </p>
-              </div>
-              <div class="flex justify-end mt-3">
-                <span class="text-sm text-muted group-hover:text-gray-700 transition-colors">More Detail</span>
-              </div>
-            </div>
-          </div>
-        </UCard>
-      </NuxtLink>
+        :enrollment="enrollment"
+      />
     </div>
   </UCard>
 </template>

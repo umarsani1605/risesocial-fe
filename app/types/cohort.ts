@@ -24,10 +24,13 @@ export interface AdminCohortModule {
   order: number
   title: string
   description: string | null
-  session_timestamp: string | null
+  session_start_time: string | null
+  session_end_time: string | null
   meeting_link: string | null
   attendance_link: string | null
+  assignment_title: string | null
   assignment_link: string | null
+  assignment_deadline: string | null
   is_published: boolean
   attachments: AdminCohortAttachment[]
 }
@@ -69,4 +72,10 @@ export interface AdminCohortEnrollment {
     phone: string | null
     avatar: string | null
   }
+  certificate: {
+    id: number
+    certificate_code: string
+    file_path: string | null
+    file_url: string | null
+  } | null
 }

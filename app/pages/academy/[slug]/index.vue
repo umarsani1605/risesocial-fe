@@ -157,7 +157,7 @@ function nextTestimonial() {
                     <div class="shrink-0">
                       <UIcon
                         :name="
-                          feature.icon?.startsWith('i-') ? feature.icon : `i-lucide-${feature.icon}`
+                          feature.icon?.startsWith('i-') ? feature.icon : `i-ph-${feature.icon}-fill`
                         "
                         class="size-12 md:size-6 text-primary"
                       />

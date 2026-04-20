@@ -29,7 +29,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'Total Revenue',
     value: overview.value?.totalRevenue ?? 0,
-    icon: 'solar:wallet-money-bold-duotone',
+    icon: 'ph:wallet',
     trend: overview.value?.totalRevenueTrend,
     trendLabel: 'vs last week',
     color: 'green',
@@ -38,7 +38,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'Total Users',
     value: overview.value?.totalUsers ?? 0,
-    icon: 'solar:users-group-rounded-bold-duotone',
+    icon: 'ph:users-three',
     trend: overview.value?.totalUsersTrend,
     trendLabel: 'vs last week',
     color: 'blue',
@@ -47,7 +47,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'Active Cohorts',
     value: overview.value?.activeCohorts ?? 0,
-    icon: 'solar:square-academic-cap-2-bold-duotone',
+    icon: 'ph:graduation-cap',
     trend: overview.value?.activeCohortsTrend,
     trendLabel: 'vs last week',
     color: 'purple',
@@ -56,7 +56,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
   {
     title: 'RYLS Registrations',
     value: overview.value?.rylsRegistrations ?? 0,
-    icon: 'solar:medal-ribbon-star-bold-duotone',
+    icon: 'ph:medal',
     trend: overview.value?.rylsRegistrationsTrend,
     trendLabel: 'vs last week',
     color: 'orange',
@@ -163,17 +163,17 @@ const columns: TableColumn<AdminTransaction>[] = [
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <LazyAnalyticsAreaChart
+      <AnalyticsAreaChart
         v-if="overview?.revenueTrend?.length"
         :data="overview.revenueTrend"
         title="Revenue Trend (30d)"
         color="primary"
         :height="300"
       />
-      <LazyAnalyticsAreaChart
+      <AnalyticsAreaChart
         v-if="overview?.usersTrend?.length"
         :data="overview.usersTrend"
-        title="User Growth (30d)"
+        title="RYLS Registrations Trend (30d)"
         color="primary"
         :height="300"
       />

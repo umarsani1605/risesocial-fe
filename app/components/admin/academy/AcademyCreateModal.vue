@@ -20,6 +20,7 @@ const formRef = useTemplateRef('formRef')
   <UModal v-model:open="open" title="Add New Academy" :ui="{ footer: 'justify-end' }">
     <template #body>
       <UForm
+        :validate-on="['submit']"
         ref="formRef"
         :schema="academyCreateSchema"
         :state="form"

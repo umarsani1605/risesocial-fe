@@ -65,7 +65,6 @@ function resetFilters() {
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 
-
 const columns: TableColumn<AdminTransaction>[] = [
   {
     accessorKey: 'transaction_code',
@@ -108,18 +107,6 @@ const columns: TableColumn<AdminTransaction>[] = [
     cell: ({ row }) => h('span', { class: 'text-sm' }, formatPrice(row.getValue('amount')))
   },
   {
-    accessorKey: 'provider',
-    header: 'Provider',
-    cell: ({ row }) => {
-      const provider = row.getValue('provider') as string | null
-      return h(
-        'span',
-        { class: 'text-sm' },
-        provider ? (PROVIDER_LABEL[provider] ?? provider) : '—'
-      )
-    }
-  },
-  {
     accessorKey: 'payment_method',
     header: 'Method',
     cell: ({ row }) => {
@@ -134,7 +121,11 @@ const columns: TableColumn<AdminTransaction>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string
       const label = status.charAt(0).toUpperCase() + status.slice(1)
-      return h(UBadge, { variant: 'subtle', color: TRANSACTION_STATUS_COLOR[status] ?? 'neutral' }, () => label)
+      return h(
+        UBadge,
+        { variant: 'subtle', color: TRANSACTION_STATUS_COLOR[status] ?? 'neutral' },
+        () => label
+      )
     }
   },
   {
@@ -144,12 +135,13 @@ const columns: TableColumn<AdminTransaction>[] = [
   },
   {
     id: 'actions',
+    header: 'Actions',
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h(UButton, {
         label: 'Detail',
         color: 'primary',
-        variant: 'outline',
+        variant: 'light',
         size: 'sm',
         leadingIcon: 'i-ph-magnifying-glass-bold',
         onClick: () => openDetail(row.original.id)
@@ -174,6 +166,7 @@ function openDetail(id: number) {
     :columns="columns"
     :table-ui="{ td: 'align-top' }"
     table-class="px-4 sm:px-6"
+    :column-pinning="{}"
   >
     <template #toolbar>
       <div class="flex flex-wrap items-center gap-2">
@@ -209,23 +202,25 @@ function openDetail(id: number) {
               :items="[10, 25, 50, 100]"
               size="sm"
               class="w-20"
-              @update:model-value="(val: number) => { limit = Number(val); page = 1 }"
+              @update:model-value="
+                (val: number) => {
+                  limit = Number(val)
+                  page = 1
+                }
+              "
             />
           </div>
-          <UPagination
-            v-model:page="page"
-            :total="meta?.total ?? 0"
-            :items-per-page="limit"
-            variant="ghost"
-            size="sm"
-          />
         </div>
+        <UPagination
+          v-model:page="page"
+          :total="meta?.total ?? 0"
+          :items-per-page="limit"
+          variant="ghost"
+          size="sm"
+        />
       </div>
     </template>
   </AdminDataTable>
 
-  <AdminTransactionDetailSlideover
-    v-model:open="isSlideoverOpen"
-    :transaction-id="selectedId"
-  />
+  <AdminTransactionDetailSlideover v-model:open="isSlideoverOpen" :transaction-id="selectedId" />
 </template>

@@ -127,9 +127,9 @@ const columns: TableColumn<AdminAcademy>[] = [
     header: 'Duration'
   },
   {
-    accessorKey: 'format',
-    header: 'Format',
-    cell: ({ row }) => h('span', { class: 'text-muted' }, row.getValue('format'))
+    accessorKey: 'cohort_count',
+    header: 'Cohorts',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, String(row.original.cohort_count ?? 0))
   },
   {
     accessorKey: 'status',
@@ -137,7 +137,7 @@ const columns: TableColumn<AdminAcademy>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string
       const label = statusOptions.find((s) => s.value === status)?.label ?? status
-      const color = status === 'ACTIVE' ? ('success' as const) : ('neutral' as const)
+      const color = status === 'ACTIVE' ? ('success' as const) : status === 'DRAFT' ? ('warning' as const) : ('neutral' as const)
       return h(UBadge, { variant: 'subtle', color }, () => label)
     }
   },
@@ -151,7 +151,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           label: 'Edit',
           size: 'sm',
           color: 'primary',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-pencil-simple-bold',
           to: `/admin/academies/${row.original.slug}/edit`
         }),
@@ -159,7 +159,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           label: 'Delete',
           size: 'sm',
           color: 'error',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })
@@ -177,12 +177,25 @@ const columns: TableColumn<AdminAcademy>[] = [
   >
     <template #toolbar-left>
       <div class="flex w-full sm:w-auto gap-2">
-        <USelect v-model="categoryFilter" :items="categoryOptions" class="flex-1 sm:flex-none sm:w-40" />
-        <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
+        <USelect
+          v-model="categoryFilter"
+          :items="categoryOptions"
+          class="flex-1 sm:flex-none sm:w-40"
+        />
+        <USelect
+          v-model="statusFilter"
+          :items="statusOptions"
+          class="flex-1 sm:flex-none sm:w-36"
+        />
       </div>
     </template>
     <template #toolbar-right>
-      <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="createModalOpen = true" />
+      <UButton
+        label="Add New"
+        icon="i-ph-plus-bold"
+        color="primary"
+        @click="createModalOpen = true"
+      />
     </template>
   </AdminDataTable>
 

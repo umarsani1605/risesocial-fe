@@ -6,10 +6,22 @@ export function randomFrom<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)]!
 }
 
+export function formatDateMonth(dateString: string): string {
+  if (!dateString) return 'N/A'
+  try {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
 export function formatDate(dateString: string): string {
   if (!dateString) return 'N/A'
   try {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
@@ -22,7 +34,7 @@ export function formatDate(dateString: string): string {
 export function formatDatetime(dateString: string): string {
   if (!dateString) return 'N/A'
   try {
-    return new Date(dateString).toLocaleString('en-US', {
+    return new Date(dateString).toLocaleString('en-GB', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -107,5 +119,40 @@ export function formatPrice(price: number): string {
 }
 
 export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
-  return (error as Record<string, any>)?.data?.message ?? fallback
+  const data = (error as Record<string, unknown> & { data?: Record<string, string> })?.data
+  return data?.details ?? data?.message ?? fallback
+}
+
+// ── Cohort module utilities ───────────────────────────────────────────────────
+
+export function formatTime(isoString: string): string {
+  if (!isoString) return 'N/A'
+  try {
+    return new Date(isoString).toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Jakarta'
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
+export type ModuleStatusInput = {
+  session_start_time: string | null
+  session_end_time: string | null
+}
+
+export function computeModuleStatus(
+  module: ModuleStatusInput,
+  now: Date
+): 'upcoming' | 'live' | 'completed' {
+  if (!module.session_start_time) return 'upcoming'
+  const start = new Date(module.session_start_time)
+  const end = module.session_end_time ? new Date(module.session_end_time) : null
+  if (now < start) return 'upcoming'
+  if (end && now > end) return 'completed'
+  if (!end && now > new Date(start.getTime() + 120 * 60 * 1000)) return 'completed'
+  return 'live'
 }

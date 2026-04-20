@@ -82,7 +82,7 @@ async function save() {
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <UForm ref="formRef" :schema="pricingFormSchema" :state="form" class="space-y-4" @submit="save">
+      <UForm ref="formRef" :schema="pricingFormSchema" :state="form" class="space-y-4" @submit="save" :validate-on="['submit']">
         <UFormField name="name" label="Package Name" required>
           <UInput v-model="form.name" placeholder="e.g. Early Bird" class="w-full" />
         </UFormField>

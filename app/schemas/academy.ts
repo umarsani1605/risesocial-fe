@@ -6,6 +6,7 @@ export const academyFormSchema = z.object({
   duration: z.string().min(1, 'Duration is required'),
   format: z.string().min(1, 'Format is required'),
   category: z.string().min(1, 'Category is required'),
+  pixel_id: z.string().optional(),
 })
 
 export const academyCreateSchema = z.object({
@@ -14,6 +15,7 @@ export const academyCreateSchema = z.object({
   duration: z.string().min(1, 'Duration is required'),
   format: z.string().min(1, 'Format is required'),
   category: z.string().min(1, 'Category is required'),
+  pixel_id: z.string().optional(),
 })
 
 export const pricingFormSchema = z.object({

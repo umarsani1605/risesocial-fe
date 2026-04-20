@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CohortEnrollment } from '@/types'
+import type { CohortEnrollment, UpcomingSession } from '@/types'
 
 definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
@@ -9,110 +9,14 @@ useSeoMeta({
 })
 
 const { user } = useAuth()
+const { api } = useApi()
 
-// TODO: Replace with real API call — await useAsyncData('dashboard:enrollments', ...)
-const enrollments = ref<CohortEnrollment[]>([
-  {
-    id: 1,
-    user_id: 1,
-    cohort_id: 5,
-    academy_id: 1,
-    status: 'active',
-    created_at: '2026-02-25T00:00:00.000Z',
-    cohort: {
-      id: 5,
-      name: 'Cohort 5',
-      status: 'ONGOING',
-      start_date: '2026-02-25',
-      end_date: '2026-06-25',
-      academy: {
-        id: 1,
-        title: 'Data Science & Machine Learning Professional',
-        slug: 'data-science',
-        image_url: '/images/academy/data-science.jpg',
-        duration: '4 bulan',
-        format: 'Live Class',
-        certificate: true,
-        description: null
-      }
-    }
-  },
-  {
-    id: 2,
-    user_id: 1,
-    cohort_id: 3,
-    academy_id: 2,
-    status: 'active',
-    created_at: '2026-02-25T00:00:00.000Z',
-    cohort: {
-      id: 3,
-      name: 'Cohort 3',
-      status: 'ONGOING',
-      start_date: '2026-02-25',
-      end_date: '2026-06-25',
-      academy: {
-        id: 2,
-        title: 'Full Stack Web Development Bootcamp',
-        slug: 'full-stack',
-        image_url: '/images/academy/fullstack.jpg',
-        duration: '3 bulan',
-        format: 'Live Class',
-        certificate: true,
-        description: null
-      }
-    }
-  },
-  {
-    id: 3,
-    user_id: 1,
-    cohort_id: 2,
-    academy_id: 3,
-    status: 'pending',
-    created_at: '2025-12-01T00:00:00.000Z',
-    cohort: {
-      id: 2,
-      name: 'Cohort 2',
-      status: 'UPCOMING',
-      start_date: '2025-12-27',
-      end_date: '2026-05-27',
-      academy: {
-        id: 3,
-        title: 'ESG Academy: Sustainability & Impact Leadership',
-        slug: 'esg-academy',
-        image_url: '/images/academy/esg.jpg',
-        duration: '5 bulan',
-        format: 'Live Class',
-        certificate: true,
-        description: null
-      }
-    }
-  },
-  {
-    id: 4,
-    user_id: 1,
-    cohort_id: 1,
-    academy_id: 3,
-    status: 'completed',
-    created_at: '2025-06-01T00:00:00.000Z',
-    cohort: {
-      id: 1,
-      name: 'Cohort 1',
-      status: 'COMPLETED',
-      start_date: '2025-02-25',
-      end_date: '2025-07-25',
-      academy: {
-        id: 3,
-        title: 'ESG Academy: Sustainability & Impact Leadership',
-        slug: 'esg-academy',
-        image_url: '/images/academy/esg.jpg',
-        duration: '5 bulan',
-        format: 'Live Class',
-        certificate: true,
-        description: null
-      }
-    }
-  }
-])
+// Hanya fetch data enrollment (My Academy) karena All Academy dihapus
+const { data: enrollmentsData } = await useAsyncData('dashboard:enrollments', () =>
+  api<PaginatedResponse<CohortEnrollment>>('/cohorts/my', { query: { limit: 100 } })
+)
+
+const enrollments = computed(() => enrollmentsData.value?.data ?? [])
 
 const dynamicGreeting = computed(() => {
   const hour = new Date().getHours()
@@ -121,296 +25,181 @@ const dynamicGreeting = computed(() => {
   return 'Good evening'
 })
 
-const activeEnrollment = computed(() =>
-  enrollments.value.find(e => e.status === 'active') ?? null
+const titleIndex = useState('dashboard:title-index', () => Math.floor(Math.random() * 5))
+
+const dynamicTitle = computed(() => {
+  const g = dynamicGreeting.value
+  const n = user.value?.first_name ?? ''
+  const templates = [
+    `${g}, ${n}!`,
+    `Ready, ${n}?`,
+    `Let's go, ${n}!`,
+    `${n}, go make impact!`,
+    `${n}, lead the change!`
+  ]
+  return templates[titleIndex.value]
+})
+
+const activeEnrollment = computed(
+  () => enrollments.value.find((e) => e.status === 'active') ?? null
 )
 
-const displayedEnrollments = computed(() =>
-  enrollments.value.slice(0, 6)
+const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, completed: 2 }
+
+const recentEnrollments = computed(() =>
+  [...enrollments.value]
+    .sort((a, b) => (STATUS_ORDER[a.cohort.status] ?? 99) - (STATUS_ORDER[b.cohort.status] ?? 99))
+    .slice(0, 3)
 )
 
-const dynamicSubtitle = computed(() =>
-  activeEnrollment.value
-    ? 'Lanjutkan perjalanan belajarmu dari sesi sebelumnya.'
-    : 'Mulai perjalanan belajarmu dan eksplorasi program akademi kami.'
-)
-
-function statusBadgeColor(status: string) {
-  if (status === 'completed') return 'success' as const
-  if (status === 'active') return 'primary' as const
-  return 'warning' as const
-}
-
-const programs = [
-  {
-    id: 1,
-    title: 'Rise Young Leaders Summit',
-    image: '/images/ryls_banner.jpg',
-    link: '/programs/rise-young-leaders-summit',
-    description:
-      'Rise Young Leaders Summit adalah program tahunan untuk meningkatkan kapasitas kepemimpinan pemuda usia 16-25 tahun melalui berbagai topik dan kompetisi.'
-  },
-  {
-    id: 2,
-    title: 'Rise Sustainability Academy',
-    image: '/images/rise_educator.png',
-    link: '/academy',
-    description:
-      'Program pembelajaran online 1-5 bulan live class bersama pakar dan mentor untuk pemahaman komprehensif di berbagai topik keberlanjutan.'
-  },
-  {
-    id: 3,
-    title: 'Rise & Thrive: Youth Empowerment Program',
-    image: '/images/programs/rise-and-thrive/rise_and_thrive_1.jpeg',
-    link: '/programs/rise-and-thrive',
-    description:
-      'Program pemberdayaan pemuda dengan membekali keterampilan, mindset, dan peluang untuk mengubah sumber daya lokal menjadi usaha ekonomi berkelanjutan.'
-  }
+const activeSubtitles = [
+  'Your cohort meets live this week. Show up, learn, and shape a greener world!',
+  'Every session is a step toward a future worth building. See you live!',
+  'The planet needs people like you. Your next live session is coming!',
+  'Sustainability starts with knowledge. Your cohort is ready when you are!',
+  'Real change is built in community. Join your live session this week.'
 ]
+
+const inactiveSubtitles = [
+  'The future is sustainable — and it starts with what you learn today.',
+  'Join a cohort of changemakers and start your journey toward a greener future.',
+  "Your skills can drive real impact. Let's continue learning."
+]
+
+const subtitleIndex = useState('dashboard:subtitle-index', () => Math.floor(Math.random() * 5))
+
+const dynamicSubtitle = computed(() => {
+  const pool = activeEnrollment.value ? activeSubtitles : inactiveSubtitles
+  return pool[subtitleIndex.value % pool.length]
+})
+
+const { data: upcomingData } = await useAsyncData('dashboard:upcoming', () =>
+  api<ApiResponse<UpcomingSession[]>>('/cohorts/upcoming', { query: { limit: 7 } })
+)
+
+const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
 </script>
 
 <template>
-  <div class="space-y-8">
-    <!-- ─── Hero Banner ─── -->
-    <div class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#073635] to-[#0E5C59] text-white">
-      <!-- Radial glow -->
-      <div class="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-      <!-- Botanical graphic -->
+  <div class="flex flex-col flex-1 space-y-6">
+    <div
+      class="relative rounded-2xl bg-deep-teal-850 px-8 sm:px-12 py-8 sm:py-10 mb-4 overflow-hidden shadow-sm"
+    >
+      <div class="relative z-10 max-w-2xl">
+        <h1
+          class="text-2xl sm:text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight text-white"
+        >
+          {{ dynamicTitle }}
+        </h1>
+
+        <p class="text-base sm:text-lg text-white/80 leading-relaxed">
+          {{ dynamicSubtitle }}
+        </p>
+
+        <!-- <div class="flex flex-wrap gap-3">
+          <UButton
+            v-if="activeEnrollment"
+            color="primary"
+            size="lg"
+            :to="`/dashboard/academy/${activeEnrollment.cohort.id}`"
+            icon="i-ph-play-bold"
+          >
+            Continue Learning
+          </UButton>
+          <UButton v-else color="primary" size="lg" to="/academy" icon="i-ph-magnifying-glass-bold">
+            Explore Academy
+          </UButton>
+        </div> -->
+      </div>
+
+      <!-- Decorative graphic -->
       <img
         src="/images/dashboard/graphic.png"
         alt=""
         aria-hidden="true"
-        class="absolute -right-10 -bottom-6 h-64 md:h-96 opacity-[0.08] pointer-events-none select-none"
+        class="absolute -right-16 -bottom-20 h-56 md:h-80 opacity-5 pointer-events-none"
       />
-
-      <div class="relative px-8 sm:px-12 pt-10 sm:pt-14 pb-10 sm:pb-14 max-w-2xl">
-        <!-- Pill label -->
-        <div class="inline-flex items-center gap-1.5 bg-white/15 rounded-full px-3 py-1 text-xs font-medium mb-5 backdrop-blur-sm">
-          <UIcon name="i-ph-graduation-cap-bold" class="size-3.5" />
-          Learning Hub
-        </div>
-
-        <!-- Greeting -->
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 leading-tight tracking-tight">
-          <ClientOnly fallback-tag="span" fallback="Welcome back">{{ dynamicGreeting }}</ClientOnly>,
-          {{ user?.first_name }}!
-        </h1>
-
-        <!-- Subtitle -->
-        <p class="text-base sm:text-lg mb-8 opacity-85 leading-relaxed">
-          {{ dynamicSubtitle }}
-        </p>
-
-        <!-- CTAs -->
-        <div class="flex flex-wrap gap-3">
-          <UButton
-            color="primary"
-            size="lg"
-            to="/dashboard/academy"
-            icon="i-ph-play-circle-bold"
-          >
-            Continue Learning
-          </UButton>
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="lg"
-            to="/academy"
-            class="text-white! hover:bg-white/15!"
-          >
-            Explore Academy
-          </UButton>
-        </div>
-      </div>
     </div>
 
-    <!-- ─── Continue Learning (Featured) ─── -->
-    <section v-if="activeEnrollment">
-      <div class="flex items-center gap-2 mb-4">
-        <UIcon name="i-ph-play-circle-fill" class="size-5 text-primary" />
-        <h2 class="text-lg font-bold">Lanjutkan Belajar</h2>
-      </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-1">
+      <div class="lg:col-span-8 space-y-6">
+        <UCard class="h-full border border-default/50" :ui="{ header: 'p-0!', body: 'p-4!' }">
+          <template #header>
+            <div class="flex items-center gap-4 px-6 pt-4 pb-0">
+              <div
+                class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+              >
+                <UIcon name="i-ph-notebook-fill" class="size-4" />
+              </div>
+              <h2 class="font-bold text-xl text-slate-800">My Academy</h2>
+            </div>
+            <USeparator class="mt-4" :ui="{ border: 'border-slate-100' }" />
+          </template>
+          <div
+            v-if="recentEnrollments.length === 0"
+            class="flex flex-col items-center justify-center py-10 text-center gap-4 rounded-xl"
+          >
+            <UIcon name="i-ph-graduation-cap-bold" class="size-12 py-8 text-slate-400" />
+            <div>
+              <p class="font-semibold text-slate-800">No active program</p>
+              <p class="text-sm text-slate-500 mt-1 max-w-xs">
+                You are not currently enrolled in any learning program.
+              </p>
+            </div>
+            <UButton to="/academy" color="primary" variant="solid" size="sm" class="mt-2">
+              Explore Academy
+            </UButton>
+          </div>
 
-      <NuxtLink :to="`/dashboard/academy/${activeEnrollment.cohort.id}`" class="block group">
-        <div
-          class="flex flex-col sm:flex-row gap-0 rounded-2xl border border-default hover:border-primary/40 hover:shadow-lg transition-all duration-200 overflow-hidden bg-white"
-        >
-          <!-- Course image -->
-          <div class="w-full sm:w-72 md:w-80 aspect-video sm:aspect-auto overflow-hidden bg-gray-100 shrink-0">
-            <NuxtImg
-              :src="activeEnrollment.cohort.academy.image_url ?? ''"
-              :alt="activeEnrollment.cohort.academy.title"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          <div v-else class="space-y-4">
+            <DashboardEnrollmentCard
+              v-for="enrollment in recentEnrollments"
+              :key="enrollment.id"
+              :enrollment="enrollment"
             />
           </div>
-
-          <!-- Course info -->
-          <div class="flex-1 flex flex-col justify-between p-6">
-            <div>
-              <div class="flex flex-wrap items-center gap-2 mb-3">
-                <UBadge color="neutral" variant="subtle" size="sm">
-                  {{ activeEnrollment.cohort.name }}
-                </UBadge>
-                <UBadge color="primary" variant="subtle" size="sm">
-                  Active
-                </UBadge>
-                <UBadge
-                  v-if="activeEnrollment.cohort.academy.certificate"
-                  color="success"
-                  variant="subtle"
-                  size="sm"
-                  icon="i-ph-certificate-bold"
-                >
-                  Certificate
-                </UBadge>
-              </div>
-              <h3 class="text-xl font-bold leading-snug mb-2">
-                {{ activeEnrollment.cohort.academy.title }}
-              </h3>
-              <div class="flex flex-wrap items-center gap-4 text-sm text-muted">
-                <span class="flex items-center gap-1.5">
-                  <UIcon name="i-ph-calendar-bold" class="size-4 shrink-0" />
-                  Mulai {{ formatDate(activeEnrollment.cohort.start_date) }}
-                </span>
-                <span v-if="activeEnrollment.cohort.academy.duration" class="flex items-center gap-1.5">
-                  <UIcon name="i-ph-clock-bold" class="size-4 shrink-0" />
-                  {{ activeEnrollment.cohort.academy.duration }}
-                </span>
-                <span v-if="activeEnrollment.cohort.academy.format" class="flex items-center gap-1.5">
-                  <UIcon name="i-ph-video-camera-bold" class="size-4 shrink-0" />
-                  {{ activeEnrollment.cohort.academy.format }}
-                </span>
-              </div>
-            </div>
-
-            <div class="mt-5">
-              <UButton color="primary" size="md" trailing-icon="i-ph-arrow-right-bold">
-                Lanjutkan
-              </UButton>
-            </div>
-          </div>
-        </div>
-      </NuxtLink>
-    </section>
-
-    <!-- ─── My Courses ─── -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold">Kursus Saya</h2>
-        <UButton variant="link" color="neutral" size="sm" to="/dashboard/academy" class="text-muted">
-          Lihat Semua
-        </UButton>
+        </UCard>
       </div>
 
-      <!-- Empty state -->
-      <div
-        v-if="displayedEnrollments.length === 0"
-        class="flex flex-col items-center justify-center py-16 text-center gap-3 rounded-2xl border border-dashed border-default"
-      >
-        <UIcon name="i-ph-graduation-cap-bold" class="size-12 text-muted" />
-        <div>
-          <p class="font-medium text-sm">Belum ada kursus</p>
-          <p class="text-sm text-muted mt-1">Daftar ke program akademi untuk mulai belajar</p>
-        </div>
-        <UButton to="/academy" color="primary" variant="outline" size="sm" class="mt-1">
-          Explore Academy
-        </UButton>
-      </div>
+      <div class="lg:col-span-4">
+        <UCard class="h-full border border-default/50" :ui="{ header: 'p-0!', body: 'p-4!' }">
+          <template #header>
+            <div class="flex items-center gap-4 px-6 pt-4 pb-0">
+              <div
+                class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+              >
+                <UIcon name="i-ph-calendar-check-fill" class="size-4" />
+              </div>
+              <h2 class="font-bold text-lg text-slate-800">Upcoming</h2>
+            </div>
+            <USeparator class="mt-4" :ui="{ border: 'border-slate-100' }" />
+          </template>
 
-      <!-- Grid -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <NuxtLink
-          v-for="enrollment in displayedEnrollments"
-          :key="enrollment.id"
-          :to="`/dashboard/academy/${enrollment.cohort.id}`"
-          class="block group"
-        >
-          <div
-            class="rounded-xl border border-default hover:border-primary/30 hover:shadow-md transition-all duration-200 overflow-hidden bg-white h-full flex flex-col"
-          >
-            <!-- Thumbnail -->
-            <div class="aspect-video bg-gray-100 overflow-hidden shrink-0">
-              <NuxtImg
-                :src="enrollment.cohort.academy.image_url ?? ''"
-                :alt="enrollment.cohort.academy.title"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
+          <div>
+            <div class="space-y-4">
+              <DashboardUpcomingCard
+                v-for="session in upcomingSessions"
+                :key="session.id"
+                :session="session"
               />
             </div>
-
-            <!-- Info -->
-            <div class="p-4 flex flex-col flex-1">
-              <p class="font-semibold leading-snug line-clamp-2 mb-1">
-                {{ enrollment.cohort.academy.title }}
-              </p>
-              <p class="text-sm text-muted mb-3">{{ enrollment.cohort.name }}</p>
-
-              <div class="flex items-center justify-between mt-auto">
-                <span class="flex items-center gap-1.5 text-xs text-muted">
-                  <UIcon name="i-ph-calendar-bold" class="size-3.5 shrink-0" />
-                  {{ formatDate(enrollment.cohort.start_date) }}
-                </span>
-                <UBadge
-                  :color="statusBadgeColor(enrollment.status)"
-                  variant="subtle"
-                  size="xs"
-                >
-                  {{ enrollment.status }}
-                </UBadge>
+            <div
+              v-if="upcomingSessions.length === 0"
+              class="py-10 text-center flex flex-col items-center gap-3"
+            >
+              <div
+                class="size-14 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center"
+              >
+                <UIcon name="i-ph-calendar-blank-duotone" class="size-7 text-slate-400" />
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-700">No upcoming schedules</p>
+                <p class="text-xs text-slate-500 mt-1">Enjoy your free time!</p>
               </div>
             </div>
           </div>
-        </NuxtLink>
+        </UCard>
       </div>
-    </section>
-
-    <!-- ─── Discover Programs ─── -->
-    <section>
-      <h2 class="text-lg font-bold mb-4">Program Rise Social</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <NuxtLink
-          v-for="program in programs"
-          :key="program.id"
-          :to="program.link"
-          class="block group"
-        >
-          <div
-            class="rounded-xl border border-default hover:border-primary/30 hover:shadow-md transition-all duration-200 overflow-hidden bg-white h-full flex flex-col"
-          >
-            <!-- Image -->
-            <div class="aspect-video bg-gray-100 overflow-hidden shrink-0">
-              <NuxtImg
-                :src="program.image"
-                :alt="program.title"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <!-- Info -->
-            <div class="p-4 flex flex-col flex-1">
-              <h3 class="font-semibold leading-snug line-clamp-2 mb-2">
-                {{ program.title }}
-              </h3>
-              <p class="text-sm text-muted leading-relaxed line-clamp-3 flex-1">
-                {{ program.description }}
-              </p>
-              <div class="mt-4">
-                <UButton
-                  variant="outline"
-                  size="sm"
-                  color="neutral"
-                  block
-                  trailing-icon="i-ph-arrow-right-bold"
-                >
-                  Lihat Detail
-                </UButton>
-              </div>
-            </div>
-          </div>
-        </NuxtLink>
-      </div>
-    </section>
+    </div>
   </div>
 </template>

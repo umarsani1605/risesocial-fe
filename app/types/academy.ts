@@ -80,6 +80,7 @@ export interface Academy {
   certificate: boolean
   portfolio: boolean
   status: 'ACTIVE' | 'DRAFT' | 'ARCHIVED'
+  pixel_id?: string | null
   pricing: AcademyPricing[]
   features: AcademyFeature[]
   instructors: AcademyInstructor[]
@@ -88,7 +89,7 @@ export interface Academy {
   faqs: AcademyFaq[]
   topicCount?: number
   instructorCount?: number
-  active_cohort?: { id: number; name: string; status: string } | null
+  has_cohort?: boolean
 }
 
 export interface AdminAcademy {
@@ -98,7 +99,8 @@ export interface AdminAcademy {
   category: string
   duration: string
   format: string
-  status: 'ACTIVE' | 'ARCHIVED'
+  status: 'ACTIVE' | 'ARCHIVED' | 'DRAFT'
+  cohort_count: number
 }
 
 // ── Form & admin-UI types ─────────────────────────────────────────────────────
@@ -112,6 +114,7 @@ export interface AcademyForm {
   status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
   certificate: string
   portfolio: string
+  pixel_id?: string
 }
 
 export interface AdminCohort {

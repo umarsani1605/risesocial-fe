@@ -33,6 +33,7 @@ function close() {
   <UModal v-model:open="open" title="Edit Cohort Info" :ui="{ footer: 'justify-end' }">
     <template #body>
       <UForm
+        :validate-on="['submit']"
         ref="editInfoForm"
         :schema="cohortEditSchema"
         :state="form"

@@ -93,7 +93,7 @@ async function save() {
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <UForm ref="formRef" :schema="testimonialFormSchema" :state="form" class="space-y-4" @submit="save">
+      <UForm ref="formRef" :schema="testimonialFormSchema" :state="form" class="space-y-4" @submit="save" :validate-on="['submit']">
         <UFormField label="Avatar">
           <input
             ref="avatarInputRef"

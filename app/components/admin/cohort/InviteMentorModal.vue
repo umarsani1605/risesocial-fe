@@ -31,7 +31,7 @@ function close() {
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
-      <UForm ref="inviteMentorForm" :schema="mentorFormSchema" :state="form" class="space-y-4" @submit="emit('submit')">
+      <UForm ref="inviteMentorForm" :schema="mentorFormSchema" :state="form" class="space-y-4" @submit="emit('submit')" :validate-on="['submit']">
         <UFormField name="name" label="Name">
           <UInput v-model="form.name" placeholder="Mentor Name" class="w-full" />
         </UFormField>
