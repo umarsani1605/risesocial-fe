@@ -14,22 +14,26 @@ function initials(s: Student) {
 
 <template>
   <div class="pt-2 min-h-[400px]">
-    <div v-if="students.length === 0" class="flex flex-col items-center justify-center py-16 text-muted text-sm">
+    <div
+      v-if="students.length === 0"
+      class="flex flex-col items-center justify-center py-16 text-muted text-sm"
+    >
       <UIcon name="i-ph-users-bold" class="size-10 mb-3 opacity-30" />
       No students enrolled yet.
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <div
         v-for="student in students"
         :key="student.id"
-        class="flex items-center gap-3 p-3 rounded-lg border border-default"
+        class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-elevated/50 transition-colors border border-default"
       >
         <UAvatar
           :src="student.user.avatar ?? undefined"
           :text="initials(student)"
           size="md"
           color="primary"
+          class="bg-primary text-white text-sm rounded-full"
         />
         <span class="font-medium text-sm truncate">
           {{ student.user.first_name }} {{ student.user.last_name }}

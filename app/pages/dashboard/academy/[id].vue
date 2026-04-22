@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
+import type { ComputedRef } from 'vue'
 import type { Cohort, CohortModule } from '@/types'
 
 definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
@@ -14,7 +15,12 @@ interface CohortStudent {
 }
 
 const { api } = useApi()
-const [{ data: cohortData, error }, { data: modulesData }, { data: studentsData }] = await Promise.all([
+const [
+  { data: cohortData, error },
+  { data: modulesData },
+  { data: studentsData },
+  { data: certData }
+] = await Promise.all([
   useAsyncData(`dashboard:cohort:${cohortId}`, () =>
     api<ApiResponse<Cohort>>(`/cohorts/${cohortId}`)
   ),
@@ -24,6 +30,11 @@ const [{ data: cohortData, error }, { data: modulesData }, { data: studentsData 
   useAsyncData(`dashboard:cohort:${cohortId}:students`, () =>
     api<ApiResponse<CohortStudent[]>>(`/cohorts/${cohortId}/students`)
   ),
+  useAsyncData(`dashboard:cohort:${cohortId}:certificate`, () =>
+    api<ApiResponse<{ certificate_url: string }>>(`/cohorts/${cohortId}/certificate`).catch(
+      () => null
+    )
+  )
 ])
 
 if (error.value || !cohortData.value?.data) {
@@ -33,6 +44,7 @@ if (error.value || !cohortData.value?.data) {
 const cohort = computed(() => cohortData.value!.data)
 const modules = computed(() => modulesData.value?.data ?? [])
 const students = computed(() => studentsData.value?.data ?? [])
+const certificateUrl = computed(() => certData.value?.data?.certificate_url ?? null)
 
 useSeoMeta({
   title: computed(() => `${cohort.value.academy.title} – ${cohort.value.name} – Rise Social`),
@@ -40,17 +52,20 @@ useSeoMeta({
 })
 
 const tabItems: TabsItem[] = [
-  { label: 'Modules', slot: 'modules' },
-  { label: 'Students', slot: 'students' },
-  { label: 'Mentors', slot: 'mentors' },
+  { label: 'Modules', slot: 'modules', icon: 'i-ph-stack-duotone' },
+  { label: 'Mentors', slot: 'mentors', icon: 'i-ph-user-duotone' }
 ]
+
+const activeTab = ref('0')
+const tabModulesRef = ref<{ isAnyOpen: ComputedRef<boolean>; toggleAll: () => void } | null>(null)
+const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? false)
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <div class="relative rounded-2xl bg-[#0E5C59] text-white p-2 overflow-hidden">
-      <div class="relative flex flex-col sm:flex-row gap-10 p-6">
-        <div class="shrink-0 rounded-xl overflow-hidden size-48">
+      <div class="relative flex flex-col sm:flex-row gap-10 p-4">
+        <div class="shrink-0 rounded-xl overflow-hidden size-36">
           <NuxtImg
             :src="cohort.academy.image_url"
             :alt="cohort.academy.title"
@@ -64,30 +79,15 @@ const tabItems: TabsItem[] = [
             <h1 class="text-xl font-bold leading-snug">{{ cohort.academy.title }}</h1>
           </div>
           <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
-            <span v-if="cohort.academy.duration" class="flex items-center gap-1.5">
-              <UIcon name="i-ph-calendar-bold" class="size-4 shrink-0" />
-              {{ cohort.academy.duration }}
-            </span>
-            <span v-else class="flex items-center gap-1.5">
-              <UIcon name="i-ph-calendar-bold" class="size-4 shrink-0" />
-              {{ formatDate(cohort.start_date) }} – {{ formatDate(cohort.end_date) }}
-            </span>
-            <span v-if="cohort.academy.certificate" class="flex items-center gap-1.5">
-              <UIcon name="i-ph-medal-bold" class="size-4 shrink-0" />
-              Certificate
-            </span>
-            <span v-if="cohort.academy.portfolio" class="flex items-center gap-1.5">
-              <UIcon name="i-ph-briefcase-bold" class="size-4 shrink-0" />
-              Portfolio
+            <span class="flex items-center gap-1.5">
+              <UIcon name="i-ph-calendar-blank-bold" class="size-4 shrink-0" />
+              {{ formatDateMonth(cohort.start_date) }} — {{ formatDateLong(cohort.end_date) }}
             </span>
             <span class="flex items-center gap-1.5">
               <UIcon name="i-ph-users-bold" class="size-4 shrink-0" />
               {{ cohort.current_students }} students
             </span>
           </div>
-          <p v-if="cohort.academy.description" class="text-sm text-white/70 leading-relaxed max-w-lg line-clamp-3">
-            {{ cohort.academy.description }}
-          </p>
         </div>
       </div>
       <img
@@ -98,33 +98,70 @@ const tabItems: TabsItem[] = [
       />
     </div>
 
-    <UCard v-if="cohort.status === 'COMPLETED'">
-      <div class="flex items-center gap-4">
-        <div class="shrink-0 size-16 rounded-lg bg-primary/10 flex items-center justify-center">
-          <UIcon name="i-ph-trophy-bold" class="size-8 text-primary" />
-        </div>
+    <UCard v-if="cohort.status === 'completed' && certificateUrl">
+      <div class="flex items-center gap-6">
+        <UIcon name="i-ph-certificate-duotone" class="size-10 text-primary" />
         <div class="flex-1 min-w-0">
           <p class="font-semibold text-base">Congratulation, you have completed this academy!</p>
-          <p class="text-sm text-muted mt-0.5">Keep learning and applying sustainability practices to make positive impact!</p>
+          <p class="text-sm text-muted mt-0.5">
+            Keep learning and applying sustainability practices to make positive impact!
+          </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <UButton variant="outline" color="primary" leading-icon="i-ph-medal-bold">
+          <UButton variant="ghost" :to="`/academy`"> Explore Academies </UButton>
+          <UButton
+            v-if="certificateUrl"
+            :to="certificateUrl"
+            target="_blank"
+            variant="dashboard"
+            leading-icon="i-ph-medal-bold"
+          >
             View Certificate
-          </UButton>
-          <UButton variant="ghost" color="primary" :to="`/academy/${cohort.academy.slug}`">
-            Explore Academy
           </UButton>
         </div>
       </div>
     </UCard>
 
+    <UCard v-if="cohort.academy.description">
+      <template #header>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-ph-info-duotone" class="text-primary size-6 shrink-0" />
+          <h2 class="text-lg font-semibold">Information</h2>
+        </div>
+      </template>
+      <p class="text-sm text-muted leading-relaxed max-w-4xl">
+        {{ cohort.academy.description }}
+      </p>
+    </UCard>
+
     <UCard>
-      <UTabs :items="tabItems" variant="link" color="primary" :unmount-on-hide="false">
-        <template #modules>
-          <DashboardAcademyTabModules :modules="modules" />
+      <UTabs
+        v-model="activeTab"
+        :items="tabItems"
+        variant="link"
+        color="primary"
+        :unmount-on-hide="false"
+        :ui="{
+          root: 'flex-1 min-h-0 gap-6',
+          list: 'py-1 px-0! shrink-0',
+          content: 'flex-1 min-h-0',
+          trigger: 'px-3 sm:px-6 whitespace-nowrap'
+        }"
+      >
+        <template #list-trailing>
+          <div v-if="activeTab === '0'" class="ml-auto pr-1">
+            <UButton
+              :label="isModulesAnyOpen ? 'Collapse All' : 'Expand All'"
+              icon="i-ph-arrows-down-up"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              @click="tabModulesRef?.toggleAll()"
+            />
+          </div>
         </template>
-        <template #students>
-          <DashboardAcademyTabStudents :students="students" />
+        <template #modules>
+          <DashboardAcademyTabModules ref="tabModulesRef" :modules="modules" />
         </template>
         <template #mentors>
           <DashboardAcademyTabMentors :mentors="cohort.mentors" />

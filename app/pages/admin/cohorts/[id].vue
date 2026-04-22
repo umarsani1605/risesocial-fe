@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TabsItem, DropdownMenuItem } from '@nuxt/ui'
-import type { Ref } from 'vue'
 import type { AdminCohortDetail } from '~/types/cohort'
 import { useAdminCohort } from '@/composables/useAdminCohort'
 import { useAdminCohortModules } from '@/composables/useAdminCohortModules'
@@ -42,6 +41,8 @@ const formRef = useTemplateRef('formRef')
 type CohortStatus = AdminCohortDetail['status']
 const currentStatus = ref<CohortStatus>(cohortRaw.value!.data!.status)
 const isTransitioningStatus = ref(false)
+const isCompleteModalOpen = ref(false)
+const isResetModalOpen = ref(false)
 
 const tabItems: TabsItem[] = [
   { label: 'Information', slot: 'information', icon: 'i-ph-info-duotone' },
@@ -62,8 +63,15 @@ watchEffect(() => {
   currentStatus.value = cohort.detail.status
 })
 
-async function onSave(targetStatus: CohortStatus, successMessage: string, loadingRef: Ref<boolean>) {
-  loadingRef.value = true
+async function transitionStatus(targetStatus: CohortStatus, successMessage: string) {
+  if (!cohort.editCohortForm.start_date || !cohort.editCohortForm.end_date) {
+    toast.add({
+      title: 'Start date and end date are required before changing status',
+      color: 'error'
+    })
+    return
+  }
+  isTransitioningStatus.value = true
   try {
     await api(`/admin/cohorts/${cohortId}`, {
       method: 'PUT',
@@ -72,7 +80,7 @@ async function onSave(targetStatus: CohortStatus, successMessage: string, loadin
         description: cohort.editCohortForm.description || null,
         status: targetStatus,
         start_date: cohort.editCohortForm.start_date,
-        end_date: cohort.editCohortForm.end_date,
+        end_date: cohort.editCohortForm.end_date
       }
     })
     currentStatus.value = targetStatus
@@ -82,45 +90,38 @@ async function onSave(targetStatus: CohortStatus, successMessage: string, loadin
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
-    loadingRef.value = false
+    isTransitioningStatus.value = false
   }
 }
 
-const headerMenuItems = computed<DropdownMenuItem[][]>(() => {
-  const statusActions: DropdownMenuItem[] = []
-  if (currentStatus.value === 'not_started') {
-    statusActions.push({
-      label: 'Start Cohort',
-      icon: 'i-ph-play-bold',
-      onSelect: () => onSave('ongoing', 'Cohort started', isTransitioningStatus)
-    })
-  } else if (currentStatus.value === 'ongoing') {
-    statusActions.push({
-      label: 'Complete Cohort',
-      icon: 'i-ph-check-circle-bold',
-      onSelect: () => onSave('completed', 'Cohort completed', isTransitioningStatus)
-    })
-    statusActions.push({
-      label: 'Reset to Not Started',
-      icon: 'i-ph-arrow-counter-clockwise-bold',
-      onSelect: () => onSave('not_started', 'Cohort reset', isTransitioningStatus)
-    })
-  } else {
-    statusActions.push({
-      label: 'Reopen Cohort',
-      icon: 'i-ph-arrow-clockwise-bold',
-      onSelect: () => onSave('ongoing', 'Cohort reopened', isTransitioningStatus)
-    })
-  }
-  return [
-    statusActions,
-    [{ label: 'Delete Cohort', icon: 'i-ph-trash-simple-bold', color: 'error', onSelect: () => { cohort.isDeleteCohortOpen = true } }]
+async function onCompleteConfirm() {
+  await transitionStatus('completed', 'Cohort completed')
+  isCompleteModalOpen.value = false
+}
+
+async function onResetConfirm() {
+  await transitionStatus('not_started', 'Cohort reset to not started')
+  isResetModalOpen.value = false
+}
+
+// Ellipsis menu: delete only
+const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
+  [
+    {
+      label: 'Delete cohort',
+      icon: 'i-ph-trash-simple-bold',
+      color: 'error' as const,
+      onSelect: () => {
+        cohort.isDeleteCohortOpen = true
+      }
+    }
   ]
-})
+])
 </script>
 
 <template>
   <div class="flex flex-col flex-1 min-h-0">
+    <!-- Header: back · title · badge · lifecycle actions · ellipsis (delete only) -->
     <div class="flex items-center justify-between gap-3 px-1 shrink-0 mb-6">
       <div class="flex items-center gap-3 min-w-0">
         <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/cohorts" />
@@ -135,21 +136,47 @@ const headerMenuItems = computed<DropdownMenuItem[][]>(() => {
         />
       </div>
 
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-2 shrink-0">
         <UButton
-          label="Save Cohort"
-          color="primary"
-          icon="i-ph-floppy-disk"
-          :loading="cohort.isEditingCohort"
-          :disabled="cohort.isEditingCohort || isTransitioningStatus"
-          @click="formRef?.submit()"
+          v-if="currentStatus === 'ongoing'"
+          label="Reset to Not Started"
+          color="neutral"
+          variant="light"
+          :disabled="isTransitioningStatus"
+          @click="isResetModalOpen = true"
         />
-        <UDropdownMenu :items="headerMenuItems">
+
+        <UButton
+          v-if="currentStatus === 'not_started'"
+          label="Start cohort"
+          color="primary"
+          :loading="isTransitioningStatus"
+          :disabled="isTransitioningStatus"
+          @click="transitionStatus('ongoing', 'Cohort started')"
+        />
+        <UButton
+          v-else-if="currentStatus === 'ongoing'"
+          label="Complete Cohort"
+          color="primary"
+          :loading="isTransitioningStatus"
+          :disabled="isTransitioningStatus"
+          @click="isCompleteModalOpen = true"
+        />
+        <UButton
+          v-else-if="currentStatus === 'completed'"
+          label="Reopen Cohort"
+          color="primary"
+          :loading="isTransitioningStatus"
+          :disabled="isTransitioningStatus"
+          @click="transitionStatus('ongoing', 'Cohort reopened')"
+        />
+
+        <!-- Ellipsis: delete only -->
+        <UDropdownMenu :items="ellipsisItems">
           <UButton
             icon="i-ph-dots-three-vertical-bold"
             color="neutral"
             variant="ghost"
-            :loading="isTransitioningStatus"
             :disabled="isTransitioningStatus || cohort.isEditingCohort"
           />
         </UDropdownMenu>
@@ -172,6 +199,7 @@ const headerMenuItems = computed<DropdownMenuItem[][]>(() => {
         <div class="flex h-full">
           <div class="flex-1 overflow-y-auto py-6">
             <UForm
+              :validate-on="['submit']"
               ref="formRef"
               :schema="cohortEditSchema"
               :state="cohort.editCohortForm as any"
@@ -179,6 +207,16 @@ const headerMenuItems = computed<DropdownMenuItem[][]>(() => {
             >
               <AdminCohortFormBasicInfo v-model="cohort.editCohortForm" />
             </UForm>
+
+            <div class="mt-6 flex justify-end max-w-5xl">
+              <UButton
+                label="Save information"
+                color="primary"
+                :loading="cohort.isEditingCohort"
+                :disabled="cohort.isEditingCohort || isTransitioningStatus"
+                @click="formRef?.submit()"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -203,6 +241,9 @@ const headerMenuItems = computed<DropdownMenuItem[][]>(() => {
           :enrollments="cohortEnrollments.enrollments"
           @invite="cohortEnrollments.openInviteStudentModal"
           @remove="() => {}"
+          @generate-cert="cohortEnrollments.openGenerateCertModal"
+          @regenerate-cert="cohortEnrollments.openRegenerateCertModal"
+          @drop-student="cohortEnrollments.submitDropStudent"
         />
       </template>
 
@@ -271,4 +312,70 @@ const headerMenuItems = computed<DropdownMenuItem[][]>(() => {
     :loading="cohortEnrollments.isInvitingMentor"
     @submit="cohortEnrollments.submitInviteMentor"
   />
+
+  <AdminCohortGenerateCertificateModal
+    v-model:open="cohortEnrollments.isGenerateCertOpen"
+    v-model:form="cohortEnrollments.certGradesForm"
+    :loading="cohortEnrollments.isGeneratingCert"
+    @submit="cohortEnrollments.submitGenerateCert"
+    @cancel="cohortEnrollments.isGenerateCertOpen = false"
+  />
+
+  <UModal
+    v-model:open="isCompleteModalOpen"
+    title="Complete Cohort"
+    :ui="{ footer: 'justify-end' }"
+  >
+    <template #body>
+      <p class="text-sm">
+        Are you sure you want to mark this cohort as <span class="font-semibold">completed</span>?
+        All active enrollments will be automatically completed.
+      </p>
+    </template>
+    <template #footer>
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="isTransitioningStatus"
+        @click="isCompleteModalOpen = false"
+      />
+      <UButton
+        label="Complete cohort"
+        color="primary"
+        :loading="isTransitioningStatus"
+        :disabled="isTransitioningStatus"
+        @click="onCompleteConfirm"
+      />
+    </template>
+  </UModal>
+
+  <UModal
+    v-model:open="isResetModalOpen"
+    title="Reset to Not Started"
+    :ui="{ footer: 'justify-end' }"
+  >
+    <template #body>
+      <p class="text-sm">
+        Are you sure you want to reset this cohort back to
+        <span class="font-semibold">Not Started</span>? This will revert the cohort status and stop
+        the ongoing session.
+      </p>
+    </template>
+    <template #footer>
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="isTransitioningStatus"
+        @click="isResetModalOpen = false"
+      />
+      <UButton
+        label="Reset to Not Started"
+        :loading="isTransitioningStatus"
+        :disabled="isTransitioningStatus"
+        @click="onResetConfirm"
+      />
+    </template>
+  </UModal>
 </template>

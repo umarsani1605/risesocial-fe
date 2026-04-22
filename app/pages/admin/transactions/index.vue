@@ -19,6 +19,7 @@ definePageMeta({
 useSeoMeta({ title: 'Transactions - Rise Social' })
 
 const { api } = useApi()
+const toast = useToast()
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,6 @@ function resetFilters() {
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 
-
 const columns: TableColumn<AdminTransaction>[] = [
   {
     accessorKey: 'transaction_code',
@@ -108,18 +108,6 @@ const columns: TableColumn<AdminTransaction>[] = [
     cell: ({ row }) => h('span', { class: 'text-sm' }, formatPrice(row.getValue('amount')))
   },
   {
-    accessorKey: 'provider',
-    header: 'Provider',
-    cell: ({ row }) => {
-      const provider = row.getValue('provider') as string | null
-      return h(
-        'span',
-        { class: 'text-sm' },
-        provider ? (PROVIDER_LABEL[provider] ?? provider) : '—'
-      )
-    }
-  },
-  {
     accessorKey: 'payment_method',
     header: 'Method',
     cell: ({ row }) => {
@@ -134,7 +122,11 @@ const columns: TableColumn<AdminTransaction>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string
       const label = status.charAt(0).toUpperCase() + status.slice(1)
-      return h(UBadge, { variant: 'subtle', color: TRANSACTION_STATUS_COLOR[status] ?? 'neutral' }, () => label)
+      return h(
+        UBadge,
+        { variant: 'subtle', color: TRANSACTION_STATUS_COLOR[status] ?? 'neutral' },
+        () => label
+      )
     }
   },
   {
@@ -144,18 +136,40 @@ const columns: TableColumn<AdminTransaction>[] = [
   },
   {
     id: 'actions',
+    header: 'Actions',
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h(UButton, {
         label: 'Detail',
         color: 'primary',
-        variant: 'outline',
+        variant: 'light',
         size: 'sm',
         leadingIcon: 'i-ph-magnifying-glass-bold',
         onClick: () => openDetail(row.original.id)
       })
   }
 ]
+
+// ── Export ────────────────────────────────────────────────────────────────────
+
+const isExporting = ref(false)
+
+async function exportExcel() {
+  isExporting.value = true
+  try {
+    const blob = await api('/admin/transactions/export-excel', { responseType: 'blob' }) as Blob
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `transactions-${new Date().toISOString().split('T')[0]}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isExporting.value = false
+  }
+}
 
 // ── Slideover ─────────────────────────────────────────────────────────────────
 
@@ -174,24 +188,35 @@ function openDetail(id: number) {
     :columns="columns"
     :table-ui="{ td: 'align-top' }"
     table-class="px-4 sm:px-6"
+    :column-pinning="{}"
   >
     <template #toolbar>
-      <div class="flex flex-wrap items-center gap-2">
-        <UInput
-          v-model="searchInput"
-          icon="i-ph-magnifying-glass-bold"
-          placeholder="Search code, name, or email"
-          class="w-full sm:w-72"
-        />
-        <USelect v-model="statusFilter" :items="statusOptions" class="w-full sm:w-40" />
-        <USelect v-model="typeFilter" :items="typeOptions" class="w-full sm:w-56" />
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <UInput
+            v-model="searchInput"
+            icon="i-ph-magnifying-glass-bold"
+            placeholder="Search code, name, or email"
+            class="w-full sm:w-72"
+          />
+          <USelect v-model="statusFilter" :items="statusOptions" class="w-full sm:w-40" />
+          <USelect v-model="typeFilter" :items="typeOptions" class="w-full sm:w-56" />
+          <UButton
+            v-if="searchInput || statusFilter || typeFilter"
+            label="Reset"
+            color="neutral"
+            variant="ghost"
+            icon="i-ph-x-bold"
+            @click="resetFilters"
+          />
+        </div>
         <UButton
-          v-if="searchInput || statusFilter || typeFilter"
-          label="Reset"
-          color="neutral"
-          variant="ghost"
-          icon="i-ph-x-bold"
-          @click="resetFilters"
+          label="Export Excel"
+          leading-icon="i-ph-download-simple-bold"
+          color="primary"
+          :loading="isExporting"
+          :disabled="isExporting"
+          @click="exportExcel"
         />
       </div>
     </template>
@@ -209,23 +234,25 @@ function openDetail(id: number) {
               :items="[10, 25, 50, 100]"
               size="sm"
               class="w-20"
-              @update:model-value="(val: number) => { limit = Number(val); page = 1 }"
+              @update:model-value="
+                (val: number) => {
+                  limit = Number(val)
+                  page = 1
+                }
+              "
             />
           </div>
-          <UPagination
-            v-model:page="page"
-            :total="meta?.total ?? 0"
-            :items-per-page="limit"
-            variant="ghost"
-            size="sm"
-          />
         </div>
+        <UPagination
+          v-model:page="page"
+          :total="meta?.total ?? 0"
+          :items-per-page="limit"
+          variant="ghost"
+          size="sm"
+        />
       </div>
     </template>
   </AdminDataTable>
 
-  <AdminTransactionDetailSlideover
-    v-model:open="isSlideoverOpen"
-    :transaction-id="selectedId"
-  />
+  <AdminTransactionDetailSlideover v-model:open="isSlideoverOpen" :transaction-id="selectedId" />
 </template>

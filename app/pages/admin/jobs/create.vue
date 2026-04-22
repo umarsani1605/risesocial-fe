@@ -57,7 +57,7 @@ async function onSave() {
 <template>
   <AdminCard :ui="{ body: 'p-0' }">
     <!-- Page Header -->
-    <UForm :schema="jobCreateSchema" :state="form" @submit="onSave">
+    <UForm :schema="jobCreateSchema" :state="form" @submit="onSave" :validate-on="['submit']">
       <div class="flex flex-wrap items-center justify-between">
         <div class="flex items-center gap-2">
           <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/jobs" />

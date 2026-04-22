@@ -30,7 +30,7 @@ const activeSchema = computed(() =>
 <template>
   <UModal v-model:open="open" :title="title" :ui="{ footer: 'justify-end' }">
     <template #body>
-      <UForm ref="userForm" :schema="activeSchema" :state="form" class="space-y-4" @submit="emit('submit')">
+      <UForm ref="userForm" :schema="activeSchema" :state="form" class="space-y-4" @submit="emit('submit')" :validate-on="['submit']">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UFormField name="first_name" label="First Name" :required="mode === 'create'">
             <UInput v-model="form!.first_name" placeholder="First name" class="w-full" />

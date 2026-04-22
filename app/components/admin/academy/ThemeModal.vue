@@ -84,7 +84,7 @@ async function save() {
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <UForm ref="formRef" :schema="themeFormSchema" :state="form" class="space-y-4" @submit="save">
+      <UForm ref="formRef" :schema="themeFormSchema" :state="form" class="space-y-4" @submit="save" :validate-on="['submit']">
         <UFormField name="title" label="Title" required>
           <UInput v-model="form.title" placeholder="e.g. Introduction to Carbon Accounting" class="w-full" />
         </UFormField>

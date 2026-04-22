@@ -215,7 +215,6 @@ async function onConfirmDelete() {
   }
 }
 
-
 const syncDate = computed(() => {
   const d = rateLimit.value?.last_updated
   return d ? formatDateLong(d) : '–'
@@ -230,7 +229,10 @@ const columns: TableColumn<Job>[] = [
       h(
         'span',
         { class: 'text-muted' },
-        row.index + 1 + (dataTableRef.value?.pagination?.pageIndex ?? 0) * (dataTableRef.value?.pagination?.pageSize ?? 10)
+        row.index +
+          1 +
+          (dataTableRef.value?.pagination?.pageIndex ?? 0) *
+            (dataTableRef.value?.pagination?.pageSize ?? 10)
       )
   },
   {
@@ -361,7 +363,7 @@ const columns: TableColumn<Job>[] = [
           label: 'Edit',
           size: 'sm',
           color: 'primary',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-pencil-simple-bold',
           to: `/admin/jobs/${row.original.id}/edit`
         }),
@@ -369,7 +371,7 @@ const columns: TableColumn<Job>[] = [
           label: 'Delete',
           size: 'sm',
           color: 'error',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => openDeleteConfirm(row.original)
         })

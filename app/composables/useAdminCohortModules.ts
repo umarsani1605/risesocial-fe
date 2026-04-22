@@ -1,8 +1,21 @@
+import { parseDate, parseTime } from '@internationalized/date'
+import type { CalendarDate, Time } from '@internationalized/date'
 import type { AdminCohortModule, AdminCohortAttachment, PendingAttachment } from '~/types/cohort'
 
 interface UseAdminCohortModulesOptions {
   cohortId: string
   refreshCohort: () => Promise<void>
+}
+
+function calendarDateTimeToISO(
+  date: { year: number; month: number; day: number } | null | undefined,
+  time: { hour: number; minute: number } | null | undefined
+): string | null {
+  if (!date || !time) return null
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return new Date(
+    `${date.year}-${pad(date.month)}-${pad(date.day)}T${pad(time.hour)}:${pad(time.minute)}:00+07:00`
+  ).toISOString()
 }
 
 export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
@@ -18,10 +31,15 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
   const addModuleForm = reactive({
     title: '',
     description: '',
-    sessionDate: '',
+    sessionDate: null as CalendarDate | null,
+    sessionStartTime: null as Time | null,
+    sessionEndTime: null as Time | null,
     meetingLink: '',
     attendanceLink: '',
+    assignmentTitle: '',
     assignmentLink: '',
+    assignmentDeadlineDate: null as CalendarDate | null,
+    assignmentDeadlineTime: null as Time | null,
     isPublished: true,
   })
 
@@ -42,10 +60,15 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
   function resetAddModuleForm() {
     addModuleForm.title = ''
     addModuleForm.description = ''
-    addModuleForm.sessionDate = ''
+    addModuleForm.sessionDate = null
+    addModuleForm.sessionStartTime = null
+    addModuleForm.sessionEndTime = null
     addModuleForm.meetingLink = ''
     addModuleForm.attendanceLink = ''
+    addModuleForm.assignmentTitle = ''
     addModuleForm.assignmentLink = ''
+    addModuleForm.assignmentDeadlineDate = null
+    addModuleForm.assignmentDeadlineTime = null
     addModuleForm.isPublished = true
     pendingAttachments.value = []
   }
@@ -62,10 +85,13 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
         body: {
           title: addModuleForm.title,
           description: addModuleForm.description || null,
-          session_timestamp: addModuleForm.sessionDate ? new Date(addModuleForm.sessionDate).toISOString() : null,
+          session_start_time: calendarDateTimeToISO(addModuleForm.sessionDate, addModuleForm.sessionStartTime),
+          session_end_time: calendarDateTimeToISO(addModuleForm.sessionDate, addModuleForm.sessionEndTime),
           meeting_link: addModuleForm.meetingLink || null,
           attendance_link: addModuleForm.attendanceLink || null,
+          assignment_title: addModuleForm.assignmentTitle || null,
           assignment_link: addModuleForm.assignmentLink || null,
+          assignment_deadline: calendarDateTimeToISO(addModuleForm.assignmentDeadlineDate, addModuleForm.assignmentDeadlineTime),
           is_published: addModuleForm.isPublished
         }
       })
@@ -118,10 +144,15 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
   const editModuleForm = reactive({
     title: '',
     description: '',
-    sessionDate: '',
+    sessionDate: null as CalendarDate | null,
+    sessionStartTime: null as Time | null,
+    sessionEndTime: null as Time | null,
     meetingLink: '',
     attendanceLink: '',
+    assignmentTitle: '',
     assignmentLink: '',
+    assignmentDeadlineDate: null as CalendarDate | null,
+    assignmentDeadlineTime: null as Time | null,
     isPublished: true
   })
 
@@ -146,12 +177,47 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
     editingModule.value = module
     editModuleForm.title = module.title
     editModuleForm.description = module.description ?? ''
-    editModuleForm.sessionDate = module.session_timestamp
-      ? module.session_timestamp.slice(0, 16)
-      : ''
+
+    if (module.session_start_time) {
+      const dateStr = new Date(module.session_start_time)
+        .toLocaleDateString('sv', { timeZone: 'Asia/Jakarta' })
+      editModuleForm.sessionDate = parseDate(dateStr)
+
+      const startTimeStr = new Date(module.session_start_time)
+        .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
+      editModuleForm.sessionStartTime = parseTime(startTimeStr)
+
+      if (module.session_end_time) {
+        const endTimeStr = new Date(module.session_end_time)
+          .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
+        editModuleForm.sessionEndTime = parseTime(endTimeStr)
+      } else {
+        editModuleForm.sessionEndTime = null
+      }
+    } else {
+      editModuleForm.sessionDate = null
+      editModuleForm.sessionStartTime = null
+      editModuleForm.sessionEndTime = null
+    }
+
     editModuleForm.meetingLink = module.meeting_link ?? ''
     editModuleForm.attendanceLink = module.attendance_link ?? ''
+    editModuleForm.assignmentTitle = module.assignment_title ?? ''
     editModuleForm.assignmentLink = module.assignment_link ?? ''
+
+    if (module.assignment_deadline) {
+      const deadlineDateStr = new Date(module.assignment_deadline)
+        .toLocaleDateString('sv', { timeZone: 'Asia/Jakarta' })
+      editModuleForm.assignmentDeadlineDate = parseDate(deadlineDateStr)
+
+      const deadlineTimeStr = new Date(module.assignment_deadline)
+        .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })
+      editModuleForm.assignmentDeadlineTime = parseTime(deadlineTimeStr)
+    } else {
+      editModuleForm.assignmentDeadlineDate = null
+      editModuleForm.assignmentDeadlineTime = null
+    }
+
     editModuleForm.isPublished = module.is_published
     moduleAttachments.value = [...(module.attachments ?? [])]
     editPendingAttachments.value = []
@@ -167,10 +233,13 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
         body: {
           title: editModuleForm.title,
           description: editModuleForm.description || null,
-          session_timestamp: editModuleForm.sessionDate ? new Date(editModuleForm.sessionDate).toISOString() : null,
+          session_start_time: calendarDateTimeToISO(editModuleForm.sessionDate, editModuleForm.sessionStartTime),
+          session_end_time: calendarDateTimeToISO(editModuleForm.sessionDate, editModuleForm.sessionEndTime),
           meeting_link: editModuleForm.meetingLink || null,
           attendance_link: editModuleForm.attendanceLink || null,
+          assignment_title: editModuleForm.assignmentTitle || null,
           assignment_link: editModuleForm.assignmentLink || null,
+          assignment_deadline: calendarDateTimeToISO(editModuleForm.assignmentDeadlineDate, editModuleForm.assignmentDeadlineTime),
           is_published: editModuleForm.isPublished
         }
       })

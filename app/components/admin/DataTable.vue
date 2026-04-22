@@ -15,6 +15,7 @@ const props = withDefaults(
     tableUi?: Record<string, any>
     tableClass?: string
     pinnedShadow?: boolean
+    columnPinning?: ColumnPinningState
   }>(),
   {
     search: undefined,
@@ -23,7 +24,8 @@ const props = withDefaults(
     loading: false,
     tableUi: undefined,
     tableClass: undefined,
-    pinnedShadow: false
+    pinnedShadow: false,
+    columnPinning: () => ({ right: ['actions'] })
   }
 )
 
@@ -36,7 +38,7 @@ defineOptions({ inheritAttrs: false })
 const table = useTemplateRef('table')
 
 const pagination = ref<PaginationState>({ pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE })
-const columnPinning = ref<ColumnPinningState>({ right: ['actions'] })
+const columnPinning = ref<ColumnPinningState>(props.columnPinning)
 const paginationRowModel = getPaginationRowModel()
 
 const mergedTableUi = computed(() => {
@@ -106,8 +108,8 @@ defineExpose({
         :page-index="pagination.pageIndex"
         :page-size="pagination.pageSize"
         :total="data.length"
-        @update:page-index="(p) => { pagination.pageIndex = p }"
-        @update:page-size="(s) => { pagination.pageSize = s; pagination.pageIndex = 0 }"
+        @update:page-index="(p) => (pagination = { ...pagination, pageIndex: p })"
+        @update:page-size="(s) => (pagination = { ...pagination, pageSize: s, pageIndex: 0 })"
       />
     </template>
   </AdminTableCard>

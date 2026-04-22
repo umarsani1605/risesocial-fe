@@ -15,7 +15,7 @@ const { api } = useApi()
 const toast = useToast()
 
 const loading = ref(false)
-const form = reactive({ name: '', description: '' })
+const form = reactive({ name: '', description: '', start_date: '', end_date: '' })
 const formRef = useTemplateRef('cohortForm')
 
 watch(
@@ -24,6 +24,8 @@ watch(
     if (!val) return
     form.name = ''
     form.description = ''
+    form.start_date = ''
+    form.end_date = ''
   }
 )
 
@@ -35,7 +37,9 @@ async function save() {
       body: {
         academy_id: props.academyId,
         name: form.name,
-        description: form.description || null
+        description: form.description || null,
+        start_date: form.start_date,
+        end_date: form.end_date,
       }
     })
     emit('update:open', false)
@@ -57,12 +61,18 @@ async function save() {
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <UForm ref="cohortForm" :schema="cohortCreateSchema" :state="form" class="space-y-4" @submit="save">
+      <UForm ref="cohortForm" :schema="cohortCreateSchema" :state="form" class="space-y-4" @submit="save" :validate-on="['submit']">
         <UFormField name="name" label="Name" required>
           <UInput v-model="form.name" placeholder="Cohort Name" class="w-full" />
         </UFormField>
         <UFormField name="description" label="Description">
           <UTextarea v-model="form.description" placeholder="Cohort Description" :rows="3" class="w-full" />
+        </UFormField>
+        <UFormField name="start_date" label="Start Date" required>
+          <UInput v-model="form.start_date" type="date" class="w-full" />
+        </UFormField>
+        <UFormField name="end_date" label="End Date" required>
+          <UInput v-model="form.end_date" type="date" class="w-full" />
         </UFormField>
       </UForm>
     </template>

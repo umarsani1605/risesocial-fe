@@ -33,6 +33,9 @@ const isArchiveConfirmOpen = ref(false)
 const isArchiving = ref(false)
 const isDeleteOpen = ref(false)
 const isDeleting = ref(false)
+const isValidationModalOpen = ref(false)
+const validationErrors = ref<string[]>([])
+const isValidating = ref(false)
 
 const headerMenuItems = computed<DropdownMenuItem[][]>(() => [
   [
@@ -137,7 +140,7 @@ const form = reactive({
   category: source.category ?? '',
   certificate: source.certificate ? 'Yes' : 'No',
   portfolio: source.portfolio ? 'Yes' : 'No',
-  meta_pixel_id: source.meta_pixel_id ?? ''
+  pixel_id: source.pixel_id ?? ''
 })
 
 const formRef = useTemplateRef('formRef')
@@ -176,6 +179,7 @@ async function onSave(
   if (form.format) fd.append('format', form.format)
   if (form.category) fd.append('category', form.category)
   if (formRef.value?.imageFile) fd.append('image', formRef.value.imageFile)
+  if (form.pixel_id) fd.append('pixel_id', form.pixel_id)
 
   try {
     const res = await api<ApiResponse<{ slug: string }>>(`/admin/academies/${source.id}`, {
@@ -198,7 +202,44 @@ async function onSave(
 const isSwitchingToDraft = ref(false)
 
 async function onHeaderSave() {
-  await onSave('ACTIVE', isHeaderSaving, saveButtonLabel.value)
+  if (currentStatus.value !== 'DRAFT') {
+    await onSave('ACTIVE', isHeaderSaving, saveButtonLabel.value)
+    return
+  }
+
+  isValidating.value = true
+  try {
+    const fresh = await api<ApiResponse<Academy>>(`/admin/academies/${academySlug}`)
+    const d = fresh.data
+
+    const errors: string[] = []
+    const requiredFields = [form.title, form.description, form.duration, form.format, form.category]
+    if (requiredFields.some((f) => !f?.trim())) {
+      errors.push(
+        'Basic information (title, description, duration, format, category) must be complete'
+      )
+    }
+    if (!d.pricing?.length) errors.push('At least 1 pricing package is required')
+    if ((d.features?.length ?? 0) < 2) errors.push('At least 2 featured benefits are required')
+    if (!d.instructors?.length) errors.push('At least 1 instructor is required')
+    if (!d.testimonials?.length) errors.push('At least 1 testimonial is required')
+    if (!d.faqs?.length) errors.push('At least 1 FAQ is required')
+    if (!d.themes?.length) errors.push('At least 1 syllabus theme is required')
+    const totalTopics = d.themes?.reduce((sum, t) => sum + (t.topics?.length ?? 0), 0) ?? 0
+    if (totalTopics < 1) errors.push('At least 1 topic is required')
+
+    if (errors.length > 0) {
+      validationErrors.value = errors
+      isValidationModalOpen.value = true
+      return
+    }
+
+    await onSave('ACTIVE', isHeaderSaving, saveButtonLabel.value)
+  } catch {
+    toast.add({ title: 'Failed to validate academy data', color: 'error' })
+  } finally {
+    isValidating.value = false
+  }
 }
 
 async function onSectionSave() {
@@ -285,8 +326,8 @@ async function onDelete() {
         <UButton
           :label="saveButtonLabel"
           color="primary"
-          :loading="isHeaderSaving"
-          :disabled="isHeaderSaving"
+          :loading="isHeaderSaving || isValidating"
+          :disabled="isHeaderSaving || isValidating"
           @click="onHeaderSave"
         />
         <UDropdownMenu :items="headerMenuItems">
@@ -311,13 +352,26 @@ async function onDelete() {
         <div class="relative flex h-full">
           <div ref="scrollContainerRef" class="flex-1 overflow-y-auto py-6">
             <div class="pr-64 space-y-6">
+              <UAlert
+                v-if="currentStatus === 'ACTIVE' && !source.has_cohort"
+                color="primary"
+                variant="subtle"
+                icon="i-ph-info-bold"
+                title="No cohort available"
+                description="This academy will appear on the public page but cannot accept payments until there is at least one available cohort."
+              />
               <div class="absolute w-56 top-0 right-4 shrink-0 overflow-y-auto">
                 <div class="border border-default rounded-lg mt-6 p-4">
                   <UNavigationMenu orientation="vertical" :items="tocItems" />
                 </div>
               </div>
               <div id="section-basic" class="space-y-6 border border-default rounded-lg p-6">
-                <UForm :schema="academyFormSchema" :state="form" @submit="onSectionSave">
+                <UForm
+                  :schema="academyFormSchema"
+                  :state="form"
+                  @submit="onSectionSave"
+                  :validate-on="['submit']"
+                >
                   <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold">Basic Information</h3>
                     <UButton
@@ -426,5 +480,35 @@ async function onDelete() {
       :loading="isDeleting"
       @confirm="onDelete"
     />
+
+    <UModal
+      v-model:open="isValidationModalOpen"
+      title="Complete Required Information"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #body>
+        <p class="text-sm text-muted mb-3">
+          Please complete the following before publishing this academy:
+        </p>
+        <ul class="space-y-2">
+          <li
+            v-for="err in validationErrors"
+            :key="err"
+            class="flex items-center gap-2 text-muted text-sm"
+          >
+            <UIcon name="i-ph-warning-circle-bold" class="size-5 text-error mt-0.5 shrink-0" />
+            {{ err }}
+          </li>
+        </ul>
+      </template>
+      <template #footer>
+        <UButton
+          label="Back"
+          color="neutral"
+          variant="outline"
+          @click="isValidationModalOpen = false"
+        />
+      </template>
+    </UModal>
   </div>
 </template>

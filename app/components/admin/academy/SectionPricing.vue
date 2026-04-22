@@ -97,15 +97,15 @@ const columns: TableColumn<AcademyPricing>[] = [
             <UButton
               size="sm"
               color="primary"
-              variant="outline"
-              leading-icon="i-ph-pencil-bold"
+              variant="light"
+              leading-icon="i-ph-pencil-simple-bold"
               label="Edit"
               @click="openEdit(row.original)"
             />
             <UButton
               size="sm"
               color="error"
-              variant="outline"
+              variant="light"
               leading-icon="i-ph-trash-simple-bold"
               label="Delete"
               @click="confirmRemove(row.original)"

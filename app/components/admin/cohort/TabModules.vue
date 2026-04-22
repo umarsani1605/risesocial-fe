@@ -57,7 +57,7 @@ function toggleAll() {
         :label="isAnyOpen ? 'Collapse All' : 'Expand All'"
         icon="i-ph-arrows-down-up"
         color="neutral"
-        variant="outline"
+        variant="link"
         class="w-36"
         @click="toggleAll"
       />

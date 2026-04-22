@@ -18,8 +18,7 @@ onMounted(async () => {
   try {
     const res = await api<ApiResponse<NotificationPreferences>>('/users/notification-preferences')
     Object.assign(prefs, res.data)
-  }
-  catch {
+  } catch {
     // non-critical, keep defaults
   }
 })
@@ -29,11 +28,9 @@ async function saveSettings() {
   try {
     await api('/users/notification-preferences', { method: 'PUT', body: { ...prefs } })
     toast.add({ title: 'Notification preferences saved', color: 'success' })
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
-  }
-  finally {
+  } finally {
     isSaving.value = false
   }
 }
@@ -41,16 +38,18 @@ async function saveSettings() {
 
 <template>
   <DashboardSettingSidebar>
-    <div class="space-y-6">
-      <h1 class="text-xl font-bold">Notifications</h1>
+    <h1 class="text-xl font-bold mb-2">Notifications</h1>
 
-      <div class="space-y-4">
-        <UCheckbox v-model="prefs.promo" label="Promo notifications" color="primary" />
-        <UCheckbox v-model="prefs.jobs" label="Job notifications" color="primary" />
-        <UCheckbox v-model="prefs.programs" label="Program notifications" color="primary" />
-      </div>
+    <div class="space-y-4">
+      <UCheckbox v-model="prefs.promo" label="Promo notifications" color="primary" />
+      <UCheckbox v-model="prefs.jobs" label="Job notifications" color="primary" />
+      <UCheckbox v-model="prefs.programs" label="Program notifications" color="primary" />
+    </div>
 
-      <UButton color="primary" :loading="isSaving" :disabled="isSaving" @click="saveSettings">Save Settings</UButton>
+    <div>
+      <UButton variant="dashboard" :loading="isSaving" :disabled="isSaving" @click="saveSettings">
+        Save Settings
+      </UButton>
     </div>
   </DashboardSettingSidebar>
 </template>

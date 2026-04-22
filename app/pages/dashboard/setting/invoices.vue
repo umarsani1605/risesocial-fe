@@ -79,64 +79,62 @@ const formatPaymentMethod = (method: string | null) => {
 
 <template>
   <DashboardSettingSidebar>
-    <div class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 class="text-xl font-bold">Invoices</h1>
-        <USelect
-          v-model="statusFilter"
-          :items="statusOptions"
-          value-key="value"
-          label-key="label"
-          placeholder="Filter by status"
-          class="w-full sm:w-40"
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+      <h1 class="text-xl font-bold">Invoices</h1>
+      <USelect
+        v-model="statusFilter"
+        :items="statusOptions"
+        value-key="value"
+        label-key="label"
+        placeholder="All status"
+        class="w-full sm:w-40"
+      />
+    </div>
+
+    <UTable
+      v-if="isLoading || transactions.length > 0"
+      :data="transactions"
+      :columns="columns"
+      :loading="isLoading"
+      class="w-full p-0! overflow-visible"
+      @select="onRowClick"
+    >
+      <template #created_at-cell="{ row }">
+        <span class="text-sm">{{ formatDatetime(row.original.created_at) }}</span>
+      </template>
+      <template #items-cell="{ row }">
+        <span class="text-sm font-medium">
+          {{ row.original.items?.[0]?.product_name ?? row.original.product_type }}
+        </span>
+      </template>
+      <template #amount-cell="{ row }">
+        <span class="text-sm font-semibold">{{ formatPrice(row.original.amount) }}</span>
+      </template>
+      <template #status-cell="{ row }">
+        <UBadge
+          :label="row.original.status"
+          :color="TRANSACTION_STATUS_COLOR[row.original.status] ?? 'neutral'"
+          variant="subtle"
+          class="capitalize"
         />
-      </div>
+      </template>
+      <template #payment_method-cell="{ row }">
+        <span class="text-sm text-muted">{{
+          formatPaymentMethod(row.original.payment_method)
+        }}</span>
+      </template>
+    </UTable>
 
-      <UTable
-        v-if="isLoading || transactions.length > 0"
-        :data="transactions"
-        :columns="columns"
-        :loading="isLoading"
-        class="w-full p-0! overflow-visible"
-        @select="onRowClick"
-      >
-        <template #created_at-cell="{ row }">
-          <span class="text-sm">{{ formatDatetime(row.original.created_at) }}</span>
-        </template>
-        <template #items-cell="{ row }">
-          <span class="text-sm font-medium">
-            {{ row.original.items?.[0]?.product_name ?? row.original.product_type }}
-          </span>
-        </template>
-        <template #amount-cell="{ row }">
-          <span class="text-sm font-semibold">{{ formatPrice(row.original.amount) }}</span>
-        </template>
-        <template #status-cell="{ row }">
-          <UBadge
-            :label="row.original.status"
-            :color="TRANSACTION_STATUS_COLOR[row.original.status] ?? 'neutral'"
-            variant="subtle"
-            class="capitalize"
-          />
-        </template>
-        <template #payment_method-cell="{ row }">
-          <span class="text-sm text-muted">{{
-            formatPaymentMethod(row.original.payment_method)
-          }}</span>
-        </template>
-      </UTable>
+    <div v-if="totalPages > 1" class="flex justify-center">
+      <UPagination v-model="page" :total="total" :items-per-page="limit" />
+    </div>
 
-      <div v-if="totalPages > 1" class="flex justify-center">
-        <UPagination v-model="page" :total="total" :items-per-page="limit" />
-      </div>
-
-      <div
-        v-if="hasFetched && !isLoading && transactions.length === 0"
-        class="text-center py-12 text-muted"
-      >
-        <UIcon name="i-ph-receipt-bold" class="size-12 mb-4 mx-auto" />
-        <p>No transactions found</p>
-      </div>
+    <div
+      v-if="hasFetched && !isLoading && transactions.length === 0"
+      class="text-center py-12 text-muted"
+    >
+      <UIcon name="i-ph-receipt-bold" class="size-12 mb-4 mx-auto" />
+      <p>No transactions found</p>
     </div>
 
     <!-- Detail Modal -->
@@ -149,6 +147,14 @@ const formatPaymentMethod = (method: string | null) => {
           <template v-else-if="selectedTransaction">
             <div class="flex items-center justify-between">
               <h2 class="text-lg font-bold">Invoice Details</h2>
+              <UButton
+                icon="i-ph-x-bold"
+                variant="ghost"
+                color="neutral"
+                size="sm"
+                aria-label="Close"
+                @click="detailOpen = false"
+              />
             </div>
             <div>
               <h3 class="font-semibold mb-2">Items</h3>
@@ -176,7 +182,7 @@ const formatPaymentMethod = (method: string | null) => {
                 <span class="text-muted">Status</span>
                 <UBadge
                   :label="selectedTransaction.status"
-                  :color="statusColor[selectedTransaction.status] ?? 'neutral'"
+                  :color="TRANSACTION_STATUS_COLOR[selectedTransaction.status] ?? 'neutral'"
                   variant="subtle"
                   class="capitalize"
                 />
@@ -203,10 +209,6 @@ const formatPaymentMethod = (method: string | null) => {
               </div>
             </div>
           </template>
-
-          <div class="flex justify-end pt-2">
-            <UButton label="Close" variant="outline" @click="detailOpen = false" />
-          </div>
         </div>
       </template>
     </UModal>

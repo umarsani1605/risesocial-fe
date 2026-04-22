@@ -62,7 +62,6 @@ const filteredData = computed(() => {
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 
-
 const columns: TableColumn<AdminCohort>[] = [
   {
     id: 'no',
@@ -80,7 +79,14 @@ const columns: TableColumn<AdminCohort>[] = [
     header: 'Description',
     cell: ({ row }) => {
       const val = row.getValue('description') as string | null
-      return h('span', { class: val ? 'text-sm' : 'text-muted text-sm' }, val ?? '-')
+      return h(
+        'span',
+        {
+          class: val ? 'text-sm max-w-[500px] line-clamp-2 truncate' : 'text-muted text-sm',
+          title: val ?? ''
+        },
+        val ?? '-'
+      )
     }
   },
   {
@@ -113,9 +119,9 @@ const columns: TableColumn<AdminCohort>[] = [
       h(UButton, {
         label: 'Detail',
         color: 'primary',
-        variant: 'outline',
+        variant: 'light',
         size: 'sm',
-        leadingIcon: 'i-ph-caret-double-right-bold',
+        leadingIcon: 'i-ph-magnifying-glass-bold',
         to: `/admin/cohorts/${row.original.id}`
       })
   }
@@ -123,10 +129,18 @@ const columns: TableColumn<AdminCohort>[] = [
 
 const isAddOpen = ref(false)
 const isAdding = ref(false)
-const addForm = reactive<{ academy_id: number | undefined; name: string; description: string }>({
+const addForm = reactive<{
+  academy_id: number | undefined
+  name: string
+  description: string
+  start_date: string
+  end_date: string
+}>({
   academy_id: undefined,
   name: '',
-  description: ''
+  description: '',
+  start_date: '',
+  end_date: ''
 })
 const academySelectItems = computed(() =>
   academies.value.map((a) => ({ label: a.title, value: a.id }))
@@ -140,7 +154,9 @@ async function onAddCohort() {
       body: {
         academy_id: addForm.academy_id,
         name: addForm.name,
-        description: addForm.description || null
+        description: addForm.description || null,
+        start_date: addForm.start_date,
+        end_date: addForm.end_date
       }
     })
     toast.add({ title: 'Cohort created', color: 'success' })
@@ -148,6 +164,8 @@ async function onAddCohort() {
     addForm.academy_id = undefined
     addForm.name = ''
     addForm.description = ''
+    addForm.start_date = ''
+    addForm.end_date = ''
     await refresh()
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
@@ -165,11 +183,20 @@ async function onAddCohort() {
     search-placeholder="Search name, description, or academy"
     search-class="w-full sm:w-80"
     table-class="px-4 sm:px-6"
+    :column-pinning="{}"
   >
     <template #toolbar-left>
       <div class="flex w-full sm:w-auto gap-2">
-        <USelect v-model="academyFilter" :items="academyOptions" class="flex-1 sm:flex-none sm:w-44" />
-        <USelect v-model="statusFilter" :items="statusOptions" class="flex-1 sm:flex-none sm:w-36" />
+        <USelect
+          v-model="academyFilter"
+          :items="academyOptions"
+          class="flex-1 sm:flex-none sm:w-44"
+        />
+        <USelect
+          v-model="statusFilter"
+          :items="statusOptions"
+          class="flex-1 sm:flex-none sm:w-36"
+        />
       </div>
     </template>
     <template #toolbar-right>

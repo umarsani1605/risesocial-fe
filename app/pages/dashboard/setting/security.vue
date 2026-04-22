@@ -23,11 +23,9 @@ async function onChangePassword() {
     form.password = ''
     form.repeatPassword = ''
     toast.add({ title: 'Password updated', color: 'success' })
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
-  }
-  finally {
+  } finally {
     isSubmitting.value = false
   }
 }
@@ -35,30 +33,41 @@ async function onChangePassword() {
 
 <template>
   <DashboardSettingSidebar>
-    <div class="space-y-6">
-      <h1 class="text-xl font-bold">Security</h1>
+    <h1 class="text-xl font-bold mb-2">Security</h1>
 
-      <UForm ref="securityForm" :schema="userPasswordSchema" :state="form" class="space-y-4 max-w-lg" @submit="onChangePassword">
-        <UFormField name="password" label="Password">
-          <UInput
-            v-model="form.password"
-            type="password"
-            placeholder="Enter new password"
-            class="w-full"
-          />
-        </UFormField>
+    <UForm
+      ref="securityForm"
+      :schema="userPasswordSchema"
+      :state="form"
+      class="space-y-4 max-w-lg"
+      @submit="onChangePassword"
+    >
+      <UFormField name="password" label="Password">
+        <UInput
+          v-model="form.password"
+          type="password"
+          placeholder="Enter new password"
+          class="w-full"
+        />
+      </UFormField>
 
-        <UFormField name="repeatPassword" label="Repeat password">
-          <UInput
-            v-model="form.repeatPassword"
-            type="password"
-            placeholder="Repeat new password"
-            class="w-full"
-          />
-        </UFormField>
-      </UForm>
+      <UFormField name="repeatPassword" label="Repeat password">
+        <UInput
+          v-model="form.repeatPassword"
+          type="password"
+          placeholder="Repeat new password"
+          class="w-full"
+        />
+      </UFormField>
+    </UForm>
 
-      <UButton color="primary" :loading="isSubmitting" :disabled="isSubmitting" @click="formRef?.submit()">
+    <div>
+      <UButton
+        variant="dashboard"
+        :loading="isSubmitting"
+        :disabled="isSubmitting"
+        @click="formRef?.submit()"
+      >
         Change Password
       </UButton>
     </div>

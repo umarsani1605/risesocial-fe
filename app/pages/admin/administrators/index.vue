@@ -167,7 +167,13 @@ const columns: TableColumn<AdminUser>[] = [
       const name = `${user.first_name} ${user.last_name}`
       const initials = `${user.first_name[0] ?? ''}${user.last_name[0] ?? ''}`.toUpperCase()
       return h('div', { class: 'flex items-center gap-2' }, [
-        h(UAvatar, { src: user.avatar ?? undefined, text: initials, size: 'xs', color: 'error' }),
+        h(UAvatar, {
+          src: user.avatar ?? undefined,
+          text: initials,
+          size: 'md',
+          color: 'primary',
+          class: 'bg-primary text-white text-sm rounded-full'
+        }),
         h('span', { class: 'font-medium' }, name)
       ])
     }
@@ -182,7 +188,8 @@ const columns: TableColumn<AdminUser>[] = [
   {
     accessorKey: 'created_at',
     header: 'Created',
-    cell: ({ row }) => h('span', { class: 'text-muted' }, formatDatetime(row.getValue('created_at')))
+    cell: ({ row }) =>
+      h('span', { class: 'text-muted' }, formatDatetime(row.getValue('created_at')))
   },
   {
     id: 'actions',
@@ -194,7 +201,7 @@ const columns: TableColumn<AdminUser>[] = [
           label: 'Edit',
           size: 'sm',
           color: 'primary',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-pencil-simple-bold',
           onClick: () => openEdit(row.original)
         }),
@@ -202,7 +209,7 @@ const columns: TableColumn<AdminUser>[] = [
           label: 'Delete',
           size: 'sm',
           color: 'error',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })

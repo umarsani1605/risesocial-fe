@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'saved': []
+  saved: []
 }>()
 
 const { api } = useApi()
@@ -82,21 +82,39 @@ async function save() {
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <UForm ref="formRef" :schema="featureFormSchema" :state="form" class="space-y-4" @submit="save">
+      <UForm
+        :validate-on="['submit']"
+        ref="formRef"
+        :schema="featureFormSchema"
+        :state="form"
+        class="space-y-4"
+        @submit="save"
+      >
         <UFormField name="title" label="Title" required>
           <UInput v-model="form.title" placeholder="e.g. Live Sessions" class="w-full" />
         </UFormField>
         <UFormField name="description" label="Description" required>
-          <UTextarea v-model="form.description" placeholder="Describe this benefit" :rows="3" class="w-full" />
+          <UTextarea
+            v-model="form.description"
+            placeholder="Describe this benefit"
+            :rows="3"
+            class="w-full"
+          />
         </UFormField>
         <UFormField name="icon" label="Icon" required>
           <template #hint>
-            Lucide icon name —
-            <a href="https://lucide.dev" target="_blank" class="underline text-primary">lucide.dev</a>
+            Use Phospor icon name, see all icons:
+            <a href="https://phosphoricons.com/" target="_blank" class="underline text-primary"
+              >phosphoricons.com</a
+            >
           </template>
           <div class="flex items-center gap-3">
             <UInput v-model="form.icon" placeholder="video" class="flex-1" />
-            <UIcon v-if="form.icon" :name="`i-ph-${form.icon}-fill`" class="size-8 text-muted shrink-0" />
+            <UIcon
+              v-if="form.icon"
+              :name="`i-ph-${form.icon}-fill`"
+              class="size-8 text-muted shrink-0"
+            />
           </div>
         </UFormField>
         <UFormField name="order" label="Order">
@@ -108,8 +126,19 @@ async function save() {
       <div class="flex items-center justify-between w-full">
         <UCheckbox v-if="!item" v-model="addMore" label="Add more" />
         <div class="flex gap-2 ml-auto">
-          <UButton label="Cancel" color="neutral" variant="outline" @click="emit('update:open', false)" />
-          <UButton label="Save" color="primary" :loading="loading" :disabled="loading" @click="formRef?.submit()" />
+          <UButton
+            label="Cancel"
+            color="neutral"
+            variant="outline"
+            @click="emit('update:open', false)"
+          />
+          <UButton
+            label="Save"
+            color="primary"
+            :loading="loading"
+            :disabled="loading"
+            @click="formRef?.submit()"
+          />
         </div>
       </div>
     </template>

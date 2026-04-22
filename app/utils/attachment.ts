@@ -1,96 +1,140 @@
 // Unified attachment style map — used in ModuleItem, TabModules, AdminCohortModuleModal
-export const ATTACHMENT_MAP: Record<string, { color: string; icon: string; label: string }> = {
+export interface AttachmentStyle {
+  label: string
+  icon: string
+  background: string
+  foreground: string
+  border: string
+}
+
+export const ATTACHMENT_MAP: Record<string, AttachmentStyle> = {
   external_link: {
     label: 'LINK',
-    color: 'bg-blue-400',
     icon: 'i-ph-link-bold',
+    background: 'bg-blue-50',
+    foreground: 'text-blue-400',
+    border: 'ring-blue-300',
   },
   embed_video: {
     label: 'VIDEO',
-    color: 'bg-red-400',
     icon: 'i-ph-video-bold',
+    background: 'bg-red-50',
+    foreground: 'text-red-400',
+    border: 'ring-red-300',
   },
   pdf: {
     label: 'PDF',
-    color: 'bg-red-400',
     icon: 'i-ph-file-text-bold',
+    background: 'bg-red-50',
+    foreground: 'text-red-400',
+    border: 'ring-red-300',
   },
   msword: {
     label: 'DOCX',
-    color: 'bg-blue-400',
     icon: 'i-ph-file-text-bold',
+    background: 'bg-blue-50',
+    foreground: 'text-blue-400',
+    border: 'ring-blue-300',
   },
   doc: {
     label: 'DOCX',
-    color: 'bg-blue-400',
     icon: 'i-ph-file-text-bold',
+    background: 'bg-blue-50',
+    foreground: 'text-blue-400',
+    border: 'ring-blue-300',
   },
   docx: {
     label: 'DOCX',
-    color: 'bg-blue-400',
     icon: 'i-ph-file-text-bold',
+    background: 'bg-blue-50',
+    foreground: 'text-blue-400',
+    border: 'ring-blue-300',
   },
   'vnd.openxmlformats-officedocument.wordprocessingml.document': {
     label: 'DOCX',
-    color: 'bg-blue-400',
     icon: 'i-ph-file-text-bold',
+    background: 'bg-blue-50',
+    foreground: 'text-blue-400',
+    border: 'ring-blue-300',
   },
   ppt: {
     label: 'PPTX',
-    color: 'bg-orange-400',
     icon: 'i-ph-file-bold',
+    background: 'bg-orange-50',
+    foreground: 'text-orange-400',
+    border: 'ring-orange-300',
   },
   pptx: {
     label: 'PPTX',
-    color: 'bg-orange-400',
     icon: 'i-ph-file-bold',
+    background: 'bg-orange-50',
+    foreground: 'text-orange-400',
+    border: 'ring-orange-300',
   },
   'vnd.openxmlformats-officedocument.presentationml.presentation': {
     label: 'PPTX',
-    color: 'bg-orange-400',
     icon: 'i-ph-file-bold',
+    background: 'bg-orange-50',
+    foreground: 'text-orange-400',
+    border: 'ring-orange-300',
   },
   xls: {
     label: 'XLSX',
-    color: 'bg-emerald-400',
     icon: 'i-ph-table-bold',
+    background: 'bg-emerald-50',
+    foreground: 'text-emerald-400',
+    border: 'ring-emerald-300',
   },
   xlsx: {
     label: 'XLSX',
-    color: 'bg-emerald-400',
     icon: 'i-ph-table-bold',
+    background: 'bg-emerald-50',
+    foreground: 'text-emerald-400',
+    border: 'ring-emerald-300',
   },
   'vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
     label: 'XLSX',
-    color: 'bg-emerald-400',
     icon: 'i-ph-table-bold',
+    background: 'bg-emerald-50',
+    foreground: 'text-emerald-400',
+    border: 'ring-emerald-300',
   },
   jpeg: {
     label: 'JPEG',
-    color: 'bg-purple-400',
     icon: 'i-ph-image-bold',
+    background: 'bg-purple-50',
+    foreground: 'text-purple-400',
+    border: 'ring-purple-300',
   },
   jpg: {
     label: 'JPEG',
-    color: 'bg-purple-400',
     icon: 'i-ph-image-bold',
+    background: 'bg-purple-50',
+    foreground: 'text-purple-400',
+    border: 'ring-purple-300',
   },
   png: {
     label: 'PNG',
-    color: 'bg-purple-400',
     icon: 'i-ph-image-bold',
+    background: 'bg-purple-50',
+    foreground: 'text-purple-400',
+    border: 'ring-purple-300',
   },
   webp: {
     label: 'WEBP',
-    color: 'bg-purple-400',
     icon: 'i-ph-image-bold',
+    background: 'bg-purple-50',
+    foreground: 'text-purple-400',
+    border: 'ring-purple-300',
   },
 }
 
-const DEFAULT_ATTACHMENT_STYLE = {
+const DEFAULT_ATTACHMENT_STYLE: AttachmentStyle = {
   label: 'FILE',
-  color: 'bg-gray-400',
   icon: 'i-ph-file-bold',
+  background: 'bg-gray-50',
+  foreground: 'text-gray-400',
+  border: 'ring-gray-300',
 }
 
 function resolveAttachmentKey(att: { file_mime?: string | null; file_path?: string | null }): string {
@@ -101,7 +145,7 @@ export function getAttachmentStyle(att: {
   type?: string
   file_mime?: string | null
   file_path?: string | null
-}): { color: string; icon: string; label: string } {
+}): AttachmentStyle {
   if (att.type === 'external_link' || att.type === 'embed_video') {
     return ATTACHMENT_MAP[att.type]!
   }

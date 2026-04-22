@@ -160,6 +160,26 @@ async function executeDelete() {
   }
 }
 
+// ── Export ───────────────────────────────────────────────────────
+const isExporting = ref(false)
+
+async function exportExcel() {
+  isExporting.value = true
+  try {
+    const blob = await api('/admin/users/export-excel', { responseType: 'blob' }) as Blob
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `users-${new Date().toISOString().split('T')[0]}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isExporting.value = false
+  }
+}
+
 const columns: TableColumn<AdminUser>[] = [
   {
     id: 'no',
@@ -174,7 +194,13 @@ const columns: TableColumn<AdminUser>[] = [
       const name = `${user.first_name} ${user.last_name}`
       const initials = `${user.first_name[0] ?? ''}${user.last_name[0] ?? ''}`.toUpperCase()
       return h('div', { class: 'flex items-center gap-2' }, [
-        h(UAvatar, { src: user.avatar ?? undefined, text: initials, size: 'xs', color: 'primary' }),
+        h(UAvatar, {
+          src: user.avatar ?? undefined,
+          text: initials,
+          size: 'sm',
+          color: 'primary',
+          class: 'bg-primary text-white text-xs rounded-full'
+        }),
         h('span', { class: 'font-medium' }, name)
       ])
     }
@@ -189,7 +215,8 @@ const columns: TableColumn<AdminUser>[] = [
   {
     accessorKey: 'created_at',
     header: 'Created',
-    cell: ({ row }) => h('span', { class: 'text-muted' }, formatDatetime(row.getValue('created_at')))
+    cell: ({ row }) =>
+      h('span', { class: 'text-muted' }, formatDatetime(row.getValue('created_at')))
   },
   {
     id: 'actions',
@@ -201,7 +228,7 @@ const columns: TableColumn<AdminUser>[] = [
           label: 'Edit',
           size: 'sm',
           color: 'primary',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-pencil-simple-bold',
           onClick: () => openEdit(row.original)
         }),
@@ -209,7 +236,7 @@ const columns: TableColumn<AdminUser>[] = [
           label: 'Delete',
           size: 'sm',
           color: 'error',
-          variant: 'outline',
+          variant: 'light',
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })
@@ -226,7 +253,18 @@ const columns: TableColumn<AdminUser>[] = [
     search-placeholder="Search name or email..."
   >
     <template #toolbar-right>
-      <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+      <div class="flex items-center gap-2">
+        <UButton
+          label="Export Excel"
+          leading-icon="i-ph-download-simple-bold"
+          color="neutral"
+          variant="outline"
+          :loading="isExporting"
+          :disabled="isExporting"
+          @click="exportExcel"
+        />
+        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+      </div>
     </template>
   </AdminDataTable>
 

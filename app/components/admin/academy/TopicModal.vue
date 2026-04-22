@@ -83,7 +83,7 @@ async function save() {
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <UForm ref="formRef" :schema="topicFormSchema" :state="form" class="space-y-4" @submit="save">
+      <UForm ref="formRef" :schema="topicFormSchema" :state="form" class="space-y-4" @submit="save" :validate-on="['submit']">
         <UFormField v-if="!defaultThemeId" label="Theme">
           <USelect v-model="form.theme_id" :items="themes" placeholder="Select theme" class="w-full" />
         </UFormField>
