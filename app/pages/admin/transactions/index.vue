@@ -19,6 +19,7 @@ definePageMeta({
 useSeoMeta({ title: 'Transactions - Rise Social' })
 
 const { api } = useApi()
+const toast = useToast()
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 
@@ -149,6 +150,27 @@ const columns: TableColumn<AdminTransaction>[] = [
   }
 ]
 
+// ── Export ────────────────────────────────────────────────────────────────────
+
+const isExporting = ref(false)
+
+async function exportExcel() {
+  isExporting.value = true
+  try {
+    const blob = await api('/admin/transactions/export-excel', { responseType: 'blob' }) as Blob
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `transactions-${new Date().toISOString().split('T')[0]}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isExporting.value = false
+  }
+}
+
 // ── Slideover ─────────────────────────────────────────────────────────────────
 
 const isSlideoverOpen = ref(false)
@@ -169,22 +191,32 @@ function openDetail(id: number) {
     :column-pinning="{}"
   >
     <template #toolbar>
-      <div class="flex flex-wrap items-center gap-2">
-        <UInput
-          v-model="searchInput"
-          icon="i-ph-magnifying-glass-bold"
-          placeholder="Search code, name, or email"
-          class="w-full sm:w-72"
-        />
-        <USelect v-model="statusFilter" :items="statusOptions" class="w-full sm:w-40" />
-        <USelect v-model="typeFilter" :items="typeOptions" class="w-full sm:w-56" />
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <UInput
+            v-model="searchInput"
+            icon="i-ph-magnifying-glass-bold"
+            placeholder="Search code, name, or email"
+            class="w-full sm:w-72"
+          />
+          <USelect v-model="statusFilter" :items="statusOptions" class="w-full sm:w-40" />
+          <USelect v-model="typeFilter" :items="typeOptions" class="w-full sm:w-56" />
+          <UButton
+            v-if="searchInput || statusFilter || typeFilter"
+            label="Reset"
+            color="neutral"
+            variant="ghost"
+            icon="i-ph-x-bold"
+            @click="resetFilters"
+          />
+        </div>
         <UButton
-          v-if="searchInput || statusFilter || typeFilter"
-          label="Reset"
-          color="neutral"
-          variant="ghost"
-          icon="i-ph-x-bold"
-          @click="resetFilters"
+          label="Export Excel"
+          leading-icon="i-ph-download-simple-bold"
+          color="primary"
+          :loading="isExporting"
+          :disabled="isExporting"
+          @click="exportExcel"
         />
       </div>
     </template>

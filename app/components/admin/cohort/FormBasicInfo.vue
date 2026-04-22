@@ -67,7 +67,7 @@ const endDate = computed({
           <UFormField name="start_date" class="flex-1">
             <UInputDate
               ref="startDateInput"
-              v-model="startDate as any"
+              v-model="startDate"
               locale="en-GB"
               class="w-full"
             >
@@ -82,7 +82,7 @@ const endDate = computed({
                     class="px-0 text-dimmed"
                   />
                   <template #content>
-                    <UCalendar v-model="startDate as any" class="p-2" />
+                    <UCalendar v-model="startDate" class="p-2" />
                   </template>
                 </UPopover>
               </template>
@@ -92,7 +92,7 @@ const endDate = computed({
           <UIcon name="i-ph-arrow-right-bold" class="shrink-0 mt-2.5 text-muted" />
 
           <UFormField name="end_date" class="flex-1">
-            <UInputDate ref="endDateInput" v-model="endDate as any" locale="en-GB" class="w-full">
+            <UInputDate ref="endDateInput" v-model="endDate" locale="en-GB" class="w-full">
               <template #leading>
                 <UPopover :reference="(endDateInput as any)?.inputsRef?.[3]?.$el">
                   <UButton
@@ -104,7 +104,7 @@ const endDate = computed({
                     class="px-0 text-dimmed"
                   />
                   <template #content>
-                    <UCalendar v-model="endDate as any" class="p-2" />
+                    <UCalendar v-model="endDate" class="p-2" />
                   </template>
                 </UPopover>
               </template>

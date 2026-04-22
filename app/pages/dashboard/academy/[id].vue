@@ -53,7 +53,6 @@ useSeoMeta({
 
 const tabItems: TabsItem[] = [
   { label: 'Modules', slot: 'modules', icon: 'i-ph-stack-duotone' },
-  { label: 'Students', slot: 'students', icon: 'i-ph-users-duotone' },
   { label: 'Mentors', slot: 'mentors', icon: 'i-ph-user-duotone' }
 ]
 
@@ -163,9 +162,6 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
         </template>
         <template #modules>
           <DashboardAcademyTabModules ref="tabModulesRef" :modules="modules" />
-        </template>
-        <template #students>
-          <DashboardAcademyTabStudents :students="students" />
         </template>
         <template #mentors>
           <DashboardAcademyTabMentors :mentors="cohort.mentors" />

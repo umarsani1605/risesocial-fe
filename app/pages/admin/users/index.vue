@@ -160,6 +160,26 @@ async function executeDelete() {
   }
 }
 
+// ── Export ───────────────────────────────────────────────────────
+const isExporting = ref(false)
+
+async function exportExcel() {
+  isExporting.value = true
+  try {
+    const blob = await api('/admin/users/export-excel', { responseType: 'blob' }) as Blob
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `users-${new Date().toISOString().split('T')[0]}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isExporting.value = false
+  }
+}
+
 const columns: TableColumn<AdminUser>[] = [
   {
     id: 'no',
@@ -233,7 +253,18 @@ const columns: TableColumn<AdminUser>[] = [
     search-placeholder="Search name or email..."
   >
     <template #toolbar-right>
-      <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+      <div class="flex items-center gap-2">
+        <UButton
+          label="Export Excel"
+          leading-icon="i-ph-download-simple-bold"
+          color="neutral"
+          variant="outline"
+          :loading="isExporting"
+          :disabled="isExporting"
+          @click="exportExcel"
+        />
+        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+      </div>
     </template>
   </AdminDataTable>
 

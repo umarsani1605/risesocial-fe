@@ -221,7 +221,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
             </UFormField>
             <UFormField name="sessionStartTime">
               <UInputTime
-                v-model="sessionTimeRange as any"
+                v-model="sessionTimeRange"
                 :hour-cycle="24"
                 range
                 icon="i-ph-clock-bold"
