@@ -5,7 +5,7 @@ const route = useRoute()
 
 const open = ref(false)
 
-const { user, logout, fullName, initials } = useAuth()
+const { user, logout, fullName, initials, hasPermission } = useAuth()
 
 const menuItems: DropdownMenuItem[][] = [
   [
@@ -41,126 +41,108 @@ const mainLinks = computed<NavigationMenuItem[]>(() => [
     icon: 'i-ph-squares-four-duotone',
     to: '/admin',
     active: isActive('/admin', true),
-    onSelect: () => {
-      open.value = false
-    }
+    onSelect: () => { open.value = false }
   },
-  {
+  ...(hasPermission('admin.transactions') ? [{
     label: 'Transactions',
     icon: 'i-ph-receipt-duotone',
     to: '/admin/transactions',
     active: isActive('/admin/transactions'),
-    onSelect: () => {
-      open.value = false
-    }
-  },
-  {
+    onSelect: () => { open.value = false }
+  }] : []),
+  ...(hasPermission('admin.ryls') ? [{
     label: 'Rise Young Leaders',
     icon: 'i-ph-medal-duotone',
     to: '/admin/programs',
     active: isActive('/admin/programs'),
-    onSelect: () => {
-      open.value = false
-    }
-  }
+    onSelect: () => { open.value = false }
+  }] : [])
 ])
 
 const analyticsLinks = computed<NavigationMenuItem[]>(() => [
-  {
+  ...(hasPermission('admin.transactions') ? [{
     label: 'Revenue',
     icon: 'i-ph-chart-line-duotone',
     to: '/admin/analytics/revenue',
     active: isActive('/admin/analytics/revenue'),
-    onSelect: () => {
-      open.value = false
-    }
-  },
-  {
+    onSelect: () => { open.value = false }
+  }] : []),
+  ...(hasPermission('admin.users') ? [{
     label: 'Users',
     icon: 'i-ph-users-three-duotone',
     to: '/admin/analytics/users',
     active: isActive('/admin/analytics/users'),
-    onSelect: () => {
-      open.value = false
-    }
-  },
-  {
+    onSelect: () => { open.value = false }
+  }] : []),
+  ...(hasPermission('admin.academy') ? [{
     label: 'Academies',
     icon: 'i-ph-graduation-cap-duotone',
     to: '/admin/analytics/academies',
     active: isActive('/admin/analytics/academies'),
-    onSelect: () => {
-      open.value = false
-    }
-  },
-  {
+    onSelect: () => { open.value = false }
+  }] : []),
+  ...(hasPermission('admin.ryls') ? [{
     label: 'Programs',
     icon: 'i-ph-medal-duotone',
     to: '/admin/analytics/programs',
     active: isActive('/admin/analytics/programs'),
-    onSelect: () => {
-      open.value = false
-    }
-  }
+    onSelect: () => { open.value = false }
+  }] : [])
 ])
 
-const academyLinks = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'All Academy',
-    icon: 'i-ph-graduation-cap-duotone',
-    to: '/admin/academies',
-    active: isActive('/admin/academies'),
-    onSelect: () => {
-      open.value = false
+const academyLinks = computed<NavigationMenuItem[]>(() =>
+  hasPermission('admin.academy') ? [
+    {
+      label: 'All Academy',
+      icon: 'i-ph-graduation-cap-duotone',
+      to: '/admin/academies',
+      active: isActive('/admin/academies'),
+      onSelect: () => { open.value = false }
+    },
+    {
+      label: 'Cohorts',
+      icon: 'i-ph-list-dashes-duotone',
+      to: '/admin/cohorts',
+      active: isActive('/admin/cohorts'),
+      onSelect: () => { open.value = false }
     }
-  },
-  {
-    label: 'Cohorts',
-    icon: 'i-ph-list-dashes-duotone',
-    to: '/admin/cohorts',
-    active: isActive('/admin/cohorts'),
-    onSelect: () => {
-      open.value = false
-    }
-  }
-])
+  ] : []
+)
 
-const userLinks = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'All Users',
-    icon: 'i-ph-users-duotone',
-    to: '/admin/users',
-    active: isActive('/admin/users'),
-    onSelect: () => {
-      open.value = false
+const userLinks = computed<NavigationMenuItem[]>(() =>
+  hasPermission('admin.users') ? [
+    {
+      label: 'All Users',
+      icon: 'i-ph-users-duotone',
+      to: '/admin/users',
+      active: isActive('/admin/users'),
+      onSelect: () => { open.value = false }
+    },
+    {
+      label: 'Administrator',
+      icon: 'i-ph-shield-duotone',
+      to: '/admin/administrators',
+      active: isActive('/admin/administrators'),
+      onSelect: () => { open.value = false }
     }
-  },
-  {
-    label: 'Administrator',
-    icon: 'i-ph-shield-duotone',
-    to: '/admin/administrators',
-    active: isActive('/admin/administrators'),
-    onSelect: () => {
-      open.value = false
-    }
-  }
-])
+  ] : []
+)
 
 const navMenuUi = {
   item: 'relative px-4 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:w-1 after:h-[90%] after:rounded-r-full after:transition-colors has-[[aria-current=page]]:after:bg-primary'
 }
 
-const jobLinks = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'All Jobs',
-    icon: 'i-ph-briefcase-duotone',
-    to: '/admin/jobs',
-    active: isActive('/admin/jobs'),
-    onSelect: () => {
-      open.value = false
+const jobLinks = computed<NavigationMenuItem[]>(() =>
+  hasPermission('admin.jobs') ? [
+    {
+      label: 'All Jobs',
+      icon: 'i-ph-briefcase-duotone',
+      to: '/admin/jobs',
+      active: isActive('/admin/jobs'),
+      onSelect: () => { open.value = false }
     }
-  }
-])
+  ] : []
+)
 </script>
 
 <template>
@@ -210,7 +192,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() => [
             tooltip
           />
         </div>
-        <div>
+        <div v-if="academyLinks.length">
           <p v-if="!collapsed" class="px-6.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
             Academy
           </p>
@@ -223,7 +205,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() => [
           />
         </div>
 
-        <div>
+        <div v-if="userLinks.length">
           <p v-if="!collapsed" class="px-6.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
             Users
           </p>
@@ -236,7 +218,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() => [
           />
         </div>
 
-        <div>
+        <div v-if="jobLinks.length">
           <p v-if="!collapsed" class="px-6.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
             Jobs
           </p>
@@ -249,7 +231,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() => [
           />
         </div>
 
-        <div>
+        <div v-if="analyticsLinks.length">
           <p v-if="!collapsed" class="px-6.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
             Statistics
           </p>
