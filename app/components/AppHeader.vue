@@ -44,8 +44,8 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
     class="bg-[#062d2c] border-transparent"
     :ui="{
       toggle: 'text-white hover:bg-white/10 hover:text-white',
-      content: 'bg-[#062d2c]',
-      body: 'bg-[#062d2c]',
+      content: 'bg-[#062d2c] divide-none h-fit',
+      body: 'bg-[#073635]'
     }"
   >
     <template #title>
@@ -61,7 +61,6 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
         link: 'hover:text-white! text-base'
       }"
     />
-
     <template #right>
       <UDropdownMenu v-if="isLoggedIn" :items="userMenuItems" :modal="false">
         <button class="flex items-center gap-2 rounded-lg p-2 hover:bg-white/10 transition-colors">
@@ -93,49 +92,9 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
       <UNavigationMenu
         :items="items"
         orientation="vertical"
-        class="-mx-2.5 [&_a]:relative [&_a]:flex [&_a]:items-center [&_a]:px-4 [&_a]:py-3 [&_a]:rounded-lg [&_a]:text-base [&_a]:font-medium [&_a]:text-white [&_a]:transition-colors [&_a]:hover:bg-white/10! [&_a[aria-current=page]]:text-orange-400! [&_a[aria-current=page]]:bg-white/5!"
-      />
-
-      <USeparator class="my-6 opacity-20" />
-
-      <template v-if="isLoggedIn">
-        <div class="flex items-center gap-3 px-4 py-2 mb-2">
-          <UAvatar
-            :src="user?.avatar"
-            :alt="fullName"
-            :text="initials"
-            size="sm"
-            color="primary"
-            class="rounded-full"
-          />
-          <span class="text-sm font-medium text-white">{{ fullName }}</span>
-        </div>
-        <UButton
-          :label="isAdmin ? 'Admin Panel' : 'Dashboard'"
-          :icon="isAdmin ? 'i-ph-shield-bold' : 'i-ph-squares-four-bold'"
-          color="neutral"
-          variant="link"
-          class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"
-          :to="isAdmin ? '/admin' : '/dashboard'"
-        />
-        <UButton
-          label="Logout"
-          icon="i-ph-sign-out-bold"
-          color="neutral"
-          variant="link"
-          class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"
-          @click="logout()"
-        />
-      </template>
-
-      <UButton
-        v-else
-        label="Login"
-        icon="i-ph-user-bold"
-        color="neutral"
-        variant="link"
-        class="px-4 rounded-lg text-white hover:bg-white/5 hover:text-white active:text-white"
-        @click="navigateTo('/login')"
+        :ui="{
+          link: 'relative flex items-center px-4 py-3 rounded-lg text-base font-medium text-white transition-colors hover:before:bg-white/5! hover:text-white! data-[active]:before:bg-white/5! data-[active]:text-orange-400!'
+        }"
       />
     </template>
   </UHeader>

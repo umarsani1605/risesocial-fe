@@ -16,7 +16,5 @@ export default eventHandler(async (event) => {
     updatedAt: new Date().toISOString()
   }
 
-  console.log('Updated blog post:', updatedPost)
-
   return updatedPost
 })

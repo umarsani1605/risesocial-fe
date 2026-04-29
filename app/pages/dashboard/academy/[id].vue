@@ -8,17 +8,10 @@ definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 const route = useRoute()
 const cohortId = route.params.id as string
 
-interface CohortStudent {
-  id: number
-  status: string
-  user: { id: number; first_name: string; last_name: string; avatar: string | null }
-}
-
 const { api } = useApi()
 const [
   { data: cohortData, error },
   { data: modulesData },
-  { data: studentsData },
   { data: certData }
 ] = await Promise.all([
   useAsyncData(`dashboard:cohort:${cohortId}`, () =>
@@ -26,9 +19,6 @@ const [
   ),
   useAsyncData(`dashboard:cohort:${cohortId}:modules`, () =>
     api<ApiResponse<CohortModule[]>>(`/cohorts/${cohortId}/modules`)
-  ),
-  useAsyncData(`dashboard:cohort:${cohortId}:students`, () =>
-    api<ApiResponse<CohortStudent[]>>(`/cohorts/${cohortId}/students`)
   ),
   useAsyncData(`dashboard:cohort:${cohortId}:certificate`, () =>
     api<ApiResponse<{ certificate_url: string }>>(`/cohorts/${cohortId}/certificate`).catch(
@@ -43,7 +33,6 @@ if (error.value || !cohortData.value?.data) {
 
 const cohort = computed(() => cohortData.value!.data)
 const modules = computed(() => modulesData.value?.data ?? [])
-const students = computed(() => studentsData.value?.data ?? [])
 const certificateUrl = computed(() => certData.value?.data?.certificate_url ?? null)
 
 useSeoMeta({

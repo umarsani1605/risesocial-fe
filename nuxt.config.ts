@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: true,
+    enabled: process.env.NODE_ENV !== 'production',
   },
 
   css: ['~/assets/css/main.css'],
@@ -49,7 +49,7 @@ export default defineNuxtConfig({
   routeRules: {
     '/docs': { redirect: '/docs/getting-started', prerender: false },
     '/api/**': {
-      cors: true
+      cors: true,
     }
   },
 

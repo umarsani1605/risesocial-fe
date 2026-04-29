@@ -42,6 +42,8 @@ const navigationMenus = computed(() => [
   }
 ])
 
+const headerRef = ref<HTMLElement>()
+
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
@@ -57,16 +59,13 @@ watch(
   }
 )
 
+onClickOutside(headerRef, () => {
+  mobileMenuOpen.value = false
+})
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   handleScroll()
-  
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement
-    if (!target.closest('header')) {
-      mobileMenuOpen.value = false
-    }
-  })
 })
 
 onUnmounted(() => {
@@ -77,6 +76,7 @@ onUnmounted(() => {
 <template>
   <div class="relative">
     <header
+      ref="headerRef"
       :class="[
         'fixed w-full top-0 z-50 bg-[#062d2c] transition-shadow duration-300',
         isScrolled ? 'shadow-md' : ''
@@ -148,7 +148,7 @@ onUnmounted(() => {
       >
         <div
           v-if="mobileMenuOpen"
-          class="lg:hidden absolute top-full left-0 right-0 bg-secondary text-white backdrop-blur-sm shadow-lg z-40"
+          class="lg:hidden absolute top-full left-0 right-0 bg-secondary text-white shadow-lg z-40"
         >
           <div class="max-w-7xl mx-auto px-6 pt-4 pb-6">
             <!-- Mobile Navigation Links -->

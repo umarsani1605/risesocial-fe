@@ -6,8 +6,7 @@ import {
   TRANSACTION_STATUS_COLOR,
   PRODUCT_TYPE_ITEMS,
   PRODUCT_TYPE_LABEL,
-  PAYMENT_METHOD_LABEL,
-  PROVIDER_LABEL
+  PAYMENT_METHOD_LABEL
 } from '@/constants/transaction'
 
 definePageMeta({

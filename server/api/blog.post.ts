@@ -17,8 +17,5 @@ export default eventHandler(async (event) => {
     updatedAt: new Date().toISOString()
   }
 
-  // In real app, save to database
-  console.log('Created blog post:', newPost)
-
   return newPost
 })

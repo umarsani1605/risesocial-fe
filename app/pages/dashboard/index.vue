@@ -24,7 +24,7 @@ const dynamicGreeting = computed(() => {
   return 'Good evening'
 })
 
-const titleIndex = useState('dashboard:title-index', () => Math.floor(Math.random() * 5))
+const titleIndex = ref(Math.floor(Math.random() * 5))
 
 const dynamicTitle = computed(() => {
   const g = dynamicGreeting.value
@@ -68,7 +68,7 @@ const inactiveSubtitles = [
   "Your skills can drive real impact. Let's continue learning."
 ]
 
-const subtitleIndex = useState('dashboard:subtitle-index', () => Math.floor(Math.random() * 5))
+const subtitleIndex = ref(Math.floor(Math.random() * 5))
 
 const dynamicSubtitle = computed(() => {
   const pool = activeEnrollment.value ? activeSubtitles : inactiveSubtitles
