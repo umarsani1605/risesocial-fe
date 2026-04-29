@@ -15,6 +15,7 @@ const {
 } = useRylsPayment()
 const { uploadPaymentProof, isUploading, uploadError, uploadProgress } = useRylsFileUpload()
 const { submit } = useRylsSubmission()
+const { loadDraft, deleteDraft, resumeToken } = useRylsDraft()
 
 const proofFile = ref<File | null>(null)
 const proofFileId = ref<string | null>(null)
@@ -25,9 +26,24 @@ const midtransError = ref('')
 const validationError = ref(false)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 
-onMounted(() => {
+onMounted(async () => {
   if (!store.step1.fullName) {
-    router.push('/programs/rise-young-leaders-summit/registration')
+    const draft = await loadDraft()
+    if (draft?.formData) {
+      const fd = draft.formData as Record<string, unknown>
+      if (fd.step1) store.setStep1(fd.step1 as Parameters<typeof store.setStep1>[0])
+      if (fd.passportNumber) {
+        store.setSelfFundedData({
+          passportNumber: fd.passportNumber as string,
+          needVisa: (fd.needVisa as 'YES' | 'NO' | '') || '',
+          headshotFile: (fd.headshotFile as string) || '',
+          readPolicies: (fd.readPolicies as 'YES' | 'NO' | '') || '',
+        })
+      }
+    }
+    else {
+      router.push('/programs/rise-young-leaders-summit/registration')
+    }
   }
 })
 
@@ -166,12 +182,15 @@ const onSubmit = async () => {
       return
     }
 
-    const submission = await submit()
+    const submission = await submit(resumeToken.value ?? undefined)
 
     if (submission) {
+      await deleteDraft()
+      store.resetAll()
       if (store.step1.scholarshipType === 'FULLY_FUNDED') {
         router.push('/programs/rise-young-leaders-summit/registration/fully-funded')
-      } else {
+      }
+      else {
         router.push('/programs/rise-young-leaders-summit/registration/success')
       }
     }

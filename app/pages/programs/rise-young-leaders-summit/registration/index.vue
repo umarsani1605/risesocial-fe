@@ -9,6 +9,9 @@ useHead({ bodyAttrs: { class: 'ryls-blue-theme' } })
 
 const store = useRylsRegistration()
 const router = useRouter()
+const toast = useToast()
+const { saveDraft, loadDraft, isDraftLoading } = useRylsDraft()
+const hasDraftRestored = ref(false)
 
 const genderValues = GENDER_OPTIONS.map(o => o.value) as [string, ...string[]]
 const discoverValues = DISCOVER_SOURCES.map(o => o.value) as [string, ...string[]]
@@ -27,7 +30,7 @@ const schema = z
     gender: z.enum(genderValues, { message: 'Please select one option' }),
     discoverSource: z.enum(discoverValues, { message: 'Please select one option' }),
     discoverOtherText: z.string().optional(),
-    scholarshipType: z.enum(scholarshipValues, { message: 'Please select one option' })
+    scholarshipType: z.enum(scholarshipValues, { message: 'Please select one option' }),
   })
   .refine(
     (data) => {
@@ -38,8 +41,8 @@ const schema = z
     },
     {
       message: 'Please specify',
-      path: ['discoverOtherText']
-    }
+      path: ['discoverOtherText'],
+    },
   )
 
 type Schema = z.output<typeof schema>
@@ -56,7 +59,40 @@ const state = reactive<Partial<Schema>>({
   gender: store.step1.gender || undefined,
   discoverSource: store.step1.discoverSource || undefined,
   discoverOtherText: store.step1.discoverOtherText || '',
-  scholarshipType: store.step1.scholarshipType || undefined
+  scholarshipType: store.step1.scholarshipType || undefined,
+})
+
+onMounted(async () => {
+  const draft = await loadDraft()
+  if (draft?.formData) {
+    const fd = draft.formData as Record<string, unknown>
+    if (fd.step1) {
+      store.setStep1(fd.step1 as Parameters<typeof store.setStep1>[0])
+      const s1 = fd.step1 as Record<string, string>
+      state.fullName = s1.fullName || ''
+      state.email = s1.email || ''
+      state.residence = s1.residence || ''
+      state.nationality = s1.nationality || ''
+      state.secondNationality = s1.secondNationality || ''
+      state.whatsapp = s1.whatsapp || ''
+      state.institution = s1.institution || ''
+      state.dateOfBirth = s1.dateOfBirth || ''
+      state.gender = s1.gender || undefined
+      state.discoverSource = s1.discoverSource || undefined
+      state.discoverOtherText = s1.discoverOtherText || ''
+      state.scholarshipType = s1.scholarshipType || undefined
+    }
+    if (fd.passportNumber) {
+      store.setSelfFundedData({
+        passportNumber: fd.passportNumber as string,
+        needVisa: (fd.needVisa as 'YES' | 'NO' | '') || '',
+        headshotFile: (fd.headshotFile as string) || '',
+        readPolicies: (fd.readPolicies as 'YES' | 'NO' | '') || '',
+      })
+    }
+    hasDraftRestored.value = true
+    toast.add({ title: 'Progress tersimpan sebelumnya telah dipulihkan', color: 'success' })
+  }
 })
 
 function onWhatsappInput(e: Event) {
@@ -66,7 +102,7 @@ function onWhatsappInput(e: Event) {
   state.whatsapp = filtered
 }
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   const values = event.data
 
   store.setStep1({
@@ -81,13 +117,16 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
     gender: values.gender,
     discoverSource: values.discoverSource,
     discoverOtherText: values.discoverOtherText ?? '',
-    scholarshipType: values.scholarshipType as 'FULLY_FUNDED' | 'SELF_FUNDED' | ''
+    scholarshipType: values.scholarshipType as 'FULLY_FUNDED' | 'SELF_FUNDED' | '',
   })
+
+  await saveDraft(1, { step1: values }, values.email, values.scholarshipType)
 
   const base = '/programs/rise-young-leaders-summit/registration'
   if (values.scholarshipType === 'FULLY_FUNDED') {
     router.push(`${base}/payment`)
-  } else if (values.scholarshipType === 'SELF_FUNDED') {
+  }
+  else if (values.scholarshipType === 'SELF_FUNDED') {
     router.push(`${base}/self-funded`)
   }
 }
@@ -113,7 +152,12 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
 
     <hr class="my-6 border-gray-200">
 
+    <div v-if="isDraftLoading" class="py-12 text-center text-sm text-gray-400">
+      Loading saved progress...
+    </div>
+
     <UForm
+      v-else
       :schema="schema"
       :state="state"
       class="space-y-8 text-gray-700"

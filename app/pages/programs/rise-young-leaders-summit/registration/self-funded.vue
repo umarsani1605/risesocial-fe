@@ -11,10 +11,27 @@ const store = useRylsRegistration()
 const router = useRouter()
 const toast = useToast()
 const { uploadHeadshot, isUploading: isUploadingFile, uploadError, uploadProgress } = useRylsFileUpload()
+const { saveDraft, loadDraft } = useRylsDraft()
 
-onMounted(() => {
-  if (store.step1.scholarshipType !== 'SELF_FUNDED') {
-    router.push('/programs/rise-young-leaders-summit/registration')
+onMounted(async () => {
+  if (!store.step1.fullName) {
+    const draft = await loadDraft()
+    if (draft?.formData) {
+      const fd = draft.formData as Record<string, unknown>
+      if (fd.step1) store.setStep1(fd.step1 as Parameters<typeof store.setStep1>[0])
+      if (fd.passportNumber) {
+        store.setSelfFundedData({
+          passportNumber: fd.passportNumber as string,
+          needVisa: (fd.needVisa as 'YES' | 'NO' | '') || '',
+          headshotFile: (fd.headshotFile as string) || '',
+          readPolicies: (fd.readPolicies as 'YES' | 'NO' | '') || '',
+        })
+      }
+    }
+    else {
+      router.push('/programs/rise-young-leaders-summit/registration')
+      return
+    }
   }
 })
 
@@ -98,7 +115,7 @@ async function onHeadshotChange(e: Event) {
   }
 }
 
-function onSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   if (!headshotFileId.value) {
     toast.add({ title: 'Please upload headshot photo first', color: 'error' })
     return
@@ -112,6 +129,13 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
     headshotFile: headshotFileId.value,
     readPolicies: values.readPolicies as 'YES' | 'NO' | '',
   })
+
+  await saveDraft(
+    2,
+    { step1: store.step1, passportNumber: values.passportNumber, needVisa: values.needVisa, headshotFile: headshotFileId.value, readPolicies: values.readPolicies },
+    store.step1.email,
+    'SELF_FUNDED',
+  )
 
   try {
     const { proxy } = useScriptMetaPixel()

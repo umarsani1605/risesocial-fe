@@ -23,7 +23,7 @@ export const useRylsSubmission = () => {
   const submissionError = ref<string | null>(null)
   const submissionSuccess = ref(false)
 
-  const submit = async (): Promise<Record<string, unknown> | false> => {
+  const submit = async (resumeToken?: string): Promise<Record<string, unknown> | false> => {
     isSubmitting.value = true
     submissionError.value = null
     submissionSuccess.value = false
@@ -64,6 +64,8 @@ export const useRylsSubmission = () => {
         body.headshotFileId = Number(store.headshotFile)
         body.readPolicies = store.readPolicies
       }
+
+      if (resumeToken) body.resumeToken = resumeToken
 
       // Send request to unified endpoint
       const response = await api<SubmissionResponse>('/ryls/registrations/submit', {
