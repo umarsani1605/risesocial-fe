@@ -12,6 +12,7 @@ const router = useRouter()
 const toast = useToast()
 const { uploadHeadshot, isUploading: isUploadingFile, uploadError, uploadProgress } = useRylsFileUpload()
 const { saveDraft, loadDraft } = useRylsDraft()
+const isSavingDraft = ref(false)
 
 onMounted(async () => {
   if (!store.step1.fullName) {
@@ -130,12 +131,23 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     readPolicies: values.readPolicies as 'YES' | 'NO' | '',
   })
 
-  await saveDraft(
-    2,
-    { step1: store.step1, passportNumber: values.passportNumber, needVisa: values.needVisa, headshotFile: headshotFileId.value, readPolicies: values.readPolicies },
-    store.step1.email,
-    'SELF_FUNDED',
-  )
+  isSavingDraft.value = true
+  try {
+    await saveDraft(
+      2,
+      { step1: store.step1, passportNumber: values.passportNumber, needVisa: values.needVisa, headshotFile: headshotFileId.value, readPolicies: values.readPolicies },
+      store.step1.email,
+      'SELF_FUNDED',
+    )
+  }
+  catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An error occurred'
+    toast.add({ title: message, color: 'error' })
+    return
+  }
+  finally {
+    isSavingDraft.value = false
+  }
 
   try {
     const { proxy } = useScriptMetaPixel()
@@ -246,7 +258,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <UButton type="button" variant="outline" class="px-6" :disabled="isUploadingFile" @click="onBack">
           Back
         </UButton>
-        <UButton type="submit" class="px-6">
+        <UButton type="submit" class="px-6" :loading="isSavingDraft" :disabled="isSavingDraft">
           Next
         </UButton>
       </div>

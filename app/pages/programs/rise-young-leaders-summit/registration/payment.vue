@@ -185,9 +185,10 @@ const onSubmit = async () => {
     const submission = await submit(resumeToken.value ?? undefined)
 
     if (submission) {
+      const scholarshipType = store.step1.scholarshipType
       await deleteDraft()
       store.resetAll()
-      if (store.step1.scholarshipType === 'FULLY_FUNDED') {
+      if (scholarshipType === 'FULLY_FUNDED') {
         router.push('/programs/rise-young-leaders-summit/registration/fully-funded')
       }
       else {

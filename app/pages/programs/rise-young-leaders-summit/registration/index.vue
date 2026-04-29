@@ -12,6 +12,7 @@ const router = useRouter()
 const toast = useToast()
 const { saveDraft, loadDraft, isDraftLoading } = useRylsDraft()
 const hasDraftRestored = ref(false)
+const isSavingDraft = ref(false)
 
 const genderValues = GENDER_OPTIONS.map(o => o.value) as [string, ...string[]]
 const discoverValues = DISCOVER_SOURCES.map(o => o.value) as [string, ...string[]]
@@ -91,7 +92,7 @@ onMounted(async () => {
       })
     }
     hasDraftRestored.value = true
-    toast.add({ title: 'Progress tersimpan sebelumnya telah dipulihkan', color: 'success' })
+    toast.add({ title: 'Saved progress restored', color: 'success' })
   }
 })
 
@@ -120,7 +121,18 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     scholarshipType: values.scholarshipType as 'FULLY_FUNDED' | 'SELF_FUNDED' | '',
   })
 
-  await saveDraft(1, { step1: values }, values.email, values.scholarshipType)
+  isSavingDraft.value = true
+  try {
+    await saveDraft(1, { step1: values }, values.email, values.scholarshipType)
+  }
+  catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An error occurred'
+    toast.add({ title: message, color: 'error' })
+    return
+  }
+  finally {
+    isSavingDraft.value = false
+  }
 
   const base = '/programs/rise-young-leaders-summit/registration'
   if (values.scholarshipType === 'FULLY_FUNDED') {
@@ -246,7 +258,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </UFormField>
 
         <div class="flex items-center justify-end gap-3 pt-2">
-          <UButton type="submit" class="px-6">
+          <UButton type="submit" class="px-6" :loading="isSavingDraft" :disabled="isSavingDraft">
             Next
           </UButton>
         </div>

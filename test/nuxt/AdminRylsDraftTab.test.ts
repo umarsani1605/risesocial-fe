@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, nextTick } from 'vue'
 
 interface RylsDraft {
   id: number

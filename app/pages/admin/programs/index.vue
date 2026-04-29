@@ -117,7 +117,6 @@ const filteredData = computed(() => {
   return result
 })
 
-// ── Drafts tab ────────────────────────────────────────────────────
 const draftSearch = ref('')
 const filteredDrafts = computed(() => {
   let result = allDrafts.value
@@ -187,7 +186,6 @@ const draftColumns: TableColumn<RylsDraft>[] = [
   },
 ]
 
-// ── Submitted tab ─────────────────────────────────────────────────
 function openDetail(reg: RylsRegistration) {
   selectedRegistration.value = reg
   isDetailOpen.value = true

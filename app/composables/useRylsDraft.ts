@@ -50,13 +50,13 @@ export const useRylsDraft = () => {
         body,
       })
 
-      if (response?.data?.resumeToken) {
+      if (response?.success === true && response?.data?.resumeToken) {
         resumeToken.value = response.data.resumeToken
       }
-      return true
+      return response?.success === true
     }
     catch (error: unknown) {
-      draftError.value = error instanceof Error ? error.message : 'Failed to save draft'
+      draftError.value = error instanceof Error ? error.message : 'An error occurred'
       return false
     }
     finally {
@@ -70,12 +70,18 @@ export const useRylsDraft = () => {
     isDraftLoading.value = true
     draftError.value = null
     try {
-      const response = await api<{ success: boolean; data: DraftData }>(
+      const response = await api<{ success: boolean; data: DraftData; message?: string }>(
         `/ryls/registrations/draft/resume/${resumeToken.value}`,
       )
-      return response?.data ?? null
+      if (response?.success === true) {
+        return response.data ?? null
+      }
+      draftError.value = response?.message ?? 'Failed to load draft'
+      resumeToken.value = null
+      return null
     }
-    catch {
+    catch (error: unknown) {
+      draftError.value = error instanceof Error ? error.message : 'An error occurred'
       resumeToken.value = null
       return null
     }
