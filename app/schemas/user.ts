@@ -22,6 +22,7 @@ export const userEditSchema = z
     email: z.email('Invalid email address'),
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
+    role: z.enum(['user', 'admin']).optional(),
   })
   .refine(
     (data) => !data.password || data.password.length >= 6,

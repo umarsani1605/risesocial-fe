@@ -8,6 +8,7 @@ const form = defineModel<{
   email: string
   password: string
   confirmPassword: string
+  role?: string
 }>('form', { required: true })
 
 const props = defineProps<{
@@ -25,6 +26,9 @@ const formRef = useTemplateRef('userForm')
 const activeSchema = computed(() =>
   props.mode === 'create' ? userCreateSchema : userEditSchema
 )
+
+const { isSuperAdmin } = useAuth()
+const showRole = computed(() => props.mode === 'edit' && isSuperAdmin.value)
 </script>
 
 <template>
@@ -60,6 +64,16 @@ const activeSchema = computed(() =>
             />
           </UFormField>
         </div>
+        <UFormField v-if="showRole" name="role" label="Role">
+          <USelect
+            v-model="form!.role"
+            :items="[
+              { label: 'User', value: 'user' },
+              { label: 'Admin', value: 'admin' }
+            ]"
+            class="w-full"
+          />
+        </UFormField>
       </UForm>
     </template>
     <template #footer>

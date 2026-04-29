@@ -88,7 +88,8 @@ const editForm = reactive({
   last_name: '',
   email: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  role: '' as string
 })
 
 function openEdit(user: AdminUser) {
@@ -98,6 +99,7 @@ function openEdit(user: AdminUser) {
   editForm.email = user.email
   editForm.password = ''
   editForm.confirmPassword = ''
+  editForm.role = user.role.toLowerCase()
   isEditOpen.value = true
 }
 
@@ -111,7 +113,8 @@ async function onSave() {
         first_name: editForm.first_name,
         last_name: editForm.last_name,
         email: editForm.email,
-        ...(editForm.password && { password: editForm.password })
+        ...(editForm.password && { password: editForm.password }),
+        ...(editForm.role && { role: editForm.role })
       }
     })
     toast.add({ title: 'Administrator updated', color: 'success' })
