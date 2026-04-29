@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
+import type { TableColumn } from '@nuxt/ui'
 import type { AdminCohortEnrollment } from '~/types/cohort'
 
 const props = defineProps<{
@@ -13,19 +13,6 @@ const emit = defineEmits<{
   regenerateCert: [enrollmentId: number]
   dropStudent: [enrollmentId: number]
 }>()
-
-function rowMenu(enrollment: AdminCohortEnrollment): DropdownMenuItem[][] {
-  return [
-    [
-      {
-        label: 'Drop Student',
-        icon: 'i-ph-user-x-bold',
-        color: 'error' as const,
-        onSelect: () => emit('dropStudent', enrollment.id)
-      }
-    ]
-  ]
-}
 
 function initials(enrollment: AdminCohortEnrollment) {
   return (
@@ -129,14 +116,6 @@ const columns: TableColumn<AdminCohortEnrollment>[] = [
                 : emit('generateCert', row.original.id)
             "
           />
-          <!-- <UDropdownMenu :items="rowMenu(row.original)">
-            <UButton
-              icon="i-ph-dots-three-vertical-bold"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-            />
-          </UDropdownMenu> -->
         </div>
       </template>
     </UTable>

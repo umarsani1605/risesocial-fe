@@ -42,7 +42,11 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
   <UHeader
     to="/"
     class="bg-[#062d2c] border-transparent"
-    :ui="{ toggle: 'text-white hover:bg-white/10 hover:text-white' }"
+    :ui="{
+      toggle: 'text-white hover:bg-white/10 hover:text-white',
+      content: 'bg-[#062d2c]',
+      body: 'bg-[#062d2c]',
+    }"
   >
     <template #title>
       <NuxtImg src="/logo.png" width="78" height="32" alt="Rise Social" class="h-8 w-auto" />

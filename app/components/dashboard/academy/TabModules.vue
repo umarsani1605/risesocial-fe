@@ -36,20 +36,6 @@ function toggleAll() {
 
 defineExpose({ isAnyOpen, toggleAll })
 
-const sessionStatusConfig: Record<
-  'upcoming' | 'live' | 'completed',
-  {
-    label: string
-    color: 'success' | 'error' | 'warning'
-    variant: 'soft' | 'solid'
-    dot?: boolean
-  }
-> = {
-  completed: { label: 'Completed', color: 'success', variant: 'soft' },
-  live: { label: 'Live Now', color: 'error', variant: 'soft', dot: true },
-  upcoming: { label: 'Up Coming', color: 'warning', variant: 'soft' }
-}
-
 function formatSessionTime(module: CohortModule) {
   if (!module.session_start_time) return null
   const date = formatDateLong(module.session_start_time)

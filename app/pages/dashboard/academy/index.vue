@@ -9,14 +9,14 @@ useSeoMeta({
 })
 
 const { api } = useApi()
-const { data: enrollmentsData } = await useAsyncData('dashboard:my-cohorts', () =>
+const { data: enrollmentsData } = await useAsyncData('dashboard:enrollments', () =>
   api<PaginatedResponse<CohortEnrollment>>('/cohorts/my')
 )
 const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, completed: 2 }
 
 const enrollments = computed(() =>
-  (enrollmentsData.value?.data.filter((e) => e.cohort) ?? []).sort(
-    (a, b) => (STATUS_ORDER[a.cohort.status] ?? 99) - (STATUS_ORDER[b.cohort.status] ?? 99)
+  [...(enrollmentsData.value?.data ?? [])].sort(
+    (a, b) => (STATUS_ORDER[a.cohort?.status ?? ''] ?? 99) - (STATUS_ORDER[b.cohort?.status ?? ''] ?? 99)
   )
 )
 </script>

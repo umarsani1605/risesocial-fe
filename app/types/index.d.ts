@@ -166,7 +166,7 @@ export interface Cohort {
 export interface CohortEnrollment {
   id: number
   user_id: number
-  cohort_id: number
+  cohort_id: number | null
   academy_id: number
   status: EnrollmentStatus
   enrolled_at: string
@@ -177,23 +177,23 @@ export interface CohortEnrollment {
   has_certificate: boolean
   certificate_url: string | null
   created_at: string
+  academy: {
+    id: number
+    title: string
+    slug: string | null
+    image_url: string | null
+    duration: string | null
+    format: string | null
+    certificate: boolean | null
+    description: string | null
+  }
   cohort: {
     id: number
     name: string
     status: CohortStatus
     start_date: string
     end_date: string
-    academy: {
-      id: number
-      title: string
-      slug: string | null
-      image_url: string | null
-      duration: string | null
-      format: string | null
-      certificate: boolean | null
-      description: string | null
-    }
-  }
+  } | null
 }
 
 // ── User Transaction Types ───────────────────────────────────────────────────

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { ref } from 'vue'
+import RegistrationPage from '~/pages/programs/rise-young-leaders-summit/registration/index.vue'
+import SelfFundedPage from '~/pages/programs/rise-young-leaders-summit/registration/self-funded.vue'
 
 const mockLoadDraft = vi.fn()
 const mockSaveDraft = vi.fn()
@@ -73,9 +75,6 @@ vi.mock('~/composables/useRylsSubmission', () => ({
     submissionSuccess: ref(false),
   }),
 }))
-
-import RegistrationPage from '~/pages/programs/rise-young-leaders-summit/registration/index.vue'
-import SelfFundedPage from '~/pages/programs/rise-young-leaders-summit/registration/self-funded.vue'
 
 describe('RYLS Registration — Integrasi Draft', () => {
   beforeEach(() => {

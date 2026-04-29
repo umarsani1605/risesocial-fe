@@ -3,8 +3,6 @@
  * Handles registration submission and file upload API calls.
  */
 
-type RegistrationData = Record<string, unknown>
-
 interface UploadResponse {
   success: boolean
   data?: { id?: string; fileUrl?: string }

@@ -11,9 +11,8 @@ useSeoMeta({
 const { user } = useAuth()
 const { api } = useApi()
 
-// Hanya fetch data enrollment (My Academy) karena All Academy dihapus
 const { data: enrollmentsData } = await useAsyncData('dashboard:enrollments', () =>
-  api<PaginatedResponse<CohortEnrollment>>('/cohorts/my', { query: { limit: 100 } })
+  api<PaginatedResponse<CohortEnrollment>>('/cohorts/my')
 )
 
 const enrollments = computed(() => enrollmentsData.value?.data ?? [])
@@ -48,7 +47,10 @@ const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, compl
 
 const recentEnrollments = computed(() =>
   [...enrollments.value]
-    .sort((a, b) => (STATUS_ORDER[a.cohort.status] ?? 99) - (STATUS_ORDER[b.cohort.status] ?? 99))
+    .sort(
+      (a, b) =>
+        (STATUS_ORDER[a.cohort?.status ?? ''] ?? 99) - (STATUS_ORDER[b.cohort?.status ?? ''] ?? 99)
+    )
     .slice(0, 3)
 )
 

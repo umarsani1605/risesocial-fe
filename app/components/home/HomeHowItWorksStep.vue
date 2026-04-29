@@ -7,7 +7,7 @@ interface Props {
   isLast?: boolean
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 </script>
 
 <template>

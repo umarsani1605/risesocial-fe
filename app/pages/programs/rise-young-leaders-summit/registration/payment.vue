@@ -10,10 +10,9 @@ const toast = useToast()
 const {
   createTransaction,
   openSnapEmbed,
-  isLoading: isProcessingPayment,
   error: paymentError
 } = useRylsPayment()
-const { uploadPaymentProof, isUploading, uploadError, uploadProgress } = useRylsFileUpload()
+const { uploadPaymentProof, uploadError } = useRylsFileUpload()
 const { submit } = useRylsSubmission()
 const { loadDraft, deleteDraft, resumeToken } = useRylsDraft()
 
