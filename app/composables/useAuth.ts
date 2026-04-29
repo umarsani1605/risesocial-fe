@@ -9,7 +9,19 @@ export const useAuth = createSharedComposable(() => {
   watch(user, (val) => { userCookie.value = val })
 
   const isLoggedIn = computed(() => !!token.value && !!user.value)
-  const isAdmin = computed(() => user.value?.role === 'ADMIN' || user.value?.role === 'SUPERADMIN')
+  const isAdmin = computed(() => user.value?.role === 'ADMIN')
+  const isSuperAdmin = computed(() => user.value?.role === 'SUPERADMIN')
+
+  const hasPermission = (key: string): boolean => {
+    if (isSuperAdmin.value) return true
+    return user.value?.permissions?.some(p => p.key === key) ?? false
+  }
+
+  const canEdit = (key: string): boolean => {
+    if (isSuperAdmin.value) return true
+    const perm = user.value?.permissions?.find(p => p.key === key)
+    return perm?.access_level === 'EDITOR'
+  }
 
   const fullName = computed(() => {
     if (!user.value) return ''
@@ -60,5 +72,5 @@ export const useAuth = createSharedComposable(() => {
     }
   }
 
-  return { user, token, isLoggedIn, isAdmin, fullName, initials, setSession, login, logout, fetchSession }
+  return { user, token, isLoggedIn, isSuperAdmin, isAdmin, hasPermission, canEdit, fullName, initials, setSession, login, logout, fetchSession }
 })

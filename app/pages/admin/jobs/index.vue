@@ -11,6 +11,7 @@ definePageMeta({
 useSeoMeta({ title: 'Jobs Management - Rise Social' })
 
 const { api } = useApi()
+const { canEdit } = useAuth()
 const { data: rawJobs, refresh: refreshJobs } = await useAsyncData('admin:jobs', () =>
   api<PaginatedResponse<Job>>('/admin/jobs')
 )
@@ -367,7 +368,7 @@ const columns: TableColumn<Job>[] = [
           leadingIcon: 'i-ph-pencil-simple-bold',
           to: `/admin/jobs/${row.original.id}/edit`
         }),
-        h(UButton, {
+        canEdit('admin.jobs') && h(UButton, {
           label: 'Delete',
           size: 'sm',
           color: 'error',
@@ -375,7 +376,7 @@ const columns: TableColumn<Job>[] = [
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => openDeleteConfirm(row.original)
         })
-      ])
+      ].filter(Boolean))
   }
 ]
 </script>
@@ -457,7 +458,7 @@ const columns: TableColumn<Job>[] = [
 
             <UButton color="primary" icon="i-ph-gear-bold" @click="syncSettingsOpen = true" />
           </UFieldGroup>
-          <UButton label="Add Job" icon="i-ph-plus-bold" color="primary" to="/admin/jobs/create" />
+          <UButton v-if="canEdit('admin.jobs')" label="Add Job" icon="i-ph-plus-bold" color="primary" to="/admin/jobs/create" />
         </div>
       </div>
     </template>

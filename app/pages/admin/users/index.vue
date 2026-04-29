@@ -11,6 +11,7 @@ useSeoMeta({ title: 'All Users - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAuth()
 
 const { data: rawUsers, refresh } = await useAsyncData('admin:users', () =>
   api<ApiResponse<AdminUser[]>>('/admin/users')
@@ -227,7 +228,7 @@ const columns: TableColumn<AdminUser>[] = [
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-2' }, [
-        h(UButton, {
+        canEdit('admin.users') && h(UButton, {
           label: 'Edit',
           size: 'sm',
           color: 'primary',
@@ -235,7 +236,7 @@ const columns: TableColumn<AdminUser>[] = [
           leadingIcon: 'i-ph-pencil-simple-bold',
           onClick: () => openEdit(row.original)
         }),
-        h(UButton, {
+        canEdit('admin.users') && h(UButton, {
           label: 'Delete',
           size: 'sm',
           color: 'error',
@@ -243,7 +244,7 @@ const columns: TableColumn<AdminUser>[] = [
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })
-      ])
+      ].filter(Boolean))
   }
 ]
 </script>
@@ -266,7 +267,7 @@ const columns: TableColumn<AdminUser>[] = [
           :disabled="isExporting"
           @click="exportExcel"
         />
-        <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+        <UButton v-if="canEdit('admin.users')" label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
       </div>
     </template>
   </AdminDataTable>

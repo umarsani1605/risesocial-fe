@@ -1,3 +1,16 @@
+declare type AdminAccessLevel = 'VIEWER' | 'EDITOR'
+
+declare interface AdminPermissionResource {
+  key: string
+  name: string
+  available_levels: AdminAccessLevel[]
+}
+
+declare interface UserAdminPermission {
+  key: string
+  access_level: AdminAccessLevel
+}
+
 declare interface UserProfile {
   id: number
   username: string
@@ -17,6 +30,7 @@ declare interface UserProfile {
   current_job: string | null
   current_company: string | null
   skills: string[]
+  permissions?: UserAdminPermission[]
   created_at: string
   updated_at: string
 }

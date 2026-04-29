@@ -11,6 +11,7 @@ definePageMeta({
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAuth()
 
 const { data: rawAcademies, refresh } = await useAsyncData('admin:academies', () =>
   api<ApiResponse<AdminAcademy[]>>('/admin/academies')
@@ -155,7 +156,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           leadingIcon: 'i-ph-pencil-simple-bold',
           to: `/admin/academies/${row.original.slug}/edit`
         }),
-        h(UButton, {
+        canEdit('admin.academy') && h(UButton, {
           label: 'Delete',
           size: 'sm',
           color: 'error',
@@ -163,7 +164,7 @@ const columns: TableColumn<AdminAcademy>[] = [
           leadingIcon: 'i-ph-trash-simple-bold',
           onClick: () => confirmDelete(row.original)
         })
-      ])
+      ].filter(Boolean))
   }
 ]
 </script>
@@ -191,6 +192,7 @@ const columns: TableColumn<AdminAcademy>[] = [
     </template>
     <template #toolbar-right>
       <UButton
+        v-if="canEdit('admin.academy')"
         label="Add New"
         icon="i-ph-plus-bold"
         color="primary"
