@@ -257,7 +257,6 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
     </UDashboardSidebar>
 
     <UDashboardPanel
-      v-if="!route.meta.noDashboardPanel"
       id="main"
       :ui="{
         body: 'p-2 sm:p-6 pb-0'
@@ -295,10 +294,6 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
         <slot />
       </template>
     </UDashboardPanel>
-
-    <template v-else>
-      <slot />
-    </template>
 
     <NotificationsSlideover />
   </UDashboardGroup>

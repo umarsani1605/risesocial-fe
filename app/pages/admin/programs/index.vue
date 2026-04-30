@@ -31,8 +31,10 @@ interface RylsDraft {
 const [{ data: rawRegistrations }, { data: rawDrafts }] = await Promise.all([
   useAsyncData('admin:ryls', () => api<ApiResponse<RylsListResponse>>('/admin/ryls/registrations')),
   useAsyncData('admin:ryls-drafts', () =>
-    api<ApiResponse<{ drafts: RylsDraft[]; pagination: { total: number } }>>('/admin/ryls/registrations/drafts'),
-  ),
+    api<ApiResponse<{ drafts: RylsDraft[]; pagination: { total: number } }>>(
+      '/admin/ryls/registrations/drafts'
+    )
+  )
 ])
 
 const allRegistrations = computed(() => rawRegistrations.value?.data?.registrations ?? [])
@@ -111,7 +113,9 @@ const filteredData = computed(() => {
   }
   if (paymentTypeFilter.value !== 'all') {
     result = result.filter((r) =>
-      r.payments.some((p: { payment_method: string }) => p.payment_method === paymentTypeFilter.value)
+      r.payments.some(
+        (p: { payment_method: string }) => p.payment_method === paymentTypeFilter.value
+      )
     )
   }
   return result
@@ -123,9 +127,9 @@ const filteredDrafts = computed(() => {
   if (draftSearch.value) {
     const s = draftSearch.value.toLowerCase()
     result = result.filter(
-      d =>
-        d.email.toLowerCase().includes(s)
-        || (d.form_data?.step1?.fullName ?? '').toLowerCase().includes(s),
+      (d) =>
+        d.email.toLowerCase().includes(s) ||
+        (d.form_data?.step1?.fullName ?? '').toLowerCase().includes(s)
     )
   }
   return result
@@ -133,8 +137,18 @@ const filteredDrafts = computed(() => {
 
 const activeTab = ref('submitted')
 const tabItems = computed(() => [
-  { label: `Submitted (${filteredData.value.length})`, value: 'submitted' },
-  { label: `Drafts (${filteredDrafts.value.length})`, value: 'drafts' },
+  {
+    label: `Submitted (${filteredData.value.length})`,
+    value: 'submitted',
+    slot: 'submitted',
+    icon: 'i-ph-users-duotone'
+  },
+  {
+    label: `Drafts (${filteredDrafts.value.length})`,
+    value: 'drafts',
+    slot: 'drafts',
+    icon: 'i-ph-files-duotone'
+  }
 ])
 
 const STEP_LABELS: Record<number, string> = { 1: 'Step 1', 2: 'Step 2', 3: 'Step 3' }
@@ -143,21 +157,24 @@ const draftColumns: TableColumn<RylsDraft>[] = [
   {
     id: 'no',
     header: 'No',
-    cell: ({ row }) => h('span', { class: 'text-muted' }, row.index + 1),
+    cell: ({ row }) => h('span', { class: 'text-muted' }, row.index + 1)
   },
   { accessorKey: 'email', header: 'Email' },
   {
     id: 'full_name',
     header: 'Nama',
     cell: ({ row }) =>
-      h('span', { class: 'font-medium' }, row.original.form_data?.step1?.fullName ?? '–'),
+      h('span', { class: 'font-medium' }, row.original.form_data?.step1?.fullName ?? '–')
   },
   {
     id: 'current_step',
     header: 'Progress',
     cell: ({ row }) =>
-      h(UBadge, { variant: 'outline', color: 'primary', class: 'whitespace-nowrap' }, () =>
-        STEP_LABELS[row.original.current_step] ?? `Step ${row.original.current_step}`),
+      h(
+        UBadge,
+        { variant: 'outline', color: 'primary', class: 'whitespace-nowrap' },
+        () => STEP_LABELS[row.original.current_step] ?? `Step ${row.original.current_step}`
+      )
   },
   {
     id: 'scholarship_type',
@@ -167,23 +184,27 @@ const draftColumns: TableColumn<RylsDraft>[] = [
       if (!type) return h('span', { class: 'text-muted' }, '–')
       return h(
         UBadge,
-        { variant: type === 'FULLY_FUNDED' ? 'solid' : 'outline', color: 'primary', class: 'whitespace-nowrap' },
-        () => SCHOLARSHIP_TYPE_LABEL[type] ?? type,
+        {
+          variant: type === 'FULLY_FUNDED' ? 'solid' : 'outline',
+          color: 'primary',
+          class: 'whitespace-nowrap'
+        },
+        () => SCHOLARSHIP_TYPE_LABEL[type] ?? type
       )
-    },
+    }
   },
   {
     id: 'updated_at',
     header: 'Last Updated',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm whitespace-nowrap' }, formatDatetime(row.original.updated_at)),
+      h('span', { class: 'text-sm whitespace-nowrap' }, formatDatetime(row.original.updated_at))
   },
   {
     id: 'expires_at',
     header: 'Expires',
     cell: ({ row }) =>
-      h('span', { class: 'text-sm whitespace-nowrap' }, formatDate(row.original.expires_at)),
-  },
+      h('span', { class: 'text-sm whitespace-nowrap' }, formatDate(row.original.expires_at))
+  }
 ]
 
 function openDetail(reg: RylsRegistration) {
@@ -289,7 +310,7 @@ const columns: TableColumn<RylsRegistration>[] = [
       const method = payment.payment_method
       const logoMap: Record<string, string> = {
         MIDTRANS: '/images/payment-logo/midtrans.png',
-        PAYPAL: '/images/payment-logo/paypal.png',
+        PAYPAL: '/images/payment-logo/paypal.png'
       }
       const logo = logoMap[method]
       if (logo) {
@@ -309,7 +330,10 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      if ((payment.payment_method === 'PAYPAL' || payment.payment_method === 'BANK_TRANSFER') && payment.payment_proof) {
+      if (
+        (payment.payment_method === 'PAYPAL' || payment.payment_method === 'BANK_TRANSFER') &&
+        payment.payment_proof
+      ) {
         return h(
           'a',
           {
@@ -331,7 +355,11 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      return h('span', { class: 'text-sm whitespace-nowrap' }, formatPrice(payment.transaction?.amount))
+      return h(
+        'span',
+        { class: 'text-sm whitespace-nowrap' },
+        formatPrice(payment.transaction?.amount)
+      )
     }
   },
   {
@@ -358,7 +386,19 @@ const columns: TableColumn<RylsRegistration>[] = [
 </script>
 
 <template>
-  <UTabs :items="tabItems" v-model="activeTab" class="w-full">
+  <UTabs
+    :items="tabItems"
+    v-model="activeTab"
+    variant="link"
+    color="primary"
+    :unmount-on-hide="false"
+    :ui="{
+      root: 'flex-1 min-h-0 gap-6',
+      list: 'p-0! shrink-0',
+      content: 'flex-1 min-h-0',
+      trigger: 'px-3 sm:px-6 whitespace-nowrap'
+    }"
+  >
     <template #submitted>
       <AdminDataTable
         ref="dataTableRef"
@@ -400,7 +440,7 @@ const columns: TableColumn<RylsRegistration>[] = [
     </template>
 
     <template #drafts>
-      <div class="space-y-4 mt-4">
+      <div class="space-y-4">
         <UInput
           v-model="draftSearch"
           placeholder="Search email or name..."

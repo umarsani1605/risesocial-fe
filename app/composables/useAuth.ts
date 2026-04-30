@@ -9,8 +9,8 @@ export const useAuth = createSharedComposable(() => {
   watch(user, (val) => { userCookie.value = val })
 
   const isLoggedIn = computed(() => !!token.value && !!user.value)
-  const isAdmin = computed(() => user.value?.role === 'ADMIN')
   const isSuperAdmin = computed(() => user.value?.role === 'SUPERADMIN')
+  const isAdmin = computed(() => user.value?.role === 'ADMIN' || isSuperAdmin.value)
 
   const hasPermission = (key: string): boolean => {
     if (isSuperAdmin.value) return true
