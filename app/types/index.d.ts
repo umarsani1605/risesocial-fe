@@ -101,8 +101,6 @@ export interface UpcomingSession {
 }
 
 export type CohortStatus = 'not_started' | 'ongoing' | 'completed'
-/** Derived from transaction.status + completed_at — not stored in DB */
-export type EnrollmentStatus = 'active' | 'pending' | 'completed'
 export type ModuleSessionStatus = 'upcoming' | 'live' | 'completed' | 'hidden'
 export interface CohortModuleAttachment {
   id: number
