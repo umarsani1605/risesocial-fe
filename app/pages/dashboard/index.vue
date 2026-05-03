@@ -40,7 +40,7 @@ const dynamicTitle = computed(() => {
 })
 
 const activeEnrollment = computed(
-  () => enrollments.value.find((e) => e.status === 'active') ?? null
+  () => enrollments.value.find((e) => !e.completed_at) ?? null
 )
 
 const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, completed: 2 }
