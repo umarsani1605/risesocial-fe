@@ -101,6 +101,7 @@ export interface UpcomingSession {
 }
 
 export type CohortStatus = 'not_started' | 'ongoing' | 'completed'
+/** Derived from transaction.status + completed_at — not stored in DB */
 export type EnrollmentStatus = 'active' | 'pending' | 'completed'
 export type ModuleSessionStatus = 'upcoming' | 'live' | 'completed' | 'hidden'
 export interface CohortModuleAttachment {
@@ -168,15 +169,18 @@ export interface CohortEnrollment {
   user_id: number
   cohort_id: number | null
   academy_id: number
-  status: EnrollmentStatus
-  enrolled_at: string
-  completion_date: string | null
+  completed_at: string | null
+  created_at: string
   next_session: string | null
   total_modules: number
   completed_modules: number
   has_certificate: boolean
   certificate_url: string | null
-  created_at: string
+  transaction: {
+    id: number
+    status: string
+    transaction_code: string | null
+  } | null
   academy: {
     id: number
     title: string

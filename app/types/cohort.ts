@@ -59,11 +59,15 @@ export interface AdminCohortDetail {
   mentors?: AdminCohortMentor[]
 }
 
-export interface AdminCohortEnrollment {
-  id: number
+/** Placement record dari GET /admin/cohorts/:id/enrollments (tab Students di Cohort Detail) */
+export interface AdminCohortPlacement {
+  id: number                         // placement_id — untuk /drop dan /certificate
+  academy_enrollment_id: number | null // untuk /assign (transfer)
+  cohort_id: number                  // cohort saat ini — untuk badge "saat ini" di slideover
+  academy_id: number
   user_id: number
   status: string
-  created_at: string
+  placed_at: string | null
   user: {
     id: number
     first_name: string
@@ -78,4 +82,46 @@ export interface AdminCohortEnrollment {
     file_path: string | null
     file_url: string | null
   } | null
+}
+
+/** @deprecated Gunakan AdminCohortPlacement */
+export type AdminCohortEnrollment = AdminCohortPlacement
+
+/** Enrollment record dari GET /admin/academy-enrollments (Students page) */
+export interface AcademyEnrollmentItem {
+  id: number
+  user_id: number
+  academy_id: number
+  completed_at: string | null
+  created_at: string
+  user: {
+    id: number
+    first_name: string
+    last_name: string
+    email: string
+    phone: string | null
+    avatar: string | null
+  }
+  academy: { id: number; title: string }
+  transaction: {
+    id: number
+    paid_at: string | null
+    status: string
+    transaction_code: string | null
+  } | null
+  placement: {
+    id: number
+    cohort_id: number
+    cohort: { id: number; name: string; status: string } | null
+  } | null
+}
+
+/** Cohort summary dari GET /admin/cohorts (untuk picker di assign slideover) */
+export interface AdminCohortSummary {
+  id: number
+  name: string
+  status: 'not_started' | 'ongoing' | 'completed'
+  start_date: string | null
+  end_date: string | null
+  enrollment_count: number
 }
