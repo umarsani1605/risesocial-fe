@@ -13,7 +13,7 @@ const { api } = useApi()
 const toast = useToast()
 const { canEdit } = useAuth()
 
-const { data: rawAcademies, refresh } = await useAsyncData('admin:academies', () =>
+const { data: rawAcademies, refresh, pending: isAcademiesPending } = await useAsyncData('admin:academies', () =>
   api<ApiResponse<AdminAcademy[]>>('/admin/academies')
 )
 
@@ -174,6 +174,7 @@ const columns: TableColumn<AdminAcademy>[] = [
     v-model:search="search"
     :data="filteredData"
     :columns="columns"
+    :loading="isAcademiesPending"
     search-class="w-full sm:w-56"
   >
     <template #toolbar-left>
