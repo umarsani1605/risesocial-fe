@@ -1,7 +1,7 @@
 export default defineNuxtPlugin(async () => {
-  const { token, fetchSession } = useAuth()
+  const { hasToken, fetchSession } = useAuth()
 
-  if (token.value) {
+  if (hasToken.value) {
     try {
       await fetchSession()
     }
