@@ -77,7 +77,7 @@ async function onSave() {
         <UScrollArea class="h-[calc(100vh-12rem)]" :ui="{ viewport: 'p-6' }">
           <div class="space-y-10">
             <div class="space-y-6">
-              <UForm ref="uformRef" :schema="academyFormSchema" :state="form" @submit="onSave" :validate-on="['submit']">
+              <UForm :schema="academyFormSchema" :state="form" @submit="onSave" :validate-on="['submit']">
                 <div class="flex items-center justify-between mb-6">
                   <h3 class="text-lg font-semibold">Basic Information</h3>
                   <UButton
