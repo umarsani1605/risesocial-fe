@@ -87,8 +87,7 @@ const createPaypalTransaction = async (e: Event) => {
     store.setMidtransData(null as unknown as Record<string, unknown>)
   } catch (error: unknown) {
     store.setPaymentStatus('FAILED')
-    const message = error instanceof Error ? error.message : 'An error occurred'
-    toast.add({ title: message, color: 'error' })
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
     resetFileInput()
   } finally {
     validationError.value = false
@@ -138,7 +137,7 @@ const createMidtransTransaction = async () => {
       }
     })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to process payment'
+    const message = getApiErrorMessage(error, 'Failed to process payment')
     midtransError.value = message
     store.setPaymentStatus('FAILED')
     toast.add({ title: message, color: 'error' })
@@ -195,8 +194,7 @@ const onSubmit = async () => {
       }
     }
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to submit registration'
-    toast.add({ title: message, color: 'error' })
+    toast.add({ title: getApiErrorMessage(error, 'Failed to submit registration'), color: 'error' })
   }
 }
 </script>
