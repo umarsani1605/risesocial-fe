@@ -120,7 +120,7 @@ export function formatPrice(price: number): string {
 
 export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
   const data = (error as Record<string, unknown> & { data?: Record<string, string> })?.data
-  return data?.details ?? data?.message ?? fallback
+  return data?.details ?? data?.message ?? (error instanceof Error ? error.message : fallback)
 }
 
 // ── Cohort module utilities ───────────────────────────────────────────────────
