@@ -9,15 +9,6 @@ export const academyFormSchema = z.object({
   pixel_id: z.string().optional(),
 })
 
-export const academyCreateSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  duration: z.string().min(1, 'Duration is required'),
-  format: z.string().min(1, 'Format is required'),
-  category: z.string().min(1, 'Category is required'),
-  pixel_id: z.string().optional(),
-})
-
 export const pricingFormSchema = z.object({
   name: z.string().min(1, 'Package name is required'),
   original_price: z.coerce.string().min(1, 'Original price is required'),
