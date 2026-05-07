@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { SCHOLARSHIP_TYPE_LABEL } from '@/constants/ryls'
+import { DISCOVER_SOURCES, GENDER_OPTIONS } from '@/utils/ryls'
+
+const DISCOVER_SOURCE_MAP = Object.fromEntries(DISCOVER_SOURCES.map((s) => [s.value, s.label]))
+const GENDER_LABEL_MAP = Object.fromEntries(GENDER_OPTIONS.map((g) => [g.value, g.label]))
+
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Program Analytics',
@@ -15,41 +21,75 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [rylsTrendData, scholarshipData, jobPostingData] = await Promise.all([
-  useAsyncData('analytics:ryls-trend', () => analytics.fetchRylsTrend(dateRange.value.period)),
-  useAsyncData('analytics:scholarship-breakdown', () => analytics.fetchScholarshipBreakdown()),
-  useAsyncData('analytics:job-postings', () =>
-    analytics.fetchJobPostingStats(dateRange.value.period)
+const [summaryData, trendData, demographicsData] = await Promise.all([
+  useAsyncData('analytics:programs-summary', () =>
+    analytics.fetchRylsAnalyticsSummary(dateRange.value).catch(() => null)
+  ),
+  useAsyncData('analytics:programs-trend', () =>
+    analytics.fetchRylsAnalyticsTrend(dateRange.value).catch(() => [])
+  ),
+  useAsyncData('analytics:programs-demographics', () =>
+    analytics.fetchRylsAnalyticsDemographics(dateRange.value).catch(() => null)
   )
 ])
 
 watch(
-  () => dateRange.value.period,
-  async () => {
-    await Promise.all([rylsTrendData.refresh(), jobPostingData.refresh()])
-  }
+  dateRange,
+  () => {
+    summaryData.refresh()
+    trendData.refresh()
+    demographicsData.refresh()
+  },
+  { deep: true }
 )
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
-    title: 'RYLS Registrations',
-    value: rylsTrendData.data.value?.reduce((s, p) => s + p.value, 0) ?? 0,
-    icon: 'i-ph-medal-fill',
-    color: 'text-purple-500'
+    title: 'Total Submitted',
+    value: summaryData.data.value?.submitted ?? 0,
+    icon: 'i-ph-check-circle-fill',
+    color: 'green'
   },
   {
-    title: 'Fully Funded',
-    value: scholarshipData.data.value?.find((d) => d.name === 'Fully Funded')?.value ?? 0,
-    icon: 'i-ph-star-fill',
-    color: 'text-warning'
-  },
-  {
-    title: 'Job Postings',
-    value: jobPostingData.data.value?.reduce((s, p) => s + p.value, 0) ?? 0,
-    icon: 'i-ph-briefcase-fill',
-    color: 'text-teal-500'
+    title: 'Active Drafts',
+    value: summaryData.data.value?.drafts ?? 0,
+    icon: 'i-ph-files-fill',
+    color: 'orange'
   }
 ])
+
+const trendChartData = computed<TimeSeriesPoint[]>(() =>
+  (trendData.data.value ?? []).map((p) => ({ date: p.date, value: p.count }))
+)
+
+const scholarshipChartData = computed<CategoryBreakdown[]>(() =>
+  (demographicsData.data.value?.byScholarshipType ?? []).map((s) => ({
+    name: SCHOLARSHIP_TYPE_LABEL[s.name] ?? s.name,
+    value: s.count
+  }))
+)
+
+const discoverSourceChartData = computed<CategoryBreakdown[]>(() =>
+  (demographicsData.data.value?.byDiscoverSource ?? []).map((s) => ({
+    name: DISCOVER_SOURCE_MAP[s.name] ?? s.name,
+    value: s.count
+  }))
+)
+
+const nationalityChartData = computed<CategoryBreakdown[]>(() =>
+  (demographicsData.data.value?.byNationality ?? []).map((n) => ({ name: n.name, value: n.count }))
+)
+
+const genderChartData = computed<CategoryBreakdown[]>(() =>
+  (demographicsData.data.value?.byGender ?? []).map((g) => ({
+    name: GENDER_LABEL_MAP[g.name] ?? g.name,
+    value: g.count
+  }))
+)
+
+const ageChartData = computed<CategoryBreakdown[]>(() =>
+  (demographicsData.data.value?.byAgeRange ?? []).map((a) => ({ name: a.name, value: a.count }))
+)
 </script>
 
 <template>
@@ -59,27 +99,60 @@ const statCards = computed<AnalyticsStat[]>(() => [
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-2 gap-4">
       <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
     </div>
 
-    <LazyAnalyticsLineChart
-      :data="rylsTrendData.data.value ?? []"
-      title="RYLS Registrations Trend"
-      :height="300"
-    />
+    <!-- Submission Trend -->
+    <AnalyticsAreaChart :data="trendChartData" title="Submission Trend" :height="288" />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <LazyAnalyticsDonutChart
-        :data="scholarshipData.data.value ?? []"
-        title="Scholarship Type Distribution"
-        :height="280"
-      />
-      <LazyAnalyticsBarChart
-        :data="jobPostingData.data.value?.map((p) => ({ name: p.date, value: p.value })) ?? []"
-        title="Job Postings"
-        :height="280"
-      />
+    <!-- Scholarship + Discover Source -->
+    <div class="flex flex-col md:flex-row items-stretch gap-4">
+      <div class="flex-1">
+        <AnalyticsDonutChart
+          class="h-full"
+          :data="scholarshipChartData"
+          title="Scholarship Type"
+          :height="288"
+        />
+      </div>
+      <div class="flex-2">
+        <AnalyticsBarChart
+          class="h-full"
+          :data="discoverSourceChartData"
+          title="Discover Source"
+          :height="288"
+        />
+      </div>
     </div>
+
+    <!-- Age Range + Gender -->
+    <div class="flex flex-col md:flex-row items-stretch gap-4">
+      <div class="flex-2">
+        <AnalyticsBarChart
+          class="h-full"
+          :data="ageChartData"
+          title="Age Range"
+          :height="288"
+        />
+      </div>
+      <div class="flex-1">
+        <AnalyticsDonutChart
+          class="h-full"
+          :data="genderChartData"
+          title="Gender"
+          :height="288"
+        />
+      </div>
+    </div>
+
+    <!-- Nationality -->
+    <AnalyticsBarChart
+      class="h-full"
+      :data="nationalityChartData"
+      title="Nationality (Top 10)"
+      :height="288"
+    />
   </div>
 </template>

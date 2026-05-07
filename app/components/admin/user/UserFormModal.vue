@@ -87,11 +87,11 @@ async function setPermissionLevel(key: string, level: AdminAccessLevel | 'none')
   <UModal
     v-model:open="open"
     :title="title"
-    :class="showPermissions ? 'max-w-4xl' : 'max-w-lg'"
+    :class="showPermissions ? 'max-w-3xl' : 'max-w-lg'"
     :ui="{ footer: 'justify-end' }"
   >
     <template #body>
-      <div class="flex items-start gap-10">
+      <div class="flex items-start gap-14">
         <UForm
           ref="userForm"
           :schema="activeSchema"

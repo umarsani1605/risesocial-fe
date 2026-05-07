@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { AdminCohortEnrollment } from '~/types/cohort'
+import type { AdminCohortPlacement } from '~/types/cohort'
 
 const props = defineProps<{
-  enrollments: AdminCohortEnrollment[]
+  enrollments: AdminCohortPlacement[]
 }>()
 
 const emit = defineEmits<{
   invite: []
-  remove: [enrollmentId: number]
-  generateCert: [enrollmentId: number]
-  regenerateCert: [enrollmentId: number]
-  dropStudent: [enrollmentId: number]
+  remove: [placementId: number]
+  generateCert: [placementId: number]
+  regenerateCert: [placementId: number]
+  dropStudent: [placementId: number]
+  editPlacement: [placement: AdminCohortPlacement]
 }>()
 
-function initials(enrollment: AdminCohortEnrollment) {
+function initials(enrollment: AdminCohortPlacement) {
   return (
-    `${enrollment.user.first_name[0] ?? ''}${enrollment.user.last_name[0] ?? ''}`.toUpperCase() ||
+    `${enrollment.user.first_name?.[0] ?? ''}${enrollment.user.last_name?.[0] ?? ''}`.toUpperCase() ||
     '?'
   )
 }
 
-const columns: TableColumn<AdminCohortEnrollment>[] = [
+const columns: TableColumn<AdminCohortPlacement>[] = [
   {
     id: 'no',
     header: '#',
@@ -39,18 +40,13 @@ const columns: TableColumn<AdminCohortEnrollment>[] = [
     cell: ({ row }) => row.original.user.email
   },
   {
-    id: 'phone',
-    header: 'Phone',
-    cell: ({ row }) => row.original.user.phone ?? '-'
-  },
-  {
     id: 'certificate',
     header: 'Certificate'
   },
   {
     id: 'actions',
     header: '',
-    size: 160
+    size: 200
   }
 ]
 </script>
@@ -75,18 +71,13 @@ const columns: TableColumn<AdminCohortEnrollment>[] = [
             color="primary"
             class="bg-primary text-white text-sm rounded-full"
           />
-          <span class="font-medium">
-            {{ row.original.user.first_name }} {{ row.original.user.last_name }}
-          </span>
+          <div>
+            <p class="font-medium text-sm">
+              {{ row.original.user.first_name }} {{ row.original.user.last_name }}
+            </p>
+            <p class="text-muted hidden md:block">{{ row.original.user.email }}</p>
+          </div>
         </div>
-      </template>
-
-      <template #email-cell="{ row }">
-        <span class="hidden md:block text-muted">{{ row.original.user.email }}</span>
-      </template>
-
-      <template #phone-cell="{ row }">
-        <span class="hidden md:block text-muted">{{ row.original.user.phone ?? '-' }}</span>
       </template>
 
       <template #certificate-cell="{ row }">
@@ -107,9 +98,18 @@ const columns: TableColumn<AdminCohortEnrollment>[] = [
       <template #actions-cell="{ row }">
         <div class="flex justify-end gap-2">
           <UButton
+            label="Move Cohort"
+            color="primary"
+            variant="light"
+            size="sm"
+            leading-icon="i-ph-arrows-left-right-bold"
+            @click="emit('editPlacement', row.original)"
+          />
+          <UButton
             :label="row.original.certificate ? 'Regenerate Certificate' : 'Generate Certificate'"
             icon="i-ph-certificate-bold"
-            variant="light"
+            variant="subtle"
+            size="sm"
             @click="
               row.original.certificate
                 ? emit('regenerateCert', row.original.id)

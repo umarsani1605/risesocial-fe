@@ -1,8 +1,22 @@
+/** Default chart palette (token names); same order as `resolveChartColor` keys in `COLOR_MAP`. */
+export const DEFAULT_CHART_COLOR_NAMES = [
+  'rise-orange',
+  'deep-teal',
+  'blue',
+  'purple',
+  'green',
+  'yellow',
+  'pink',
+  'cyan',
+  'indigo',
+  'red',
+] as const
+
 // Maps semantic/common color names to hex values for use in chart libraries
 // that require actual color values (not CSS variables or Tailwind classes).
 const COLOR_MAP: Record<string, string> = {
   // Project semantic colors
-  primary: '#FF8E50',
+  primary: '#ff8904',
   secondary: '#145b56',
   success: '#22c55e',
   error: '#ef4444',

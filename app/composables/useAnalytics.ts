@@ -1,4 +1,11 @@
+function periodToQuery(dateRange: AnalyticsDateRange): string {
+  const s = dateRange.start.toISOString().split('T')[0]
+  const e = dateRange.end.toISOString().split('T')[0]
+  return `startDate=${s}&endDate=${e}`
+}
+
 export const useAnalytics = () => {
+  const { api } = useApi()
   const mock = useAnalyticsMock()
 
   const fetchOverview = async (): Promise<AnalyticsOverview> => {
@@ -54,6 +61,27 @@ export const useAnalytics = () => {
     return mock.getJobPostingStats(period)
   }
 
+  const fetchRylsAnalyticsSummary = async (dateRange: AnalyticsDateRange): Promise<RylsAnalyticsSummary> => {
+    const res = await api<ApiResponse<RylsAnalyticsSummary>>(
+      `/admin/ryls/registrations/analytics/summary?${periodToQuery(dateRange)}`
+    )
+    return res.data
+  }
+
+  const fetchRylsAnalyticsTrend = async (dateRange: AnalyticsDateRange): Promise<RylsAnalyticsTrendPoint[]> => {
+    const res = await api<ApiResponse<RylsAnalyticsTrendPoint[]>>(
+      `/admin/ryls/registrations/analytics/trend?${periodToQuery(dateRange)}`
+    )
+    return res.data
+  }
+
+  const fetchRylsAnalyticsDemographics = async (dateRange: AnalyticsDateRange): Promise<RylsAnalyticsDemographics> => {
+    const res = await api<ApiResponse<RylsAnalyticsDemographics>>(
+      `/admin/ryls/registrations/analytics/demographics?${periodToQuery(dateRange)}`
+    )
+    return res.data
+  }
+
   return {
     fetchOverview,
     fetchRevenueTrend,
@@ -67,6 +95,9 @@ export const useAnalytics = () => {
     fetchCompletionRates,
     fetchRylsTrend,
     fetchScholarshipBreakdown,
-    fetchJobPostingStats
+    fetchJobPostingStats,
+    fetchRylsAnalyticsSummary,
+    fetchRylsAnalyticsTrend,
+    fetchRylsAnalyticsDemographics,
   }
 }

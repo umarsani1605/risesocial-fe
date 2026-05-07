@@ -1,4 +1,4 @@
-import type { AdminCohortEnrollment } from '~/types/cohort'
+import type { AdminCohortPlacement, AdminCohortSummary } from '~/types/cohort'
 
 interface UseAdminCohortEnrollmentsOptions {
   cohortId: string
@@ -9,13 +9,13 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
   const { api } = useApi()
   const toast = useToast()
 
-  const enrollments = ref<AdminCohortEnrollment[]>([])
+  const enrollments = ref<AdminCohortPlacement[]>([])
   const isLoadingEnrollments = ref(false)
 
   async function loadEnrollments() {
     isLoadingEnrollments.value = true
     try {
-      const res = await api<ApiResponse<AdminCohortEnrollment[]>>(
+      const res = await api<ApiResponse<AdminCohortPlacement[]>>(
         `/admin/cohorts/${cohortId}/enrollments`
       )
       enrollments.value = res.data
@@ -55,11 +55,11 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
 
   const isGenerateCertOpen = ref(false)
   const isGeneratingCert = ref(false)
-  const generatingEnrollmentId = ref<number | null>(null)
+  const generatingPlacementId = ref<number | null>(null)
   const certGradesForm = reactive({ assignments: '', case_study: '', final_test: '', final_score: '' })
 
-  function openGenerateCertModal(enrollmentId: number) {
-    generatingEnrollmentId.value = enrollmentId
+  function openGenerateCertModal(placementId: number) {
+    generatingPlacementId.value = placementId
     certGradesForm.assignments = ''
     certGradesForm.case_study = ''
     certGradesForm.final_test = ''
@@ -68,7 +68,7 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
   }
 
   async function submitGenerateCert() {
-    if (!generatingEnrollmentId.value) return
+    if (!generatingPlacementId.value) return
     isGeneratingCert.value = true
     try {
       const grades: Record<string, number> = {}
@@ -77,7 +77,7 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
       if (certGradesForm.final_test !== '') grades.final_test = Number(certGradesForm.final_test)
       if (certGradesForm.final_score !== '') grades.final_score = Number(certGradesForm.final_score)
 
-      await api(`/admin/cohorts/${cohortId}/enrollments/${generatingEnrollmentId.value}/certificate`, {
+      await api(`/admin/cohorts/${cohortId}/placements/${generatingPlacementId.value}/certificate`, {
         method: 'POST',
         body: { grades },
       })
@@ -91,24 +91,21 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
     }
   }
 
-  // --- Regenerate certificate ---
-
-  function openRegenerateCertModal(enrollmentId: number) {
-    openGenerateCertModal(enrollmentId)
+  function openRegenerateCertModal(placementId: number) {
+    openGenerateCertModal(placementId)
   }
 
-  // --- Drop student ---
+  // --- Drop student (from cohort, placement deleted, enrollment stays active) ---
 
   const isDroppingStudent = ref(false)
 
-  async function submitDropStudent(enrollmentId: number) {
+  async function submitDropStudent(placementId: number) {
     isDroppingStudent.value = true
     try {
-      await api(`/admin/cohorts/${cohortId}/enrollments/${enrollmentId}`, {
-        method: 'PUT',
-        body: { status: 'dropped' },
+      await api(`/admin/cohort-placements/${placementId}/drop`, {
+        method: 'POST',
       })
-      toast.add({ title: 'Student dropped', color: 'success' })
+      toast.add({ title: 'Student removed from cohort', color: 'success' })
       await loadEnrollments()
     } catch (error: unknown) {
       toast.add({ title: getApiErrorMessage(error), color: 'error' })
@@ -116,6 +113,74 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
       isDroppingStudent.value = false
     }
   }
+
+  // --- Assign / Transfer cohort ---
+
+  const isAssignOpen = ref(false)
+  const assignTarget = ref<AdminCohortPlacement | null>(null)
+  const availableCohorts = ref<AdminCohortSummary[]>([])
+  const selectedCohortId = ref<number | null>(null)
+  const isLoadingCohorts = ref(false)
+  const isAssigning = ref(false)
+
+  async function openAssignModal(placement: AdminCohortPlacement) {
+    assignTarget.value = placement
+    selectedCohortId.value = null
+    availableCohorts.value = []
+    isAssignOpen.value = true
+    isLoadingCohorts.value = true
+    try {
+      const res = await api<ApiResponse<AdminCohortSummary[]>>(
+        `/admin/cohorts?academy_id=${placement.academy_id}&status[]=not_started&status[]=ongoing`
+      )
+      availableCohorts.value = res.data
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
+    } finally {
+      isLoadingCohorts.value = false
+    }
+  }
+
+  function closeAssignModal() {
+    isAssignOpen.value = false
+    assignTarget.value = null
+    selectedCohortId.value = null
+    availableCohorts.value = []
+  }
+
+  async function submitAssign() {
+    if (!assignTarget.value?.academy_enrollment_id || !selectedCohortId.value) return
+    isAssigning.value = true
+    try {
+      await api(`/admin/academy-enrollments/${assignTarget.value.academy_enrollment_id}/assign`, {
+        method: 'POST',
+        body: { cohort_id: selectedCohortId.value },
+      })
+      toast.add({ title: 'Student assigned to cohort', color: 'success' })
+      closeAssignModal()
+      await loadEnrollments()
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
+    } finally {
+      isAssigning.value = false
+    }
+  }
+
+  async function submitDropFromCohort(placementId: number) {
+    isDroppingStudent.value = true
+    try {
+      await api(`/admin/cohort-placements/${placementId}/drop`, { method: 'POST' })
+      toast.add({ title: 'Student removed from cohort', color: 'success' })
+      closeAssignModal()
+      await loadEnrollments()
+    } catch (error: unknown) {
+      toast.add({ title: getApiErrorMessage(error), color: 'error' })
+    } finally {
+      isDroppingStudent.value = false
+    }
+  }
+
+  // --- Mentors ---
 
   const isInviteMentorOpen = ref(false)
   const isInvitingMentor = ref(false)
@@ -140,6 +205,7 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
   return reactive({
     enrollments,
     isLoadingEnrollments,
+    loadEnrollments,
     isInviteStudentOpen,
     isInvitingStudent,
     inviteStudentEmail,
@@ -153,10 +219,20 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
     openRegenerateCertModal,
     isDroppingStudent,
     submitDropStudent,
+    isAssignOpen,
+    assignTarget,
+    availableCohorts,
+    selectedCohortId,
+    isLoadingCohorts,
+    isAssigning,
+    openAssignModal,
+    closeAssignModal,
+    submitAssign,
+    submitDropFromCohort,
     isInviteMentorOpen,
     isInvitingMentor,
     mentorForm,
     openInviteMentorModal,
-    submitInviteMentor
+    submitInviteMentor,
   })
 }

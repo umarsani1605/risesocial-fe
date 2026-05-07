@@ -6,14 +6,15 @@ const df = new DateFormatter('en-US', { dateStyle: 'medium' })
 const selected = defineModel<AnalyticsDateRange>({ required: true })
 
 const presets = [
-  { label: '7D', period: '7d' as AnalyticsPeriod, days: 7 },
-  { label: '30D', period: '30d' as AnalyticsPeriod, days: 30 },
-  { label: '3M', period: '3m' as AnalyticsPeriod, months: 3 },
-  { label: '6M', period: '6m' as AnalyticsPeriod, months: 6 },
-  { label: '1Y', period: '1y' as AnalyticsPeriod, years: 1 }
+  { label: '7 days', period: '7d' as AnalyticsPeriod, days: 7 },
+  { label: '30 days', period: '30d' as AnalyticsPeriod, days: 30 },
+  { label: '3 months', period: '3m' as AnalyticsPeriod, months: 3 },
+  { label: '6 months', period: '6m' as AnalyticsPeriod, months: 6 },
+  { label: '1 year', period: '1y' as AnalyticsPeriod, years: 1 }
 ]
 
-const toCalendarDate = (date: Date) => new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate())
+const toCalendarDate = (date: Date) =>
+  new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate())
 
 const calendarRange = computed({
   get: () => ({
@@ -31,7 +32,7 @@ const calendarRange = computed({
   }
 })
 
-const selectPreset = (preset: typeof presets[0]) => {
+const selectPreset = (preset: (typeof presets)[0]) => {
   const end = today(getLocalTimeZone())
   let start = end.copy()
   if ('days' in preset && preset.days) start = start.subtract({ days: preset.days })
@@ -44,7 +45,7 @@ const selectPreset = (preset: typeof presets[0]) => {
   }
 }
 
-const isPresetActive = (preset: typeof presets[0]) => selected.value.period === preset.period
+const isPresetActive = (preset: (typeof presets)[0]) => selected.value.period === preset.period
 
 const dateLabel = computed(() => {
   if (selected.value.period !== 'custom') return ''
@@ -71,9 +72,8 @@ const dateLabel = computed(() => {
     <UPopover :content="{ align: 'start' }" :modal="true">
       <UButton
         color="neutral"
-        variant="outline"
+        variant="light"
         icon="i-lucide-calendar"
-        size="xs"
         :class="selected.period === 'custom' ? 'ring-1 ring-primary' : ''"
       >
         {{ dateLabel || 'Custom' }}
@@ -84,7 +84,7 @@ const dateLabel = computed(() => {
 
       <template #content>
         <div class="flex items-stretch sm:divide-x divide-default">
-          <div class="hidden sm:flex flex-col justify-center p-2 gap-1">
+          <div class="hidden sm:flex flex-col p-2 pt-6 gap-2">
             <UButton
               v-for="preset in presets"
               :key="preset.period"

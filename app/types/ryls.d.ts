@@ -1,3 +1,21 @@
+interface RylsAnalyticsSummary {
+  submitted: number
+  drafts: number
+}
+
+interface RylsAnalyticsTrendPoint {
+  date: string
+  count: number
+}
+
+interface RylsAnalyticsDemographics {
+  byNationality: Array<{ name: string; count: number }>
+  byDiscoverSource: Array<{ name: string; count: number }>
+  byGender: Array<{ name: string; count: number }>
+  byAgeRange: Array<{ name: string; count: number }>
+  byScholarshipType: Array<{ name: string; count: number }>
+}
+
 interface RylsPayment {
   id: number
   paid_at: string | null

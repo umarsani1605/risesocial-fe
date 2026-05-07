@@ -41,91 +41,150 @@ const mainLinks = computed<NavigationMenuItem[]>(() => [
     icon: 'i-ph-squares-four-duotone',
     to: '/admin',
     active: isActive('/admin', true),
-    onSelect: () => { open.value = false }
+    onSelect: () => {
+      open.value = false
+    }
   },
-  ...(hasPermission('admin.transactions') ? [{
-    label: 'Transactions',
-    icon: 'i-ph-receipt-duotone',
-    to: '/admin/transactions',
-    active: isActive('/admin/transactions'),
-    onSelect: () => { open.value = false }
-  }] : []),
-  ...(hasPermission('admin.ryls') ? [{
-    label: 'Rise Young Leaders',
-    icon: 'i-ph-medal-duotone',
-    to: '/admin/programs',
-    active: isActive('/admin/programs'),
-    onSelect: () => { open.value = false }
-  }] : [])
+  ...(hasPermission('admin.transactions')
+    ? [
+        {
+          label: 'Transactions',
+          icon: 'i-ph-receipt-duotone',
+          to: '/admin/transactions',
+          active: isActive('/admin/transactions'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []),
+  ...(hasPermission('admin.ryls')
+    ? [
+        {
+          label: 'Rise Young Leaders',
+          icon: 'i-ph-medal-duotone',
+          to: '/admin/programs',
+          active: isActive('/admin/programs'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : [])
 ])
 
 const analyticsLinks = computed<NavigationMenuItem[]>(() => [
-  ...(hasPermission('admin.transactions') ? [{
-    label: 'Revenue',
-    icon: 'i-ph-chart-line-duotone',
-    to: '/admin/analytics/revenue',
-    active: isActive('/admin/analytics/revenue'),
-    onSelect: () => { open.value = false }
-  }] : []),
-  ...(hasPermission('admin.users') ? [{
-    label: 'Users',
-    icon: 'i-ph-users-three-duotone',
-    to: '/admin/analytics/users',
-    active: isActive('/admin/analytics/users'),
-    onSelect: () => { open.value = false }
-  }] : []),
-  ...(hasPermission('admin.academy') ? [{
-    label: 'Academies',
-    icon: 'i-ph-graduation-cap-duotone',
-    to: '/admin/analytics/academies',
-    active: isActive('/admin/analytics/academies'),
-    onSelect: () => { open.value = false }
-  }] : []),
-  ...(hasPermission('admin.ryls') ? [{
-    label: 'Programs',
-    icon: 'i-ph-medal-duotone',
-    to: '/admin/analytics/programs',
-    active: isActive('/admin/analytics/programs'),
-    onSelect: () => { open.value = false }
-  }] : [])
+  ...(hasPermission('admin.transactions')
+    ? [
+        {
+          label: 'Revenue',
+          icon: 'i-ph-chart-line-duotone',
+          to: '/admin/analytics/revenue',
+          active: isActive('/admin/analytics/revenue'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []),
+  ...(hasPermission('admin.users')
+    ? [
+        {
+          label: 'Users',
+          icon: 'i-ph-users-three-duotone',
+          to: '/admin/analytics/users',
+          active: isActive('/admin/analytics/users'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []),
+  ...(hasPermission('admin.academy')
+    ? [
+        {
+          label: 'Academies',
+          icon: 'i-ph-graduation-cap-duotone',
+          to: '/admin/analytics/academies',
+          active: isActive('/admin/analytics/academies'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []),
+  ...(hasPermission('admin.ryls')
+    ? [
+        {
+          label: 'Programs',
+          icon: 'i-ph-medal-duotone',
+          to: '/admin/analytics/programs',
+          active: isActive('/admin/analytics/programs'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : [])
 ])
 
 const academyLinks = computed<NavigationMenuItem[]>(() =>
-  hasPermission('admin.academy') ? [
-    {
-      label: 'All Academy',
-      icon: 'i-ph-graduation-cap-duotone',
-      to: '/admin/academies',
-      active: isActive('/admin/academies'),
-      onSelect: () => { open.value = false }
-    },
-    {
-      label: 'Cohorts',
-      icon: 'i-ph-list-dashes-duotone',
-      to: '/admin/cohorts',
-      active: isActive('/admin/cohorts'),
-      onSelect: () => { open.value = false }
-    }
-  ] : []
+  hasPermission('admin.academy')
+    ? [
+        {
+          label: 'All Academy',
+          icon: 'i-ph-graduation-cap-duotone',
+          to: '/admin/academies',
+          active: isActive('/admin/academies'),
+          onSelect: () => {
+            open.value = false
+          }
+        },
+        {
+          label: 'Cohorts',
+          icon: 'i-ph-list-dashes-duotone',
+          to: '/admin/cohorts',
+          active: isActive('/admin/cohorts'),
+          onSelect: () => {
+            open.value = false
+          }
+        },
+        {
+          label: 'Students',
+          icon: 'i-ph-users-duotone',
+          to: '/admin/students',
+          active: isActive('/admin/students'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []
 )
 
 const userLinks = computed<NavigationMenuItem[]>(() =>
-  hasPermission('admin.users') ? [
-    {
-      label: 'All Users',
-      icon: 'i-ph-users-duotone',
-      to: '/admin/users',
-      active: isActive('/admin/users'),
-      onSelect: () => { open.value = false }
-    },
-    {
-      label: 'Administrator',
-      icon: 'i-ph-shield-duotone',
-      to: '/admin/administrators',
-      active: isActive('/admin/administrators'),
-      onSelect: () => { open.value = false }
-    }
-  ] : []
+  hasPermission('admin.users')
+    ? [
+        {
+          label: 'All Users',
+          icon: 'i-ph-users-duotone',
+          to: '/admin/users',
+          active: isActive('/admin/users'),
+          onSelect: () => {
+            open.value = false
+          }
+        },
+        {
+          label: 'Administrator',
+          icon: 'i-ph-shield-duotone',
+          to: '/admin/administrators',
+          active: isActive('/admin/administrators'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []
 )
 
 const navMenuUi = {
@@ -133,15 +192,19 @@ const navMenuUi = {
 }
 
 const jobLinks = computed<NavigationMenuItem[]>(() =>
-  hasPermission('admin.jobs') ? [
-    {
-      label: 'All Jobs',
-      icon: 'i-ph-briefcase-duotone',
-      to: '/admin/jobs',
-      active: isActive('/admin/jobs'),
-      onSelect: () => { open.value = false }
-    }
-  ] : []
+  hasPermission('admin.jobs')
+    ? [
+        {
+          label: 'All Jobs',
+          icon: 'i-ph-briefcase-duotone',
+          to: '/admin/jobs',
+          active: isActive('/admin/jobs'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []
 )
 </script>
 

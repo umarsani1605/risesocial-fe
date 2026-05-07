@@ -42,6 +42,7 @@
   --ui-primary: var(--color-rise-orange-400);
   --ui-secondary: var(--color-deep-teal-800);
   --ui-header-height: 5rem;
+  --vis-donut-background-color: transparent !important;
 }
 
 /* RYLS (Rise Young Leaders Summit) blue theme override */

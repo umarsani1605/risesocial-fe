@@ -61,11 +61,16 @@ defineProps<{
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Discover Source</span>
-              <span>{{ DISCOVER_SOURCE_LABEL[registration.discover_source] ?? registration.discover_source }}</span>
+              <span>{{
+                DISCOVER_SOURCE_LABEL[registration.discover_source] ?? registration.discover_source
+              }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Scholarship Type</span>
-              <span>{{ SCHOLARSHIP_TYPE_LABEL[registration.scholarship_type] ?? registration.scholarship_type }}</span>
+              <span>{{
+                SCHOLARSHIP_TYPE_LABEL[registration.scholarship_type] ??
+                registration.scholarship_type
+              }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Registration Date</span>
@@ -84,9 +89,7 @@ defineProps<{
               <div class="grid grid-cols-2 gap-2 text-sm">
                 <span class="text-muted">Essay Topic</span>
                 <span
-                  :class="
-                    registration.fully_funded_submission?.essay_topic ? '' : 'text-muted'
-                  "
+                  :class="registration.fully_funded_submission?.essay_topic ? '' : 'text-muted'"
                 >
                   {{ registration.fully_funded_submission?.essay_topic ?? 'Not provided' }}
                 </span>
@@ -115,7 +118,8 @@ defineProps<{
                 class="h-5 object-contain"
               />
               <span v-else class="font-medium">{{
-                PAYMENT_TYPE_LABEL[registration.payments[0].payment_method] ?? registration.payments[0].payment_method
+                PAYMENT_TYPE_LABEL[registration.payments[0].payment_method] ??
+                registration.payments[0].payment_method
               }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
@@ -141,14 +145,15 @@ defineProps<{
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Payment Proof</span>
               <span v-if="!registration.payments[0].payment_proof" class="text-muted">–</span>
-              <UButton
-                v-else
-                icon="i-ph-download-simple-bold"
-                label="Download"
-                size="xs"
-                color="neutral"
-                variant="outline"
-              />
+              <div v-else>
+                <UButton
+                  icon="i-ph-download-simple-bold"
+                  label="Download"
+                  size="sm"
+                  color="neutral"
+                  variant="light"
+                />
+              </div>
             </div>
           </div>
         </div>

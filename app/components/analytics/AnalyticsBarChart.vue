@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DEFAULT_CHART_COLOR_NAMES, resolveChartColor } from '~/utils/chartColor'
+
 const props = defineProps<{
   data: CategoryBreakdown[]
   title?: string
@@ -6,13 +8,22 @@ const props = defineProps<{
   color?: string
 }>()
 
-const chartData = computed(() =>
-  props.data.map(d => ({ name: d.name, value: d.value }))
-)
+const chartData = computed(() => props.data.map((d) => ({ name: d.name, value: d.value })))
 
-const categories = computed(() => ({
-  value: { name: 'Value', color: resolveChartColor(props.color) }
-}))
+const categories = computed(() => {
+  const seriesColor =
+    resolveChartColor(props.color) ??
+    resolveChartColor(props.data[0]?.color) ??
+    resolveChartColor(DEFAULT_CHART_COLOR_NAMES[0])!
+  return {
+    value: { name: 'Value', color: seriesColor },
+  }
+})
+
+const xFormatter = (tick: number): string => {
+  if (!Number.isInteger(tick)) return ''
+  return chartData.value[tick]?.name ?? ''
+}
 
 const yFormatter = (value: number) => {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
@@ -31,9 +42,14 @@ const yFormatter = (value: number) => {
         :data="chartData"
         :categories="categories"
         :height="height ?? 280"
+        :radius="8"
         :y-axis="['value']"
-        x-axis="name"
+        :group-padding="0"
+        :bar-padding="0.2"
+        :x-formatter="xFormatter"
+        :tooltip-title-formatter="(d: Record<string, unknown>) => String(d.name ?? '')"
         :y-formatter="yFormatter"
+        :hide-legend="true"
         class="w-full h-full"
       />
     </div>

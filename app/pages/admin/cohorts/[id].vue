@@ -244,6 +244,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
           @generate-cert="cohortEnrollments.openGenerateCertModal"
           @regenerate-cert="cohortEnrollments.openRegenerateCertModal"
           @drop-student="cohortEnrollments.submitDropStudent"
+          @edit-placement="cohortEnrollments.openAssignModal"
         />
       </template>
 
@@ -319,6 +320,21 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
     :loading="cohortEnrollments.isGeneratingCert"
     @submit="cohortEnrollments.submitGenerateCert"
     @cancel="cohortEnrollments.isGenerateCertOpen = false"
+  />
+
+  <AdminCohortAssignCohortSlideover
+    :open="cohortEnrollments.isAssignOpen"
+    :placement="cohortEnrollments.assignTarget"
+    :academy-name="cohort.detail?.academy?.title"
+    :cohorts="cohortEnrollments.availableCohorts"
+    :selected-cohort-id="cohortEnrollments.selectedCohortId"
+    :is-loading-cohorts="cohortEnrollments.isLoadingCohorts"
+    :is-assigning="cohortEnrollments.isAssigning"
+    :is-dropping-student="cohortEnrollments.isDroppingStudent"
+    @update:open="cohortEnrollments.isAssignOpen = $event"
+    @update:selected-cohort-id="cohortEnrollments.selectedCohortId = $event"
+    @confirm="cohortEnrollments.submitAssign"
+    @drop="cohortEnrollments.submitDropFromCohort(cohortEnrollments.assignTarget!.id)"
   />
 
   <UModal
