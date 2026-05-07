@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-og-image',
     '@nuxt/scripts',
-    '@nuxt/test-utils',
     '@nuxthub/core',
     'nuxt-csurf',
     'nuxt-charts'
@@ -38,7 +37,7 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: '',
       partykitHost: '',
-      whatsappNumber: '6285111032928',
+      whatsappNumber: process.env.NUXT_PUBLIC_WHATSAPP_NUMBER || '6285111032928',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
       midtransClientKey: process.env.MIDTRANS_MODE === 'PRODUCTION'
         ? process.env.MIDTRANS_CLIENT_KEY
