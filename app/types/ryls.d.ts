@@ -46,3 +46,19 @@ interface RylsRegistration {
     essay_description: string | null
   } | null
 }
+
+interface RylsListResponse {
+  registrations: RylsRegistration[]
+  pagination: { page: number; limit: number; total: number; totalPages: number }
+}
+
+interface RylsDraft {
+  id: number
+  email: string
+  resume_token: string
+  current_step: number
+  form_data: { step1?: { fullName?: string; scholarshipType?: string }; [key: string]: unknown }
+  scholarship_type: string | null
+  expires_at: string
+  updated_at: string
+}

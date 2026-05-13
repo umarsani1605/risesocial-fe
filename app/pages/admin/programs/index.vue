@@ -12,22 +12,6 @@ useSeoMeta({ title: 'Rise Young Leaders Scholarship - Rise Social' })
 
 const { api } = useApi()
 
-interface RylsListResponse {
-  registrations: RylsRegistration[]
-  pagination: { page: number; limit: number; total: number; totalPages: number }
-}
-
-interface RylsDraft {
-  id: number
-  email: string
-  resume_token: string
-  current_step: number
-  form_data: { step1?: { fullName?: string; scholarshipType?: string }; [key: string]: unknown }
-  scholarship_type: string | null
-  expires_at: string
-  updated_at: string
-}
-
 const [{ data: rawRegistrations }, { data: rawDrafts }] = await Promise.all([
   useAsyncData('admin:ryls', () => api<ApiResponse<RylsListResponse>>('/admin/ryls/registrations')),
   useAsyncData('admin:ryls-drafts', () =>

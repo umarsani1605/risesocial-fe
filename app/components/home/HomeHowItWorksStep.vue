@@ -1,13 +1,11 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   step: number
   title: string
   description: string
   image: string
   isLast?: boolean
-}
-
-defineProps<Props>()
+}>()
 </script>
 
 <template>

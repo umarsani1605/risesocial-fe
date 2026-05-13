@@ -1,16 +1,12 @@
 <script setup lang="ts">
-interface Testimonial {
-  quote: string
-  name: string
-  country: string
-  rating: number
-}
-
-interface Props {
-  testimonial: Testimonial
-}
-
-defineProps<Props>()
+defineProps<{
+  testimonial: {
+    quote: string
+    name: string
+    country: string
+    rating: number
+  }
+}>()
 </script>
 
 <template>
