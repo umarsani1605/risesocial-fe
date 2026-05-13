@@ -47,8 +47,8 @@ export const useTransactionHistory = () => {
   }
 
   return {
-    isLoading: readonly(isLoading),
-    error: readonly(error),
+    isLoading,
+    error,
     fetchTransactions,
     fetchTransactionDetail
   }

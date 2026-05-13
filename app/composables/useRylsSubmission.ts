@@ -121,9 +121,9 @@ export const useRylsSubmission = () => {
   }
 
   return {
-    isSubmitting: readonly(isSubmitting),
-    submissionError: readonly(submissionError),
-    submissionSuccess: readonly(submissionSuccess),
+    isSubmitting,
+    submissionError,
+    submissionSuccess,
     submit,
     uploadEssayFile,
     uploadHeadshotFile,

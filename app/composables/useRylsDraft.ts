@@ -103,10 +103,10 @@ export const useRylsDraft = () => {
   }
 
   return {
-    resumeToken: readonly(resumeToken),
-    isDraftSaving: readonly(isDraftSaving),
-    isDraftLoading: readonly(isDraftLoading),
-    draftError: readonly(draftError),
+    resumeToken,
+    isDraftSaving,
+    isDraftLoading,
+    draftError,
     saveDraft,
     loadDraft,
     deleteDraft,

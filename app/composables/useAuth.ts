@@ -1,12 +1,7 @@
 export const useAuth = createSharedComposable(() => {
   const cookieOptions = { sameSite: 'lax' as const, maxAge: 60 * 60 * 24 * 7, secure: true }
   const token = useCookie<string | null>('auth_token', cookieOptions)
-  const userCookie = useCookie<UserProfile | null>('auth_user', { ...cookieOptions, default: () => null })
-
-  const user = useState<UserProfile | null>('auth:user', () => userCookie.value)
-
-  // keep cookie in sync with state
-  watch(user, (val) => { userCookie.value = val })
+  const user = useCookie<UserProfile | null>('auth_user', { ...cookieOptions, default: () => null })
 
   const isLoggedIn = computed(() => !!token.value && !!user.value)
   const isSuperAdmin = computed(() => user.value?.role === 'SUPERADMIN')
@@ -58,7 +53,6 @@ export const useAuth = createSharedComposable(() => {
     finally {
       token.value = null
       user.value = null
-      userCookie.value = null
       await navigateTo('/')
     }
   }

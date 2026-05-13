@@ -54,8 +54,8 @@ export const useRylsPayment = () => {
   }
 
   return {
-    isLoading: readonly(isLoading),
-    error: readonly(error),
+    isLoading,
+    error,
     createTransaction,
     openSnapEmbed,
   }

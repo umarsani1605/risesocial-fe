@@ -147,9 +147,9 @@ export const useRylsFileUpload = () => {
   }
 
   return {
-    isUploading: readonly(isUploading),
-    uploadProgress: readonly(uploadProgress),
-    uploadError: readonly(uploadError),
+    isUploading,
+    uploadProgress,
+    uploadError,
     uploadEssay,
     uploadHeadshot,
     uploadPaymentProof,

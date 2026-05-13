@@ -82,8 +82,8 @@ export const useAcademyPayment = () => {
   }
 
   return {
-    isLoading: readonly(isLoading),
-    error: readonly(error),
+    isLoading,
+    error,
     createEnrollment,
     openSnapEmbed,
     checkPaymentStatus,
