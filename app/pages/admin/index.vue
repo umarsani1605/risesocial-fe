@@ -19,7 +19,7 @@ const UBadge = resolveComponent('UBadge')
 const { api } = useApi()
 const analytics = useAnalytics()
 
-const { data: overviewData } = await useAsyncData('admin:analytics-overview', () =>
+const { data: overviewData, pending: isOverviewPending } = await useAsyncData('admin:analytics-overview', () =>
   analytics.fetchOverview()
 )
 
@@ -159,7 +159,12 @@ const columns: TableColumn<AdminTransaction>[] = [
 <template>
   <div class="flex flex-col gap-4">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+      <template v-if="isOverviewPending">
+        <USkeleton v-for="i in 4" :key="i" class="h-28 rounded-xl" />
+      </template>
+      <template v-else>
+        <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+      </template>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { academyCreateSchema } from '@/schemas/academy'
+import { academyFormSchema } from '@/schemas/academy'
 import { ACADEMY_DURATION_OPTIONS, ACADEMY_FORMAT_OPTIONS } from '@/constants/academy'
 
 const open = defineModel<boolean>('open', { required: true })
@@ -22,7 +22,7 @@ const formRef = useTemplateRef('formRef')
       <UForm
         :validate-on="['submit']"
         ref="formRef"
-        :schema="academyCreateSchema"
+        :schema="academyFormSchema"
         :state="form"
         class="space-y-4"
         @submit="emit('submit')"

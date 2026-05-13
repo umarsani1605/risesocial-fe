@@ -50,7 +50,12 @@ async function loadPermissions() {
 }
 
 watch(open, (val) => {
-  if (val) loadPermissions()
+  if (val) {
+    loadPermissions()
+  } else {
+    registry.value = []
+    userPermissions.value = []
+  }
 })
 
 function getPermission(key: string): UserAdminPermission | undefined {
