@@ -1,3 +1,5 @@
+type RylsPaymentType = 'PAYPAL' | 'MIDTRANS'
+
 interface RylsAnalyticsSummary {
   submitted: number
   drafts: number

@@ -1,6 +1,6 @@
 type ScholarshipType = 'FULLY_FUNDED' | 'SELF_FUNDED' | ''
 type YesNoEmpty = 'YES' | 'NO' | ''
-type PaymentType = 'PAYPAL' | 'MIDTRANS' | null
+type PaymentType = RylsPaymentType | null
 type PaymentStatus = 'PENDING' | 'EXPIRED' | 'PAID' | 'FAILED' | null
 
 interface Step1Data {

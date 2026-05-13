@@ -4,7 +4,7 @@
  */
 
 interface CreateTransactionPayload {
-  type: 'PAYPAL' | 'MIDTRANS'
+  type: RylsPaymentType
   data: Record<string, unknown>
 }
 
