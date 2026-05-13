@@ -51,10 +51,10 @@ async function onCreateAcademy() {
   }
 }
 
-watch(createModalOpen, (val) => {
-  if (!val) return
+function openCreateModal() {
   Object.assign(createForm, { title: '', description: '', duration: '', format: '', category: '' })
-})
+  createModalOpen.value = true
+}
 
 function confirmDelete(academy: AdminAcademy) {
   deleteTarget.value = academy
@@ -197,7 +197,7 @@ const columns: TableColumn<AdminAcademy>[] = [
         label="Add New"
         icon="i-ph-plus-bold"
         color="primary"
-        @click="createModalOpen = true"
+        @click="openCreateModal"
       />
     </template>
   </AdminDataTable>
