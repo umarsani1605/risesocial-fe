@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
-import type { AdminCohortDetail } from '~/types/cohort'
 
 const form = defineModel<{
   name: string

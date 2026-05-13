@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AdminCohortDetail } from '~/types/cohort'
 import { COHORT_STATUS_ITEMS } from '@/constants/cohort'
 import { cohortEditSchema } from '@/schemas/cohort'
 

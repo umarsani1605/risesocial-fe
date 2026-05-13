@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { AdminCohortModule } from '~/types/cohort'
-
 defineProps<{
   module: AdminCohortModule
   isOpen: boolean

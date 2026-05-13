@@ -1,5 +1,3 @@
-import type { AdminCohortPlacement, AdminCohortSummary } from '~/types/cohort'
-
 interface UseAdminCohortEnrollmentsOptions {
   cohortId: string
 }

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { AdminCohortPlacement } from '~/types/cohort'
 
 const props = defineProps<{
   enrollments: AdminCohortPlacement[]

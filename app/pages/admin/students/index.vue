@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type {
-  AcademyEnrollmentItem,
-  AdminCohortPlacement,
-  AdminCohortSummary
-} from '~/types/cohort'
 
 definePageMeta({
   layout: 'dashboard-admin',

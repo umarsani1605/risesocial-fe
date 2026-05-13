@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AdminCohortPlacement, AdminCohortSummary } from '~/types/cohort'
 import { COHORT_STATUS_COLOR, COHORT_STATUS_LABEL } from '~/constants/cohort'
 
 const props = defineProps<{

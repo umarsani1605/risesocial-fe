@@ -36,8 +36,7 @@ export type {
   AcademyTopic, AcademyTheme, AcademyTestimonial, AcademyFaq
 } from './academy'
 
-// ── Cohort Types (Admin) ──────────────────────────────────────────────────────
-export type { AdminCohortDetail, AdminCohortModule, AdminCohortAttachment, AdminCohortEnrollment, AdminCohortMentor, PendingAttachment } from './cohort'
+// ── Cohort Types (Admin) — defined in cohort.d.ts as ambient globals ────────
 
 // ── Cohort Types (User Dashboard) ────────────────────────────────────────────
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
-import type { AdminCohortMentor } from '~/types/cohort'
 
 const props = defineProps<{
   mentors: AdminCohortMentor[]

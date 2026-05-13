@@ -2,7 +2,6 @@
 import { Time } from '@internationalized/date'
 import type { TabsItem } from '@nuxt/ui'
 import { moduleFormSchema } from '@/schemas/cohort'
-import type { PendingAttachment, AdminCohortAttachment } from '~/types/cohort'
 import { ATTACHMENT_MAP, getAttachmentStyle } from '~/utils/attachment'
 
 const {

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { AdminCohortModule } from '~/types/cohort'
-
 const props = defineProps<{
   modules: AdminCohortModule[]
 }>()

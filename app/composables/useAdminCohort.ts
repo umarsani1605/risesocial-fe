@@ -1,5 +1,3 @@
-import type { AdminCohortDetail } from '~/types/cohort'
-
 export function useAdminCohort(cohortId: string) {
   const { api } = useApi()
   const toast = useToast()

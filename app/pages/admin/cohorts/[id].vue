@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TabsItem, DropdownMenuItem } from '@nuxt/ui'
-import type { AdminCohortDetail } from '~/types/cohort'
 import { useAdminCohort } from '@/composables/useAdminCohort'
 import { useAdminCohortModules } from '@/composables/useAdminCohortModules'
 import { useAdminCohortEnrollments } from '@/composables/useAdminCohortEnrollments'

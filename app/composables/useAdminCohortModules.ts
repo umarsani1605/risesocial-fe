@@ -1,6 +1,5 @@
 import { parseDate, parseTime } from '@internationalized/date'
 import type { CalendarDate, Time } from '@internationalized/date'
-import type { AdminCohortModule, AdminCohortAttachment, PendingAttachment } from '~/types/cohort'
 
 interface UseAdminCohortModulesOptions {
   cohortId: string

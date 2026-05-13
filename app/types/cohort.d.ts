@@ -1,4 +1,4 @@
-export interface PendingAttachment {
+interface PendingAttachment {
   id: string
   type: 'file' | 'external_link'
   label: string
@@ -6,7 +6,7 @@ export interface PendingAttachment {
   file?: File
 }
 
-export interface AdminCohortAttachment {
+interface AdminCohortAttachment {
   id: number
   type: 'file' | 'external_link' | 'embed_video'
   label: string | null
@@ -19,7 +19,7 @@ export interface AdminCohortAttachment {
   order: number
 }
 
-export interface AdminCohortModule {
+interface AdminCohortModule {
   id: number
   order: number
   title: string
@@ -35,7 +35,7 @@ export interface AdminCohortModule {
   attachments: AdminCohortAttachment[]
 }
 
-export interface AdminCohortMentor {
+interface AdminCohortMentor {
   id: number
   name: string
   job_title: string | null
@@ -44,7 +44,7 @@ export interface AdminCohortMentor {
   phone?: string
 }
 
-export interface AdminCohortDetail {
+interface AdminCohortDetail {
   id: number
   name: string
   description: string | null
@@ -60,7 +60,7 @@ export interface AdminCohortDetail {
 }
 
 /** Placement record dari GET /admin/cohorts/:id/enrollments (tab Students di Cohort Detail) */
-export interface AdminCohortPlacement {
+interface AdminCohortPlacement {
   id: number                         // placement_id — untuk /drop dan /certificate
   academy_enrollment_id: number | null // untuk /assign (transfer)
   cohort_id: number                  // cohort saat ini — untuk badge "saat ini" di slideover
@@ -85,10 +85,10 @@ export interface AdminCohortPlacement {
 }
 
 /** @deprecated Gunakan AdminCohortPlacement */
-export type AdminCohortEnrollment = AdminCohortPlacement
+type AdminCohortEnrollment = AdminCohortPlacement
 
 /** Enrollment record dari GET /admin/academy-enrollments (Students page) */
-export interface AcademyEnrollmentItem {
+interface AcademyEnrollmentItem {
   id: number
   user_id: number
   academy_id: number
@@ -117,7 +117,7 @@ export interface AcademyEnrollmentItem {
 }
 
 /** Cohort summary dari GET /admin/cohorts (untuk picker di assign slideover) */
-export interface AdminCohortSummary {
+interface AdminCohortSummary {
   id: number
   name: string
   status: 'not_started' | 'ongoing' | 'completed'
