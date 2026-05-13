@@ -26,8 +26,6 @@ export interface Notification {
   date: string
 }
 
-export type Period = 'daily' | 'weekly' | 'monthly'
-
 // ── Jobs Types (see app/types/jobs.ts) ───────────────────────────────────────
 export type { Job, JobCompany, JobCompanyDetail, JobLocation, JobType, ExperienceLevel, AdminJobForm } from './jobs'
 
