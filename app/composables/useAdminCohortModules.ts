@@ -6,6 +6,38 @@ interface UseAdminCohortModulesOptions {
   refreshCohort: () => Promise<void>
 }
 
+/** Shared shape for add + edit module forms (kept as two separate reactive instances
+ *  so the modals don't leak state between each other). */
+interface ModuleFormState {
+  title: string
+  description: string
+  sessionDate: CalendarDate | null
+  sessionStartTime: Time | null
+  sessionEndTime: Time | null
+  meetingLink: string
+  attendanceLink: string
+  assignmentTitle: string
+  assignmentLink: string
+  assignmentDeadlineDate: CalendarDate | null
+  assignmentDeadlineTime: Time | null
+  isPublished: boolean
+}
+
+const blankModuleForm = (): ModuleFormState => ({
+  title: '',
+  description: '',
+  sessionDate: null,
+  sessionStartTime: null,
+  sessionEndTime: null,
+  meetingLink: '',
+  attendanceLink: '',
+  assignmentTitle: '',
+  assignmentLink: '',
+  assignmentDeadlineDate: null,
+  assignmentDeadlineTime: null,
+  isPublished: true
+})
+
 function calendarDateTimeToISO(
   date: { year: number; month: number; day: number } | null | undefined,
   time: { hour: number; minute: number } | null | undefined
@@ -27,20 +59,7 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
   const isAddModuleOpen = ref(false)
   const isAddingModule = ref(false)
   const saveAndAddMore = ref(false)
-  const addModuleForm = reactive({
-    title: '',
-    description: '',
-    sessionDate: null as CalendarDate | null,
-    sessionStartTime: null as Time | null,
-    sessionEndTime: null as Time | null,
-    meetingLink: '',
-    attendanceLink: '',
-    assignmentTitle: '',
-    assignmentLink: '',
-    assignmentDeadlineDate: null as CalendarDate | null,
-    assignmentDeadlineTime: null as Time | null,
-    isPublished: true,
-  })
+  const addModuleForm = reactive<ModuleFormState>(blankModuleForm())
 
   const pendingAttachments = ref<PendingAttachment[]>([])
 
@@ -140,20 +159,7 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
   const isEditModuleOpen = ref(false)
   const isEditingModule = ref(false)
   const editingModule = ref<AdminCohortModule | null>(null)
-  const editModuleForm = reactive({
-    title: '',
-    description: '',
-    sessionDate: null as CalendarDate | null,
-    sessionStartTime: null as Time | null,
-    sessionEndTime: null as Time | null,
-    meetingLink: '',
-    attendanceLink: '',
-    assignmentTitle: '',
-    assignmentLink: '',
-    assignmentDeadlineDate: null as CalendarDate | null,
-    assignmentDeadlineTime: null as Time | null,
-    isPublished: true
-  })
+  const editModuleForm = reactive<ModuleFormState>(blankModuleForm())
 
   const moduleAttachments = ref<AdminCohortAttachment[]>([])
   const isDeletingAttachment = ref(false)
@@ -178,6 +184,7 @@ export function useAdminCohortModules(options: UseAdminCohortModulesOptions) {
     editModuleForm.description = module.description ?? ''
 
     if (module.session_start_time) {
+      // 'sv' locale yields ISO 8601 (YYYY-MM-DD) which parseDate expects
       const dateStr = new Date(module.session_start_time)
         .toLocaleDateString('sv', { timeZone: 'Asia/Jakarta' })
       editModuleForm.sessionDate = parseDate(dateStr)
