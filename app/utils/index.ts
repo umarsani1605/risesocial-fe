@@ -118,6 +118,33 @@ export function formatPrice(price: number): string {
   }).format(price)
 }
 
+/** Indonesian-locale date: "5 Mei 2026" */
+export function formatDateID(dateString: string): string {
+  if (!dateString) return 'N/A'
+  try {
+    return new Date(dateString).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
+/** Indonesian-locale integer with thousand separator: "1.234.567" */
+export function formatNumber(n: number): string {
+  return new Intl.NumberFormat('id-ID').format(n)
+}
+
+/** Compact notation for large numbers: "1,2 jt" / "5,5 rb" (id-ID locale) */
+export function formatNumberCompact(n: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    notation: 'compact',
+    maximumFractionDigits: 1
+  }).format(n)
+}
+
 export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
   const data = (error as Record<string, unknown> & { data?: Record<string, string> })?.data
   return data?.details ?? data?.message ?? (error instanceof Error ? error.message : fallback)
