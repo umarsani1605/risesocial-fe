@@ -159,15 +159,6 @@ const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 const UAvatar = resolveComponent('UAvatar')
 
-function formatDate(d: string | null | undefined) {
-  if (!d) return '-'
-  return new Date(d).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  })
-}
-
 const columns: TableColumn<AcademyEnrollmentItem>[] = [
   {
     id: 'no',

@@ -82,27 +82,13 @@ const progressPercentage = computed(() => {
 
       <template v-else-if="enrollment.cohort.status === 'not_started'">
         <p class="text-sm text-dimmed">
-          Starts on
-          {{
-            new Date(enrollment.cohort.start_date).toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            })
-          }}
+          Starts on {{ formatDate(enrollment.cohort.start_date) }}
         </p>
       </template>
 
       <template v-else>
         <p class="text-sm text-dimmed">
-          Completed on
-          {{
-            new Date(enrollment.cohort.end_date).toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            })
-          }}
+          Completed on {{ formatDate(enrollment.cohort.end_date) }}
         </p>
       </template>
     </div>

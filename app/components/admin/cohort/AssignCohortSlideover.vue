@@ -38,11 +38,9 @@ function initials(placement: AdminCohortPlacement) {
 
 function formatDateRange(start: string | null, end: string | null) {
   if (!start && !end) return '—'
-  const fmt = (d: string) =>
-    new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-  if (start && end) return `${fmt(start)} – ${fmt(end)}`
-  if (start) return `Mulai ${fmt(start)}`
-  return `s.d. ${fmt(end!)}`
+  if (start && end) return `${formatDateID(start)} – ${formatDateID(end)}`
+  if (start) return `Mulai ${formatDateID(start)}`
+  return `s.d. ${formatDateID(end!)}`
 }
 
 function selectCohort(id: number) {

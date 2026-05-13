@@ -145,6 +145,16 @@ export function formatNumberCompact(n: number): string {
   }).format(n)
 }
 
+/** Compact currency notation: "Rp 1,2 jt" / "Rp 5,5 rb" — for stat cards showing large amounts */
+export function formatPriceCompact(price: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 1,
+    notation: 'compact'
+  }).format(price)
+}
+
 export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
   const data = (error as Record<string, unknown> & { data?: Record<string, string> })?.data
   return data?.details ?? data?.message ?? (error instanceof Error ? error.message : fallback)

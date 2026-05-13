@@ -9,15 +9,8 @@ const iconColor = computed(() => ICON_COLOR[props.stat.color ?? ''] ?? ICON_COLO
 
 const formattedValue = computed(() => {
   if (typeof props.stat.value === 'string') return props.stat.value
-  if (props.stat.value >= 1_000_000) {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 1,
-      notation: 'compact'
-    }).format(props.stat.value)
-  }
-  return new Intl.NumberFormat('id-ID').format(props.stat.value)
+  if (props.stat.value >= 1_000_000) return formatPriceCompact(props.stat.value)
+  return formatNumber(props.stat.value)
 })
 
 const trendPct = computed(() => {
