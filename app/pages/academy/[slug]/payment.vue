@@ -108,8 +108,7 @@ const onPay = async () => {
       }
     })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to process payment'
-    toast.add({ title: message, color: 'error' })
+    toast.add({ title: getApiErrorMessage(error, 'Failed to process payment'), color: 'error' })
   }
 }
 </script>
