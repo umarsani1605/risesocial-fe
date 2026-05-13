@@ -65,7 +65,7 @@ export function useEditorCompletion(editorRef: Ref<{ editor: Editor | undefined 
       insertState.value = undefined
     },
     onError: (error) => {
-      console.error('AI completion error:', error)
+      if (import.meta.dev) console.error('AI completion error:', error)
       insertState.value = undefined
       getCompletionStorage()?.clearSuggestion()
     }

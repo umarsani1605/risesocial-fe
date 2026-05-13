@@ -72,5 +72,7 @@ export const useAuth = createSharedComposable(() => {
     }
   }
 
-  return { user, token, isLoggedIn, isSuperAdmin, isAdmin, hasPermission, canEdit, fullName, initials, setSession, login, logout, fetchSession }
+  const hasToken = computed(() => !!token.value)
+
+  return { user, hasToken, isLoggedIn, isSuperAdmin, isAdmin, hasPermission, canEdit, fullName, initials, setSession, login, logout, fetchSession }
 })
