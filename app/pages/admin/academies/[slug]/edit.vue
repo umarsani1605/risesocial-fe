@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Academy } from '@/types'
+import type { Academy, AcademyStatus } from '@/types'
 import { ACADEMY_TAB_ITEMS } from '@/constants/academy'
 import { academyFormSchema } from '@/schemas/academy'
 import type { DropdownMenuItem } from '@nuxt/ui'
@@ -27,7 +27,7 @@ if (sourceError.value || !sourceData.value?.data) {
 const source = sourceData.value.data
 
 const pageTitle = ref(source.title)
-const currentStatus = ref(source.status as 'DRAFT' | 'ACTIVE' | 'ARCHIVED')
+const currentStatus = ref<AcademyStatus>(source.status)
 
 const isArchiveConfirmOpen = ref(false)
 const isArchiving = ref(false)
@@ -144,8 +144,6 @@ const form = reactive({
 const formRef = useTemplateRef('formRef')
 const isHeaderSaving = ref(false)
 const isSectionSaving = ref(false)
-
-type AcademyStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
 
 async function onSave(
   targetStatus: AcademyStatus,

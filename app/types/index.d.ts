@@ -31,9 +31,9 @@ export type { Job, JobCompany, JobCompanyDetail, JobLocation, JobType, Experienc
 
 // ── Academy Types (see app/types/academy.ts) ─────────────────────────────────
 export type {
-  Academy, AdminAcademy, AcademyForm, AdminCohort,
+  Academy, AdminAcademy, AcademyForm, AcademyStatus, AdminCohort,
   AcademyPricing, AcademyFeature, AcademyInstructor,
-  AcademyTopic, AcademyTheme, AcademyTestimonial, AcademyFaq
+  AcademyTopic, AcademyTopicForm, AcademyTheme, AcademyTestimonial, AcademyFaq
 } from './academy'
 
 // ── Cohort Types (Admin) — defined in cohort.d.ts as ambient globals ────────

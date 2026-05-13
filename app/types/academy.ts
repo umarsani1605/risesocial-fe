@@ -1,3 +1,7 @@
+// ── Status enum ───────────────────────────────────────────────────────────────
+
+export type AcademyStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
+
 // ── Sub-resource types ────────────────────────────────────────────────────────
 
 export interface AcademyPricing {
@@ -27,6 +31,15 @@ export interface AcademyInstructor {
 }
 
 export interface AcademyTopic {
+  id: number
+  theme_id?: number
+  title: string
+  description: string
+  order: number
+}
+
+/** Form/draft shape used by SectionSyllabus + TopicModal (mirrors AcademyTopic) */
+export interface AcademyTopicForm {
   id: number
   theme_id?: number
   title: string
@@ -79,7 +92,7 @@ export interface Academy {
   image_url: string
   certificate: boolean
   portfolio: boolean
-  status: 'ACTIVE' | 'DRAFT' | 'ARCHIVED'
+  status: AcademyStatus
   pixel_id?: string | null
   pricing: AcademyPricing[]
   features: AcademyFeature[]
@@ -99,7 +112,7 @@ export interface AdminAcademy {
   category: string
   duration: string
   format: string
-  status: 'ACTIVE' | 'ARCHIVED' | 'DRAFT'
+  status: AcademyStatus
   cohort_count: number
 }
 
@@ -111,7 +124,7 @@ export interface AcademyForm {
   duration: string
   format: string
   category: string
-  status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
+  status: AcademyStatus
   certificate: string
   portfolio: string
   pixel_id?: string

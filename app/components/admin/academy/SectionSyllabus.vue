@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AcademyTheme, SyllabusRow } from '@/types'
+import type { AcademyTheme, AcademyTopicForm, SyllabusRow } from '@/types'
 import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
@@ -69,13 +69,7 @@ const editingTheme = ref<AcademyTheme | null>(null)
 
 // Topic modal
 const isTopicModalOpen = ref(false)
-const editingTopic = ref<{
-  id: number
-  theme_id?: number
-  title: string
-  description: string
-  order: number
-} | null>(null)
+const editingTopic = ref<AcademyTopicForm | null>(null)
 const topicDefaultThemeId = ref(0)
 const topicNextOrder = ref(1)
 

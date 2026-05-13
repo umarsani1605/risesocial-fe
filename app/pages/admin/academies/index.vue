@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { AdminAcademy } from '@/types'
-import { ACADEMY_STATUS_FILTER_OPTIONS } from '@/constants/academy'
+import type { AdminAcademy, AcademyStatus } from '@/types'
+import { ACADEMY_STATUS_FILTER_OPTIONS, ACADEMY_STATUS_COLOR } from '@/constants/academy'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -87,7 +87,7 @@ const UButton = resolveComponent('UButton')
 
 const search = ref('')
 const categoryFilter = ref('all')
-const statusFilter = ref<'all' | 'ACTIVE' | 'ARCHIVED'>('all')
+const statusFilter = ref<'all' | AcademyStatus>('all')
 
 const statusOptions = ACADEMY_STATUS_FILTER_OPTIONS
 
@@ -136,10 +136,9 @@ const columns: TableColumn<AdminAcademy>[] = [
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const status = row.getValue('status') as string
+      const status = row.getValue('status') as AcademyStatus
       const label = statusOptions.find((s) => s.value === status)?.label ?? status
-      const color = status === 'ACTIVE' ? ('success' as const) : status === 'DRAFT' ? ('warning' as const) : ('neutral' as const)
-      return h(UBadge, { variant: 'subtle', color }, () => label)
+      return h(UBadge, { variant: 'subtle', color: ACADEMY_STATUS_COLOR[status] }, () => label)
     }
   },
   {
