@@ -1,17 +1,19 @@
-declare type AdminAccessLevel = 'VIEWER' | 'EDITOR'
+type AdminAccessLevel = 'VIEWER' | 'EDITOR'
 
-declare interface AdminPermissionResource {
+type UserRole = 'SUPERADMIN' | 'ADMIN' | 'USER'
+
+interface AdminPermissionResource {
   key: string
   name: string
   available_levels: AdminAccessLevel[]
 }
 
-declare interface UserAdminPermission {
+interface UserAdminPermission {
   key: string
   access_level: AdminAccessLevel
 }
 
-declare interface UserProfile {
+interface UserProfile {
   id: number
   username: string
   first_name: string
@@ -21,7 +23,7 @@ declare interface UserProfile {
   phone: string | null
   email_verified_at: string | null
   phone_verified_at: string | null
-  role: string
+  role: UserRole
   gender: string | null
   country: string | null
   province: string | null
@@ -35,7 +37,7 @@ declare interface UserProfile {
   updated_at: string
 }
 
-declare interface AdminUser {
+interface AdminUser {
   id: number
   username: string
   first_name: string
@@ -43,11 +45,11 @@ declare interface AdminUser {
   email: string
   phone: string | null
   avatar: string | null
-  role: string
+  role: UserRole
   created_at: string
 }
 
-declare interface NotificationPreferences {
+interface NotificationPreferences {
   promo: boolean
   jobs: boolean
   programs: boolean

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ICON_COLOR } from '@/constants/colorMap'
+import { ICON_COLOR } from '@/constants/iconColor'
 
 const props = defineProps<{
   stat: AnalyticsStat
