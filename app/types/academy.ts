@@ -136,7 +136,7 @@ export interface AdminCohort {
   description: string | null
   academy_id: number
   academy: { id: number; title: string; slug: string }
-  status: 'not_started' | 'ongoing' | 'completed'
+  status: CohortStatus
   enrollment_count: number
   start_date: string
   end_date: string

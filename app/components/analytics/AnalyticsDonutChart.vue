@@ -71,9 +71,7 @@ const radius = computed(() => Math.floor((props.height ?? 280) / 2) - 20)
           />
           <span class="truncate text-muted">{{ item.name }}</span>
         </div>
-        <span class="font-medium tabular-nums ml-4 shrink-0">{{
-          item.value.toLocaleString()
-        }}</span>
+        <span class="font-medium tabular-nums ml-4 shrink-0">{{ formatNumber(item.value) }}</span>
       </div>
     </div>
   </UCard>

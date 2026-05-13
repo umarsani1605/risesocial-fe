@@ -1,3 +1,5 @@
+type CohortStatus = 'not_started' | 'ongoing' | 'completed'
+
 interface PendingAttachment {
   id: string
   type: 'file' | 'external_link'
@@ -53,7 +55,7 @@ interface AdminCohortDetail {
   start_date: string
   end_date: string
   max_students: number
-  status: 'not_started' | 'ongoing' | 'completed'
+  status: CohortStatus
   enrollment_count: number
   modules: AdminCohortModule[]
   mentors?: AdminCohortMentor[]
@@ -120,7 +122,7 @@ interface AcademyEnrollmentItem {
 interface AdminCohortSummary {
   id: number
   name: string
-  status: 'not_started' | 'ongoing' | 'completed'
+  status: CohortStatus
   start_date: string | null
   end_date: string | null
   enrollment_count: number

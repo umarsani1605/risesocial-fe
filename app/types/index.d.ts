@@ -51,7 +51,7 @@ export interface UpcomingSession {
   assignment_deadline: string | null
 }
 
-export type CohortStatus = 'not_started' | 'ongoing' | 'completed'
+// CohortStatus defined ambient in cohort.d.ts
 export type ModuleSessionStatus = 'upcoming' | 'live' | 'completed' | 'hidden'
 export interface CohortModuleAttachment {
   id: number
