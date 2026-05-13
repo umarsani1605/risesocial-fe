@@ -14,12 +14,13 @@ useSeoMeta({ title: 'Cohorts - Rise Social' })
 const { api } = useApi()
 const toast = useToast()
 
-const { data: cohortsData, refresh } = await useAsyncData('admin-cohorts', () =>
-  api<ApiResponse<AdminCohort[]>>('/admin/cohorts')
-)
-const { data: academiesData } = await useAsyncData('admin-academy-list', () =>
-  api<ApiResponse<AdminAcademy[]>>('/admin/academies')
-)
+const [
+  { data: cohortsData, refresh },
+  { data: academiesData }
+] = await Promise.all([
+  useAsyncData('admin-cohorts', () => api<ApiResponse<AdminCohort[]>>('/admin/cohorts')),
+  useAsyncData('admin-academy-list', () => api<ApiResponse<AdminAcademy[]>>('/admin/academies'))
+])
 
 const cohorts = computed(() => cohortsData.value?.data ?? [])
 const academies = computed(() => academiesData.value?.data ?? [])
