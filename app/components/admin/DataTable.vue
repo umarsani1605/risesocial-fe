@@ -35,26 +35,26 @@ const emit = defineEmits<{
 
 defineOptions({ inheritAttrs: false })
 
+// Slots consumed by this wrapper; everything else is forwarded to UTable
+// (per-column cell/header slots, plus UTable's own `empty`, `loading`, `expanded`, etc.).
+const RESERVED_SLOTS: readonly string[] = ['toolbar', 'toolbar-left', 'toolbar-right', 'footer']
+
 const table = useTemplateRef('table')
 
 const pagination = ref<PaginationState>({ pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE })
 const columnPinning = ref<ColumnPinningState>(props.columnPinning)
 const paginationRowModel = getPaginationRowModel()
 
-const mergedTableUi = computed(() => {
-  const base = {
-    tbody: '[&>tr]:hover:bg-elevated/50 [&>tr]:transition-colors',
-    ...(props.pinnedShadow ? PINNED_COLUMN_SHADOW_UI : {})
-  }
-  return props.tableUi ? { ...base, ...props.tableUi } : base
-})
+const mergedTableUi = computed(() => ({
+  tbody: '[&>tr]:hover:bg-elevated/50 [&>tr]:transition-colors',
+  ...(props.pinnedShadow ? PINNED_COLUMN_SHADOW_UI : {}),
+  ...(props.tableUi ?? {})
+}))
 
 const slots = useSlots()
-const filteredSlots = computed(() =>
+const forwardedSlots = computed(() =>
   Object.fromEntries(
-    Object.entries(slots).filter(
-      ([name]) => !['toolbar', 'toolbar-left', 'toolbar-right', 'footer'].includes(name)
-    )
+    Object.entries(slots).filter(([name]) => !RESERVED_SLOTS.includes(name))
   )
 )
 
@@ -65,8 +65,8 @@ defineExpose({
 </script>
 
 <template>
-  <AdminTableCard>
-    <template #toolbar>
+  <AdminCard :ui="{ root: 'overflow-scroll' }">
+    <template #header>
       <slot v-if="$slots.toolbar" name="toolbar" />
       <div v-else class="flex flex-wrap items-center justify-between">
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -84,22 +84,24 @@ defineExpose({
       </div>
     </template>
 
-    <UTable
-      ref="table"
-      v-model:pagination="pagination"
-      v-model:column-pinning="columnPinning"
-      :pagination-options="{ getPaginationRowModel: paginationRowModel }"
-      :data="data"
-      :columns="columns"
-      :loading="loading"
-      :ui="mergedTableUi"
-      :class="tableClass"
-      v-bind="$attrs"
-    >
-      <template v-for="(_, name) in filteredSlots" :key="name" #[name]="slotData">
-        <slot :name="name" v-bind="slotData ?? {}" />
-      </template>
-    </UTable>
+    <div class="overflow-x-auto">
+      <UTable
+        ref="table"
+        v-model:pagination="pagination"
+        v-model:column-pinning="columnPinning"
+        :pagination-options="{ getPaginationRowModel: paginationRowModel }"
+        :data="data"
+        :columns="columns"
+        :loading="loading"
+        :ui="mergedTableUi"
+        :class="tableClass"
+        v-bind="$attrs"
+      >
+        <template v-for="(_, name) in forwardedSlots" :key="name" #[name]="slotData">
+          <slot :name="name" v-bind="slotData ?? {}" />
+        </template>
+      </UTable>
+    </div>
 
     <template #footer>
       <slot v-if="$slots.footer" name="footer" :pagination="pagination" />
@@ -112,5 +114,5 @@ defineExpose({
         @update:page-size="(s) => (pagination = { ...pagination, pageSize: s, pageIndex: 0 })"
       />
     </template>
-  </AdminTableCard>
+  </AdminCard>
 </template>
