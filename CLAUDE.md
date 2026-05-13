@@ -80,6 +80,28 @@ async function onSave() {
 
 ---
 
+## Text Color
+
+Untuk styling teks, pilih sesuai hirarki — **jangan asal hard-code grayscale**.
+
+| Hirarki                  | Class                               | Kapan dipakai                                              |
+| ------------------------ | ----------------------------------- | ---------------------------------------------------------- |
+| Body / heading (default) | _(tanpa class)_                     | Inherit dari body. Jangan tulis `text-slate-900` dsb.      |
+| Sekunder / muted         | `text-muted` (Nuxt UI semantic)     | Paragraf pendukung, deskripsi sekunder.                    |
+| Metadata / caption       | `text-dimmed` (Nuxt UI semantic)    | Caption, timestamp, helper text, role di bawah nama.       |
+| Fallback grayscale       | `text-slate-500` / `text-slate-400` | Hanya kalau semantic tidak cocok atau perlu tone spesifik. |
+
+- **Hover state** tetap perlu class eksplisit (override default), mis. `hover:text-slate-900`.
+- **Background & border** tetap eksplisit (`bg-slate-900`, `border-slate-200`) — aturan ini hanya untuk teks.
+- Prioritaskan semantic (`text-muted`, `text-dimmed`) di atas hard-coded grayscale — auto-adjust dgn theme dan menyampaikan _intent_ hirarki.
+
+**Mental check sebelum hard-code `text-slate-*`:**
+
+1. "Kalau class warna ini dihapus, apakah teksnya kelihatan beda?" Kalau enggak → hapus.
+2. "Bisakah `text-muted` / `text-dimmed` menggantikan ini?" Kalau bisa → pakai semantic.
+
+---
+
 ## Performance & Hydration
 
 - Prefix with `Lazy` to defer heavy component load: `<LazyHeavyTable />`
@@ -117,6 +139,7 @@ async function onSave() {
 - Shared constants → `app/utils/`; reusable stateful logic → `app/composables/`
 - Shared form templates → separate component with `defineModel` + `defineExpose`
 - Comments: remove obvious ones; keep only those explaining non-obvious _why_
+- Catch parameter: always `catch (error: unknown)` — typed and readable. Never `catch (e: any)`, `catch (e)` (untyped), atau campur penamaan `e` vs `error`. Pakai `getApiErrorMessage(error)` (lihat `app/utils/index.ts`) untuk ekstrak pesan.
 - **DRY**: before writing new logic, check if a composable or util already covers it
 - **YAGNI**: don't add features, abstractions, or config options not explicitly required
 - **Single Responsibility**: one composable/component = one concern; split when a file grows large
@@ -151,6 +174,7 @@ async function onSave() {
 
 - Using advanced or unfamiliar Nuxt features → `mcp__plugin_nuxt-v4_nuxt__*`
 - Using non-common Nuxt UI components (DataTable, Dashboard layout, CommandPalette, etc.) → `mcp__plugin_nuxt-ui-v4_nuxt-ui__*`
+- Sebelum membangun halaman public/marketing baru: cek Nuxt UI layout components dulu (`UContainer`, `UPageHero`, `UPageSection`, `UPageHeader`, `UPageCTA`, `UPageGrid`, `UPageFeature`) via `mcp__plugin_nuxt-ui-v4_nuxt-ui__search-components` sebelum menulis `<div class="max-w-7xl mx-auto ...">` manual. Untuk halaman admin biasanya tidak relevan.
 
 ---
 
