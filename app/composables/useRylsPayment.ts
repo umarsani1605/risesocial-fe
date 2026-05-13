@@ -13,15 +13,9 @@ interface TransactionResponse {
   token?: string
 }
 
-interface SnapCallbacks {
-  onSuccess?: (result: Record<string, unknown>) => void
-  onPending?: (result: Record<string, unknown>) => void
-  onError?: (error: Record<string, unknown>) => void
-  onClose?: () => void
-}
-
 export const useRylsPayment = () => {
   const { api } = useApi()
+  const { openSnapEmbed } = useMidtransPayment()
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -50,39 +44,13 @@ export const useRylsPayment = () => {
       return res.data
     }
     catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : 'Failed to create transaction'
+      const errorMessage = getApiErrorMessage(e, 'Failed to create transaction')
       error.value = errorMessage
       throw new Error(errorMessage)
     }
     finally {
       isLoading.value = false
     }
-  }
-
-  const openSnapEmbed = async (token: string, callbacks: SnapCallbacks = {}) => {
-    const snap = await useMidtransSnap()
-    if (!snap) throw new Error('Midtrans payment is not available')
-
-    const containerId = 'snap-container'
-    snap.hide()
-
-    const { onSuccess = () => {}, onPending = () => {}, onError = () => {}, onClose = () => {} } = callbacks
-
-    snap.embed(token, {
-      embedId: containerId,
-      onSuccess: (result) => {
-        onSuccess(result)
-      },
-      onPending: (result) => {
-        onPending(result)
-      },
-      onError: (err) => {
-        onError(err)
-      },
-      onClose: () => {
-        onClose()
-      },
-    })
   }
 
   return {

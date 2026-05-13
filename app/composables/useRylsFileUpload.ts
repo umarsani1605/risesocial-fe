@@ -63,8 +63,7 @@ export const useRylsFileUpload = () => {
       }
     }
     catch (error: unknown) {
-      const err = error as { data?: { message?: string } }
-      uploadError.value = err.data?.message || 'Upload failed'
+      uploadError.value = getApiErrorMessage(error, 'Upload failed')
       return null
     }
     finally {
@@ -96,8 +95,7 @@ export const useRylsFileUpload = () => {
       }
     }
     catch (error: unknown) {
-      const err = error as { data?: { message?: string } }
-      uploadError.value = err.data?.message || 'Upload failed'
+      uploadError.value = getApiErrorMessage(error, 'Upload failed')
       return null
     }
     finally {
@@ -133,8 +131,7 @@ export const useRylsFileUpload = () => {
       }
     }
     catch (error: unknown) {
-      const err = error as { data?: { message?: string } }
-      uploadError.value = err.data?.message || 'Payment proof upload failed'
+      uploadError.value = getApiErrorMessage(error, 'Payment proof upload failed')
       return null
     }
     finally {

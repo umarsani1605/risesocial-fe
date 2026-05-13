@@ -33,15 +33,9 @@ interface EnrollmentCheckResponse {
   transaction_code?: string | null
 }
 
-interface SnapCallbacks {
-  onSuccess?: (result: Record<string, unknown>) => void
-  onPending?: (result: Record<string, unknown>) => void
-  onError?: (error: Record<string, unknown>) => void
-  onClose?: () => void
-}
-
 export const useAcademyPayment = () => {
   const { api } = useApi()
+  const { openSnapEmbed } = useMidtransPayment()
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -61,38 +55,12 @@ export const useAcademyPayment = () => {
 
       return res.data
     } catch (e: unknown) {
-      const message = (e as any)?.data?.message ?? (e instanceof Error ? e.message : 'Failed to create enrollment')
+      const message = getApiErrorMessage(e, 'Failed to create enrollment')
       error.value = message
       throw new Error(message)
     } finally {
       isLoading.value = false
     }
-  }
-
-  const openSnapEmbed = async (token: string, callbacks: SnapCallbacks = {}) => {
-    const snap = await useMidtransSnap()
-    if (!snap) throw new Error('Midtrans payment is not available')
-
-    const containerId = 'snap-container'
-    snap.hide()
-
-    const { onSuccess = () => {}, onPending = () => {}, onError = () => {}, onClose = () => {} } = callbacks
-
-    snap.embed(token, {
-      embedId: containerId,
-      onSuccess: (result) => {
-        onSuccess(result)
-      },
-      onPending: (result) => {
-        onPending(result)
-      },
-      onError: (err) => {
-        onError(err)
-      },
-      onClose: () => {
-        onClose()
-      }
-    })
   }
 
   const checkPaymentStatus = async (enrollmentId: number): Promise<PaymentStatusResponse> => {

@@ -87,7 +87,7 @@ const createPaypalTransaction = async (e: Event) => {
     store.setMidtransData(null as unknown as Record<string, unknown>)
   } catch (error: unknown) {
     store.setPaymentStatus('FAILED')
-    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+    toast.add({ title: getApiErrorMessage(error, 'An error occurred'), color: 'error' })
     resetFileInput()
   } finally {
     validationError.value = false

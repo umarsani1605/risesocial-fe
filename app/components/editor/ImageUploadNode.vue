@@ -40,7 +40,7 @@ async function onFileChange() {
       .setImage({ src: result.url || `/images/${result.pathname}` })
       .run()
   } catch (e) {
-    error.value = (e as Error & { data: { message: string } }).data.message || 'An unknown error occurred'
+    error.value = getApiErrorMessage(e, 'An unknown error occurred')
   } finally {
     loading.value = false
   }

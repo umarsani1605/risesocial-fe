@@ -56,7 +56,7 @@ export const useRylsDraft = () => {
       return response?.success === true
     }
     catch (error: unknown) {
-      draftError.value = error instanceof Error ? error.message : 'An error occurred'
+      draftError.value = getApiErrorMessage(error, 'An error occurred')
       return false
     }
     finally {
@@ -81,7 +81,7 @@ export const useRylsDraft = () => {
       return null
     }
     catch (error: unknown) {
-      draftError.value = error instanceof Error ? error.message : 'An error occurred'
+      draftError.value = getApiErrorMessage(error, 'An error occurred')
       resumeToken.value = null
       return null
     }

@@ -141,7 +141,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     )
   }
   catch (error: unknown) {
-    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+    toast.add({ title: getApiErrorMessage(error, 'An error occurred'), color: 'error' })
     return
   }
   finally {

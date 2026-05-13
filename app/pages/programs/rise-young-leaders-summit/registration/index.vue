@@ -126,7 +126,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     await saveDraft(1, { step1: values }, values.email, values.scholarshipType)
   }
   catch (error: unknown) {
-    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+    toast.add({ title: getApiErrorMessage(error, 'An error occurred'), color: 'error' })
     return
   }
   finally {

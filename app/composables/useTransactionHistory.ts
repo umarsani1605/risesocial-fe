@@ -22,7 +22,7 @@ export const useTransactionHistory = () => {
       const res = await api<PaginatedResponse<UserTransaction>>(`/payments/transactions${qs ? `?${qs}` : ''}`)
       return res
     } catch (e: unknown) {
-      const message = (e as any)?.data?.message ?? 'Failed to load transactions'
+      const message = getApiErrorMessage(e, 'Failed to load transactions')
       error.value = message
       throw new Error(message)
     } finally {
@@ -38,7 +38,7 @@ export const useTransactionHistory = () => {
       const res = await api<ApiResponse<UserTransactionDetail>>(`/payments/transactions/${transactionCode}`)
       return res.data
     } catch (e: unknown) {
-      const message = (e as any)?.data?.message ?? 'Failed to load transaction detail'
+      const message = getApiErrorMessage(e, 'Failed to load transaction detail')
       error.value = message
       throw new Error(message)
     } finally {
