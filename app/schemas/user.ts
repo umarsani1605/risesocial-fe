@@ -1,12 +1,17 @@
 import { z } from 'zod'
 
+// Backend Fastify enforces min 6 on password — keep frontend in sync.
+export const PASSWORD_MIN_LENGTH = 6 as const
+
+const passwordMinMessage = `Password must be at least ${PASSWORD_MIN_LENGTH} characters`
+
 // Admin: Create User — semua field required
 export const userCreateSchema = z
   .object({
     first_name: z.string().min(1, 'First name is required'),
     last_name: z.string().min(1, 'Last name is required'),
     email: z.email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string().min(PASSWORD_MIN_LENGTH, passwordMinMessage),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -22,11 +27,11 @@ export const userEditSchema = z
     email: z.email('Invalid email address'),
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
-    role: z.enum(['user', 'admin']).optional(),
+    role: z.enum(['user', 'admin'], { error: 'Role must be user or admin' }).optional(),
   })
   .refine(
-    (data) => !data.password || data.password.length >= 6,
-    { message: 'Password must be at least 6 characters', path: ['password'] }
+    (data) => !data.password || data.password.length >= PASSWORD_MIN_LENGTH,
+    { message: passwordMinMessage, path: ['password'] }
   )
   .refine(
     (data) => !data.password || data.password === data.confirmPassword,
@@ -48,10 +53,10 @@ export const userAccountSchema = z.object({
   current_company: z.string().optional(),
 })
 
-// Dashboard: Security — password + repeat required, min 6 (sesuai backend)
+// Dashboard: Security — password + repeat required
 export const userPasswordSchema = z
   .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string().min(PASSWORD_MIN_LENGTH, passwordMinMessage),
     repeatPassword: z.string().min(1, 'Please confirm your password'),
   })
   .refine((data) => data.password === data.repeatPassword, {

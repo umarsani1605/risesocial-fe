@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import { PASSWORD_MIN_LENGTH } from '~/schemas/user'
 
 definePageMeta({
   layout: 'auth',
@@ -39,7 +40,7 @@ const fields: AuthFormField[] = [
 
 const schema = z.object({
   email: z.email('Invalid email'),
-  password: z.string('Password is required').min(8, 'Must be at least 8 characters')
+  password: z.string('Password is required').min(PASSWORD_MIN_LENGTH, `Must be at least ${PASSWORD_MIN_LENGTH} characters`)
 })
 
 type Schema = z.output<typeof schema>
