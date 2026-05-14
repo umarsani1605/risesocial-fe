@@ -34,6 +34,16 @@ if (!pricing.value) {
   throw createError({ statusCode: 404, statusMessage: 'Pricing tier not found' })
 }
 
+let metaPixelProxy: ReturnType<typeof useScriptMetaPixel>['proxy'] | undefined
+if (academy.value.pixel_id) {
+  try {
+    const { proxy } = useScriptMetaPixel({ id: academy.value.pixel_id })
+    metaPixelProxy = proxy
+  } catch {
+    // meta pixel script unavailable
+  }
+}
+
 useSeoMeta({
   title: computed(() => `Payment - ${academy.value.title} - Rise Social`)
 })
@@ -53,6 +63,14 @@ const transactionCode = ref<string | null>(null)
 
 // Check if already enrolled
 onMounted(async () => {
+  metaPixelProxy?.fbq('track', 'InitiateCheckout', {
+    content_ids: [String(pricing.value!.id)],
+    content_name: academy.value.title,
+    content_type: 'product',
+    value: pricing.value!.discount_price,
+    currency: 'IDR'
+  })
+
   let hasPendingPayment = false
   try {
     const result = await checkEnrollment(academy.value.id)
@@ -89,6 +107,13 @@ const onPay = async () => {
         if (transactionCode.value)
           await syncTransactionStatus(transactionCode.value).catch(() => {})
         paymentStatus.value = 'paid'
+        metaPixelProxy?.fbq('track', 'Purchase', {
+          content_ids: [String(pricing.value!.id)],
+          content_name: academy.value.title,
+          content_type: 'product',
+          value: pricing.value!.discount_price,
+          currency: 'IDR'
+        })
         toast.add({ title: 'Enrollment successful', color: 'success' })
       },
       onPending: async () => {

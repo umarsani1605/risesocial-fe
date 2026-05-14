@@ -29,6 +29,25 @@ if (academyData.value.data.status !== 'ACTIVE') {
 
 const academy = computed(() => academyData.value!.data)
 
+let metaPixelProxy: ReturnType<typeof useScriptMetaPixel>['proxy'] | undefined
+if (academy.value.pixel_id) {
+  try {
+    const { proxy } = useScriptMetaPixel({ id: academy.value.pixel_id })
+    metaPixelProxy = proxy
+  } catch {
+    // meta pixel script unavailable
+  }
+}
+
+onMounted(() => {
+  metaPixelProxy?.fbq('track', 'ViewContent', {
+    content_name: academy.value.title,
+    content_category: 'Academy',
+    content_ids: [String(academy.value.id)],
+    content_type: 'product'
+  })
+})
+
 useSeoMeta({
   title: computed(() => `${academy.value.title} - Rise Sustainability Academy - Rise Social`),
   description: computed(() => academy.value.description)
