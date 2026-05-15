@@ -72,7 +72,6 @@ const onEnroll = () => {
         label="Enroll Now"
         color="primary"
         size="lg"
-        :disabled="academy.has_cohort === false"
         class="flex items-center justify-center w-full rounded-lg"
         @click="onEnroll"
       />

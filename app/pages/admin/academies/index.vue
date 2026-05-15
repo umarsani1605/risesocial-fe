@@ -17,10 +17,6 @@ const { data: rawAcademies, refresh, pending: isAcademiesPending } = await useAs
   api<ApiResponse<AdminAcademy[]>>('/admin/academies')
 )
 
-const deleteTarget = ref<AdminAcademy | null>(null)
-const isDeleteOpen = ref(false)
-const isDeleting = ref(false)
-
 const createModalOpen = ref(false)
 const isCreating = ref(false)
 const createForm = reactive({ title: '', description: '', duration: '', format: '', category: '' })
@@ -54,27 +50,6 @@ async function onCreateAcademy() {
 function openCreateModal() {
   Object.assign(createForm, { title: '', description: '', duration: '', format: '', category: '' })
   createModalOpen.value = true
-}
-
-function confirmDelete(academy: AdminAcademy) {
-  deleteTarget.value = academy
-  isDeleteOpen.value = true
-}
-
-async function onDelete() {
-  if (!deleteTarget.value) return
-  isDeleting.value = true
-  try {
-    await api(`/admin/academies/${deleteTarget.value.id}`, { method: 'DELETE' })
-    toast.add({ title: 'Academy deleted', color: 'success' })
-    isDeleteOpen.value = false
-    deleteTarget.value = null
-    await refresh()
-  } catch (error: unknown) {
-    toast.add({ title: getApiErrorMessage(error), color: 'error' })
-  } finally {
-    isDeleting.value = false
-  }
 }
 
 const categoryOptions = computed(() => {
@@ -146,24 +121,14 @@ const columns: TableColumn<AdminAcademy>[] = [
     header: () => h('div', 'Actions'),
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
-      h('div', { class: 'flex items-center gap-2' }, [
-        h(UButton, {
-          label: 'Edit',
-          size: 'sm',
-          color: 'primary',
-          variant: 'light',
-          leadingIcon: 'i-ph-pencil-simple-bold',
-          to: `/admin/academies/${row.original.slug}/edit`
-        }),
-        canEdit('admin.academy') && h(UButton, {
-          label: 'Delete',
-          size: 'sm',
-          color: 'error',
-          variant: 'light',
-          leadingIcon: 'i-ph-trash-simple-bold',
-          onClick: () => confirmDelete(row.original)
-        })
-      ].filter(Boolean))
+      h(UButton, {
+        label: 'Edit',
+        size: 'sm',
+        color: 'primary',
+        variant: 'light',
+        leadingIcon: 'i-ph-pencil-simple-bold',
+        to: `/admin/academies/${row.original.slug}/edit`
+      })
   }
 ]
 </script>
@@ -206,12 +171,5 @@ const columns: TableColumn<AdminAcademy>[] = [
     v-model:form="createForm"
     :loading="isCreating"
     @submit="onCreateAcademy"
-  />
-
-  <AdminConfirmDeleteModal
-    v-model:open="isDeleteOpen"
-    :item-name="deleteTarget?.title"
-    :loading="isDeleting"
-    @confirm="onDelete"
   />
 </template>

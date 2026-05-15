@@ -49,6 +49,7 @@ const headerMenuItems = computed<DropdownMenuItem[][]>(() => [
       label: 'Delete Academy',
       icon: 'i-ph-trash-bold',
       color: 'error' as const,
+      disabled: source.has_cohort,
       onSelect: () => {
         isDeleteOpen.value = true
       }
@@ -242,35 +243,49 @@ async function onDelete() {
 
 <template>
   <div class="flex flex-col flex-1 min-h-0">
-    <div class="flex items-center justify-between gap-4 px-1 shrink-0 mb-6">
-      <div class="flex items-center gap-4 min-w-0">
-        <UButton
-          icon="i-ph-arrow-left-bold"
-          color="neutral"
-          variant="ghost"
-          to="/admin/academies"
-        />
-        <h2 class="text-xl font-semibold truncate">Edit {{ pageTitle }}</h2>
-        <UBadge
-          :color="
-            currentStatus === 'ACTIVE'
-              ? 'success'
-              : currentStatus === 'ARCHIVED'
-                ? 'neutral'
-                : 'primary'
-          "
-          variant="subtle"
-          size="lg"
-          :label="
-            currentStatus === 'ACTIVE'
-              ? 'Active'
-              : currentStatus === 'ARCHIVED'
-                ? 'Archived'
-                : 'Draft'
-          "
-        />
+    <div
+      class="mb-6 flex shrink-0 flex-col gap-3 px-1 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div class="flex min-w-0 items-center justify-between gap-3 sm:gap-4 lg:justify-start">
+        <div class="flex min-w-0 items-center gap-3 sm:gap-4">
+          <UButton
+            icon="i-ph-arrow-left-bold"
+            color="neutral"
+            variant="ghost"
+            to="/admin/academies"
+          />
+          <h2 class="min-w-0 truncate text-lg font-semibold sm:text-xl">Edit {{ pageTitle }}</h2>
+          <UBadge
+            :color="
+              currentStatus === 'ACTIVE'
+                ? 'success'
+                : currentStatus === 'ARCHIVED'
+                  ? 'neutral'
+                  : 'primary'
+            "
+            variant="subtle"
+            size="lg"
+            :label="
+              currentStatus === 'ACTIVE'
+                ? 'Active'
+                : currentStatus === 'ARCHIVED'
+                  ? 'Archived'
+                  : 'Draft'
+            "
+          />
+        </div>
+        <UDropdownMenu :items="headerMenuItems">
+          <UButton
+            icon="i-ph-dots-three-vertical-bold"
+            color="neutral"
+            variant="light"
+            class="shrink-0 lg:hidden"
+          />
+        </UDropdownMenu>
       </div>
-      <div class="flex items-center justify-center gap-4">
+      <div
+        class="hidden w-full flex-wrap items-center gap-2 sm:gap-3 lg:flex lg:w-auto lg:justify-end"
+      >
         <UButton
           v-if="currentStatus === 'ACTIVE'"
           label="View Public Page"
@@ -280,6 +295,7 @@ async function onDelete() {
           variant="link"
           :to="`/academy/${academySlug}`"
           target="_blank"
+          class="w-full justify-center sm:w-auto"
         />
         <UButton
           v-if="currentStatus === 'ACTIVE'"
@@ -289,6 +305,7 @@ async function onDelete() {
           :loading="isSwitchingToDraft"
           :disabled="isSwitchingToDraft"
           @click="onSwitchToDraft"
+          class="flex-1 justify-center sm:flex-none"
         />
         <UButton
           :label="saveButtonLabel"
@@ -296,9 +313,15 @@ async function onDelete() {
           :loading="isHeaderSaving || isValidating"
           :disabled="isHeaderSaving || isValidating"
           @click="onHeaderSave"
+          class="justify-center"
         />
         <UDropdownMenu :items="headerMenuItems">
-          <UButton icon="i-ph-dots-three-vertical-bold" color="neutral" variant="light" />
+          <UButton
+            icon="i-ph-dots-three-vertical-bold"
+            color="neutral"
+            variant="light"
+            class="shrink-0"
+          />
         </UDropdownMenu>
       </div>
     </div>
@@ -317,29 +340,34 @@ async function onDelete() {
     >
       <template #information>
         <div class="relative flex h-full">
-          <div ref="scrollContainerRef" class="flex-1 overflow-y-auto py-6">
-            <div class="pr-64 space-y-6">
-              <UAlert
-                v-if="currentStatus === 'ACTIVE' && !source.has_cohort"
-                color="primary"
-                variant="subtle"
-                icon="i-ph-info-bold"
-                title="No cohort available"
-                description="This academy will appear on the public page but cannot accept payments until there is at least one available cohort."
-              />
-              <div class="absolute w-56 top-0 right-4 shrink-0 overflow-y-auto">
+          <div ref="scrollContainerRef" class="flex-1 overflow-y-auto py-4 sm:py-6">
+            <div class="space-y-6 xl:pr-64">
+              <div class="xl:hidden -mx-1 overflow-x-auto pb-1">
+                <div class="flex min-w-max gap-2 px-1">
+                  <UButton
+                    v-for="item in tocItems"
+                    :key="item.label"
+                    :label="item.label"
+                    :color="item.active ? 'primary' : 'neutral'"
+                    :variant="item.active ? 'subtle' : 'ghost'"
+                    class="shrink-0"
+                    @click="item.onSelect?.()"
+                  />
+                </div>
+              </div>
+              <div class="absolute top-0 right-4 hidden w-56 shrink-0 overflow-y-auto xl:block">
                 <div class="border border-default rounded-lg mt-6 p-4">
                   <UNavigationMenu orientation="vertical" :items="tocItems" />
                 </div>
               </div>
-              <div id="section-basic" class="space-y-6 border border-default rounded-lg p-6">
+              <div id="section-basic" class="border border-default rounded-lg p-6">
                 <UForm
                   :schema="academyFormSchema"
                   :state="form"
                   @submit="onSectionSave"
                   :validate-on="['submit']"
                 >
-                  <div class="flex items-center justify-between mb-6">
+                  <div class="mb-6 flex items-center justify-between gap-3">
                     <h3 class="text-lg font-semibold">Basic Information</h3>
                     <UButton
                       type="submit"
@@ -347,6 +375,7 @@ async function onDelete() {
                       color="primary"
                       :loading="isSectionSaving"
                       :disabled="isSectionSaving"
+                      class="shrink-0"
                     />
                   </div>
                   <AdminAcademyFormBasicInfo
@@ -357,31 +386,31 @@ async function onDelete() {
                 </UForm>
               </div>
 
-              <div id="section-pricing" class="space-y-6 border border-default rounded-lg p-6">
+              <div id="section-pricing" class="border border-default rounded-lg">
                 <AdminAcademySectionPricing
                   :academy-id="source.id"
                   :initial-data="source.pricing ?? []"
                 />
               </div>
-              <div id="section-features" class="space-y-6 border border-default rounded-lg p-6">
+              <div id="section-features" class="border border-default rounded-lg">
                 <AdminAcademySectionFeatures
                   :academy-id="source.id"
                   :initial-data="source.features ?? []"
                 />
               </div>
-              <div id="section-instructors" class="space-y-6 border border-default rounded-lg p-6">
+              <div id="section-instructors" class="border border-default rounded-lg">
                 <AdminAcademySectionInstructors
                   :academy-id="source.id"
                   :initial-data="source.instructors ?? []"
                 />
               </div>
-              <div id="section-testimonials" class="space-y-6 border border-default rounded-lg p-6">
+              <div id="section-testimonials" class="border border-default rounded-lg">
                 <AdminAcademySectionTestimonials
                   :academy-id="source.id"
                   :initial-data="source.testimonials ?? []"
                 />
               </div>
-              <div id="section-faqs" class="space-y-6 border border-default rounded-lg p-6">
+              <div id="section-faqs" class="border border-default rounded-lg">
                 <AdminAcademySectionFaqs
                   :academy-id="source.id"
                   :initial-data="source.faqs ?? []"
@@ -411,6 +440,19 @@ async function onDelete() {
         </div>
       </template>
     </UTabs>
+
+    <div
+      class="sticky bottom-0 z-20 border-t border-default bg-default/95 p-3 backdrop-blur lg:hidden"
+    >
+      <UButton
+        :label="saveButtonLabel"
+        color="primary"
+        block
+        :loading="isHeaderSaving || isValidating"
+        :disabled="isHeaderSaving || isValidating"
+        @click="onHeaderSave"
+      />
+    </div>
 
     <UModal
       v-model:open="isArchiveConfirmOpen"

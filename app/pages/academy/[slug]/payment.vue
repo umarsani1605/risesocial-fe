@@ -71,7 +71,6 @@ onMounted(async () => {
     currency: 'IDR'
   })
 
-  let hasPendingPayment = false
   try {
     const result = await checkEnrollment(academy.value.id)
     if (result.enrolled) {
@@ -79,14 +78,8 @@ onMounted(async () => {
       router.replace(`/academy/${academySlug}`)
       return
     }
-    hasPendingPayment = result.hasPendingPayment ?? false
   } catch {
     // silently fail
-  }
-
-  if (!hasPendingPayment && academy.value.has_cohort === false) {
-    toast.add({ title: 'No enrollment batch available for this academy', color: 'warning' })
-    router.replace(`/academy/${academySlug}`)
   }
 })
 
