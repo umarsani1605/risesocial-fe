@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { AdminCohort } from '@/types'
 import type { TableColumn } from '@nuxt/ui'
-import { COHORT_STATUS_LABEL, COHORT_STATUS_COLOR } from '@/constants/cohort'
+import { COHORT_PHASE_LABEL, COHORT_PHASE_COLOR } from '@/constants/cohort'
+import { getCohortPhase } from '@/utils/cohort'
 
 const props = defineProps<{
   academyId: number
@@ -88,8 +89,8 @@ const columns: TableColumn<AdminCohort>[] = [
           <span class="text-sm">{{ row.original.enrollment_count ?? 0 }}</span>
         </template>
         <template #status-cell="{ row }">
-          <UBadge :color="COHORT_STATUS_COLOR[row.original.status] ?? 'neutral'" variant="subtle">
-            {{ COHORT_STATUS_LABEL[row.original.status] ?? row.original.status }}
+          <UBadge :color="COHORT_PHASE_COLOR[getCohortPhase(row.original)] ?? 'neutral'" variant="subtle">
+            {{ COHORT_PHASE_LABEL[getCohortPhase(row.original)] }}
           </UBadge>
         </template>
         <template #actions-cell="{ row }">

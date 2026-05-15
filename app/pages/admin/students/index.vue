@@ -26,7 +26,7 @@ const enrollments = computed(() => rawData.value?.data ?? [])
 // ── Filters ──────────────────────────────────────────────────
 const search = ref('')
 const academyFilter = ref('all')
-const assignmentFilter = ref<'all' | 'unassigned' | 'assigned'>('all')
+const assignmentFilter = ref<'all' | 'unassigned' | 'assigned' | 'completed'>('all')
 
 const academyOptions = computed(() => {
   const seen = new Map<number, string>()
@@ -38,8 +38,13 @@ const academyOptions = computed(() => {
 })
 
 const totalCount = computed(() => enrollments.value.length)
-const unassignedCount = computed(() => enrollments.value.filter((e) => !e.placement).length)
-const assignedCount = computed(() => enrollments.value.filter((e) => !!e.placement).length)
+const unassignedCount = computed(
+  () => enrollments.value.filter((e) => !e.completed_at && !e.placement).length
+)
+const assignedCount = computed(
+  () => enrollments.value.filter((e) => !e.completed_at && !!e.placement).length
+)
+const completedCount = computed(() => enrollments.value.filter((e) => !!e.completed_at).length)
 
 const assignmentTabItems = computed(() => [
   {
@@ -48,14 +53,19 @@ const assignmentTabItems = computed(() => [
     icon: 'i-ph-users-duotone'
   },
   {
+    label: `Not Assigned (${unassignedCount.value})`,
+    value: 'unassigned',
+    icon: 'i-ph-user-circle-minus-duotone'
+  },
+  {
     label: `Assigned (${assignedCount.value})`,
     value: 'assigned',
     icon: 'i-ph-user-circle-check-duotone'
   },
   {
-    label: `Not Assigned (${unassignedCount.value})`,
-    value: 'unassigned',
-    icon: 'i-ph-user-circle-minus-duotone'
+    label: `Completed (${completedCount.value})`,
+    value: 'completed',
+    icon: 'i-ph-graduation-cap-duotone'
   }
 ])
 
@@ -63,9 +73,11 @@ const filteredData = computed(() => {
   let result = [...enrollments.value]
 
   if (assignmentFilter.value === 'unassigned') {
-    result = result.filter((e) => !e.placement)
+    result = result.filter((e) => !e.completed_at && !e.placement)
   } else if (assignmentFilter.value === 'assigned') {
-    result = result.filter((e) => !!e.placement)
+    result = result.filter((e) => !e.completed_at && !!e.placement)
+  } else if (assignmentFilter.value === 'completed') {
+    result = result.filter((e) => !!e.completed_at)
   }
 
   if (academyFilter.value !== 'all') {
@@ -235,10 +247,10 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
     id: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const isAssigned = !!row.original.placement
-      return h(UBadge, { variant: 'subtle', color: isAssigned ? 'success' : 'warning' }, () =>
-        isAssigned ? 'Assigned' : 'Not Assigned'
-      )
+      const e = row.original
+      const label = e.completed_at ? 'Completed' : e.placement ? 'Assigned' : 'Not Assigned'
+      const color = e.completed_at ? 'primary' : e.placement ? 'success' : 'warning'
+      return h(UBadge, { variant: 'subtle', color }, () => label)
     }
   },
   {

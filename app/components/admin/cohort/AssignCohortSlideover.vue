@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { COHORT_STATUS_COLOR, COHORT_STATUS_LABEL } from '~/constants/cohort'
+import { COHORT_PHASE_COLOR, COHORT_PHASE_LABEL } from '~/constants/cohort'
+import { getCohortPhase } from '~/utils/cohort'
 
 const props = defineProps<{
   open: boolean
@@ -149,8 +150,8 @@ function selectCohort(id: number) {
                     />
                   </div>
                   <UBadge
-                    :label="COHORT_STATUS_LABEL[cohort.status] ?? cohort.status"
-                    :color="COHORT_STATUS_COLOR[cohort.status] ?? 'neutral'"
+                    :label="COHORT_PHASE_LABEL[getCohortPhase(cohort)]"
+                    :color="COHORT_PHASE_COLOR[getCohortPhase(cohort)] ?? 'neutral'"
                     variant="subtle"
                     class="shrink-0"
                   />

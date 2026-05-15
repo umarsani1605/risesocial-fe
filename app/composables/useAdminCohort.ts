@@ -14,19 +14,9 @@ export function useAdminCohort(cohortId: string) {
   const editCohortForm = reactive({
     name: '',
     description: '',
-    status: 'not_started' as AdminCohortDetail['status'],
     start_date: '',
     end_date: '',
   })
-
-  function hydrateEditForm() {
-    if (!detail.value) return
-    editCohortForm.name = detail.value.name
-    editCohortForm.description = detail.value.description ?? ''
-    editCohortForm.status = detail.value.status
-    editCohortForm.start_date = detail.value.start_date?.split('T')[0] ?? ''
-    editCohortForm.end_date = detail.value.end_date?.split('T')[0] ?? ''
-  }
 
   async function onEditCohort() {
     isEditingCohort.value = true
@@ -36,7 +26,6 @@ export function useAdminCohort(cohortId: string) {
         body: {
           name: editCohortForm.name,
           description: editCohortForm.description || null,
-          status: editCohortForm.status,
           start_date: editCohortForm.start_date,
           end_date: editCohortForm.end_date,
         }
@@ -72,7 +61,6 @@ export function useAdminCohort(cohortId: string) {
     // edit + delete cohort
     editCohortForm,
     isEditingCohort,
-    hydrateEditForm,
     onEditCohort,
     isDeleteCohortOpen,
     isDeletingCohort,

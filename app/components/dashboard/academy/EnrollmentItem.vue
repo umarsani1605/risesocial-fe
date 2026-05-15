@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CohortEnrollment } from '@/types'
+import { getCohortPhase } from '@/utils/cohort'
 
 const props = defineProps<{
   enrollment: CohortEnrollment
@@ -14,6 +15,8 @@ const progressPercentage = computed(() => {
   if (!props.enrollment.total_modules) return 0
   return Math.round((props.enrollment.completed_modules / props.enrollment.total_modules) * 100)
 })
+
+const cohortPhase = computed(() => (props.enrollment.cohort ? getCohortPhase(props.enrollment.cohort) : null))
 </script>
 
 <template>
@@ -61,13 +64,13 @@ const progressPercentage = computed(() => {
         >
           <span class="line-clamp-2">{{ academy?.title }}</span>
           <UIcon
-            v-if="enrollment.cohort.status === 'completed'"
+            v-if="cohortPhase === 'completed'"
             name="i-ph-check-circle-fill"
             class="size-4 text-success shrink-0"
           />
         </p>
 
-        <template v-if="enrollment.cohort.status === 'ongoing'">
+        <template v-if="cohortPhase === 'ongoing'">
           <div class="mt-1 flex flex-col gap-2">
             <UProgress :model-value="progressPercentage" color="primary" />
             <div class="flex items-center justify-between">
@@ -83,7 +86,7 @@ const progressPercentage = computed(() => {
           </div>
         </template>
 
-        <template v-else-if="enrollment.cohort.status === 'not_started'">
+        <template v-else-if="cohortPhase === 'not_started'">
           <p class="text-sm text-dimmed">
             Starts on {{ formatDate(enrollment.cohort.start_date) }}
           </p>

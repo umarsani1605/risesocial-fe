@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { AdminCohort, AdminAcademy } from '@/types'
-import { COHORT_STATUS_LABEL, COHORT_STATUS_COLOR, COHORT_STATUS_ITEMS } from '@/constants/cohort'
+import { COHORT_PHASE_LABEL, COHORT_PHASE_COLOR, COHORT_PHASE_ITEMS } from '@/constants/cohort'
+import { getCohortPhase } from '@/utils/cohort'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -38,7 +39,7 @@ const academyOptions = computed(() => [
   ...academies.value.map((a) => ({ label: a.title, value: String(a.id) }))
 ])
 
-const statusOptions = [{ label: 'All Status', value: 'all' }, ...COHORT_STATUS_ITEMS]
+const statusOptions = [{ label: 'All Status', value: 'all' }, ...COHORT_PHASE_ITEMS]
 
 const filteredData = computed(() => {
   let result = [...cohorts.value]
@@ -55,7 +56,7 @@ const filteredData = computed(() => {
     result = result.filter((c) => String(c.academy?.id) === academyFilter.value)
   }
   if (statusFilter.value !== 'all') {
-    result = result.filter((c) => c.status === statusFilter.value)
+    result = result.filter((c) => getCohortPhase(c) === statusFilter.value)
   }
   return result
 })
@@ -101,14 +102,14 @@ const columns: TableColumn<AdminCohort>[] = [
     cell: ({ row }) => h('span', { class: 'text-sm' }, String(row.original.enrollment_count ?? '-'))
   },
   {
-    accessorKey: 'status',
+    id: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const s = row.getValue('status') as string
+      const phase = getCohortPhase(row.original)
       return h(
         UBadge,
-        { variant: 'subtle', color: COHORT_STATUS_COLOR[s] ?? 'neutral' },
-        () => COHORT_STATUS_LABEL[s] ?? s
+        { variant: 'subtle', color: COHORT_PHASE_COLOR[phase] ?? 'neutral' },
+        () => COHORT_PHASE_LABEL[phase]
       )
     }
   },

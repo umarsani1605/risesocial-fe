@@ -4,7 +4,6 @@ import { CalendarDate } from '@internationalized/date'
 const form = defineModel<{
   name: string
   description: string
-  status: AdminCohortDetail['status']
   start_date: string
   end_date: string
 }>({ required: true })

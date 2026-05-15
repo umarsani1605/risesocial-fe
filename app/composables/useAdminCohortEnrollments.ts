@@ -129,7 +129,7 @@ export function useAdminCohortEnrollments(options: UseAdminCohortEnrollmentsOpti
     isLoadingCohorts.value = true
     try {
       const res = await api<ApiResponse<AdminCohortSummary[]>>(
-        `/admin/cohorts?academy_id=${placement.academy_id}&status[]=not_started&status[]=ongoing`
+        `/admin/cohorts?academy_id=${placement.academy_id}&status=not_started&status=ongoing`
       )
       availableCohorts.value = res.data
     } catch (error: unknown) {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { COHORT_STATUS_ITEMS } from '@/constants/cohort'
 import { cohortEditSchema } from '@/schemas/cohort'
 
 const { loading } = defineProps<{
@@ -10,7 +9,6 @@ const open = defineModel<boolean>('open', { required: true })
 const form = defineModel<{
   name: string
   description: string
-  status: AdminCohortDetail['status']
   start_date: string
   end_date: string
 }>('form', { required: true })
@@ -49,9 +47,6 @@ function close() {
             :rows="3"
             class="w-full"
           />
-        </UFormField>
-        <UFormField name="status" label="Status">
-          <USelect v-model="form.status" :items="COHORT_STATUS_ITEMS" class="w-full" />
         </UFormField>
         <div class="grid grid-cols-2 gap-3">
           <UFormField name="start_date" label="Start Date">
