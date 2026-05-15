@@ -51,7 +51,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
     color: 'green'
   },
   {
-    title: 'Active Drafts',
+    title: 'Drafts',
     value: summaryData.data.value?.drafts ?? 0,
     icon: 'i-ph-files-fill',
     color: 'orange'

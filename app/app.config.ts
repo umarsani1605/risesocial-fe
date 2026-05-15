@@ -82,14 +82,14 @@ export default defineAppConfig({
         variant: {
           solid: 'shadow inset-shadow-white/15 inset-shadow-2xs',
           light: 'bg-white border border-default',
-          dashboard: 'rounded-sm' 
+          dashboard: 'rounded-sm'
         },
         size: {
           sm: {
-            base: 'px-3 py-1.5 rounded-lg',
+            base: 'px-3 py-1.5 rounded-lg'
           },
           md: {
-            base: 'px-4 py-1.5 rounded-lg',
+            base: 'px-4 py-1.5 rounded-lg'
           }
         }
       },
@@ -97,7 +97,8 @@ export default defineAppConfig({
         {
           color: 'white',
           variant: 'solid',
-          class: 'text-default bg-white hover:bg-gray-50 active:bg-gray-50 disabled:bg-white aria-disabled:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ring ring-default hover:ring-default/85 shadow-none'
+          class:
+            'text-default bg-white hover:bg-gray-50 active:bg-gray-50 disabled:bg-white aria-disabled:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ring ring-default hover:ring-default/85 shadow-none'
         },
         {
           color: 'primary',
@@ -162,37 +163,44 @@ export default defineAppConfig({
         {
           color: 'primary',
           variant: 'light',
-          class: 'text-gray-500 hover:text-primary hover:bg-primary-50 hover:border-primary-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+          class:
+            'text-gray-500 hover:text-primary hover:bg-primary-50 hover:border-primary-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
         },
         {
           color: 'neutral',
           variant: 'light',
-          class: 'text-gray-500 hover:text-neutral hover:bg-neutral-50 hover:border-neutral-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+          class:
+            'text-gray-500 hover:text-neutral hover:bg-neutral-50 hover:border-neutral-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
         },
         {
           color: 'success',
           variant: 'light',
-          class: 'text-gray-500 hover:text-success hover:bg-success-50 hover:border-success-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+          class:
+            'text-gray-500 hover:text-success hover:bg-success-50 hover:border-success-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
         },
         {
           color: 'warning',
           variant: 'light',
-          class: 'text-gray-500 hover:text-warning hover:bg-warning-50 hover:border-warning-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+          class:
+            'text-gray-500 hover:text-warning hover:bg-warning-50 hover:border-warning-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
         },
         {
           color: 'error',
           variant: 'light',
-          class: 'text-gray-500 hover:text-error hover:bg-error-50 hover:border-error-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+          class:
+            'text-gray-500 hover:text-error hover:bg-error-50 hover:border-error-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
         },
         {
           color: 'info',
           variant: 'light',
-          class: 'text-gray-500 hover:text-info hover:bg-info-50 hover:border-info-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+          class:
+            'text-gray-500 hover:text-info hover:bg-info-50 hover:border-info-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
         },
         {
           color: 'primary',
           variant: 'dashboard',
-          class: 'text-inverted bg-primary hover:bg-primary/75 active:bg-primary/75 disabled:bg-primary aria-disabled:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+          class:
+            'text-inverted bg-primary hover:bg-primary/75 active:bg-primary/75 disabled:bg-primary aria-disabled:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
         }
       ]
     },
@@ -215,7 +223,9 @@ export default defineAppConfig({
     },
     input: {
       slots: {
-        base: ['transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600']
+        base: [
+          'transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600'
+        ]
       },
       compoundVariants: [
         {
@@ -235,7 +245,9 @@ export default defineAppConfig({
     },
     inputTags: {
       slots: {
-        base: ['transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600']
+        base: [
+          'transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600'
+        ]
       },
       compoundVariants: [
         {
@@ -255,7 +267,9 @@ export default defineAppConfig({
     },
     textarea: {
       slots: {
-        base: ['transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-600 read-only:bg-muted read-only:text-gray-600']
+        base: [
+          'transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-600 read-only:bg-muted read-only:text-gray-600'
+        ]
       },
       compoundVariants: [
         {
@@ -330,7 +344,7 @@ export default defineAppConfig({
     },
     pageSection: {
       slots: {
-        container: "py-12 sm:py-12 md:py-16 lg:py-16"
+        container: 'py-12 sm:py-12 md:py-16 lg:py-16'
       }
     },
     navigationMenu: {
@@ -363,7 +377,8 @@ export default defineAppConfig({
     },
     modal: {
       slots: {
-        header: "min-h-[3.75rem]"
+        header: 'min-h-[3.75rem]',
+        footer: 'justify-end'
       },
       variants: {
         overlay: {
@@ -386,6 +401,6 @@ export default defineAppConfig({
       slots: {
         overlay: 'bg-black/50'
       }
-    },
+    }
   }
 })

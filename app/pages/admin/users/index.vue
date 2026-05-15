@@ -14,7 +14,7 @@ const toast = useToast()
 const { canEdit } = useAuth()
 
 const { data: rawUsers, refresh } = await useAsyncData('admin:users', () =>
-  api<ApiResponse<AdminUser[]>>('/admin/users')
+  api<ApiResponse<UserProfile[]>>('/admin/users')
 )
 
 const UButton = resolveComponent('UButton')
@@ -27,7 +27,7 @@ const search = ref('')
 const idFilter = computed(() => (route.query.id ? Number(route.query.id) : null))
 
 const filteredData = computed(() => {
-  let result = (rawUsers.value?.data ?? []).filter((u) => u.role === 'USER')
+  let result = rawUsers.value?.data ?? []
   if (idFilter.value) {
     return result.filter((u) => u.id === idFilter.value)
   }
@@ -90,6 +90,9 @@ async function onCreate() {
 const isEditOpen = ref(false)
 const isSaving = ref(false)
 const editingUser = ref<AdminUser | null>(null)
+const isDetailOpen = ref(false)
+const selectedUserDetail = ref<UserProfile | null>(null)
+const isDetailSaving = ref(false)
 
 const editForm = reactive({
   first_name: '',
@@ -109,6 +112,55 @@ function openEdit(user: AdminUser) {
   editForm.confirmPassword = ''
   editForm.role = user.role.toLowerCase()
   isEditOpen.value = true
+}
+
+function openDetail(user: UserProfile) {
+  selectedUserDetail.value = user
+  isDetailOpen.value = true
+}
+
+function normalizeOptionalText(value: string) {
+  const trimmed = value.trim()
+  return trimmed ? trimmed : null
+}
+
+async function onSaveDetail(form: AdminUserDetailForm) {
+  if (!selectedUserDetail.value) return
+
+  isDetailSaving.value = true
+  try {
+    const body = new FormData()
+    body.append('username', form.username.trim())
+    body.append('first_name', form.first_name.trim())
+    body.append('last_name', form.last_name.trim())
+    body.append('email', form.email.trim())
+    body.append('phone', form.phone.trim())
+    body.append('role', form.role)
+    body.append('gender', form.gender)
+    body.append('country', form.country.trim())
+    body.append('province', form.province.trim())
+    body.append('city', form.city.trim())
+    body.append('last_education', form.last_education.trim())
+    body.append('current_job', form.current_job.trim())
+    body.append('current_company', form.current_company.trim())
+    body.append('avatar', normalizeOptionalText(form.avatar) ?? '')
+    if (form.avatarFile) {
+      body.append('image', form.avatarFile)
+    }
+
+    await api(`/admin/users/${selectedUserDetail.value.id}`, {
+      method: 'PUT',
+      body
+    })
+
+    toast.add({ title: 'User updated', color: 'success' })
+    isDetailOpen.value = false
+    await refresh()
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isDetailSaving.value = false
+  }
 }
 
 async function onSave() {
@@ -138,9 +190,9 @@ async function onSave() {
 // ── Delete modal ─────────────────────────────────
 const isDeleteOpen = ref(false)
 const isDeleting = ref(false)
-const deleteTarget = ref<AdminUser | null>(null)
+const deleteTarget = ref<UserProfile | null>(null)
 
-function confirmDelete(user: AdminUser) {
+function confirmDelete(user: UserProfile) {
   deleteTarget.value = user
   isDeleteOpen.value = true
 }
@@ -228,21 +280,13 @@ const columns: TableColumn<AdminUser>[] = [
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-2' }, [
-        canEdit('admin.users') && h(UButton, {
-          label: 'Edit',
+        h(UButton, {
+          label: 'Detail',
           size: 'sm',
           color: 'primary',
           variant: 'light',
-          leadingIcon: 'i-ph-pencil-simple-bold',
-          onClick: () => openEdit(row.original)
-        }),
-        canEdit('admin.users') && h(UButton, {
-          label: 'Delete',
-          size: 'sm',
-          color: 'error',
-          variant: 'light',
-          leadingIcon: 'i-ph-trash-simple-bold',
-          onClick: () => confirmDelete(row.original)
+          leadingIcon: 'i-ph-magnifying-glass-bold',
+          onClick: () => openDetail(row.original)
         })
       ].filter(Boolean))
   }
@@ -292,7 +336,22 @@ const columns: TableColumn<AdminUser>[] = [
     @cancel="isEditOpen = false"
   />
 
-  <!-- Delete Confirmation Modal -->
+  <AdminUserDetailSlideover
+    v-model:open="isDetailOpen"
+    :user="selectedUserDetail"
+    :loading="isDetailSaving"
+    :show-delete="canEdit('admin.users')"
+    delete-label="Hapus User"
+    @submit="onSaveDetail"
+    @delete="
+      () => {
+        if (!selectedUserDetail) return
+        isDetailOpen = false
+        confirmDelete(selectedUserDetail)
+      }
+    "
+  />
+
   <AdminConfirmDeleteModal
     v-model:open="isDeleteOpen"
     :item-name="`${deleteTarget?.first_name} ${deleteTarget?.last_name}`"

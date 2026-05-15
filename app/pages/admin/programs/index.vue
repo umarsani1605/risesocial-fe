@@ -11,6 +11,16 @@ definePageMeta({
 useSeoMeta({ title: 'Rise Young Leaders Scholarship - Rise Social' })
 
 const { api } = useApi()
+const { public: { apiBaseUrl } } = useRuntimeConfig()
+
+function getFileUrl(filePath?: string | null): string {
+  if (!filePath) return ''
+  const idx = filePath.indexOf('/uploads/')
+  if (idx === -1) return ''
+  const rel = filePath.slice(idx + '/uploads/'.length)
+  const encoded = rel.split('/').map(encodeURIComponent).join('/')
+  return `${apiBaseUrl}/uploads/${encoded}`
+}
 
 const [{ data: rawRegistrations }, { data: rawDrafts }] = await Promise.all([
   useAsyncData('admin:ryls', () => api<ApiResponse<RylsListResponse>>('/admin/ryls/registrations')),
@@ -44,6 +54,7 @@ const nationalityFilter = ref('all')
 const paymentTypeFilter = ref('all')
 
 const dataTableRef = ref()
+const toast = useToast()
 
 const selectedRegistration = ref<RylsRegistration | null>(null)
 const isDetailOpen = ref(false)
@@ -106,6 +117,22 @@ const filteredData = computed(() => {
 })
 
 const draftSearch = ref('')
+const draftStepFilter = ref('all')
+const draftScholarshipFilter = ref('all')
+
+const draftStepOptions = [
+  { label: 'All Progress', value: 'all' },
+  { label: 'Step 1', value: '1' },
+  { label: 'Step 2', value: '2' },
+  { label: 'Step 3', value: '3' }
+]
+
+const draftScholarshipOptions = [
+  { label: 'All Types', value: 'all' },
+  { label: 'Fully Funded', value: 'FULLY_FUNDED' },
+  { label: 'Self Funded', value: 'SELF_FUNDED' }
+]
+
 const filteredDrafts = computed(() => {
   let result = allDrafts.value
   if (draftSearch.value) {
@@ -115,6 +142,12 @@ const filteredDrafts = computed(() => {
         d.email.toLowerCase().includes(s) ||
         (d.form_data?.step1?.fullName ?? '').toLowerCase().includes(s)
     )
+  }
+  if (draftStepFilter.value !== 'all') {
+    result = result.filter((d) => String(d.current_step) === draftStepFilter.value)
+  }
+  if (draftScholarshipFilter.value !== 'all') {
+    result = result.filter((d) => d.scholarship_type === draftScholarshipFilter.value)
   }
   return result
 })
@@ -137,32 +170,132 @@ const tabItems = computed(() => [
 
 const STEP_LABELS: Record<number, string> = { 1: 'Step 1', 2: 'Step 2', 3: 'Step 3' }
 
+const isExportingSubmitted = ref(false)
+const isExportingDrafts = ref(false)
+
+async function exportSubmittedExcel() {
+  isExportingSubmitted.value = true
+  try {
+    const blob = await api('/admin/ryls/registrations/export-excel', { responseType: 'blob' }) as Blob
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `ryls-registrations-${new Date().toISOString().split('T')[0]}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isExportingSubmitted.value = false
+  }
+}
+
+async function exportDraftsExcel() {
+  isExportingDrafts.value = true
+  try {
+    const blob = await api('/admin/ryls/registrations/drafts/export-excel', { responseType: 'blob' }) as Blob
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `ryls-drafts-${new Date().toISOString().split('T')[0]}.xlsx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isExportingDrafts.value = false
+  }
+}
+
+function formatDraftGender(gender?: string | null) {
+  if (!gender) return '–'
+  if (gender === 'FEMALE') return 'Female'
+  if (gender === 'MALE') return 'Male'
+  if (gender === 'PREFER_NOT_TO_SAY') return 'Prefer not to say'
+  return gender
+}
+
+function formatDraftDiscoverSource(source?: string | null, otherText?: string | null) {
+  if (!source) return '–'
+  if (source === 'OTHER') return otherText?.trim() || 'Other'
+  return DISCOVER_SOURCE_LABEL[source] ?? source
+}
+
 const draftColumns: TableColumn<RylsDraft>[] = [
   {
     id: 'no',
     header: 'No',
     cell: ({ row }) => h('span', { class: 'text-muted' }, row.index + 1)
   },
-  { accessorKey: 'email', header: 'Email' },
   {
     id: 'full_name',
-    header: 'Nama',
+    header: 'Name',
     cell: ({ row }) =>
       h('span', { class: 'font-medium' }, row.original.form_data?.step1?.fullName ?? '–')
   },
+  { accessorKey: 'email', header: 'Email' },
   {
-    id: 'current_step',
-    header: 'Progress',
+    id: 'whatsapp',
+    header: 'Whatsapp',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, row.original.form_data?.step1?.whatsapp ?? '–')
+  },
+  {
+    id: 'gender',
+    header: 'Gender',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, formatDraftGender(row.original.form_data?.step1?.gender as string | undefined))
+  },
+  {
+    id: 'date_of_birth',
+    header: 'Date of Birth',
+    cell: ({ row }) => {
+      const value = row.original.form_data?.step1?.dateOfBirth
+      return h('span', { class: 'text-sm whitespace-nowrap' }, value ? formatDate(value) : '–')
+    }
+  },
+  {
+    id: 'residence',
+    header: 'Residence',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, row.original.form_data?.step1?.residence ?? '–')
+  },
+  {
+    id: 'nationality',
+    header: 'Nationality',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, row.original.form_data?.step1?.nationality ?? '–')
+  },
+  {
+    id: 'second_nationality',
+    header: 'Second Nationality',
+    cell: ({ row }) => h('span', { class: 'text-sm' }, row.original.form_data?.step1?.secondNationality ?? '–')
+  },
+  {
+    id: 'institution',
+    header: 'Institution',
     cell: ({ row }) =>
       h(
-        UBadge,
-        { variant: 'outline', color: 'primary', class: 'whitespace-nowrap' },
-        () => STEP_LABELS[row.original.current_step] ?? `Step ${row.original.current_step}`
+        'span',
+        {
+          class: 'text-sm line-clamp-2 max-w-[12rem]',
+          title: row.original.form_data?.step1?.institution ?? undefined
+        },
+        row.original.form_data?.step1?.institution ?? '–'
+      )
+  },
+  {
+    id: 'discover_source',
+    header: 'Discover Source',
+    cell: ({ row }) =>
+      h(
+        'span',
+        { class: 'text-sm' },
+        formatDraftDiscoverSource(
+          row.original.form_data?.step1?.discoverSource as string | undefined,
+          row.original.form_data?.step1?.discoverOtherText as string | undefined
+        )
       )
   },
   {
     id: 'scholarship_type',
-    header: 'Tipe Beasiswa',
+    header: 'Type',
     cell: ({ row }) => {
       const type = row.original.scholarship_type
       if (!type) return h('span', { class: 'text-muted' }, '–')
@@ -178,16 +311,20 @@ const draftColumns: TableColumn<RylsDraft>[] = [
     }
   },
   {
+    id: 'current_step',
+    header: 'Progress',
+    cell: ({ row }) =>
+      h(
+        UBadge,
+        { variant: 'outline', color: 'primary', class: 'whitespace-nowrap' },
+        () => STEP_LABELS[row.original.current_step] ?? `Step ${row.original.current_step}`
+      )
+  },
+  {
     id: 'updated_at',
     header: 'Last Updated',
     cell: ({ row }) =>
       h('span', { class: 'text-sm whitespace-nowrap' }, formatDatetime(row.original.updated_at))
-  },
-  {
-    id: 'expires_at',
-    header: 'Expires',
-    cell: ({ row }) =>
-      h('span', { class: 'text-sm whitespace-nowrap' }, formatDate(row.original.expires_at))
   }
 ]
 
@@ -314,22 +451,36 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
+
+      const linkClass =
+        'inline-flex items-center gap-1 text-primary text-sm hover:underline max-w-52 truncate'
+
       if (
         (payment.payment_method === 'PAYPAL' || payment.payment_method === 'BANK_TRANSFER') &&
-        payment.payment_proof
+        payment.payment_proof?.file_path
       ) {
-        return h(
-          'a',
-          {
-            href: '#',
-            class: 'flex items-center gap-1 text-primary text-sm hover:underline'
-          },
-          [
-            h('span', { class: 'i-ph-arrow-square-out-bold size-3' }),
-            h('span', {}, 'Payment Proof')
-          ]
-        )
+        const href = getFileUrl(payment.payment_proof.file_path)
+        if (href) {
+          return h('a', { href, target: '_blank', rel: 'noopener', class: linkClass }, [
+            h('span', { class: 'i-ph-arrow-square-out-bold size-3 shrink-0' }),
+            h('span', { class: 'truncate' }, 'Payment Proof')
+          ])
+        }
       }
+
+      if (payment.payment_method === 'MIDTRANS') {
+        const orderId =
+          payment.transaction?.midtrans_data?.midtrans_order_id ??
+          payment.transaction?.transaction_code
+        if (orderId) {
+          const href = `https://dashboard.midtrans.com/beta/transactions?type=order_id&query=${orderId}`
+          return h('a', { href, target: '_blank', rel: 'noopener', class: linkClass }, [
+            h('span', { class: 'i-ph-arrow-square-out-bold size-3 shrink-0' }),
+            h('span', { class: 'truncate', title: orderId }, orderId)
+          ])
+        }
+      }
+
       return h('span', { class: 'text-muted text-sm' }, '–')
     }
   },
@@ -418,21 +569,51 @@ const columns: TableColumn<RylsRegistration>[] = [
           </div>
         </template>
         <template #toolbar-right>
-          <UButton label="Export Excel" leading-icon="i-ph-download-simple-bold" color="primary" />
+          <UButton
+            label="Export Excel"
+            leading-icon="i-ph-download-simple-bold"
+            color="primary"
+            :loading="isExportingSubmitted"
+            :disabled="isExportingSubmitted"
+            @click="exportSubmittedExcel"
+          />
         </template>
       </AdminDataTable>
     </template>
 
     <template #drafts>
-      <div class="space-y-4">
-        <UInput
-          v-model="draftSearch"
-          placeholder="Search email or name..."
-          leading-icon="i-ph-magnifying-glass-bold"
-          class="w-full sm:w-64"
-        />
-        <UTable :data="filteredDrafts" :columns="draftColumns" />
-      </div>
+      <AdminDataTable
+        v-model:search="draftSearch"
+        :data="filteredDrafts"
+        :columns="draftColumns"
+        search-placeholder="Search email or name..."
+        search-class="w-full sm:w-52"
+      >
+        <template #toolbar-left>
+          <div class="flex flex-wrap w-full sm:w-auto gap-2">
+            <USelect
+              v-model="draftStepFilter"
+              :items="draftStepOptions"
+              class="flex-1 sm:flex-none sm:w-36"
+            />
+            <USelect
+              v-model="draftScholarshipFilter"
+              :items="draftScholarshipOptions"
+              class="flex-1 sm:flex-none sm:w-36"
+            />
+          </div>
+        </template>
+        <template #toolbar-right>
+          <UButton
+            label="Export Excel"
+            leading-icon="i-ph-download-simple-bold"
+            color="primary"
+            :loading="isExportingDrafts"
+            :disabled="isExportingDrafts"
+            @click="exportDraftsExcel"
+          />
+        </template>
+      </AdminDataTable>
     </template>
   </UTabs>
 

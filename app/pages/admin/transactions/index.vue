@@ -156,7 +156,7 @@ const isExporting = ref(false)
 async function exportExcel() {
   isExporting.value = true
   try {
-    const blob = await api('/admin/transactions/export-excel', { responseType: 'blob' }) as Blob
+    const blob = (await api('/admin/transactions/export-excel', { responseType: 'blob' })) as Blob
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -222,25 +222,23 @@ function openDetail(id: number) {
 
     <template #footer>
       <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-sm text-muted shrink-0">
-          Showing {{ (page - 1) * limit + 1 }} to {{ Math.min(page * limit, meta?.total ?? 0) }} of
-          {{ meta?.total ?? 0 }} entries
-        </p>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <USelect
-              :model-value="limit"
-              :items="[10, 25, 50, 100]"
-              size="sm"
-              class="w-20"
-              @update:model-value="
-                (val: number) => {
-                  limit = Number(val)
-                  page = 1
-                }
-              "
-            />
-          </div>
+        <div class="flex items-center gap-4">
+          <USelect
+            :model-value="limit"
+            :items="[10, 25, 50, 100]"
+            size="sm"
+            class="w-20"
+            @update:model-value="
+              (val: number) => {
+                limit = Number(val)
+                page = 1
+              }
+            "
+          />
+          <p class="text-sm text-muted shrink-0">
+            Showing {{ (page - 1) * limit + 1 }} to
+            {{ Math.min(page * limit, meta?.total ?? 0) }} of {{ meta?.total ?? 0 }} entries
+          </p>
         </div>
         <UPagination
           v-model:page="page"

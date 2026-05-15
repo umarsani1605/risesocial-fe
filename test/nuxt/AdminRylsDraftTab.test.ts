@@ -9,7 +9,6 @@ interface RylsDraft {
   current_step: number
   form_data: { step1?: { fullName?: string; scholarshipType?: string }; [key: string]: unknown }
   scholarship_type: string | null
-  expires_at: string
   updated_at: string
 }
 
@@ -53,7 +52,6 @@ const sampleDrafts: RylsDraft[] = [
     current_step: 1,
     form_data: { step1: { fullName: 'Alice Smith', scholarshipType: 'FULLY_FUNDED' } },
     scholarship_type: 'FULLY_FUNDED',
-    expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
@@ -63,7 +61,6 @@ const sampleDrafts: RylsDraft[] = [
     current_step: 2,
     form_data: { step1: { fullName: 'Bob Jones', scholarshipType: 'SELF_FUNDED' } },
     scholarship_type: 'SELF_FUNDED',
-    expires_at: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
@@ -73,7 +70,6 @@ const sampleDrafts: RylsDraft[] = [
     current_step: 1,
     form_data: { step1: { fullName: 'Carol Tan' } },
     scholarship_type: null,
-    expires_at: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date().toISOString(),
   },
 ]

@@ -16,14 +16,14 @@ interface DraftData {
   formData: Record<string, unknown>
   currentStep: number
   scholarshipType: string | null
-  expiresAt: string
+  email: string
 }
 
 export const useRylsDraft = () => {
   const { api } = useApi()
 
   const resumeToken = useCookie<string | null>('ryls_resume_token', {
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 10 * 365 * 24 * 60 * 60,
     path: '/',
     sameSite: 'lax',
   })

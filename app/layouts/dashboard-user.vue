@@ -4,11 +4,46 @@ import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
 const { user, logout, fullName, initials } = useAuth()
 const route = useRoute()
 
+function createNavItem(
+  label: string,
+  icon: string,
+  to: string,
+  active: boolean
+): NavigationMenuItem {
+  return {
+    label,
+    icon,
+    to,
+    active,
+    ui: active ? { linkLabel: 'font-bold!' } : undefined
+  }
+}
+
 const navItems = computed<NavigationMenuItem[]>(() => [
-  { label: 'Dashboard', icon: 'i-ph-squares-four-duotone', to: '/dashboard', active: route.path === '/dashboard' },
-  { label: 'Academy', icon: 'i-ph-graduation-cap-duotone', to: '/dashboard/academy', active: route.path.startsWith('/dashboard/academy') },
-  { label: 'Jobs', icon: 'i-ph-briefcase-duotone', to: '/dashboard/jobs', active: route.path.startsWith('/dashboard/jobs') },
-  { label: 'Programs', icon: 'i-ph-rocket-launch-duotone', to: '/dashboard/programs', active: route.path.startsWith('/dashboard/programs') }
+  createNavItem(
+    'Dashboard',
+    'i-ph-squares-four-duotone',
+    '/dashboard',
+    route.path === '/dashboard'
+  ),
+  createNavItem(
+    'Academy',
+    'i-ph-graduation-cap-duotone',
+    '/dashboard/academy',
+    route.path.startsWith('/dashboard/academy')
+  ),
+  createNavItem(
+    'Jobs',
+    'i-ph-briefcase-duotone',
+    '/dashboard/jobs',
+    route.path.startsWith('/dashboard/jobs')
+  ),
+  createNavItem(
+    'Programs',
+    'i-ph-rocket-launch-duotone',
+    '/dashboard/programs',
+    route.path.startsWith('/dashboard/programs')
+  )
 ])
 
 const userMenuItems: DropdownMenuItem[][] = [
@@ -48,8 +83,10 @@ const userMenuItems: DropdownMenuItem[][] = [
         variant="link"
         :ui="{
           list: 'gap-2',
-          item: '[&_a]:relative [&_a]:inline-flex [&_a]:h-9 [&_a]:items-center [&_a]:justify-center [&_a]:rounded-lg [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-medium [&_a]:text-default [&_a]:transition-colors [&_a[aria-current=page]]:text-primary! [&_a[aria-current=page]]:font-bold [&_a[aria-current=page]]:after:scale-x-100',
-          link: 'hover:text-default! text-base'
+          item: 'shrink-0 [&_a]:relative [&_a]:inline-flex [&_a]:h-9 [&_a]:items-center [&_a]:justify-center [&_a]:rounded-lg [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-medium [&_a]:text-default [&_a]:transition-colors [&_a[aria-current=page]]:text-primary!',
+          link: '!font-medium !tracking-normal whitespace-nowrap hover:text-default! text-base',
+          linkLabel: '!font-medium !tracking-normal',
+          linkLeadingIcon: 'shrink-0 size-5'
         }"
       />
 
@@ -78,7 +115,7 @@ const userMenuItems: DropdownMenuItem[][] = [
         <UNavigationMenu
           :items="navItems"
           orientation="vertical"
-          class="-mx-2.5 [&_a]:relative [&_a]:flex [&_a]:items-center [&_a]:px-4 [&_a]:py-3 [&_a]:rounded-lg [&_a]:text-base [&_a]:font-medium [&_a]:text-default [&_a]:transition-colors [&_a[aria-current=page]]:text-primary! [&_a[aria-current=page]]:font-bold [&_a[aria-current=page]]:bg-primary/5"
+          class="-mx-2.5 [&_a]:relative [&_a]:flex [&_a]:items-center [&_a]:px-4 [&_a]:py-3 [&_a]:rounded-lg [&_a]:text-base [&_a]:font-medium [&_a]:text-default [&_a]:transition-colors [&_a[aria-current=page]]:text-primary! [&_a[aria-current=page]]:bg-primary/5"
         />
       </template>
     </UHeader>

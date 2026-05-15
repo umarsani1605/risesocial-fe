@@ -108,9 +108,21 @@ useSeoMeta({
         <UDrawer
           v-model:open="isFilterOpen"
           direction="left"
-          title="Filter Jobs"
-          :ui="{ content: 'max-w-sm' }"
+          :ui="{ content: 'w-screen max-w-none' }"
         >
+          <template #header>
+            <div class="flex items-center justify-between gap-4">
+              <h3 class="text-lg font-semibold">Filter Jobs</h3>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-ph-x-bold"
+                square
+                @click="isFilterOpen = false"
+              />
+            </div>
+          </template>
+
           <template #body>
             <div class="space-y-6">
             <UFormField label="Search">
@@ -156,20 +168,24 @@ useSeoMeta({
               <UInput
                 v-model="pendingFilters.company"
                 placeholder="Company name..."
-                icon="i-ph-buildings-bold"
                 class="w-full"
               />
             </UFormField>
 
             <UFormField label="Remote Only">
-              <UToggle v-model="pendingFilters.isRemote" />
+              <UCheckbox
+                v-model="pendingFilters.isRemote"
+                :true-value="true"
+                :false-value="undefined"
+                label="Show remote jobs only"
+              />
             </UFormField>
             </div>
           </template>
 
           <template #footer>
             <div class="space-y-3">
-              <UButton color="primary" block @click="handleApplyFilters(true)">
+              <UButton color="primary" block class="justify-center" @click="handleApplyFilters(true)">
                 <UIcon name="i-ph-magnifying-glass-bold" class="mr-2 size-4" />
                 Apply Filters
               </UButton>
@@ -231,17 +247,18 @@ useSeoMeta({
               <UInput
                 v-model="pendingFilters.company"
                 placeholder="Company name..."
-                icon="i-ph-buildings-bold"
                 class="w-full"
                 @keyup.enter="handleApplyFilters()"
               />
             </UFormField>
 
             <UFormField label="Remote Only">
-              <div class="flex items-center gap-2">
-                <UToggle v-model="pendingFilters.isRemote" />
-                <span class="text-sm text-muted">Show remote jobs only</span>
-              </div>
+              <UCheckbox
+                v-model="pendingFilters.isRemote"
+                :true-value="true"
+                :false-value="undefined"
+                label="Show remote jobs only"
+              />
             </UFormField>
 
             <UButton icon="i-ph-magnifying-glass-bold" block @click="handleApplyFilters()">

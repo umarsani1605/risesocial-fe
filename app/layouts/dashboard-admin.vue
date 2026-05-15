@@ -187,6 +187,8 @@ const userLinks = computed<NavigationMenuItem[]>(() =>
     : []
 )
 
+const currentYear = new Date().getFullYear()
+
 const navMenuUi = {
   item: 'relative px-4 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:w-1 after:h-[90%] after:rounded-r-full after:transition-colors has-[[aria-current=page]]:after:bg-primary'
 }
@@ -322,7 +324,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
     <UDashboardPanel
       id="main"
       :ui="{
-        body: 'p-2 sm:p-6 pb-0'
+        body: 'p-4 sm:p-6 pb-0'
       }"
     >
       <template #header>

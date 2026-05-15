@@ -49,7 +49,7 @@ describe('useRylsDraft', () => {
         formData: { step1: { fullName: 'Test' } },
         currentStep: 2,
         scholarshipType: 'FULLY_FUNDED',
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        email: 'test@test.com',
       }
       mockApi
         .mockResolvedValueOnce({

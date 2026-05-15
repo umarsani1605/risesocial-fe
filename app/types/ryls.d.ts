@@ -18,13 +18,29 @@ interface RylsAnalyticsDemographics {
   byScholarshipType: Array<{ name: string; count: number }>
 }
 
+interface RylsPaymentTransaction {
+  id: number
+  transaction_code: string
+  amount: number
+  status: string
+  provider: string
+  payment_method: string | null
+  paid_at: string | null
+  midtrans_data: {
+    midtrans_order_id: string
+    transaction_status: string | null
+    payment_type: string | null
+  } | null
+}
+
 interface RylsPayment {
   id: number
   paid_at: string | null
   amount: number
   status: string
-  type: string
+  payment_method: string
   payment_proof: { id: number; original_name: string; file_path: string } | null
+  transaction: RylsPaymentTransaction | null
 }
 
 interface RylsRegistration {
@@ -59,8 +75,22 @@ interface RylsDraft {
   email: string
   resume_token: string
   current_step: number
-  form_data: { step1?: { fullName?: string; scholarshipType?: string }; [key: string]: unknown }
+  form_data: {
+    step1?: {
+      fullName?: string
+      scholarshipType?: string
+      whatsapp?: string
+      gender?: string
+      dateOfBirth?: string
+      residence?: string
+      nationality?: string
+      secondNationality?: string
+      institution?: string
+      discoverSource?: string
+      discoverOtherText?: string
+    }
+    [key: string]: unknown
+  }
   scholarship_type: string | null
-  expires_at: string
   updated_at: string
 }

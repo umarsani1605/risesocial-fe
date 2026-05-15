@@ -95,7 +95,7 @@ describe('RYLS Registration — Integrasi Draft', () => {
         formData: { step1: { fullName: 'Test User', email: 'test@test.com' } },
         currentStep: 1,
         scholarshipType: null,
-        expiresAt: new Date(Date.now() + 1000).toISOString(),
+        email: 'test@test.com',
       }
       mockLoadDraft.mockResolvedValueOnce(draftData)
       await mountSuspended(RegistrationPage)

@@ -58,6 +58,12 @@ export interface JobCompanyDetail {
   linkedin_url: string | null
   linkedin_employees: number | null
   linkedin_size: string | null
+  linkedin_slogan?: string | null
+  linkedin_followers?: number | null
+  linkedin_type?: string | null
+  linkedin_founded_date?: string | null
+  linkedin_specialties?: unknown
+  linkedin_locations?: unknown
   _count: { jobs: number }
 }
 

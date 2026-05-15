@@ -40,7 +40,9 @@ const fields: AuthFormField[] = [
 
 const schema = z.object({
   email: z.email('Invalid email'),
-  password: z.string('Password is required').min(PASSWORD_MIN_LENGTH, `Must be at least ${PASSWORD_MIN_LENGTH} characters`)
+  password: z
+    .string('Password is required')
+    .min(PASSWORD_MIN_LENGTH, `Must be at least ${PASSWORD_MIN_LENGTH} characters`)
 })
 
 type Schema = z.output<typeof schema>

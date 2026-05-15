@@ -40,14 +40,19 @@ defineOptions({ inheritAttrs: false })
 const RESERVED_SLOTS: readonly string[] = ['toolbar', 'toolbar-left', 'toolbar-right', 'footer']
 
 const table = useTemplateRef('table')
+const isSmUp = useMediaQuery('(min-width: 640px)')
 
 const pagination = ref<PaginationState>({ pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE })
 const columnPinning = ref<ColumnPinningState>(props.columnPinning)
 const paginationRowModel = getPaginationRowModel()
 
+watchEffect(() => {
+  columnPinning.value = isSmUp.value ? props.columnPinning : { left: [], right: [] }
+})
+
 const mergedTableUi = computed(() => ({
   tbody: '[&>tr]:hover:bg-elevated/50 [&>tr]:transition-colors',
-  ...(props.pinnedShadow ? PINNED_COLUMN_SHADOW_UI : {}),
+  ...(props.pinnedShadow && isSmUp.value ? PINNED_COLUMN_SHADOW_UI : {}),
   ...(props.tableUi ?? {})
 }))
 
@@ -65,7 +70,7 @@ defineExpose({
 </script>
 
 <template>
-  <AdminCard :ui="{ root: 'overflow-scroll' }">
+  <AdminCard :ui="{ root: 'overflow-scroll', body: 'p-0!' }">
     <template #header>
       <slot v-if="$slots.toolbar" name="toolbar" />
       <div v-else class="flex flex-wrap items-center justify-between">
@@ -80,7 +85,9 @@ defineExpose({
           />
           <slot name="toolbar-left" />
         </div>
-        <slot name="toolbar-right" />
+        <div class="mt-2 w-full sm:mt-0 sm:w-auto">
+          <slot name="toolbar-right" />
+        </div>
       </div>
     </template>
 

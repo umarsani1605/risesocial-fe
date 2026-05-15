@@ -74,7 +74,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     isLoading.value = true
     errorMessage.value = ''
-    const res = await api<ApiResponse<{ token: string, user: UserProfile }>>('/auth/register', {
+    const res = await api<ApiResponse<{ token: string; user: UserProfile }>>('/auth/register', {
       method: 'POST',
       body: {
         first_name: payload.data.first_name,
@@ -85,11 +85,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     })
     setSession(res.data.token, res.data.user)
     await navigateTo('/dashboard')
-  }
-  catch (e: unknown) {
+  } catch (e: unknown) {
     errorMessage.value = getApiErrorMessage(e)
-  }
-  finally {
+  } finally {
     isLoading.value = false
   }
 }
@@ -107,7 +105,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         :schema="schema"
         :fields="fields"
         title="Create an Account"
-        class="w-full"
+        class="w-90"
         :submit="{
           label: 'Register',
           class: 'rounded-lg',

@@ -81,25 +81,7 @@ defineProps<{
 
         <USeparator />
 
-        <!-- Section 2: Fully Funded -->
-        <template v-if="registration.scholarship_type === 'FULLY_FUNDED'">
-          <div class="p-6">
-            <p class="text-xs font-bold uppercase tracking-wide mb-4">Fully Funded</p>
-            <div class="space-y-2">
-              <div class="grid grid-cols-2 gap-2 text-sm">
-                <span class="text-muted">Essay Topic</span>
-                <span
-                  :class="registration.fully_funded_submission?.essay_topic ? '' : 'text-muted'"
-                >
-                  {{ registration.fully_funded_submission?.essay_topic ?? 'Not provided' }}
-                </span>
-              </div>
-            </div>
-          </div>
-          <USeparator />
-        </template>
-
-        <!-- Section 3: Payment Information -->
+        <!-- Section 2: Payment Information -->
         <div v-if="registration.payments?.[0]" class="p-6">
           <p class="text-xs font-bold uppercase tracking-wide mb-4">Payment Information</p>
           <div class="space-y-2">

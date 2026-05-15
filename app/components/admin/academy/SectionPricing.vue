@@ -79,13 +79,18 @@ const columns: TableColumn<AcademyPricing>[] = [
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
+  <div class="space-y-6 pt-6">
+    <div class="flex items-center justify-between gap-3 px-6">
       <h3 class="text-lg font-semibold">Pricing</h3>
-      <UButton label="Add" color="primary" @click="openAdd" />
+      <UButton label="Add" color="primary" class="shrink-0" @click="openAdd" />
     </div>
-    <div class="p-px overflow-x-auto">
-      <UTable :data="items" :columns="columns" class="px-0 overflow-visible">
+    <div class="overflow-x-auto border-t border-default">
+      <UTable
+        :data="items"
+        :columns="columns"
+        :ui="{ root: 'p-0!', base: 'rounded-none outline-0' }"
+        class="px-0 overflow-visible"
+      >
         <template #original_price-cell="{ row }">
           {{ formatPrice(row.original.original_price) }}
         </template>

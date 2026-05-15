@@ -67,7 +67,7 @@ async function remove() {
 
 const columns: TableColumn<AcademyInstructor>[] = [
   { accessorKey: 'order', header: 'Order' },
-  { id: 'avatar', header: '' },
+  { accessorKey: 'avatar_url', header: 'Avatar' },
   { accessorKey: 'name', header: 'Name' },
   {
     accessorKey: 'job_title',
@@ -103,27 +103,27 @@ const columns: TableColumn<AcademyInstructor>[] = [
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
+  <div class="space-y-6 pt-6">
+    <div class="flex items-center justify-between gap-3 px-6">
       <h3 class="text-lg font-semibold">Instructors</h3>
-      <UButton label="+ Add" color="primary" @click="openAdd" />
+      <UButton label="+ Add" color="primary" class="shrink-0" @click="openAdd" />
     </div>
-    <div class="p-px overflow-x-auto">
+    <div class="overflow-x-auto border-t border-default">
       <UTable
         :data="items"
         :columns="columns"
-        :ui="{ base: 'table-fixed' }"
+        :ui="{ root: 'p-0!', base: 'table-fixed rounded-none outline-0' }"
         class="px-0 overflow-visible"
       >
-        <template #avatar-cell="{ row }">
-          <UAvatar
-            :src="row.original.avatar_url ?? undefined"
-            :fallback="row.original.name.slice(0, 2).toUpperCase()"
-            size="sm"
-            color="primary"
-            variant="subtle"
-            class="bg-primary text-white text-sm rounded-full"
+        <template #avatar_url-cell="{ row }">
+          <img
+            v-if="row.original.avatar_url"
+            :src="row.original.avatar_url"
+            class="size-8 rounded-full object-cover"
           />
+          <div v-else class="size-8 rounded-full bg-elevated flex items-center justify-center">
+            <UIcon name="i-ph-user-bold" class="size-4 text-muted" />
+          </div>
         </template>
         <template #actions-cell="{ row }">
           <div class="flex items-center gap-2 justify-end">
