@@ -129,23 +129,23 @@ function nextTestimonial() {
           </h1>
           <div class="flex flex-wrap items-center gap-4 md:gap-6 text-white/90 text-sm">
             <div class="flex items-center gap-2">
-              <UIcon name="i-ph-clock-bold" class="size-4" />
+              <UIcon name="i-ph-clock-bold" class="size-4 text-white/70" />
               <span>{{ academy.duration }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <UIcon name="i-ph-book-open-bold" class="size-4" />
+              <UIcon name="i-ph-book-open-bold" class="size-4 text-white/70" />
               <span>{{ academy.format }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <UIcon name="i-ph-tag-bold" class="size-4" />
+              <UIcon name="i-ph-tag-bold" class="size-4 text-white/70" />
               <span>{{ academy.category }}</span>
             </div>
             <div v-if="academy.certificate" class="flex items-center gap-2">
-              <UIcon name="i-ph-medal-bold" class="size-4" />
+              <UIcon name="i-ph-medal-bold" class="size-4 text-white/70" />
               <span>Certificate</span>
             </div>
             <div class="flex items-center gap-2">
-              <UIcon name="i-ph-briefcase-bold" class="size-4" />
+              <UIcon name="i-ph-briefcase-bold" class="size-4 text-white/70" />
               <span>Portfolio</span>
             </div>
           </div>
@@ -159,7 +159,7 @@ function nextTestimonial() {
             <UCard v-if="academy.description" class="py-8">
               <div class="px-8">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">About Program</h2>
-                <p class="text-gray-700 leading-relaxed">{{ academy.description }}</p>
+                <p class="text-base text-muted leading-relaxed">{{ academy.description }}</p>
               </div>
             </UCard>
 
@@ -171,7 +171,7 @@ function nextTestimonial() {
                   <div
                     v-for="feature in academy.features"
                     :key="feature.id"
-                    class="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    class="flex flex-col md:flex-row gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                   >
                     <div class="shrink-0">
                       <UIcon
@@ -182,8 +182,8 @@ function nextTestimonial() {
                       />
                     </div>
                     <div>
-                      <h3 class="font-semibold mb-1">{{ feature.title }}</h3>
-                      <p class="text-muted text-sm">{{ feature.description }}</p>
+                      <h3 class="text-lg font-semibold mb-1">{{ feature.title }}</h3>
+                      <p class="text-base text-muted">{{ feature.description }}</p>
                     </div>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ function nextTestimonial() {
                   :ui="{
                     item: 'border-none',
                     trigger:
-                      'px-6 py-4 hover:no-underline hover:bg-gray-50 rounded-lg data-[state=open]:rounded-b-none group'
+                      'py-4 hover:no-underline hover:bg-slate-50 rounded-lg data-[state=open]:rounded-b-none group'
                   }"
                 >
                   <template #default="{ index }">
@@ -214,7 +214,7 @@ function nextTestimonial() {
                         <h3 class="text-lg font-bold mb-1">
                           {{ academy.themes[index]?.title }}
                         </h3>
-                        <p class="text-muted text-sm">
+                        <p class="text-base text-muted">
                           {{ academy.themes[index]?.description }}
                         </p>
                       </div>
@@ -223,19 +223,19 @@ function nextTestimonial() {
                   <template #body="{ index }">
                     <div
                       v-if="academy.themes[index]?.topics?.length"
-                      class="px-6 pb-4 space-y-2"
+                      class="pb-4 space-y-2"
                     >
                       <div
                         v-for="topic in academy.themes[index]!.topics"
                         :key="topic.id"
-                        class="flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-lg"
+                        class="flex items-center gap-3 px-4 py-2.5 bg-slate-50 rounded-lg"
                       >
                         <div
-                          class="size-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-semibold shrink-0"
+                          class="size-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-semibold shrink-0"
                         >
                           {{ topic.order }}
                         </div>
-                        <span class="text-sm">{{ topic.title }}</span>
+                        <span class="text-base">{{ topic.title }}</span>
                       </div>
                     </div>
                   </template>
@@ -264,8 +264,8 @@ function nextTestimonial() {
                       <h3 class="text-xl font-bold mb-1">
                         {{ instructor.name }}
                       </h3>
-                      <p class="text-muted font-medium mb-3">{{ instructor.job_title }}</p>
-                      <p v-if="instructor.description" class="text-muted leading-relaxed">
+                      <p class="text-base text-muted font-medium mb-3">{{ instructor.job_title }}</p>
+                      <p v-if="instructor.description" class="text-base text-muted leading-relaxed">
                         {{ instructor.description }}
                       </p>
                     </div>
@@ -307,7 +307,7 @@ function nextTestimonial() {
                     viewport: 'pb-4'
                   }"
                 >
-                  <div class="flex flex-col h-full bg-gray-50 p-6 rounded-xl">
+                  <div class="flex flex-col h-full bg-slate-50 p-6 rounded-xl">
                     <div class="flex gap-4 mb-4">
                       <UAvatar
                         :alt="item.name"
@@ -318,18 +318,18 @@ function nextTestimonial() {
                         }"
                       />
                       <div class="space-y-1">
-                        <h4 class="font-semibold">{{ item.name }}</h4>
+                        <h4 class="text-lg font-semibold">{{ item.name }}</h4>
                         <div class="flex items-center gap-0.5">
                           <UIcon
                             v-for="i in 5"
                             :key="i"
                             name="i-heroicons-star-solid"
-                            class="size-4 fill-yellow-400 text-yellow-400"
+                            class="size-4 fill-warning text-warning"
                           />
                         </div>
                       </div>
                     </div>
-                    <p class="text-muted leading-relaxed flex-1">{{ item.comment }}</p>
+                    <p class="text-base text-muted leading-relaxed flex-1">{{ item.comment }}</p>
                   </div>
                 </UCarousel>
               </div>
@@ -341,9 +341,9 @@ function nextTestimonial() {
                   :items="faqItems"
                   :ui="{
                     root: 'space-y-4',
-                    item: 'bg-gray-50 rounded-xl px-6 border-none',
+                    item: 'bg-slate-50 rounded-xl border-none px-6',
                     trigger:
-                      'text-base font-medium text-muted hover:text-gray-800 transition-colors cursor-pointer py-3',
+                      'text-lg font-medium text-muted hover:text-slate-800 transition-colors cursor-pointer py-3',
                     body: 'text-base text-muted pb-4'
                   }"
                 />
@@ -360,7 +360,7 @@ function nextTestimonial() {
                 <div class="space-y-0">
                   <h2 class="block md:hidden text-2xl font-bold mb-4 px-6 pt-6">Apply Programs</h2>
                   <div
-                    class="w-full aspect-square overflow-hidden bg-gray-100 flex items-center justify-center rounded-lg"
+                    class="w-full aspect-square overflow-hidden bg-slate-100 flex items-center justify-center rounded-lg"
                   >
                     <img
                       v-if="academy.image_url"
@@ -368,7 +368,7 @@ function nextTestimonial() {
                       :alt="academy.title"
                       class="w-full h-full object-cover"
                     />
-                    <div v-else class="flex flex-col items-center justify-center text-gray-400">
+                    <div v-else class="flex flex-col items-center justify-center text-slate-400">
                       <UIcon name="i-ph-image-bold" class="size-12 mb-2" />
                       <span class="text-sm">No Image</span>
                     </div>

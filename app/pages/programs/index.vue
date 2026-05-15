@@ -107,7 +107,7 @@ const testimonialsItems = [
 
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">Rise Exclusive Programs</h1>
 
-        <p class="text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
+        <p class="text-lg sm:text-xl text-muted mb-8 max-w-2xl mx-auto">
           Gain hands-on learning experience in various countries while being exposed to a wide range
           of expertise in the field.
         </p>
@@ -115,7 +115,7 @@ const testimonialsItems = [
         <UButton color="secondary" size="lg"> Sign Up Now! </UButton>
       </div>
     </UPageSection>
-    <UPageSection class="border-t border-gray-100">
+    <UPageSection class="border-t border-slate-100">
       <div
         class="flex flex-col lg:flex-row w-full items-center gap-12 lg:gap-24 text-center justify-center"
       >
@@ -135,7 +135,7 @@ const testimonialsItems = [
     </UPageSection>
     <UPageSection
       title="Choose The Perfect Programs for You"
-      class="bg-gray-100"
+      class="bg-slate-100"
       :ui="{ title: 'text-2xl lg:text-3xl' }"
     >
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -155,8 +155,8 @@ const testimonialsItems = [
             />
           </div>
           <h3 class="text-lg font-bold mb-3">{{ program.title }}</h3>
-          <p class="text-sm leading-relaxed mb-3">{{ program.description1 }}</p>
-          <p class="text-sm leading-relaxed flex-1 mb-6">
+          <p class="text-base text-muted leading-relaxed mb-3">{{ program.description1 }}</p>
+          <p class="text-base text-muted leading-relaxed flex-1 mb-6">
             {{ program.description2 }}
           </p>
           <UButton :to="program.link" color="secondary" size="lg" block>
@@ -189,7 +189,7 @@ const testimonialsItems = [
         </template>
       </UCarousel>
     </UPageSection>
-    <UPageSection class="bg-green-50" :ui="{ container: 'pb-0!', title: 'text-2xl lg:text-3xl' }">
+    <UPageSection class="bg-slate-50" :ui="{ container: 'pb-0!', title: 'text-2xl lg:text-3xl' }">
       <div class="flex flex-col lg:flex-row gap-8 lg:gap-24 items-center">
         <div class="w-64 sm:w-80 lg:w-[40rem]">
           <NuxtImg
@@ -202,7 +202,7 @@ const testimonialsItems = [
         </div>
         <div class="space-y-6">
           <h2 class="text-3xl lg:text-4xl font-bold">Seamless Access, Anytime, Anywhere</h2>
-          <p class="text-lg leading-relaxed">
+          <p class="text-lg text-muted leading-relaxed">
             Discover opportunities to make an impact. From green jobs to skill-building programs,
             our platform is your gateway to a sustainable tomorrow.
           </p>
@@ -220,7 +220,7 @@ const testimonialsItems = [
           to="/opportunities"
           size="xl"
           color="neutral"
-          class="bg-white text-[#095351] hover:bg-gray-200 font-bold"
+          class="bg-white text-[#095351] hover:bg-slate-200 font-bold"
         >
           Search Job
         </UButton>

@@ -72,7 +72,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-4">
     <UPageCard
-      class="w-full max-w-md rounded-2xl shadow"
+      class="w-full max-w-md rounded-xl shadow-subtle border border-default/25"
       :ui="{
         container: 'sm:p-10'
       }"
@@ -90,15 +90,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #header>
-          <div class="h-8 flex flex-col gap-4 items-center justify-center py-12 mb-4">
-            <NuxtImg
-              src="/logo.png"
-              width="78"
-              height="32"
-              alt="Rise Social"
-              class="size-auto mb-4"
-            />
-            <div class="text-2xl font-bold">Login to Your Account</div>
+          <div class="flex flex-col gap-8 items-center justify-center text-center">
+            <NuxtImg src="/logo.png" width="78" height="32" alt="Rise Social" class="size-auto" />
+            <div class="flex flex-col gap-2">
+              <div class="text-2xl font-bold">Welcome Back</div>
+              <p class="text-muted">Sign in to continue to Rise Social</p>
+            </div>
           </div>
         </template>
         <template #validation>

@@ -18,7 +18,7 @@ const locationText = computed(() => formatLocation(props.job.location))
             class="size-full object-contain rounded-xl"
             loading="lazy"
           />
-          <div v-else class="size-full bg-gray-100 rounded-full flex items-center justify-center">
+          <div v-else class="size-full bg-slate-100 rounded-full flex items-center justify-center">
             <UIcon name="i-ph-buildings-bold" class="size-8 text-muted" />
           </div>
         </div>
@@ -26,26 +26,26 @@ const locationText = computed(() => formatLocation(props.job.location))
         <div class="flex-1 flex flex-col justify-between min-w-0 overflow-hidden">
           <div class="space-y-2 min-w-0">
             <h3 class="font-bold text-default line-clamp-2 transition-colors duration-300 ease-out group-hover:text-highlighted">{{ job.title }}</h3>
-            <p class="text-muted text-sm line-clamp-1">{{ job.company.name }}</p>
+            <p class="text-sm text-muted line-clamp-1">{{ job.company.name }}</p>
             <UBadge
               v-if="job.company.industry"
               color="neutral"
-              variant="subtle"
-              class="w-fit text-xs font-medium transition-colors duration-300 ease-out"
+              variant="soft"
+              class="w-fit font-medium transition-colors duration-300 ease-out"
             >
               {{ job.company.industry }}
             </UBadge>
-            <div class="flex gap-2 text-muted text-sm mt-auto">
+            <div class="mt-auto flex gap-2 text-sm text-muted">
               <div class="flex items-center min-w-0 shrink-0">
-                <UIcon name="i-ph-calendar-bold" class="size-4 mr-2 shrink-0" />
-                <span v-if="job.valid_until" class="text-xs whitespace-nowrap">
+                <UIcon name="i-ph-calendar-bold" class="size-4 mr-2 shrink-0 text-muted" />
+                <span v-if="job.valid_until" class="whitespace-nowrap">
                   Deadline: {{ formatDate(job.valid_until) }}
                 </span>
-                <span v-else class="text-xs whitespace-nowrap text-muted">No deadline</span>
+                <span v-else class="whitespace-nowrap text-muted">No deadline</span>
               </div>
               <div class="flex items-center min-w-0 flex-1">
-                <UIcon name="i-ph-map-pin-bold" class="size-4 mr-2 shrink-0" />
-                <span class="line-clamp-1 text-xs">{{ locationText }}</span>
+                <UIcon name="i-ph-map-pin-bold" class="size-4 mr-2 shrink-0 text-muted" />
+                <span class="line-clamp-1">{{ locationText }}</span>
               </div>
             </div>
           </div>

@@ -154,8 +154,7 @@ useSeoMeta({
               :key="category"
               variant="soft"
               color="neutral"
-              size="sm"
-              class="bg-white/10 text-white ring ring-gray-50/30 hover:bg-white/20 text-xs sm:text-sm cursor-pointer rounded-lg"
+              class="bg-white/10 text-white ring ring-slate-100/30 hover:bg-white/20 cursor-pointer rounded-lg"
             >
               {{ category }}
             </UBadge>
@@ -178,7 +177,7 @@ useSeoMeta({
       </div>
     </UPageSection>
 
-    <UPageSection class="bg-gray-50">
+    <UPageSection class="bg-slate-50">
       <UPageGrid>
         <UCard v-for="feature in featuresItems" :key="feature.title" class="rounded-2xl shadow-sm">
           <div class="flex flex-col h-full gap-4">
@@ -191,7 +190,7 @@ useSeoMeta({
               <h3 class="text-lg text-center font-bold">
                 {{ feature.title }}
               </h3>
-              <p class="text-sm text-center">
+              <p class="text-base text-center text-muted">
                 {{ feature.description }}
               </p>
             </div>
@@ -242,7 +241,7 @@ useSeoMeta({
         <div class="flex-1 space-y-6 text-center md:text-left">
           <div>
             <h2 class="text-4xl font-bold mb-4">Get the Perfect Job for You!</h2>
-            <p class="text-lg text-gray-600">
+            <p class="text-lg text-muted">
               Unlock your potential with personalized job matches and comprehensive career tools.
             </p>
           </div>

@@ -39,9 +39,7 @@ const dynamicTitle = computed(() => {
   return templates[titleIndex.value]
 })
 
-const activeEnrollment = computed(
-  () => enrollments.value.find((e) => !e.completed_at) ?? null
-)
+const activeEnrollment = computed(() => enrollments.value.find((e) => !e.completed_at) ?? null)
 
 const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, completed: 2 }
 
@@ -163,8 +161,12 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
         </UCard>
       </div>
 
-      <div class="lg:col-span-4">
-        <UCard class="h-full border border-default/50" :ui="{ header: 'p-0!', body: 'p-4!' }">
+      <div class="lg:col-span-4 flex flex-col gap-6">
+        <UCard
+          class="border border-default/50"
+          :class="'basis-0 grow-[3]'"
+          :ui="{ header: 'p-0!', body: 'p-4!' }"
+        >
           <template #header>
             <div class="flex items-center gap-4 px-6 pt-4 pb-0">
               <div
@@ -200,6 +202,39 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
               </div>
             </div>
           </div>
+        </UCard>
+
+        <UCard
+          class="border border-default/50"
+          :class="'basis-0 grow-[2]'"
+          :ui="{ header: 'p-0!', body: 'p-4!' }"
+        >
+          <template #header>
+            <div class="flex items-center gap-4 px-6 pt-4 pb-0">
+              <div
+                class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+              >
+                <UIcon name="i-ph-rocket-launch-fill" class="size-4" />
+              </div>
+              <h2 class="font-bold text-lg text-slate-800">Active Program</h2>
+            </div>
+            <USeparator class="mt-4" :ui="{ border: 'border-slate-100' }" />
+          </template>
+
+          <NuxtLink
+            to="/programs/rise-young-leaders-summit"
+            class="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            <NuxtImg
+              src="/images/rise_young_leader.png"
+              alt="Rise Young Leaders Scholarship"
+              class="size-20 rounded-lg object-cover shrink-0"
+            />
+            <div class="min-w-0 space-y-1">
+              <p class="font-bold text-slate-800 text-lg">Rise Young Leaders Scholarship</p>
+              <p class="text-slate-600 text-sm">View Program Details</p>
+            </div>
+          </NuxtLink>
         </UCard>
       </div>
     </div>

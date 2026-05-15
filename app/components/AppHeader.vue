@@ -57,8 +57,8 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
       variant="link"
       :ui="{
         list: 'gap-2',
-        item: '[&_a]:relative [&_a]:inline-flex [&_a]:h-9 [&_a]:items-center [&_a]:justify-center [&_a]:rounded-lg [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-medium [&_a]:text-white [&_a]:hover:bg-white/5! [&_a]:transition-colors [&_a]:after:content-[\'\'] [&_a]:after:absolute [&_a]:after:bottom-0 [&_a]:after:left-1/4 [&_a]:after:w-1/2 [&_a]:after:h-[3px] [&_a]:after:bg-primary [&_a]:after:rounded-full [&_a]:after:scale-x-0 [&_a]:after:transition-transform [&_a]:after:duration-300 [&_a]:after:ease-in-out [&_a]:hover:after:scale-x-100 [&_a[aria-current=page]]:text-orange-400 [&_a[aria-current=page]]:after:scale-x-100',
-        link: 'hover:text-white! text-base'
+        item: '[&_a]:relative [&_a]:inline-flex [&_a]:h-9 [&_a]:items-center [&_a]:justify-center [&_a]:rounded-lg [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-medium [&_a]:text-white [&_a]:hover:bg-white/5! [&_a]:transition-colors [&_a]:after:content-[\'\'] [&_a]:after:absolute [&_a]:after:bottom-0 [&_a]:after:left-1/4 [&_a]:after:w-1/2 [&_a]:after:h-[3px] [&_a]:after:bg-primary [&_a]:after:rounded-full [&_a]:after:scale-x-0 [&_a]:after:transition-transform [&_a]:after:duration-300 [&_a]:after:ease-in-out [&_a]:hover:after:scale-x-100 [&_a[aria-current=page]]:text-primary! [&_a[aria-current=page]]:hover:text-primary! [&_a[aria-current=page]]:after:scale-x-100',
+        link: 'text-base hover:text-white!'
       }"
     />
     <template #right>
@@ -93,7 +93,7 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
         :items="items"
         orientation="vertical"
         :ui="{
-          link: 'relative flex items-center px-4 py-3 rounded-lg text-base font-medium text-white transition-colors hover:before:bg-white/5! hover:text-white! data-[active]:before:bg-white/5! data-[active]:text-orange-400!'
+          link: 'relative flex items-center px-4 py-3 rounded-lg text-base font-medium text-white transition-colors hover:before:bg-white/5! hover:text-white! data-[active]:before:bg-white/5! data-[active]:text-primary! data-[active]:hover:text-primary!'
         }"
       />
     </template>

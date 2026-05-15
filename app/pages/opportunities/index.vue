@@ -89,14 +89,14 @@ useSeoMeta({
 
 <template>
   <UPageSection>
-    <div class="text-center mb-8 lg:mb-12">
+    <div class="text-center mb-6 lg:mb-8">
       <h1 class="text-3xl sm:text-4xl font-bold mb-4">Job Opportunities</h1>
       <p class="text-lg text-muted max-w-3xl mx-auto">
         Discover green career opportunities that match your passion and expertise
       </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <!-- Mobile: drawer trigger -->
       <div class="lg:hidden">
         <UButton variant="outline" block @click="isFilterOpen = true">

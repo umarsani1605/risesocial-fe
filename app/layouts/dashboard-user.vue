@@ -37,12 +37,6 @@ const navItems = computed<NavigationMenuItem[]>(() => [
     'i-ph-briefcase-duotone',
     '/dashboard/jobs',
     route.path.startsWith('/dashboard/jobs')
-  ),
-  createNavItem(
-    'Programs',
-    'i-ph-rocket-launch-duotone',
-    '/dashboard/programs',
-    route.path.startsWith('/dashboard/programs')
   )
 ])
 

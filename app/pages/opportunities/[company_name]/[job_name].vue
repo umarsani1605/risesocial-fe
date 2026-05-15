@@ -31,6 +31,40 @@ const similarJobs = computed(() =>
 )
 
 const locationString = computed(() => formatLocation(job.value?.location))
+const salaryDisplay = computed(() => {
+  const raw = job.value?.salary_raw
+  if (!raw) return null
+
+  try {
+    const parsed = JSON.parse(raw)
+    const currency = parsed?.currency
+    const value = parsed?.value
+    const minValue = Number(value?.minValue)
+    const maxValue = Number(value?.maxValue)
+    const unitText = typeof value?.unitText === 'string' ? value.unitText : null
+
+    if (!currency || (!Number.isFinite(minValue) && !Number.isFinite(maxValue))) {
+      return raw
+    }
+
+    const fmt = (amount: number) =>
+      new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 0
+      }).format(amount)
+
+    const range = Number.isFinite(minValue) && Number.isFinite(maxValue)
+      ? `${fmt(minValue)} - ${fmt(maxValue)}`
+      : Number.isFinite(minValue)
+        ? `From ${fmt(minValue)}`
+        : `Up to ${fmt(maxValue)}`
+
+    return unitText ? `${range} / ${unitText.toLowerCase()}` : range
+  } catch {
+    return raw
+  }
+})
 
 const parsedDescription = computed(() => {
   const text = job.value?.description ?? ''
@@ -91,7 +125,7 @@ useSeoMeta({
   <UPageSection :ui="{ container: 'gap-0!' }">
     <div class="my-2 hidden lg:block mb-6">
       <UButton variant="ghost" color="neutral" @click="router.push('/opportunities')">
-        <UIcon name="i-ph-arrow-left-bold" class="mr-2 size-4" />
+        <UIcon name="i-ph-arrow-left-bold" class="mr-2 size-4 text-muted" />
         Back to Job Opportunities
       </UButton>
     </div>
@@ -111,22 +145,27 @@ useSeoMeta({
             </div>
 
             <div class="flex flex-wrap gap-2 mb-4">
-              <UBadge v-if="job.company?.industry" color="neutral" variant="soft" size="sm">
+              <UBadge v-if="job.company?.industry" color="neutral" variant="soft">
                 {{ job.company.industry }}
               </UBadge>
-              <UBadge v-if="job.employment_type" color="neutral" variant="soft" size="sm" class="capitalize">
+              <UBadge
+                v-if="job.employment_type"
+                color="neutral"
+                variant="soft"
+                class="capitalize"
+              >
                 {{ formatJobType(job.employment_type) }}
               </UBadge>
-              <UBadge v-if="job.location?.is_remote" color="success" variant="soft" size="sm">
+              <UBadge v-if="job.location?.is_remote" color="success" variant="soft">
                 Remote
               </UBadge>
-              <UBadge v-if="job.seniority_level" color="neutral" variant="soft" size="sm">
+              <UBadge v-if="job.seniority_level" color="neutral" variant="soft">
                 {{ formatExperienceLevel(job.seniority_level) }}
               </UBadge>
             </div>
 
             <div class="flex flex-col lg:flex-row justify-between lg:items-center mb-6 gap-4">
-              <h1 class="text-2xl lg:text-3xl font-bold">{{ job.title }}</h1>
+              <h1 class="text-2xl lg:text-3xl font-bold text-default">{{ job.title }}</h1>
               <div class="flex gap-3 flex-wrap">
                 <UButton
                   color="primary"
@@ -143,16 +182,16 @@ useSeoMeta({
 
             <div class="flex flex-wrap gap-4 lg:gap-6 mb-4">
               <div v-if="job.valid_until" class="flex items-center">
-                <UIcon name="i-ph-calendar-bold" class="mr-2 size-4 shrink-0" />
-                <span class="text-sm whitespace-nowrap">Deadline: {{ formatDate(job.valid_until) }}</span>
+                <UIcon name="i-ph-calendar-bold" class="mr-2 size-4 shrink-0 text-muted" />
+                <span class="text-base whitespace-nowrap">Deadline: {{ formatDate(job.valid_until) }}</span>
               </div>
               <div class="flex items-center">
-                <UIcon name="i-ph-map-pin-bold" class="mr-2 size-4 shrink-0" />
-                <span class="text-sm">{{ locationString }}</span>
+                <UIcon name="i-ph-map-pin-bold" class="mr-2 size-4 shrink-0 text-muted" />
+                <span class="text-base">{{ locationString }}</span>
               </div>
-              <div v-if="job.salary_raw" class="flex items-center">
-                <UIcon name="i-ph-money-bold" class="mr-2 size-4 shrink-0" />
-                <span class="text-sm">{{ job.salary_raw }}</span>
+              <div v-if="salaryDisplay" class="flex items-center">
+                <UIcon name="i-ph-money-bold" class="mr-2 size-4 shrink-0 text-muted" />
+                <span class="text-base">{{ salaryDisplay }}</span>
               </div>
             </div>
           </div>
@@ -160,8 +199,8 @@ useSeoMeta({
           <!-- Description sections -->
           <div class="space-y-8">
             <div v-for="(section, index) in parsedDescription.sections" :key="index">
-              <h2 class="text-xl font-semibold mb-4">{{ section.title }}</h2>
-              <div class="text-muted leading-relaxed whitespace-pre-line">
+              <h2 class="mb-4 text-2xl font-semibold text-default">{{ section.title }}</h2>
+              <div class="text-base text-muted leading-relaxed whitespace-pre-line">
                 {{ section.content }}
               </div>
             </div>
@@ -183,26 +222,26 @@ useSeoMeta({
               />
             </div>
             <UIcon v-else name="i-ph-buildings-bold" class="size-8 text-primary" />
-            <h3 class="font-bold text-lg">{{ job.company?.name }}</h3>
+            <h3 class="text-2xl font-bold text-default">{{ job.company?.name }}</h3>
           </div>
 
           <div class="space-y-4 mb-4">
             <div class="flex items-center">
-              <UIcon name="i-ph-map-pin-bold" class="mr-3 size-4 shrink-0" />
-              <span class="text-sm">{{ locationString }}</span>
+              <UIcon name="i-ph-map-pin-bold" class="mr-3 size-4 shrink-0 text-muted" />
+              <span class="text-base">{{ locationString }}</span>
             </div>
 
             <div v-if="job.company?.industry" class="flex items-center">
-              <UIcon name="i-ph-briefcase-bold" class="mr-3 size-4 shrink-0" />
-              <span class="text-sm">{{ job.company.industry }}</span>
+              <UIcon name="i-ph-briefcase-bold" class="mr-3 size-4 shrink-0 text-muted" />
+              <span class="text-base">{{ job.company.industry }}</span>
             </div>
 
             <div v-if="job.company?.website_url" class="flex items-center">
-              <UIcon name="i-ph-globe-bold" class="mr-3 size-4 shrink-0" />
+              <UIcon name="i-ph-globe-bold" class="mr-3 size-4 shrink-0 text-muted" />
               <ULink
                 :to="job.company.website_url"
                 target="_blank"
-                class="text-sm text-primary hover:underline"
+                class="text-base text-primary hover:underline"
               >
                 {{ job.company.website_url }}
               </ULink>
@@ -218,7 +257,7 @@ useSeoMeta({
       <!-- Similar jobs -->
       <div class="lg:col-span-2 order-3">
         <div v-if="similarJobs.length > 0">
-          <h2 class="text-xl font-semibold mb-6">Similar Jobs</h2>
+          <h2 class="mb-6 text-2xl font-semibold text-default">Similar Jobs</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <SharedJobCard
               v-for="similarJob in similarJobs"

@@ -6,11 +6,10 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/ui',
     '@vueuse/nuxt',
-    'nuxt-og-image',
     '@nuxt/scripts',
     '@nuxthub/core',
-    'nuxt-csurf',
-    'nuxt-charts'
+    'nuxt-charts',
+    '@nuxtjs/seo'
   ],
   
   imports: {
@@ -22,6 +21,13 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://risesocial.org',
+    name: 'Rise Social',
+    description: 'Discover 40,000+ green job opportunities, sustainability academies, and youth leadership programs across Southeast Asia.',
+    defaultLocale: 'en'
+  },
 
   ui: {
     experimental: {
@@ -47,6 +53,12 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/docs': { redirect: '/docs/getting-started', prerender: false },
+    '/admin/**': { robots: false },
+    '/dashboard/**': { robots: false },
+    '/login': { robots: false },
+    '/register': { robots: false },
+    '/**/payment': { robots: false },
+    '/**/registration/success': { robots: false },
     '/**': {
       headers: {
         'X-Content-Type-Options': 'nosniff',

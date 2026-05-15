@@ -94,13 +94,13 @@ const teamMembersData = [
             PT. Rise Edukasi Inspirasi
           </h1>
           <div class="space-y-4 leading-relaxed">
-            <p class="text-lg">
+            <p class="text-lg text-muted">
               Is a provider for future careers in the social and environmental fields, dedicated to
               empowering youth across Southeast Asia. We specialize in offering an extensive hub of
               resources, including grants, job opportunities, internships, scholarships, and more,
               tailored specifically with an AI career buddy.
             </p>
-            <p class="text-lg">
+            <p class="text-lg text-muted">
               We transformed from Gina Academy to Rise Social, we are committed to nurturing talent,
               fostering innovation, and driving positive change in the social and environmental
               sectors.
@@ -110,7 +110,7 @@ const teamMembersData = [
       </div>
     </UPageSection>
     <UPageSection
-      class="bg-gray-100"
+      class="bg-slate-100"
       title="3 Organization Pillars"
       :ui="{ title: 'text-2xl lg:text-3xl' }"
     >
@@ -128,7 +128,7 @@ const teamMembersData = [
             </div>
           </div>
           <h3 class="text-lg font-bold">{{ pillar.title }}</h3>
-          <p class="leading-relaxed">{{ pillar.description }}</p>
+          <p class="text-base text-muted leading-relaxed">{{ pillar.description }}</p>
         </div>
       </div>
     </UPageSection>
@@ -141,7 +141,7 @@ const teamMembersData = [
           loading="lazy"
           format="webp"
         />
-        <div class="absolute inset-0 bg-gray-900/70" />
+        <div class="absolute inset-0 bg-slate-900/70" />
       </div>
       <div class="relative z-10">
         <UContainer>
@@ -151,7 +151,7 @@ const teamMembersData = [
                 <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary">
                   {{ stat.value }}
                 </div>
-                <div class="text-sm sm:text-base">{{ stat.label }}</div>
+                <div class="text-base text-muted">{{ stat.label }}</div>
               </div>
             </div>
           </div>
@@ -177,7 +177,7 @@ const teamMembersData = [
             />
           </div>
           <h3 class="text-base font-bold mb-1">{{ member.name }}</h3>
-          <p class="font-medium">{{ member.position }}</p>
+          <p class="text-base text-muted font-medium">{{ member.position }}</p>
         </div>
       </div>
     </UPageSection>

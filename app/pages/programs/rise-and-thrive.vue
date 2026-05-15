@@ -34,17 +34,17 @@ const featuresData: FeatureItem[] = [
 </script>
 
 <template>
-  <div class="bg-gray-50">
+  <div class="bg-slate-50">
     <!-- Hero Section -->
     <UPageSection class="bg-white py-8 lg:py-12">
       <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
         <!-- Left Content -->
         <div class="flex-1 space-y-6 lg:space-y-8">
-          <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-gray-800 leading-tight">
+          <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-slate-800 leading-tight">
             Rise & Thrive: Youth Empowerment Program
           </h1>
           <div class="space-y-3 lg:space-y-4">
-            <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
+            <p class="text-base text-muted leading-relaxed">
               Our program in Malang, Indonesia is dedicated to empowering local youth by helping them
               transform their natural resources into meaningful economic opportunities. By equipping
               them with knowledge, mentorship, and practical tools, we encouraged young people to see
@@ -78,7 +78,7 @@ const featuresData: FeatureItem[] = [
     </UPageSection>
 
     <!-- Features Section -->
-    <UPageSection class="bg-gray-50">
+    <UPageSection class="bg-slate-50">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8">
         <UCard
           v-for="feature in featuresData"
@@ -87,12 +87,12 @@ const featuresData: FeatureItem[] = [
           :ui="{ body: 'p-6' }"
         >
           <div class="flex justify-center mb-4">
-            <div class="size-20 rounded-full flex items-center justify-center bg-gray-100">
+            <div class="size-20 rounded-full flex items-center justify-center bg-slate-100">
               <UIcon :name="feature.icon" class="size-10 text-emerald-600" />
             </div>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">{{ feature.title }}</h3>
-          <p class="text-gray-600 leading-relaxed">
+          <h3 class="text-lg font-bold text-default mb-2">{{ feature.title }}</h3>
+          <p class="text-base text-muted leading-relaxed">
             {{ feature.description }}
           </p>
         </UCard>
@@ -112,7 +112,7 @@ const featuresData: FeatureItem[] = [
         </div>
         <div class="flex-1 space-y-6 lg:space-y-8">
           <div class="space-y-3 lg:space-y-4">
-            <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+            <p class="text-base lg:text-lg text-muted leading-relaxed">
               At the heart of the program are these young leaders, who have transformed local
               knowledge and resources into sustainable enterprises. These community-driven businesses
               are designed to last, ensuring long-term benefits for both the youth and the broader
@@ -129,7 +129,7 @@ const featuresData: FeatureItem[] = [
       <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
         <div class="flex-1 space-y-6 lg:space-y-8">
           <div class="space-y-3 lg:space-y-4">
-            <p class="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+            <p class="text-base lg:text-lg text-muted leading-relaxed">
               Ultimately, this initiative is not just about economic gain, but about fostering a
               resilient ecosystem where youth, natural resources, and community development are
               interconnected. It serves as a model for how local empowerment can drive sustainable
@@ -154,10 +154,10 @@ const featuresData: FeatureItem[] = [
       <div
         class="text-center bg-gradient-to-r from-[#0a5c5b]/10 to-[#095351]/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12"
       >
-        <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">
+        <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-default mb-3 lg:mb-4">
           Ready to Accelerate Your Sustainability Career?
         </h3>
-        <p class="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 lg:mb-6 max-w-2xl mx-auto">
+        <p class="text-base lg:text-lg text-muted mb-4 lg:mb-6 max-w-2xl mx-auto">
           Join our comprehensive bootcamp programs and get direct access to job opportunities with
           our hiring partners
         </p>

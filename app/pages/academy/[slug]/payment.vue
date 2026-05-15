@@ -61,7 +61,7 @@ const snapDisplayed = ref(false)
 const paymentStatus = ref<string | null>(null)
 const transactionCode = ref<string | null>(null)
 
-// Check if already enrolled
+// Check if already enrolled, then auto-open snap
 onMounted(async () => {
   metaPixelProxy?.fbq('track', 'InitiateCheckout', {
     content_ids: [String(pricing.value!.id)],
@@ -81,6 +81,8 @@ onMounted(async () => {
   } catch {
     // silently fail
   }
+
+  await onPay()
 })
 
 const onPay = async () => {
@@ -132,111 +134,105 @@ const onPay = async () => {
 </script>
 
 <template>
-  <div class="mx-auto">
-    <UAlert
-      v-if="paymentError"
-      color="error"
-      variant="subtle"
-      icon="i-ph-info-bold"
-      title="Payment Error"
-      :description="paymentError"
-    />
-
-    <UCard :ui="{ root: 'w-[500px]', body: 'border-t border-default' }">
-      <template #header>
-        <h1 class="text-2xl font-bold">Complete Your Payment</h1>
-      </template>
-      <div class="space-y-4">
-        <!-- Academy info row -->
-        <div class="flex gap-4">
-          <NuxtImg
-            :src="academy.image_url"
-            :alt="academy.title"
-            width="56"
-            height="56"
-            class="rounded-lg object-cover shrink-0 size-14"
-          />
-          <div class="flex-1">
-            <p class="font-semibold leading-tight truncate">{{ academy.title }}</p>
-          </div>
-          <div class="text-right shrink-0">
-            <p class="font-semibold">{{ formatPrice(pricing!.discount_price) }}</p>
-          </div>
-        </div>
-
-        <hr class="border-gray-100" />
-
-        <!-- Payment widget / status -->
-        <UAlert
-          v-if="paymentStatus === 'paid'"
-          color="success"
-          variant="subtle"
-          icon="i-ph-check-circle-bold"
-          title="Payment Successful"
-          :description="`You are now enrolled in ${academy.title}`"
-        />
-
-        <UAlert
-          v-else-if="paymentStatus === 'pending'"
-          color="warning"
-          variant="subtle"
-          icon="i-ph-clock-bold"
-          title="Payment Pending"
-          description="Please complete your payment to finish enrollment"
-        />
-
-        <template v-else>
-          <p v-if="snapDisplayed" class="text-sm text-muted">
-            After selecting a payment method, complete the payment below.
-          </p>
-        </template>
-
-        <ClientOnly>
-          <div id="snap-container" class="max-h-[400px] overflow-hidden" />
-        </ClientOnly>
-
-        <!-- Subtotal + Total -->
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between text-muted">
-            <span>Subtotal</span>
-            <span>{{ formatPrice(pricing!.discount_price) }}</span>
-          </div>
-          <div class="flex justify-between font-semibold text-base">
-            <span>Total</span>
-            <span>{{ formatPrice(pricing!.discount_price) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pay Now -->
-      <template #footer>
-        <UButton
-          v-if="!snapDisplayed && paymentStatus === null"
-          label="Pay Now"
-          color="primary"
-          size="lg"
-          :loading="isProcessingPayment"
-          :disabled="isProcessingPayment"
-          block
-          @click="onPay"
-        />
-        <UButton
-          v-if="paymentStatus === 'paid'"
-          label="Go to Dashboard"
-          color="primary"
-          size="lg"
-          block
-          @click="navigateTo('/dashboard/academy')"
-        />
-
-        <p class="text-xs text-muted text-center mt-4">
-          Having trouble? Contact us at
-          <a href="mailto:risesocial.official@gmail.com" class="underline"
-            >risesocial.official@gmail.com</a
+  <div
+    class="min-h-screen bg-gradient-to-t from-orange-50 to-white flex items-center justify-center p-4 sm:p-8"
+  >
+    <UPageCard
+      class="w-full max-w-6xl rounded-xl shadow-subtle overflow-hidden"
+      :ui="{ container: 'p-0!' }"
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[640px]">
+        <!-- Left panel: order summary -->
+        <aside class="bg-primary text-white flex flex-col gap-8 px-8 py-10 lg:px-12 lg:py-12">
+          <UButton
+            to="/academy"
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-arrow-left"
+            class="self-start text-white hover:bg-white/10 hover:text-white -ml-2"
           >
-        </p>
-      </template>
-    </UCard>
+            Back
+          </UButton>
+
+          <div class="max-w-md">
+            <NuxtImg
+              :src="academy.image_url"
+              :alt="academy.title"
+              width="160"
+              height="160"
+              class="rounded-xl object-cover size-40"
+            />
+            <h1 class="mt-6 text-2xl lg:text-3xl font-bold leading-tight">{{ academy.title }}</h1>
+            <p class="mt-3 text-2xl font-semibold">{{ formatPrice(pricing!.discount_price) }}</p>
+          </div>
+          <dl class="space-y-3 text-sm">
+            <hr class="my-8 border-white/15" />
+            <div class="flex justify-between text-white/80">
+              <dt>Subtotal</dt>
+              <dd>{{ formatPrice(pricing!.discount_price) }}</dd>
+            </div>
+            <div class="pt-3 border-t border-white/15 flex justify-between font-semibold text-base">
+              <dt>Total</dt>
+              <dd>{{ formatPrice(pricing!.discount_price) }}</dd>
+            </div>
+          </dl>
+        </aside>
+
+        <!-- Right panel: payment -->
+        <section class="flex flex-col">
+          <UAlert
+            v-if="paymentError"
+            color="error"
+            variant="subtle"
+            icon="i-ph-info-bold"
+            title="Payment Error"
+            :description="paymentError"
+            class="mb-6"
+          />
+
+          <UAlert
+            v-if="paymentStatus === 'paid'"
+            color="success"
+            variant="subtle"
+            icon="i-ph-check-circle-bold"
+            title="Payment Successful"
+            :description="`You are now enrolled in ${academy.title}`"
+            class="mb-6"
+          />
+
+          <UAlert
+            v-else-if="paymentStatus === 'pending'"
+            color="warning"
+            variant="subtle"
+            icon="i-ph-clock-bold"
+            title="Payment Pending"
+            description="Please complete your payment to finish enrollment"
+            class="mb-6"
+          />
+
+          <ClientOnly>
+            <div id="snap-container" class="w-full" />
+          </ClientOnly>
+
+          <UButton
+            v-if="paymentStatus === 'paid'"
+            label="Go to Dashboard"
+            color="primary"
+            size="lg"
+            block
+            class="mt-6"
+            @click="navigateTo('/dashboard/academy')"
+          />
+
+          <p class="text-xs text-muted text-center mt-6">
+            Having trouble? Contact us at
+            <a href="mailto:risesocial.official@gmail.com" class="underline"
+              >risesocial.official@gmail.com</a
+            >
+          </p>
+        </section>
+      </div>
+    </UPageCard>
   </div>
 </template>
 

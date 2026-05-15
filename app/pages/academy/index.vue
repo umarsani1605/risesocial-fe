@@ -34,12 +34,12 @@ const isLoading = computed(() => status.value === 'pending')
             Rise Sustainability Academy
           </h1>
           <div class="space-y-3 lg:space-y-4">
-            <p class="text-sm sm:text-base lg:text-lg leading-relaxed">
+            <p class="text-base lg:text-lg text-muted leading-relaxed">
               Rise Sustainability Academy is an online learning program started from 1 up to 5
               months live class with experts and mentor to student get comprehensive understanding
               in various sustainability topic.
             </p>
-            <p class="text-sm sm:text-base lg:text-lg leading-relaxed">
+            <p class="text-base lg:text-lg text-muted leading-relaxed">
               This program is for young professional, career switchers, sustainability and green
               workers to improve their knowledge and skills in this topic, equipped with
               <span class="font-semibold">JOB ACCELERATOR program</span> with our hiring partners.
@@ -60,7 +60,7 @@ const isLoading = computed(() => status.value === 'pending')
     <UPageSection>
       <div>
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Available Academy Programs</h2>
-        <p class="text-sm sm:text-base lg:text-lg">
+        <p class="text-base lg:text-lg text-muted">
           Choose from our specialized academy programs designed to accelerate your sustainability
           career
         </p>
@@ -71,12 +71,12 @@ const isLoading = computed(() => status.value === 'pending')
           <UCard>
             <div class="flex flex-col-reverse lg:flex-row gap-8">
               <div class="flex-4 space-y-4">
-                <div class="h-8 bg-gray-200 rounded w-3/4" />
-                <div class="h-4 bg-gray-200 rounded w-1/2" />
-                <div class="h-20 bg-gray-200 rounded" />
+                <div class="h-8 bg-slate-200 rounded w-3/4" />
+                <div class="h-4 bg-slate-200 rounded w-1/2" />
+                <div class="h-20 bg-slate-200 rounded" />
               </div>
               <div class="flex-1">
-                <div class="h-48 bg-gray-200 rounded-2xl" />
+                <div class="h-48 bg-slate-200 rounded-2xl" />
               </div>
             </div>
           </UCard>
@@ -102,21 +102,21 @@ const isLoading = computed(() => status.value === 'pending')
                 <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold">
                   {{ academy.title }}
                 </h3>
-                <div class="flex flex-wrap items-center gap-2 lg:gap-4 text-xs sm:text-sm">
+                <div class="flex flex-wrap items-center gap-2 lg:gap-4 text-sm">
                   <UBadge color="neutral" variant="soft" class="rounded-lg">
-                    <UIcon name="i-ph-tag-bold" class="size-3 lg:size-4 mr-1" />
+                    <UIcon name="i-ph-tag-bold" class="size-3 lg:size-4 mr-1 text-muted" />
                     {{ academy.category }}
                   </UBadge>
                   <UBadge color="neutral" variant="soft" class="rounded-lg">
-                    <UIcon name="i-ph-clock-bold" class="size-3 lg:size-4 mr-1" />
+                    <UIcon name="i-ph-clock-bold" class="size-3 lg:size-4 mr-1 text-muted" />
                     {{ academy.duration }}
                   </UBadge>
                   <UBadge color="neutral" variant="soft" class="rounded-lg">
-                    <UIcon name="i-ph-video-bold" class="size-3 lg:size-4 mr-1" />
+                    <UIcon name="i-ph-video-bold" class="size-3 lg:size-4 mr-1 text-muted" />
                     {{ academy.format }}
                   </UBadge>
                 </div>
-                <p class="text-sm sm:text-base leading-relaxed line-clamp-3">
+                <p class="text-base text-muted leading-relaxed line-clamp-3">
                   {{ academy.description }}
                 </p>
               </div>
@@ -147,4 +147,3 @@ const isLoading = computed(() => status.value === 'pending')
     </UPageSection>
   </div>
 </template>
-

@@ -238,8 +238,8 @@ const pricingBenefits = {
       <div class="container mx-auto px-4 relative">
         <div class="flex flex-col-reverse lg:flex-row gap-12 items-stretch">
           <div class="flex-1 pt-24 space-y-6 lg:space-y-8 text-center lg:text-left">
-            <h2 class="text-xl text-gray-700 font-semibold">International Climate Change Leadership Forum</h2>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">Rise Young Leaders Summit Japan 2026</h1>
+            <h2 class="text-xl text-slate-700 font-semibold">International Climate Change Leadership Forum</h2>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">Rise Young Leaders Summit Japan 2026</h1>
             <div class="space-y-4 leading-relaxed">
               <p>
                 <span class="font-bold">Rise Young Leaders Summit Japan 2026</span> is an international forum by
@@ -290,7 +290,7 @@ const pricingBenefits = {
     <section class="bg-transparent py-16 lg:py-24">
       <div class="container mx-auto px-4 space-y-8 lg:space-y-16">
         <div class="text-center max-w-4xl mx-auto mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Be the Force Behind World's Green Revolution</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-6">Be the Force Behind World's Green Revolution</h2>
           <p class="text-base lg:text-lg">
             If you're passionate about sustainability, driven to lead, and ready to turn your climate ideas into real projects, this is your moment to
             rise.
@@ -345,7 +345,7 @@ const pricingBenefits = {
             </svg>
           </div>
           <blockquote class="mb-8">
-            <p class="text-base md:text-lg lg:text-xl font-medium text-gray-800 leading-relaxed">
+            <p class="text-base md:text-lg lg:text-xl font-medium text-slate-800 leading-relaxed">
               This is where <span class="text-sky-400 font-semibold">climate action meets leadership</span>, and where your
               <span class="relative">journey begins.</span>
             </p>
@@ -356,7 +356,7 @@ const pricingBenefits = {
     </section>
 
     <!-- Eligibility Section -->
-    <section class="py-16 lg:py-24 bg-gradient-to-t from-sky-100 to-white text-gray-800 relative overflow-hidden">
+    <section class="py-16 lg:py-24 bg-gradient-to-t from-sky-100 to-white text-slate-800 relative overflow-hidden">
       <div class="absolute inset-0 opacity-5">
         <div class="absolute -bottom-4 left-4 h-96 z-20">
           <NuxtImg
@@ -413,59 +413,59 @@ const pricingBenefits = {
 
       <div class="relative z-10 container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto mb-12 lg:mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Are You Eligible?</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Are You Eligible?</h2>
           <p class="text-lg">We're looking for passionate individuals ready to drive real change in their communities and beyond.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-6xl mx-auto">
-          <div class="md:col-span-6 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
+          <div class="md:col-span-6 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
               <UIcon name="i-ph-users-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-bold">Target Audience</h3>
-            <p class="text-sm">Aspiring young leaders, volunteers, and professionals in the social and environmental sectors.</p>
+            <p class="text-base text-muted">Aspiring young leaders, volunteers, and professionals in the social and environmental sectors.</p>
           </div>
 
-          <div class="md:col-span-6 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
+          <div class="md:col-span-6 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
               <UIcon name="i-ph-handshake-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Advocacy Focus</h3>
-            <p class="text-sm">Your passion lies in sustainability, youth empowerment, climate leadership, or community development.</p>
+            <p class="text-base text-muted">Your passion lies in sustainability, youth empowerment, climate leadership, or community development.</p>
           </div>
 
-          <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
+          <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
               <UIcon name="i-ph-graduation-cap-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Eligibility</h3>
-            <p class="text-sm">Open to university students and early-career professionals.</p>
+            <p class="text-base text-muted">Open to university students and early-career professionals.</p>
           </div>
 
-          <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
+          <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
               <UIcon name="i-ph-calendar-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Age Requirement</h3>
-            <p class="text-sm">Applicants must be 19 - 35 years old at the time of application.</p>
+            <p class="text-base text-muted">Applicants must be 19 - 35 years old at the time of application.</p>
           </div>
 
-          <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-gray-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
+          <div class="md:col-span-4 flex flex-col items-center text-center gap-4 bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-400 transition-all duration-300 shadow-subtle">
             <div class="size-14 bg-sky-400 rounded-xl flex items-center justify-center">
               <UIcon name="i-ph-globe-bold" class="size-6! text-white" />
             </div>
             <h3 class="text-lg font-semibold">Nationality</h3>
-            <p class="text-sm">Open to all nationalities, across Southeast Asia and beyond.</p>
+            <p class="text-base text-muted">Open to all nationalities, across Southeast Asia and beyond.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Program Highlights Section -->
-    <section class="py-16 lg:py-24 bg-white text-gray-800 relative z-20">
+    <section class="py-16 lg:py-24 bg-white text-slate-800 relative z-20">
       <div class="relative z-10 container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Program Highlights</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Program Highlights</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
         </div>
 
@@ -485,7 +485,7 @@ const pricingBenefits = {
             </div>
             <div class="flex-1 flex flex-col items-center p-4 lg:p-6 gap-3">
               <h3 class="text-xl font-bold">Competition</h3>
-              <p class="text-sm">
+              <p class="text-base text-white/90">
                 Stand a chance to be one of <span class="font-bold">two fully funded delegates</span>, selected through a compelling climate, economic
                 & sustainable growth themed essay. In addition, <span class="font-bold">25 outstanding applicants</span> will be granted
                 <span class="font-bold">partial and self-funded slots</span>, offering them the opportunity to join this prestigious international
@@ -509,7 +509,7 @@ const pricingBenefits = {
             </div>
             <div class="flex-1 flex flex-col items-center p-4 lg:p-6 gap-3">
               <h3 class="text-xl font-bold">Mini Lecture Series</h3>
-              <p class="text-sm">
+              <p class="text-base text-white/90">
                 All applicants will gain exclusive access to a <span class="font-bold">virtual pre-summit lecture</span> led by renowned professors
                 and climate experts, providing a solid foundation on the climate crisis and sustainability before diving into the main forum.
               </p>
@@ -531,7 +531,7 @@ const pricingBenefits = {
             </div>
             <div class="p-4 lg:p-8 flex-1 flex flex-col items-center gap-4">
               <h3 class="text-2xl font-bold">Summit & International Forum</h3>
-              <p class="text-sm">
+              <p class="text-base text-white/90">
                 Engage in a <span class="font-bold">transformative youth summit experience</span> in Japan, where selected participants will present
                 their climate ideas, attend expert-led talks and workshops, and collaborate in rich cultural exchange activities, all designed to
                 foster global leadership in sustainability.
@@ -543,10 +543,10 @@ const pricingBenefits = {
     </section>
 
     <!-- Speakers Section -->
-    <section class="py-16 lg:py-24 mb-16 bg-white text-gray-800 relative z-20">
+    <section class="py-16 lg:py-24 mb-16 bg-white text-slate-800 relative z-20">
       <div class="container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Previous Speakers</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Previous Speakers</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
         </div>
 
@@ -671,7 +671,7 @@ const pricingBenefits = {
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">How to Apply</h2>
             <div class="w-24 h-1 bg-white mx-auto rounded-full" />
           </div>
-          <div class="bg-white text-center rounded-3xl shadow-lg p-8 md:p-10 mb-10 border border-gray-100">
+          <div class="bg-white text-center rounded-3xl shadow-lg p-8 md:p-10 mb-10 border border-slate-100">
             <h3 class="text-2xl font-bold mb-6">Ready to take the next step?</h3>
             <div class="flex flex-col gap-6 max-w-3xl mx-auto">
               <p>
@@ -680,7 +680,7 @@ const pricingBenefits = {
               </p>
               <p class="flex flex-col lg:flex-row items-center justify-center gap-2 w-full">
                 <span class="flex items-center gap-2">
-                  <UIcon name="i-heroicons-calendar-days-20-solid" class="size-6! text-sky-500" />
+                  <UIcon name="i-heroicons-calendar-days-20-solid" class="size-6! text-muted" />
                   <span class="font-semibold">Application Deadline:</span>
                 </span>
                 <span>May 31, 2026</span>
@@ -705,29 +705,29 @@ const pricingBenefits = {
     <section id="scholarship" class="py-16 lg:py-24 bg-white">
       <div class="container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Scholarship Opportunity</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Scholarship Opportunity</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
         </div>
 
         <div class="grid lg:grid-cols-3 gap-8">
           <!-- Fully Funded -->
-          <UCard class="border border-gray-100 py-10 hover:-translate-y-2 transition-transform duration-300" variant="outline">
+          <UCard class="border border-slate-100 py-10 hover:-translate-y-2 transition-transform duration-300" variant="outline">
             <div class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-sky-400 to-sky-400 text-white rounded-xl w-12 h-12">
                   <UIcon name="i-ph-sparkle-bold" class="size-6!" />
                 </span>
-                <h3 class="text-2xl font-bold text-gray-900">2 Fully Funded ($10)</h3>
+                <h3 class="text-2xl font-bold text-slate-900">2 Fully Funded ($10)</h3>
               </div>
               <div>
-                <p class="text-sm text-gray-600 mt-2">
+                <p class="text-base text-muted mt-2">
                   Ideal for driven students and young professionals eager to seize this transformative experience in Climate Change, Economic &amp;
                   Sustainable Growth Leadership.
                 </p>
               </div>
-              <ul class="space-y-3 text-gray-600 ml-2">
+              <ul class="space-y-3 text-muted ml-2">
                 <li v-for="benefit in pricingBenefits.fullyFunded" :key="benefit" class="flex items-start">
-                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-muted w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
               </ul>
@@ -738,30 +738,30 @@ const pricingBenefits = {
           </UCard>
 
           <!-- Partial Funded -->
-          <UCard class="border border-gray-100 py-10 hover:-translate-y-1 transition-transform duration-300" variant="outline">
+          <UCard class="border border-slate-100 py-10 hover:-translate-y-1 transition-transform duration-300" variant="outline">
             <div class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-sky-400 to-sky-400 text-white rounded-xl w-12 h-12">
                   <UIcon name="i-ph-rocket-bold" class="size-6!" />
                 </span>
-                <h3 class="text-2xl font-bold text-gray-900">15 Partial Funded</h3>
+                <h3 class="text-2xl font-bold text-slate-900">15 Partial Funded</h3>
               </div>
               <div>
-                <p class="text-sm text-gray-600 mt-2">
+                <p class="text-base text-muted mt-2">
                   Automatically selected from the non-selected Fully Funded candidates, this option lets you increase your participation in the Summit
                   and gives you the chance to upgrade and join the full activities.
                 </p>
               </div>
-              <ul class="space-y-3 text-gray-600 ml-2 mb-4">
+              <ul class="space-y-3 text-muted ml-2 mb-4">
                 <li v-for="benefit in pricingBenefits.partialFunded" :key="benefit" class="flex items-start">
-                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-muted w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
                 <div class="py-2">
-                  <p class="text-base text-gray-800 font-semibold">With upgrade ($650):</p>
+                  <p class="text-base text-slate-800 font-semibold">With upgrade ($650):</p>
                 </div>
                 <li v-for="benefit in pricingBenefits.partialFundedUpgrade" :key="benefit" class="flex items-start">
-                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-muted w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
               </ul>
@@ -772,23 +772,23 @@ const pricingBenefits = {
           </UCard>
 
           <!-- Self Funded -->
-          <UCard class="border border-gray-100 py-10 hover:-translate-y-1 transition-transform duration-300" variant="outline">
+          <UCard class="border border-slate-100 py-10 hover:-translate-y-1 transition-transform duration-300" variant="outline">
             <div class="flex flex-col gap-6 h-full px-10">
               <div class="flex items-center gap-4">
                 <span class="flex items-center justify-center bg-gradient-to-tr from-sky-400 to-sky-400 text-white rounded-xl w-12 h-12">
                   <UIcon name="i-ph-trophy-bold" class="size-6!" />
                 </span>
-                <h3 class="text-2xl font-bold text-gray-900">10 Self Funded ($800)</h3>
+                <h3 class="text-2xl font-bold text-slate-900">10 Self Funded ($800)</h3>
               </div>
               <div>
-                <p class="text-sm text-gray-600 mt-2">
+                <p class="text-base text-muted mt-2">
                   Ideal for experienced professionals and executives, this Global Leadership Experience equips you with cutting-edge climate change,
                   economic and sustainable growth leadership skills, and culminates in a prestigious RYLS certification.
                 </p>
               </div>
-              <ul class="space-y-3 text-gray-600 ml-2">
+              <ul class="space-y-3 text-muted ml-2">
                 <li v-for="benefit in pricingBenefits.selfFunded" :key="benefit" class="flex items-start">
-                  <UIcon name="i-ph-check-circle-bold" class="text-green-500 w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <UIcon name="i-ph-check-circle-bold" class="text-muted w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span class="ml-4">{{ benefit }}</span>
                 </li>
               </ul>
@@ -802,12 +802,12 @@ const pricingBenefits = {
     </section>
 
     <!-- Gallery Section -->
-    <section id="gallery" class="py-12 lg:py-16 bg-gray-50">
+    <section id="gallery" class="py-12 lg:py-16 bg-slate-50">
       <div class="container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Gallery</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Gallery</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
-          <p class="mt-6 text-gray-600">Glimpses from our previous events and activities.</p>
+          <p class="mt-6 text-muted">Glimpses from our previous events and activities.</p>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -883,7 +883,7 @@ const pricingBenefits = {
     <section class="py-12 lg:py-16 bg-white">
       <div class="container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Hear from Our Alumni</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Hear from Our Alumni</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full mt-4" />
         </div>
 
@@ -901,10 +901,10 @@ const pricingBenefits = {
           >
             <template #default="{ item: testimonial }">
               <div class="px-2 py-4">
-                <UCard class="p-4 sm:p-6 lg:p-8 text-center h-full border border-gray-100" variant="outline">
+                <UCard class="p-4 sm:p-6 lg:p-8 text-center h-full border border-slate-100" variant="outline">
                   <div class="flex flex-col justify-between h-full">
                     <div class="space-y-3 lg:space-y-4">
-                      <p class="text-sm lg:text-base text-gray-600 leading-relaxed">"{{ testimonial.text }}"</p>
+                      <p class="text-base text-muted leading-relaxed">"{{ testimonial.text }}"</p>
                     </div>
                     <div class="mt-4 lg:mt-6 space-y-2">
                       <div class="flex justify-center space-x-1">
@@ -912,10 +912,10 @@ const pricingBenefits = {
                           v-for="i in 5"
                           :key="i"
                           name="i-heroicons-star-solid"
-                          class="h-3 w-3 lg:h-4 lg:w-4 text-yellow-400"
+                          class="h-3 w-3 lg:h-4 lg:w-4 text-warning"
                         />
                       </div>
-                      <h4 class="text-sm lg:text-base font-semibold text-gray-900">
+                      <h4 class="text-base font-semibold text-slate-900">
                         {{ testimonial.name }}
                       </h4>
                       <p class="text-sm lg:text-base text-sky-400 font-medium">
@@ -935,16 +935,16 @@ const pricingBenefits = {
     <section class="py-12 lg:py-16 bg-white relative">
       <div class="container mx-auto px-4 relative z-30">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Frequently Asked Questions</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full mt-4" />
         </div>
         <div class="max-w-3xl mx-auto">
           <UAccordion
             :items="faqItems"
             :ui="{
-              item: 'rounded-lg px-4 bg-white border border-gray-100 mb-4',
-              trigger: 'text-left text-base font-medium text-gray-700 hover:text-gray-900 cursor-pointer py-4',
-              content: 'text-gray-600 text-base pb-4'
+              item: 'rounded-lg px-4 bg-white border border-slate-100 mb-4',
+              trigger: 'text-left text-base font-medium text-slate-700 hover:text-slate-900 cursor-pointer py-4',
+              content: 'text-muted text-base pb-4'
             }"
           />
         </div>
