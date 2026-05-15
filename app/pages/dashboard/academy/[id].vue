@@ -11,7 +11,7 @@ const cohortId = route.params.id as string
 const { api } = useApi()
 const [
   { data: cohortData, error },
-  { data: modulesData },
+  { data: modulesData, error: modulesError },
   { data: certData }
 ] = await Promise.all([
   useAsyncData(`dashboard:cohort:${cohortId}`, () =>
@@ -26,6 +26,12 @@ const [
     )
   )
 ])
+
+// Ownership guard: backend returns 403 on /modules if user has no placement here.
+// Redirect to dashboard instead of leaking other cohorts' details.
+if (modulesError.value) {
+  await navigateTo('/dashboard/academy', { replace: true })
+}
 
 if (error.value || !cohortData.value?.data) {
   throw createError({ statusCode: 404, message: 'Cohort not found' })

@@ -115,6 +115,7 @@ interface AcademyEnrollmentItem {
     id: number
     cohort_id: number
     cohort: { id: number; name: string; status: string } | null
+    certificate: { id: number } | null
   } | null
 }
 

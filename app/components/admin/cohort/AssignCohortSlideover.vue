@@ -25,15 +25,31 @@ const title = computed(() => (isTransferMode.value ? 'Move Cohort' : 'Assign Coh
 
 const confirmLabel = computed(() => (isTransferMode.value ? 'Confirm Move' : 'Confirm Assign'))
 
-function studentName(placement: AdminCohortPlacement) {
-  return `${placement.user.first_name} ${placement.user.last_name}`.trim()
+const isCurrentCohortSelected = computed(
+  () => isTransferMode.value && props.selectedCohortId === props.placement?.cohort_id
+)
+
+const hasCertificate = computed(() => !!props.placement?.certificate)
+
+const isUnassignConfirmOpen = ref(false)
+
+const currentCohort = computed(() =>
+  props.cohorts.find((c) => c.id === props.placement?.cohort_id)
+)
+
+function confirmUnassign() {
+  emit('drop')
 }
 
-function initials(placement: AdminCohortPlacement) {
-  return (
-    `${placement.user.first_name?.[0] ?? ''}${placement.user.last_name?.[0] ?? ''}`.toUpperCase() ||
-    '?'
-  )
+watch(
+  () => props.isDroppingStudent,
+  (loading) => {
+    if (!loading) isUnassignConfirmOpen.value = false
+  }
+)
+
+function studentName(placement: AdminCohortPlacement) {
+  return `${placement.user.first_name} ${placement.user.last_name}`.trim()
 }
 
 function formatDateRange(start: string | null, end: string | null) {
@@ -71,18 +87,29 @@ function selectCohort(id: number) {
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 space-y-8">
+          <UAlert
+            v-if="hasCertificate"
+            color="primary"
+            variant="subtle"
+            icon="i-ph-certificate-bold"
+            title="Academy completed"
+            description="This student has already completed the academy and received a certificate. Transfer and unassign are disabled."
+          />
           <div v-if="placement" class="flex flex-col gap-2">
             <p class="font-bold mb-2">Student Details</p>
             <div class="flex gap-2">
-              <p class="font-medium text-sm text-muted w-20">Name:</p>
+              <p class="font-medium text-sm text-muted w-20">Name</p>
+              <p class="font-medium text-sm text-muted">:</p>
               <p class="font-medium text-sm">{{ studentName(placement) }}</p>
             </div>
             <div class="flex gap-2">
-              <p class="font-medium text-sm text-muted w-20">Email:</p>
+              <p class="font-medium text-sm text-muted w-20">Email</p>
+              <p class="font-medium text-sm text-muted">:</p>
               <p class="font-medium text-sm">{{ placement.user.email }}</p>
             </div>
             <div class="flex gap-2">
-              <p class="font-medium text-sm text-muted w-20">Phone:</p>
+              <p class="font-medium text-sm text-muted w-20">Phone</p>
+              <p class="font-medium text-sm text-muted">:</p>
               <p class="font-medium text-sm">{{ placement.user.phone ?? '-' }}</p>
             </div>
           </div>
@@ -116,7 +143,7 @@ function selectCohort(id: number) {
                     <span class="font-semibold text-sm truncate">{{ cohort.name }}</span>
                     <UBadge
                       v-if="isTransferMode && cohort.id === placement?.cohort_id"
-                      label="current"
+                      label="Current"
                       color="primary"
                       variant="subtle"
                     />
@@ -147,13 +174,13 @@ function selectCohort(id: number) {
           <div class="flex items-center gap-2">
             <UButton
               v-if="isTransferMode"
-              label="Remove"
-              icon="i-ph-trash-bold"
+              label="Unassign"
+              icon="i-ph-user-minus-bold"
               color="error"
               variant="outline"
               :loading="isDroppingStudent"
-              :disabled="isAssigning"
-              @click="emit('drop')"
+              :disabled="isAssigning || hasCertificate"
+              @click="isUnassignConfirmOpen = true"
             />
             <div class="flex-1" />
             <UButton
@@ -167,7 +194,7 @@ function selectCohort(id: number) {
               :label="confirmLabel"
               color="primary"
               :loading="isAssigning"
-              :disabled="!selectedCohortId || isDroppingStudent"
+              :disabled="!selectedCohortId || isCurrentCohortSelected || isDroppingStudent || hasCertificate"
               @click="emit('confirm')"
             />
           </div>
@@ -175,4 +202,39 @@ function selectCohort(id: number) {
       </div>
     </template>
   </USlideover>
+
+  <UModal
+    v-model:open="isUnassignConfirmOpen"
+    title="Unassign Student"
+    :ui="{ footer: 'justify-end' }"
+  >
+    <template #body>
+      <p class="text-sm">
+        Are you sure you want to unassign
+        <span v-if="placement" class="font-semibold">{{ studentName(placement) }}</span>
+        <template v-else>this student</template>
+        from
+        <span v-if="currentCohort" class="font-semibold">{{ currentCohort.name }}</span>
+        <template v-else>their current cohort</template>? Their enrollment and payment will be
+        kept — they can be reassigned to any cohort later.
+      </p>
+    </template>
+    <template #footer>
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="isDroppingStudent"
+        @click="isUnassignConfirmOpen = false"
+      />
+      <UButton
+        label="Unassign"
+        icon="i-ph-user-minus-bold"
+        color="error"
+        :loading="isDroppingStudent"
+        :disabled="isDroppingStudent"
+        @click="confirmUnassign"
+      />
+    </template>
+  </UModal>
 </template>

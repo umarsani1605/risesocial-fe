@@ -26,13 +26,7 @@ const enrollments = computed(() => rawData.value?.data ?? [])
 // ── Filters ──────────────────────────────────────────────────
 const search = ref('')
 const academyFilter = ref('all')
-const assignmentFilter = ref('unassigned')
-
-const assignmentOptions = [
-  { label: 'All', value: 'all' },
-  { label: 'Not Assigned', value: 'unassigned' },
-  { label: 'Assigned', value: 'assigned' }
-]
+const assignmentFilter = ref<'all' | 'unassigned' | 'assigned'>('all')
 
 const academyOptions = computed(() => {
   const seen = new Map<number, string>()
@@ -43,7 +37,27 @@ const academyOptions = computed(() => {
   ]
 })
 
+const totalCount = computed(() => enrollments.value.length)
 const unassignedCount = computed(() => enrollments.value.filter((e) => !e.placement).length)
+const assignedCount = computed(() => enrollments.value.filter((e) => !!e.placement).length)
+
+const assignmentTabItems = computed(() => [
+  {
+    label: `All (${totalCount.value})`,
+    value: 'all',
+    icon: 'i-ph-users-duotone'
+  },
+  {
+    label: `Assigned (${assignedCount.value})`,
+    value: 'assigned',
+    icon: 'i-ph-user-circle-check-duotone'
+  },
+  {
+    label: `Not Assigned (${unassignedCount.value})`,
+    value: 'unassigned',
+    icon: 'i-ph-user-circle-minus-duotone'
+  }
+])
 
 const filteredData = computed(() => {
   let result = [...enrollments.value]
@@ -90,7 +104,14 @@ function toPlacementAdapter(enrollment: AcademyEnrollmentItem): AdminCohortPlace
     status: enrollment.completed_at ? 'completed' : 'active',
     placed_at: null,
     user: enrollment.user,
-    certificate: null
+    certificate: enrollment.placement?.certificate
+      ? {
+          id: enrollment.placement.certificate.id,
+          certificate_code: '',
+          file_path: null,
+          file_url: null
+        }
+      : null
   }
 }
 
@@ -103,7 +124,7 @@ async function openAssignModal(enrollment: AcademyEnrollmentItem) {
   isLoadingCohorts.value = true
   try {
     const res = await api<ApiResponse<AdminCohortSummary[]>>(
-      `/admin/cohorts?academy_id=${enrollment.academy_id}&status[]=not_started&status[]=ongoing`
+      `/admin/cohorts?academy_id=${enrollment.academy_id}&status=not_started&status=ongoing`
     )
     availableCohorts.value = res.data
   } catch (error: unknown) {
@@ -226,13 +247,14 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) => {
       const isPlaced = !!row.original.placement
+      const hasCert = !!row.original.placement?.certificate
       return h(UButton, {
         label: isPlaced ? 'Move Cohort' : 'Assign Cohort',
         color: 'primary',
         variant: 'light',
         size: 'sm',
         leadingIcon: isPlaced ? 'i-ph-arrows-left-right-bold' : 'i-ph-plus-bold',
-        disabled: !canEdit('admin.cohort'),
+        disabled: !canEdit('admin.cohort') || hasCert,
         onClick: () => openAssignModal(row.original)
       })
     }
@@ -250,6 +272,18 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
       icon="i-ph-warning-circle-bold"
     />
 
+    <UTabs
+      v-model="assignmentFilter"
+      :items="assignmentTabItems"
+      :content="false"
+      variant="link"
+      color="primary"
+      :ui="{
+        list: 'p-0!',
+        trigger: 'px-3 sm:px-6 whitespace-nowrap'
+      }"
+    />
+
     <AdminDataTable
       v-model:search="search"
       :data="filteredData"
@@ -261,18 +295,11 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
       :column-pinning="{}"
     >
       <template #toolbar-left>
-        <div class="flex w-full sm:w-auto gap-2">
-          <USelect
-            v-model="academyFilter"
-            :items="academyOptions"
-            class="flex-1 sm:flex-none sm:w-48"
-          />
-          <USelect
-            v-model="assignmentFilter"
-            :items="assignmentOptions"
-            class="flex-1 sm:flex-none sm:w-44"
-          />
-        </div>
+        <USelect
+          v-model="academyFilter"
+          :items="academyOptions"
+          class="flex-1 sm:flex-none sm:w-48"
+        />
       </template>
     </AdminDataTable>
   </div>
