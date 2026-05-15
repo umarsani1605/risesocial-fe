@@ -13,10 +13,10 @@ const { api } = useApi()
 
 const [{ data: companyRes, error: companyError }, { data: jobsRes }] = await Promise.all([
   useAsyncData(`company:${companySlug}`, () =>
-    api<PaginatedResponse<JobCompanyDetail>>('/jobs/companies', { params: { search: companySlug, limit: 1 } })
+    api<PaginatedResponse<JobCompanyDetail>>('/jobs/company', { params: { slug: companySlug, limit: 1 } })
   ),
   useAsyncData(`company-jobs:${companySlug}`, () =>
-    api<PaginatedResponse<Job>>('/jobs', { params: { company: companySlug, limit: 50 } })
+    api<PaginatedResponse<Job>>('/jobs', { params: { companySlug, limit: 50 } })
   )
 ])
 

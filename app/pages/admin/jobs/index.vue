@@ -32,12 +32,14 @@ const filterEmploymentType = ref<string | undefined>(undefined)
 const filterSeniorityLevel = ref<string | undefined>(undefined)
 const filterIsRemote = ref<string | undefined>(undefined)
 const filterCountry = ref<string | undefined>(undefined)
+const filterStatus = ref<string | undefined>('active')
 
 // Applied filter state
 const appliedEmploymentType = ref<string | undefined>(undefined)
 const appliedSeniorityLevel = ref<string | undefined>(undefined)
 const appliedIsRemote = ref<string | undefined>(undefined)
 const appliedCountry = ref<string | undefined>(undefined)
+const appliedStatus = ref<string | undefined>('active')
 
 const dataTableRef = ref()
 
@@ -110,7 +112,8 @@ const activeFilterCount = computed(
       appliedEmploymentType.value,
       appliedSeniorityLevel.value,
       appliedIsRemote.value,
-      appliedCountry.value
+      appliedCountry.value,
+      appliedStatus.value && appliedStatus.value !== 'active' ? appliedStatus.value : undefined
     ].filter(Boolean).length
 )
 
@@ -136,6 +139,8 @@ const filteredData = computed(() => {
   if (appliedIsRemote.value === 'no') result = result.filter((j) => j.location?.is_remote === false)
   if (appliedCountry.value)
     result = result.filter((j) => j.location?.country === appliedCountry.value)
+  if (appliedStatus.value && appliedStatus.value !== 'all')
+    result = result.filter((j) => j.status === appliedStatus.value)
   return result
 })
 
@@ -145,6 +150,7 @@ function applyFilters() {
   appliedSeniorityLevel.value = filterSeniorityLevel.value
   appliedIsRemote.value = filterIsRemote.value
   appliedCountry.value = filterCountry.value
+  appliedStatus.value = filterStatus.value
   filterPopoverOpen.value = false
 }
 
@@ -153,10 +159,12 @@ function clearFilters() {
   filterSeniorityLevel.value = undefined
   filterIsRemote.value = undefined
   filterCountry.value = undefined
+  filterStatus.value = 'active'
   appliedEmploymentType.value = undefined
   appliedSeniorityLevel.value = undefined
   appliedIsRemote.value = undefined
   appliedCountry.value = undefined
+  appliedStatus.value = 'active'
   filterPopoverOpen.value = false
 }
 
@@ -400,6 +408,7 @@ const columns: TableColumn<Job>[] = [
             v-model:seniority-level="filterSeniorityLevel"
             v-model:is-remote="filterIsRemote"
             v-model:country="filterCountry"
+            v-model:status="filterStatus"
             :active-filter-count="activeFilterCount"
             :unique-countries="uniqueCountries"
             @apply="applyFilters"

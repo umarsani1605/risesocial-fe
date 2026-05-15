@@ -4,6 +4,7 @@ const employmentType = defineModel<string | undefined>('employmentType')
 const seniorityLevel = defineModel<string | undefined>('seniorityLevel')
 const isRemote = defineModel<string | undefined>('isRemote')
 const country = defineModel<string | undefined>('country')
+const status = defineModel<string | undefined>('status')
 
 defineProps<{
   activeFilterCount: number
@@ -18,6 +19,12 @@ const emit = defineEmits<{
 const remoteFilterOptions = [
   { label: 'Yes', value: 'yes' },
   { label: 'No', value: 'no' }
+]
+
+const statusFilterOptions = [
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
+  { label: 'All', value: 'all' }
 ]
 </script>
 
@@ -74,6 +81,15 @@ const remoteFilterOptions = [
             v-model="country"
             :items="uniqueCountries"
             placeholder="All Countries"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField label="Status">
+          <USelect
+            v-model="status"
+            :items="statusFilterOptions"
+            placeholder="Active"
             class="w-full"
           />
         </UFormField>

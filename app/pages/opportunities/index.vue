@@ -25,7 +25,7 @@ const {
     params: {
       search: appliedFilters.search || undefined,
       location: appliedFilters.location || undefined,
-      company: appliedFilters.company || undefined,
+      companyName: appliedFilters.company || undefined,
       jobType: appliedFilters.jobType || undefined,
       experienceLevel: appliedFilters.experienceLevel || undefined,
       isRemote: appliedFilters.isRemote || undefined,
