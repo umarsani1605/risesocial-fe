@@ -105,15 +105,14 @@ useSeoMeta({
           <UBadge v-if="hasActiveFilters" color="primary" class="ml-2">Active</UBadge>
         </UButton>
 
-        <UDrawer v-model:open="isFilterOpen" side="left">
-          <div class="p-6 space-y-6">
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">Filter Jobs</h3>
-              <UButton variant="ghost" size="sm" square @click="isFilterOpen = false">
-                <UIcon name="i-ph-x-bold" class="size-5" />
-              </UButton>
-            </div>
-
+        <UDrawer
+          v-model:open="isFilterOpen"
+          direction="left"
+          title="Filter Jobs"
+          :ui="{ content: 'max-w-sm' }"
+        >
+          <template #body>
+            <div class="space-y-6">
             <UFormField label="Search">
               <UInput
                 v-model="pendingFilters.search"
@@ -165,8 +164,11 @@ useSeoMeta({
             <UFormField label="Remote Only">
               <UToggle v-model="pendingFilters.isRemote" />
             </UFormField>
+            </div>
+          </template>
 
-            <div class="space-y-3 pt-2">
+          <template #footer>
+            <div class="space-y-3">
               <UButton color="primary" block @click="handleApplyFilters(true)">
                 <UIcon name="i-ph-magnifying-glass-bold" class="mr-2 size-4" />
                 Apply Filters
@@ -176,7 +178,7 @@ useSeoMeta({
                 Clear All
               </UButton>
             </div>
-          </div>
+          </template>
         </UDrawer>
       </div>
 
