@@ -84,8 +84,8 @@ export interface CohortModule {
 export interface CohortMentor {
   id: number
   name: string
-  job_title: string
-  avatar: string
+  job_title: string | null
+  avatar: string | null
 }
 
 export interface Cohort {
@@ -227,4 +227,3 @@ export interface AdminTransactionDetail {
     ryls_registration: { id: number; full_name: string; scholarship_type: string } | null
   }
 }
-

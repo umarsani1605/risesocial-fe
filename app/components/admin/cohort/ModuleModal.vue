@@ -2,7 +2,7 @@
 import { Time } from '@internationalized/date'
 import type { TabsItem } from '@nuxt/ui'
 import { moduleFormSchema } from '@/schemas/cohort'
-import { ATTACHMENT_MAP, getAttachmentStyle } from '~/utils/attachment'
+import { ATTACHMENT_MAP, getAttachmentLinkError, getAttachmentStyle } from '~/utils/attachment'
 
 const {
   mode,
@@ -131,11 +131,32 @@ function onDrop(e: DragEvent) {
 }
 
 const linkUrl = ref('')
+const linkError = ref<string | null>(null)
+const linkRowClass = 'pt-2 flex gap-2 items-start'
+const addLinkButtonClass = 'self-start shrink-0'
+
+watch(linkUrl, (value) => {
+  if (!value) {
+    linkError.value = null
+    return
+  }
+
+  if (!getAttachmentLinkError(value)) {
+    linkError.value = null
+  }
+})
 
 function addLink() {
   if (!linkUrl.value) return
+  const error = getAttachmentLinkError(linkUrl.value)
+  if (error) {
+    linkError.value = error
+    return
+  }
+
   emit('addLink', linkUrl.value, '')
   linkUrl.value = ''
+  linkError.value = null
 }
 
 function resolveStyle(att: PendingAttachment | AdminCohortAttachment) {
@@ -383,14 +404,17 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
                     </div>
                   </template>
                   <template #link>
-                    <div class="pt-2 flex gap-2">
-                      <UInput v-model="linkUrl" placeholder="https://..." class="flex-1" />
+                    <div :class="linkRowClass">
+                      <UFormField :error="linkError" class="flex-1">
+                        <UInput v-model="linkUrl" placeholder="https://..." class="w-full" />
+                      </UFormField>
                       <UButton
                         label="Add Link"
                         icon="i-ph-plus-bold"
                         :loading="mode === 'edit' ? isAddingAttachment : false"
                         :disabled="!linkUrl"
                         size="sm"
+                        :class="addLinkButtonClass"
                         @click="addLink"
                       />
                     </div>

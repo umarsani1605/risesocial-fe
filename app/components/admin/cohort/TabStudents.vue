@@ -100,7 +100,6 @@ const columns: TableColumn<AdminCohortPlacement>[] = [
             label="Move Cohort"
             color="primary"
             variant="light"
-            size="sm"
             leading-icon="i-ph-arrows-left-right-bold"
             @click="emit('editPlacement', row.original)"
           />
@@ -108,7 +107,6 @@ const columns: TableColumn<AdminCohortPlacement>[] = [
             :label="row.original.certificate ? 'Regenerate Certificate' : 'Generate Certificate'"
             icon="i-ph-certificate-bold"
             variant="subtle"
-            size="sm"
             @click="
               row.original.certificate
                 ? emit('regenerateCert', row.original.id)

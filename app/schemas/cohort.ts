@@ -1,8 +1,20 @@
 import { z } from 'zod'
 import type { CalendarDate, Time } from '@internationalized/date'
 
+const friendlyCohortDateRangeMessage = 'Please set the start date before the end date'
+
+function withCohortDateRangeValidation<T extends z.ZodRawShape>(shape: T) {
+  return z.object(shape).refine(
+    ({ start_date, end_date }) => !start_date || !end_date || new Date(start_date) < new Date(end_date),
+    {
+      message: friendlyCohortDateRangeMessage,
+      path: ['end_date'],
+    }
+  )
+}
+
 // For CohortModal (academy_id passed as prop, not a form field)
-export const cohortCreateSchema = z.object({
+export const cohortCreateSchema = withCohortDateRangeValidation({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   start_date: z.string().min(1, 'Start date is required'),
@@ -10,15 +22,16 @@ export const cohortCreateSchema = z.object({
 })
 
 // For cohorts/index.vue create form (academy_id is a select field)
-export const cohortCreatePageSchema = z.object({
+export const cohortCreatePageSchema = withCohortDateRangeValidation({
   academy_id: z.number({ error: 'Academy is required' }).int().positive(),
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   start_date: z.string().min(1, 'Start date is required'),
   end_date: z.string().min(1, 'End date is required'),
+  copy_from_academy: z.boolean().optional(),
 })
 
-export const cohortEditSchema = z.object({
+export const cohortEditSchema = withCohortDateRangeValidation({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   start_date: z.string().min(1, 'Start date is required'),

@@ -3,6 +3,8 @@
  * Handles academy enrollment transaction creation and Midtrans Snap integration.
  */
 
+import type { PaymentCustomer } from '@/schemas/user'
+
 interface EnrollmentResponse {
   enrollment_id: number
   transaction_code: string
@@ -39,14 +41,22 @@ export const useAcademyPayment = () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  const createEnrollment = async (academyId: number, pricingId: number): Promise<EnrollmentResponse> => {
+  const createEnrollment = async (
+    academyId: number,
+    pricingId: number,
+    customerDetails?: PaymentCustomer
+  ): Promise<EnrollmentResponse> => {
     isLoading.value = true
     error.value = null
 
     try {
       const res = await api<ApiResponse<EnrollmentResponse>>('/payments/academy/transactions', {
         method: 'POST',
-        body: { academy_id: academyId, pricing_id: pricingId }
+        body: {
+          academy_id: academyId,
+          pricing_id: pricingId,
+          ...(customerDetails ? { customer_details: customerDetails } : {})
+        }
       })
 
       if (!res?.data) {

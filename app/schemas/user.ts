@@ -53,6 +53,15 @@ export const userAccountSchema = z.object({
   current_company: z.string().optional(),
 })
 
+// Payment Checkout: customer info form (sent to Midtrans as customer_details)
+export const paymentCustomerSchema = z.object({
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().optional(),
+  email: z.email('Invalid email address'),
+  phone: z.string().min(6, 'Phone number is required'),
+})
+export type PaymentCustomer = z.infer<typeof paymentCustomerSchema>
+
 // Dashboard: Security — password + repeat required
 export const userPasswordSchema = z
   .object({

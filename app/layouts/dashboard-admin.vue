@@ -1,11 +1,27 @@
 <script setup lang="ts">
 import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
+import { ADMIN_STUDENTS_NAV_BADGE_ASYNC_KEY } from '@/utils/adminStudents'
 
 const route = useRoute()
+const { api } = useApi()
 
 const open = ref(false)
 
 const { user, logout, fullName, initials, hasPermission } = useAuth()
+
+const { data: studentBadgeRaw } = await useAsyncData(ADMIN_STUDENTS_NAV_BADGE_ASYNC_KEY, async () => {
+  if (!hasPermission('admin.academy')) {
+    return { data: [] as Array<{ completed_at: string | null; placement: unknown | null }> }
+  }
+
+  return api<ApiResponse<Array<{ completed_at: string | null; placement: unknown | null }>>>(
+    '/admin/academy-enrollments?limit=500'
+  )
+})
+
+const unassignedStudentsCount = computed(
+  () => studentBadgeRaw.value?.data.filter((item) => !item.completed_at && !item.placement).length ?? 0
+)
 
 const menuItems: DropdownMenuItem[][] = [
   [
@@ -152,6 +168,14 @@ const academyLinks = computed<NavigationMenuItem[]>(() =>
         {
           label: 'Students',
           icon: 'i-ph-users-duotone',
+          badge:
+            unassignedStudentsCount.value > 0
+              ? {
+                  label: String(unassignedStudentsCount.value),
+                  color: 'primary',
+                  variant: 'solid'
+                }
+              : undefined,
           to: '/admin/students',
           active: isActive('/admin/students'),
           onSelect: () => {

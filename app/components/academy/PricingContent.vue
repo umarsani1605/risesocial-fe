@@ -62,7 +62,6 @@ const onEnroll = () => {
         v-else-if="hasPendingPayment"
         label="Complete Payment"
         icon="i-ph-clock-bold"
-        color="warning"
         size="lg"
         class="flex items-center justify-center w-full rounded-lg"
         @click="onEnroll"
@@ -70,7 +69,6 @@ const onEnroll = () => {
       <UButton
         v-else
         label="Enroll Now"
-        color="primary"
         size="lg"
         class="flex items-center justify-center w-full rounded-lg"
         @click="onEnroll"

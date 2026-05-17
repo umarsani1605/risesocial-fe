@@ -9,6 +9,7 @@ import {
   formatPrice,
   getApiErrorMessage
 } from '../../app/utils/index'
+import { cohortEditSchema } from '../../app/schemas/cohort'
 
 // ---------------------------------------------------------------------------
 // formatDate
@@ -298,5 +299,29 @@ describe('getApiErrorMessage', () => {
   it('returns server message over any fallback when message is present', () => {
     const error = { data: { message: 'Unauthorized' } }
     expect(getApiErrorMessage(error, 'Should not appear')).toBe('Unauthorized')
+  })
+
+  it('maps technical cohort date-range errors to a friendly message', () => {
+    const error = { data: { message: 'start_date must be before end_date' } }
+    expect(getApiErrorMessage(error)).toBe('Please set the start date before the end date')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// cohortEditSchema
+// ---------------------------------------------------------------------------
+
+describe('cohortEditSchema', () => {
+  it('rejects when start date is the same as end date with a friendly message', () => {
+    const result = cohortEditSchema.safeParse({
+      name: 'Batch 1',
+      description: '',
+      start_date: '2026-06-01',
+      end_date: '2026-06-01',
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0]?.message).toBe('Please set the start date before the end date')
+    expect(result.error?.issues[0]?.path).toEqual(['end_date'])
   })
 })

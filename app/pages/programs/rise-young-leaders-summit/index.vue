@@ -2,7 +2,7 @@
 import type { AccordionItem } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'white-navbar'
 })
 
 useHead({

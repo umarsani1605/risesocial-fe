@@ -157,7 +157,13 @@ export function formatPriceCompact(price: number): string {
 
 export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
   const data = (error as Record<string, unknown> & { data?: Record<string, string> })?.data
-  return data?.details ?? data?.message ?? (error instanceof Error ? error.message : fallback)
+  const message = data?.details ?? data?.message ?? (error instanceof Error ? error.message : fallback)
+
+  if (message === 'start_date must be before end_date') {
+    return 'Please set the start date before the end date'
+  }
+
+  return message
 }
 
 // ── Cohort module utilities ───────────────────────────────────────────────────

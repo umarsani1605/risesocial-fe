@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
+import { refreshAdminStudentSurfaces } from '@/utils/adminStudents'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -164,7 +165,7 @@ async function submitAssign() {
     })
     toast.add({ title: 'Student assigned to cohort', color: 'success' })
     closeAssignModal()
-    await refresh()
+    await refreshAdminStudentSurfaces(refresh, (key) => refreshNuxtData(key))
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {
@@ -179,7 +180,7 @@ async function submitDropFromCohort() {
     await api(`/admin/cohort-placements/${assignTarget.value.id}/drop`, { method: 'POST' })
     toast.add({ title: 'Student removed from cohort', color: 'success' })
     closeAssignModal()
-    await refresh()
+    await refreshAdminStudentSurfaces(refresh, (key) => refreshNuxtData(key))
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
   } finally {

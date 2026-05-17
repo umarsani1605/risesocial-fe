@@ -70,7 +70,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center gap-4 p-4">
+  <div class="flex flex-col items-center justify-center gap-4 p-0 md:p-4">
     <UPageCard
       class="w-full max-w-md rounded-xl shadow-subtle border border-default/25"
       :ui="{

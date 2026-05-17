@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Academy } from '@/types'
+import { paymentCustomerSchema, type PaymentCustomer } from '@/schemas/user'
 
 definePageMeta({
   layout: 'empty',
@@ -57,11 +58,33 @@ const {
   error: paymentError
 } = useAcademyPayment()
 
+const { user } = useAuth()
+
 const snapDisplayed = ref(false)
 const paymentStatus = ref<string | null>(null)
 const transactionCode = ref<string | null>(null)
+const redirectCountdown = ref(0)
 
-// Check if already enrolled, then auto-open snap
+const { resume: startRedirectCountdown, pause: stopRedirectCountdown } = useIntervalFn(
+  () => {
+    redirectCountdown.value -= 1
+    if (redirectCountdown.value <= 0) {
+      stopRedirectCountdown()
+      navigateTo('/dashboard')
+    }
+  },
+  1000,
+  { immediate: false }
+)
+
+const customerForm = reactive<PaymentCustomer>({
+  first_name: user.value?.first_name ?? '',
+  last_name: user.value?.last_name ?? '',
+  email: user.value?.email ?? '',
+  phone: user.value?.phone ?? ''
+})
+
+// Check if already enrolled (do not auto-open snap — user must submit form first)
 onMounted(async () => {
   metaPixelProxy?.fbq('track', 'InitiateCheckout', {
     content_ids: [String(pricing.value!.id)],
@@ -76,18 +99,15 @@ onMounted(async () => {
     if (result.enrolled) {
       toast.add({ title: 'You are already enrolled in this academy', color: 'info' })
       router.replace(`/academy/${academySlug}`)
-      return
     }
   } catch {
     // silently fail
   }
-
-  await onPay()
 })
 
-const onPay = async () => {
+const onPay = async (formState: PaymentCustomer) => {
   try {
-    const result = await createEnrollment(academy.value.id, pricingId)
+    const result = await createEnrollment(academy.value.id, pricingId, formState)
 
     if (!result.token) {
       throw new Error('Failed to create payment transaction')
@@ -110,6 +130,8 @@ const onPay = async () => {
           currency: 'IDR'
         })
         toast.add({ title: 'Enrollment successful', color: 'success' })
+        redirectCountdown.value = 3
+        startRedirectCountdown()
       },
       onPending: async () => {
         if (transactionCode.value)
@@ -134,22 +156,20 @@ const onPay = async () => {
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-t from-orange-50 to-white flex items-center justify-center p-4 sm:p-8"
-  >
+  <div class="flex flex-col items-center justify-center gap-4 p-0 md:p-4">
     <UPageCard
       class="w-full max-w-6xl rounded-xl shadow-subtle overflow-hidden"
       :ui="{ container: 'p-0!' }"
     >
       <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[640px]">
         <!-- Left panel: order summary -->
-        <aside class="bg-primary text-white flex flex-col gap-8 px-8 py-10 lg:px-12 lg:py-12">
+        <aside class="bg-primary text-white flex flex-col gap-8 p-6 md:p-10">
           <UButton
             to="/academy"
-            variant="ghost"
+            variant="link"
             color="neutral"
             icon="i-lucide-arrow-left"
-            class="self-start text-white hover:bg-white/10 hover:text-white -ml-2"
+            class="self-start text-white/80 hover:text-white -ml-2"
           >
             Back
           </UButton>
@@ -179,7 +199,14 @@ const onPay = async () => {
         </aside>
 
         <!-- Right panel: payment -->
-        <section class="flex flex-col">
+        <section
+          class="flex flex-col gap-6 pb-6"
+          :class="
+            snapDisplayed && paymentStatus === null
+              ? 'px-0 pt-0'
+              : 'px-6 pt-6 md:px-10 md:pt-10'
+          "
+        >
           <UAlert
             v-if="paymentError"
             color="error"
@@ -187,7 +214,6 @@ const onPay = async () => {
             icon="i-ph-info-bold"
             title="Payment Error"
             :description="paymentError"
-            class="mb-6"
           />
 
           <UAlert
@@ -196,8 +222,7 @@ const onPay = async () => {
             variant="subtle"
             icon="i-ph-check-circle-bold"
             title="Payment Successful"
-            :description="`You are now enrolled in ${academy.title}`"
-            class="mb-6"
+            :description="`You are now enrolled in ${academy.title}. Redirecting to your dashboard in ${redirectCountdown}…`"
           />
 
           <UAlert
@@ -207,29 +232,75 @@ const onPay = async () => {
             icon="i-ph-clock-bold"
             title="Payment Pending"
             description="Please complete your payment to finish enrollment"
-            class="mb-6"
           />
+
+          <UForm
+            v-if="!snapDisplayed && paymentStatus === null"
+            :schema="paymentCustomerSchema"
+            :state="customerForm"
+            class="flex-1 flex flex-col gap-4"
+            @submit="onPay(customerForm)"
+          >
+            <div>
+              <h2 class="text-xl font-bold">Your Details</h2>
+              <p class="text-sm text-muted mt-1">We'll use these details for your order updates.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <UFormField name="first_name" label="First name" required>
+                <UInput v-model="customerForm.first_name" placeholder="First name" class="w-full" />
+              </UFormField>
+              <UFormField name="last_name" label="Last name">
+                <UInput v-model="customerForm.last_name" placeholder="Last name" class="w-full" />
+              </UFormField>
+            </div>
+
+            <UFormField name="email" label="Email" required>
+              <UInput
+                v-model="customerForm.email"
+                type="email"
+                placeholder="your@email.com"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField name="phone" label="Phone number" required>
+              <UInput v-model="customerForm.phone" placeholder="08xxxxxxxxxx" class="w-full" />
+            </UFormField>
+
+            <UButton
+              type="submit"
+              :label="`Continue to Payment`"
+              color="primary"
+              size="lg"
+              block
+              class="mt-auto"
+              :loading="isProcessingPayment"
+              :disabled="isProcessingPayment"
+            />
+          </UForm>
 
           <ClientOnly>
-            <div id="snap-container" class="w-full" />
+            <div v-show="snapDisplayed" id="snap-container" class="w-full" />
           </ClientOnly>
 
-          <UButton
-            v-if="paymentStatus === 'paid'"
-            label="Go to Dashboard"
-            color="primary"
-            size="lg"
-            block
-            class="mt-6"
-            @click="navigateTo('/dashboard/academy')"
-          />
+          <div class="mt-auto flex flex-col gap-6">
+            <UButton
+              v-if="paymentStatus === 'paid'"
+              label="Go to Dashboard Now"
+              color="primary"
+              size="lg"
+              block
+              @click="navigateTo('/dashboard')"
+            />
 
-          <p class="text-xs text-muted text-center mt-6">
-            Having trouble? Contact us at
-            <a href="mailto:risesocial.official@gmail.com" class="underline"
-              >risesocial.official@gmail.com</a
-            >
-          </p>
+            <p class="text-sm text-muted text-center">
+              Having trouble? Contact us at
+              <a href="mailto:risesocial.official@gmail.com" class="underline"
+                >risesocial.official@gmail.com</a
+              >
+            </p>
+          </div>
         </section>
       </div>
     </UPageCard>

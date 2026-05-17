@@ -14,7 +14,7 @@ defineProps<{
       class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-elevated/50 transition-colors border border-default"
     >
       <UAvatar
-        :src="mentor.avatar"
+        :src="mentor.avatar ?? undefined"
         :alt="mentor.name"
         size="2xl"
         color="primary"

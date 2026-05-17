@@ -3,6 +3,7 @@ import type { TabsItem, DropdownMenuItem } from '@nuxt/ui'
 import { useAdminCohort } from '@/composables/useAdminCohort'
 import { useAdminCohortModules } from '@/composables/useAdminCohortModules'
 import { useAdminCohortEnrollments } from '@/composables/useAdminCohortEnrollments'
+import { useAdminCohortMentors } from '@/composables/useAdminCohortMentors'
 import { cohortEditSchema } from '@/schemas/cohort'
 import { COHORT_PHASE_COLOR, COHORT_PHASE_LABEL } from '@/constants/cohort'
 import { getCohortPhase } from '@/utils/cohort'
@@ -35,6 +36,10 @@ const cohortModules = useAdminCohortModules({
 })
 
 const cohortEnrollments = useAdminCohortEnrollments({ cohortId })
+const cohortMentors = useAdminCohortMentors({
+  cohortId,
+  refreshCohort: cohort.refreshCohort,
+})
 
 const formRef = useTemplateRef('formRef')
 
@@ -205,8 +210,9 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       <template #mentors>
         <AdminCohortTabMentors
           :mentors="cohort.detail?.mentors ?? []"
-          @invite="cohortEnrollments.openInviteMentorModal"
-          @remove="() => {}"
+          @invite="cohortMentors.openAddMentorModal"
+          @edit="cohortMentors.openEditMentorModal"
+          @remove="cohortMentors.confirmDeleteMentor"
         />
       </template>
     </UTabs>
@@ -262,10 +268,12 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
   />
 
   <AdminCohortInviteMentorModal
-    v-model:open="cohortEnrollments.isInviteMentorOpen"
-    v-model:form="cohortEnrollments.mentorForm"
-    :loading="cohortEnrollments.isInvitingMentor"
-    @submit="cohortEnrollments.submitInviteMentor"
+    v-model:open="cohortMentors.isMentorModalOpen"
+    v-model:form="cohortMentors.mentorForm"
+    :item="cohortMentors.editingMentor"
+    :loading="cohortMentors.isSavingMentor"
+    @submit="cohortMentors.submitMentor"
+    @cancel="cohortMentors.closeMentorModal"
   />
 
   <AdminCohortGenerateCertificateModal
@@ -289,6 +297,13 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
     @update:selected-cohort-id="cohortEnrollments.selectedCohortId = $event"
     @confirm="cohortEnrollments.submitAssign"
     @drop="cohortEnrollments.submitDropFromCohort(cohortEnrollments.assignTarget!.id)"
+  />
+
+  <AdminConfirmDeleteModal
+    v-model:open="cohortMentors.isDeleteMentorOpen"
+    :item-name="cohortMentors.deletingMentor?.name ?? ''"
+    :loading="cohortMentors.isDeletingMentor"
+    @confirm="cohortMentors.submitDeleteMentor"
   />
 
   <UModal

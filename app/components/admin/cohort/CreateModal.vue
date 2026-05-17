@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CalendarDate } from '@internationalized/date'
 import { cohortCreatePageSchema } from '@/schemas/cohort'
 
 const open = defineModel<boolean>('open', { required: true })
@@ -8,6 +9,7 @@ const form = defineModel<{
   description: string
   start_date: string
   end_date: string
+  copy_from_academy: boolean
 }>('form', { required: true })
 
 defineProps<{
@@ -16,6 +18,29 @@ defineProps<{
 }>()
 const emit = defineEmits<{ submit: [] }>()
 const formRef = useTemplateRef('formRef')
+const startDateInput = useTemplateRef('startDateInput')
+const endDateInput = useTemplateRef('endDateInput')
+
+function stringToCalendarDate(s: string): CalendarDate | null {
+  if (!s) return null
+  const parts = s.split('-').map(Number)
+  if (parts.length !== 3 || parts.some(isNaN)) return null
+  return new CalendarDate(parts[0]!, parts[1]!, parts[2]!)
+}
+
+const startDate = computed({
+  get: () => stringToCalendarDate(form.value.start_date),
+  set: (val: CalendarDate | null) => {
+    form.value.start_date = val ? val.toString() : ''
+  }
+})
+
+const endDate = computed({
+  get: () => stringToCalendarDate(form.value.end_date),
+  set: (val: CalendarDate | null) => {
+    form.value.end_date = val ? val.toString() : ''
+  }
+})
 </script>
 
 <template>
@@ -29,15 +54,20 @@ const formRef = useTemplateRef('formRef')
         class="space-y-5"
         @submit="emit('submit')"
       >
-        <UFormField name="academy_id" label="Academy" required>
-          <USelectMenu
-            v-model="form.academy_id"
-            value-key="value"
-            :items="academyItems"
-            placeholder="Select Academy"
-            class="w-full"
-          />
-        </UFormField>
+        <div class="space-y-3">
+          <UFormField name="academy_id" label="Academy" required>
+            <USelectMenu
+              v-model="form.academy_id"
+              value-key="value"
+              :items="academyItems"
+              placeholder="Select Academy"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField name="copy_from_academy">
+            <UCheckbox v-model="form.copy_from_academy" label="Copy syllabus and mentors" />
+          </UFormField>
+        </div>
         <UFormField name="name" label="Name" required>
           <UInput v-model="form.name" placeholder="Cohort Name" class="w-full" />
         </UFormField>
@@ -49,11 +79,50 @@ const formRef = useTemplateRef('formRef')
             class="w-full"
           />
         </UFormField>
-        <UFormField name="start_date" label="Start Date" required>
-          <UInput v-model="form.start_date" type="date" class="w-full" />
-        </UFormField>
-        <UFormField name="end_date" label="End Date" required>
-          <UInput v-model="form.end_date" type="date" class="w-full" />
+        <UFormField label="Duration" required>
+          <div class="flex items-start gap-2">
+            <UFormField name="start_date" class="flex-1">
+              <UInputDate ref="startDateInput" v-model="startDate" locale="en-GB" class="w-full">
+                <template #leading>
+                  <UPopover :reference="(startDateInput as any)?.inputsRef?.[3]?.$el">
+                    <UButton
+                      color="neutral"
+                      variant="link"
+                      size="md"
+                      icon="i-ph-calendar-blank-bold"
+                      aria-label="Select start date"
+                      class="px-0 text-dimmed"
+                    />
+                    <template #content>
+                      <UCalendar v-model="startDate" class="p-2" />
+                    </template>
+                  </UPopover>
+                </template>
+              </UInputDate>
+            </UFormField>
+
+            <UIcon name="i-ph-arrow-right-bold" class="shrink-0 mt-2.5 text-muted" />
+
+            <UFormField name="end_date" class="flex-1">
+              <UInputDate ref="endDateInput" v-model="endDate" locale="en-GB" class="w-full">
+                <template #leading>
+                  <UPopover :reference="(endDateInput as any)?.inputsRef?.[3]?.$el">
+                    <UButton
+                      color="neutral"
+                      variant="link"
+                      size="md"
+                      icon="i-ph-calendar-blank-bold"
+                      aria-label="Select end date"
+                      class="px-0 text-dimmed"
+                    />
+                    <template #content>
+                      <UCalendar v-model="endDate" class="p-2" />
+                    </template>
+                  </UPopover>
+                </template>
+              </UInputDate>
+            </UFormField>
+          </div>
         </UFormField>
       </UForm>
     </template>

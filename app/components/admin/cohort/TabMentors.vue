@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
+import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
   mentors: AdminCohortMentor[]
@@ -7,21 +7,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   invite: []
-  remove: [mentorId: number]
+  edit: [mentor: AdminCohortMentor]
+  remove: [mentor: AdminCohortMentor]
 }>()
-
-function rowMenu(mentorId: number): DropdownMenuItem[][] {
-  return [
-    [
-      {
-        label: 'Remove',
-        icon: 'i-ph-user-x-bold',
-        color: 'error',
-        onSelect: () => emit('remove', mentorId)
-      }
-    ]
-  ]
-}
 
 function initials(mentor: AdminCohortMentor) {
   return (
@@ -47,25 +35,24 @@ const columns: TableColumn<AdminCohortMentor>[] = [
     cell: ({ row }) => row.original.name
   },
   {
-    id: 'email',
-    header: 'Email',
-    cell: ({ row }) => row.original.email ?? '-'
-  },
-  {
-    id: 'phone',
-    header: 'Phone',
-    cell: ({ row }) => row.original.phone ?? '-'
+    id: 'job_title',
+    header: 'Job Title',
+    cell: ({ row }) => row.original.job_title ?? '-'
   },
   {
     id: 'actions',
-    header: '',
-    size: 56
+    header: () => h('div', 'Actions'),
+    size: 180
   }
 ]
 </script>
 
 <template>
   <div class="pt-6 min-h-[400px]">
+    <div class="flex justify-end mb-4">
+      <UButton label="+ Add" color="primary" class="shrink-0" @click="emit('invite')" />
+    </div>
+
     <div
       v-if="mentors.length === 0"
       class="flex flex-col items-center justify-center py-16 text-muted text-sm"
@@ -92,24 +79,28 @@ const columns: TableColumn<AdminCohortMentor>[] = [
         </div>
       </template>
 
-      <template #email-cell="{ row }">
-        <span class="hidden md:block text-muted">{{ row.original.email ?? '-' }}</span>
-      </template>
-
-      <template #phone-cell="{ row }">
-        <span class="hidden md:block text-muted">{{ row.original.phone ?? '-' }}</span>
+      <template #job_title-cell="{ row }">
+        <span class="text-muted">{{ row.original.job_title ?? '-' }}</span>
       </template>
 
       <template #actions-cell="{ row }">
-        <div class="text-right">
-          <UDropdownMenu :items="rowMenu(row.original.id)">
-            <UButton
-              icon="i-ph-dots-three-vertical-bold"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-            />
-          </UDropdownMenu>
+        <div class="flex items-center gap-2 justify-end">
+          <UButton
+            size="sm"
+            color="primary"
+            variant="light"
+            leading-icon="i-ph-pencil-simple-bold"
+            label="Edit"
+            @click="emit('edit', row.original)"
+          />
+          <UButton
+            size="sm"
+            color="error"
+            variant="light"
+            leading-icon="i-ph-trash-simple-bold"
+            label="Remove"
+            @click="emit('remove', row.original)"
+          />
         </div>
       </template>
     </UTable>

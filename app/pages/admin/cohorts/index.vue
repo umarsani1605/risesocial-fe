@@ -137,12 +137,14 @@ const addForm = reactive<{
   description: string
   start_date: string
   end_date: string
+  copy_from_academy: boolean
 }>({
   academy_id: undefined,
   name: '',
   description: '',
   start_date: '',
-  end_date: ''
+  end_date: '',
+  copy_from_academy: false
 })
 const academySelectItems = computed(() =>
   academies.value.map((a) => ({ label: a.title, value: a.id }))
@@ -158,7 +160,8 @@ async function onAddCohort() {
         name: addForm.name,
         description: addForm.description || null,
         start_date: addForm.start_date,
-        end_date: addForm.end_date
+        end_date: addForm.end_date,
+        copy_from_academy: addForm.copy_from_academy
       }
     })
     toast.add({ title: 'Cohort created', color: 'success' })
@@ -168,6 +171,7 @@ async function onAddCohort() {
     addForm.description = ''
     addForm.start_date = ''
     addForm.end_date = ''
+    addForm.copy_from_academy = false
     await refresh()
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })

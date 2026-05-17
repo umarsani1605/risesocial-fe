@@ -151,3 +151,14 @@ export function getAttachmentStyle(att: {
   }
   return ATTACHMENT_MAP[resolveAttachmentKey(att)] ?? DEFAULT_ATTACHMENT_STYLE
 }
+
+export function getAttachmentLinkError(url: string): string | null {
+  if (!url) return null
+
+  try {
+    const parsedUrl = new URL(url)
+    return ['http:', 'https:'].includes(parsedUrl.protocol) ? null : 'Please enter a valid link'
+  } catch {
+    return 'Please enter a valid link'
+  }
+}

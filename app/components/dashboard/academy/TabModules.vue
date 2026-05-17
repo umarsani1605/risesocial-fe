@@ -100,14 +100,7 @@ function formatSessionTime(module: CohortModule) {
         v-if="module.meeting_link || module.assignment_link || module.attendance_link"
         #footer
       >
-        <div
-          v-if="getStatus(module) === 'completed'"
-          class="flex items-center gap-1.5 text-sm text-muted px-1"
-        >
-          <UIcon name="i-ph-check-circle-fill" class="size-4 text-success" />
-          Session Ended
-        </div>
-        <div v-else class="flex gap-2">
+        <div class="flex gap-2">
           <UButton
             v-if="module.meeting_link"
             variant="dashboard"
@@ -122,6 +115,7 @@ function formatSessionTime(module: CohortModule) {
             v-if="module.attendance_link"
             variant="light"
             leading-icon="i-ph-note-pencil"
+            :to="module.attendance_link"
             :disabled="getStatus(module) !== 'completed'"
             target="_blank"
           >
@@ -131,6 +125,7 @@ function formatSessionTime(module: CohortModule) {
             v-if="module.assignment_link"
             variant="light"
             leading-icon="i-ph-clipboard-text"
+            :to="module.assignment_link"
             :disabled="getStatus(module) !== 'completed'"
             target="_blank"
           >

@@ -42,8 +42,6 @@ interface AdminCohortMentor {
   name: string
   job_title: string | null
   avatar: string | null
-  email?: string
-  phone?: string
 }
 
 interface AdminCohortDetail {
