@@ -15,10 +15,9 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [enrollmentData, cohortFillData, completionData] = await Promise.all([
+const [enrollmentData, cohortFillData] = await Promise.all([
   useAsyncData('analytics:enrollment-by-academy', () => analytics.fetchEnrollmentByAcademy()),
-  useAsyncData('analytics:cohort-fill-rates', () => analytics.fetchCohortFillRates()),
-  useAsyncData('analytics:completion-rates', () => analytics.fetchCompletionRates())
+  useAsyncData('analytics:cohort-fill-rates', () => analytics.fetchCohortFillRates())
 ])
 
 const statCards = computed<AnalyticsStat[]>(() => [
@@ -26,31 +25,24 @@ const statCards = computed<AnalyticsStat[]>(() => [
     title: 'Total Enrollments',
     value: enrollmentData.data.value?.reduce((s, d) => s + d.value, 0) ?? 0,
     icon: 'i-ph-student-fill',
-    color: 'text-primary'
-  },
-  {
-    title: 'Completion Rate',
-    value: `${completionData.data.value?.find((d) => d.name === 'Completed')?.value ?? 0}%`,
-    icon: 'i-ph-check-circle-fill',
-    color: 'text-success'
+    color: 'blue'
   },
   {
     title: 'Active Cohorts',
     value: cohortFillData.data.value?.length ?? 0,
     icon: 'i-ph-list-dashes-fill',
-    color: 'text-blue-500'
+    color: 'green'
   }
 ])
 </script>
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <h1 class="text-lg font-semibold">Academy Analytics</h1>
+    <div class="flex justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
     </div>
 
@@ -59,18 +51,5 @@ const statCards = computed<AnalyticsStat[]>(() => [
       title="Enrollments by Academy"
       :height="300"
     />
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <LazyAnalyticsBarChart
-        :data="cohortFillData.data.value ?? []"
-        title="Cohort Fill Rates (%)"
-        :height="280"
-      />
-      <LazyAnalyticsDonutChart
-        :data="completionData.data.value ?? []"
-        title="Completion Status"
-        :height="280"
-      />
-    </div>
   </div>
 </template>

@@ -33,7 +33,7 @@ const yFormatter = (value: number) => {
 </script>
 
 <template>
-  <UCard class="ring-transparent shadow-none border border-default">
+  <UCard class="shadow-none!">
     <template v-if="title" #header>
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>

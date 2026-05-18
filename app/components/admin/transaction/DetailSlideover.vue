@@ -157,26 +157,6 @@ const customerRows = computed(() => {
         <USeparator />
 
         <div class="p-6">
-          <!-- Academy Enrollment sub-section -->
-          <div v-if="detail.product_details.enrollment" class="space-y-2">
-            <p class="text-xs font-bold uppercase tracking-wide mb-4">Academy Enrollment</p>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Cohort ID</span>
-              <span>{{ detail.product_details.enrollment.cohort_id }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Cohort Name</span>
-              <NuxtLink
-                :to="`/admin/cohorts?id=${detail.product_details.enrollment.cohort_id}`"
-                target="_blank"
-                class="text-primary hover:underline flex items-center gap-1"
-              >
-                {{ detail.product_details.enrollment.cohort_name }}
-                <UIcon name="i-ph-arrow-square-out-bold" class="size-3" />
-              </NuxtLink>
-            </div>
-          </div>
-
           <!-- RYLS Registration sub-section -->
           <div v-if="detail.product_details.ryls_registration" class="space-y-2">
             <p class="text-xs font-bold uppercase tracking-wide mb-4">RYLS Registration</p>

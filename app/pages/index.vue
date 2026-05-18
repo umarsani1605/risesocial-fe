@@ -149,15 +149,19 @@ useSeoMeta({
           </div>
           <HomeHeroSearchBar />
           <div class="flex flex-wrap gap-2 sm:gap-3 justify-center md:justify-start">
-            <UBadge
+            <NuxtLink
               v-for="category in heroCategories"
               :key="category"
-              variant="soft"
-              color="neutral"
-              class="bg-white/10 text-white ring ring-slate-100/30 hover:bg-white/20 cursor-pointer rounded-lg"
+              :to="{ path: '/opportunities', query: { search: category } }"
             >
-              {{ category }}
-            </UBadge>
+              <UBadge
+                variant="soft"
+                color="neutral"
+                class="bg-white/10 text-white ring ring-slate-100/30 hover:bg-white/20 cursor-pointer rounded-lg transition-colors"
+              >
+                {{ category }}
+              </UBadge>
+            </NuxtLink>
           </div>
         </div>
 
@@ -178,7 +182,7 @@ useSeoMeta({
     </UPageSection>
 
     <UPageSection class="bg-slate-50">
-      <UPageGrid>
+      <UPageGrid class="grid-cols-1 sm:grid-cols-3">
         <UCard v-for="feature in featuresItems" :key="feature.title" class="rounded-2xl shadow-sm">
           <div class="flex flex-col h-full gap-4">
             <div class="flex items-center justify-center">

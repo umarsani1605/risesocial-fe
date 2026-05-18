@@ -50,7 +50,13 @@ const columns: TableColumn<AdminCohortMentor>[] = [
 <template>
   <div class="pt-6 min-h-[400px]">
     <div class="flex justify-end mb-4">
-      <UButton label="+ Add" color="primary" class="shrink-0" @click="emit('invite')" />
+      <UButton
+        label="Add"
+        icon="i-ph-plus-bold"
+        color="primary"
+        class="shrink-0"
+        @click="emit('invite')"
+      />
     </div>
 
     <div

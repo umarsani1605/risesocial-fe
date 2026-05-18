@@ -1,7 +1,7 @@
-export const COHORT_PHASE_COLOR: Record<string, 'success' | 'primary' | 'neutral'> = {
+export const COHORT_PHASE_COLOR: Record<string, 'success' | 'warning' | 'neutral'> = {
   not_started: 'neutral',
-  ongoing: 'success',
-  completed: 'primary',
+  ongoing: 'warning',
+  completed: 'success',
 }
 
 export const COHORT_PHASE_ITEMS = [

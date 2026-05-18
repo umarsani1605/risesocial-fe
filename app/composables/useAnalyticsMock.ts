@@ -94,6 +94,11 @@ export const useAnalyticsMock = () => {
     })
   }
 
+  const getRevenueByType = (): CategoryBreakdown[] => [
+    { name: 'RYLS', value: 42000, color: '#fe5b11' },
+    { name: 'Academy', value: 29541, color: '#1bb1a0' }
+  ]
+
   const getPaymentStatusBreakdown = (): CategoryBreakdown[] => [
     { name: 'Paid', value: 14, color: '#22c55e' },
     { name: 'Pending', value: 4, color: '#f59e0b' },
@@ -154,6 +159,7 @@ export const useAnalyticsMock = () => {
     getOverview,
     getRevenueTrend,
     getRevenueBreakdown,
+    getRevenueByType,
     getPaymentStatusBreakdown,
     getUserGrowth,
     getRegistrationsTrend,

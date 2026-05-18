@@ -62,7 +62,6 @@ const handleGoToPage = (page: number) => {
 }
 
 const locationOptions = [
-  { label: 'All Locations', value: '' },
   { label: 'Remote', value: 'Remote' },
   { label: 'Jakarta', value: 'Jakarta' },
   { label: 'Bandung', value: 'Bandung' },
@@ -70,9 +69,6 @@ const locationOptions = [
   { label: 'Australia', value: 'Australia' },
   { label: 'United States', value: 'United States' }
 ]
-
-const jobTypeOptionsWithAll = [{ label: 'All Types', value: '' }, ...jobTypeOptions]
-const experienceLevelOptionsWithAll = [{ label: 'All Levels', value: '' }, ...experienceLevelOptions]
 
 useSeoMeta({
   title: computed(() => {
@@ -140,25 +136,26 @@ useSeoMeta({
                 value-key="value"
                 :items="locationOptions"
                 placeholder="All Locations"
+                clear
                 class="w-full"
               />
             </UFormField>
 
             <UFormField label="Job Type">
-              <USelectMenu
+              <USelect
                 v-model="pendingFilters.jobType"
                 value-key="value"
-                :items="jobTypeOptionsWithAll"
+                :items="jobTypeOptions"
                 placeholder="All Types"
                 class="w-full"
               />
             </UFormField>
 
             <UFormField label="Experience Level">
-              <USelectMenu
+              <USelect
                 v-model="pendingFilters.experienceLevel"
                 value-key="value"
-                :items="experienceLevelOptionsWithAll"
+                :items="experienceLevelOptions"
                 placeholder="All Levels"
                 class="w-full"
               />
@@ -218,26 +215,27 @@ useSeoMeta({
                 value-key="value"
                 :items="locationOptions"
                 placeholder="All Locations"
+                clear
                 :search-input="{ placeholder: 'Search location...' }"
                 class="w-full"
               />
             </UFormField>
 
             <UFormField label="Job Type">
-              <USelectMenu
+              <USelect
                 v-model="pendingFilters.jobType"
                 value-key="value"
-                :items="jobTypeOptionsWithAll"
+                :items="jobTypeOptions"
                 placeholder="All Types"
                 class="w-full"
               />
             </UFormField>
 
             <UFormField label="Experience Level">
-              <USelectMenu
+              <USelect
                 v-model="pendingFilters.experienceLevel"
                 value-key="value"
-                :items="experienceLevelOptionsWithAll"
+                :items="experienceLevelOptions"
                 placeholder="All Levels"
                 class="w-full"
               />

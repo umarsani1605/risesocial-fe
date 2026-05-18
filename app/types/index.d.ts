@@ -223,7 +223,14 @@ export interface AdminTransactionDetail {
   product_details: {
     type: string
     items: AdminTransactionItem[]
-    enrollment: { cohort_id: number; cohort_name: string } | null
+    enrollment: {
+      academy_enrollment_id: number
+      academy_id: number | null
+      academy_title: string | null
+      placement_id: number | null
+      cohort_id: number | null
+      cohort_name: string | null
+    } | null
     ryls_registration: { id: number; full_name: string; scholarship_type: string } | null
   }
 }

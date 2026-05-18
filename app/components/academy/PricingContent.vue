@@ -6,7 +6,7 @@ const props = defineProps<{
   academy: Academy
   academySlug: string
   isEnrolled?: boolean
-  hasPendingPayment?: boolean
+  pendingPricingId?: number | null
 }>()
 
 const { isLoggedIn } = useAuth()
@@ -59,7 +59,7 @@ const onEnroll = () => {
         class="flex items-center justify-center w-full rounded-lg"
       />
       <UButton
-        v-else-if="hasPendingPayment"
+        v-else-if="pendingPricingId === tier.id"
         label="Complete Payment"
         icon="i-ph-clock-bold"
         size="lg"

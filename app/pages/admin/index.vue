@@ -6,7 +6,24 @@ import { PRODUCT_TYPE_LABEL, PAYMENT_METHOD_LABEL, PROVIDER_LABEL } from '@/cons
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Dashboard',
-  middleware: ['auth', 'admin']
+  middleware: [
+    'auth',
+    'admin',
+    () => {
+      const { hasPermission } = useAuth()
+      if (hasPermission('admin.dashboard')) return
+      const fallback: Array<{ key: string, to: string }> = [
+        { key: 'admin.transactions', to: '/admin/transactions' },
+        { key: 'admin.ryls', to: '/admin/programs' },
+        { key: 'admin.academy', to: '/admin/academies' },
+        { key: 'admin.users', to: '/admin/users' },
+        { key: 'admin.jobs', to: '/admin/jobs' },
+        { key: 'admin.statistics', to: '/admin/analytics/revenue' }
+      ]
+      const target = fallback.find((entry) => hasPermission(entry.key))
+      if (target) return navigateTo(target.to, { replace: true })
+    }
+  ]
 })
 
 useSeoMeta({

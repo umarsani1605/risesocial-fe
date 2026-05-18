@@ -25,6 +25,10 @@ export const useAnalytics = () => {
     return mock.getPaymentStatusBreakdown()
   }
 
+  const fetchRevenueByType = async (): Promise<CategoryBreakdown[]> => {
+    return mock.getRevenueByType()
+  }
+
   const fetchUserGrowth = async (period: AnalyticsPeriod = '30d'): Promise<TimeSeriesPoint[]> => {
     return mock.getUserGrowth(period)
   }
@@ -87,6 +91,7 @@ export const useAnalytics = () => {
     fetchRevenueTrend,
     fetchRevenueBreakdown,
     fetchPaymentStatusBreakdown,
+    fetchRevenueByType,
     fetchUserGrowth,
     fetchRegistrationsTrend,
     fetchUserDistribution,

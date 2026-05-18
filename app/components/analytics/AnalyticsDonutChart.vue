@@ -6,7 +6,10 @@ const props = defineProps<{
   title?: string
   height?: number
   colors?: string[]
+  valueFormatter?: (value: number) => string
 }>()
+
+const formatValue = (v: number) => (props.valueFormatter ? props.valueFormatter(v) : formatNumber(v))
 
 const resolvedColors = computed(() =>
   props.data.map((d, i) => {
@@ -33,7 +36,7 @@ const radius = computed(() => Math.floor((props.height ?? 280) / 2) - 20)
 </script>
 
 <template>
-  <UCard class="ring-transparent shadow-none border border-default">
+  <UCard class="shadow-none!">
     <template v-if="title" #header>
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>
@@ -51,7 +54,7 @@ const radius = computed(() => Math.floor((props.height ?? 280) / 2) - 20)
       >
         <div class="text-center">
           <div class="text-2xl font-bold">
-            {{ total }}
+            {{ formatValue(total) }}
           </div>
           <div class="text-muted">Total</div>
         </div>
@@ -71,7 +74,7 @@ const radius = computed(() => Math.floor((props.height ?? 280) / 2) - 20)
           />
           <span class="truncate text-muted">{{ item.name }}</span>
         </div>
-        <span class="font-medium tabular-nums ml-4 shrink-0">{{ formatNumber(item.value) }}</span>
+        <span class="font-medium tabular-nums ml-4 shrink-0">{{ formatValue(item.value) }}</span>
       </div>
     </div>
   </UCard>

@@ -15,12 +15,12 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [revenueTrendData, revenueBreakdownData, paymentStatusData] = await Promise.all([
+const [revenueTrendData, paymentStatusData, revenueByTypeData] = await Promise.all([
   useAsyncData('analytics:revenue-trend', () =>
     analytics.fetchRevenueTrend(dateRange.value.period)
   ),
-  useAsyncData('analytics:revenue-breakdown', () => analytics.fetchRevenueBreakdown()),
-  useAsyncData('analytics:payment-status', () => analytics.fetchPaymentStatusBreakdown())
+  useAsyncData('analytics:payment-status', () => analytics.fetchPaymentStatusBreakdown()),
+  useAsyncData('analytics:revenue-by-type', () => analytics.fetchRevenueByType())
 ])
 
 watch(
@@ -35,33 +35,32 @@ const statCards = computed<AnalyticsStat[]>(() => [
     title: 'Total Revenue',
     value: revenueTrendData.data.value?.reduce((s, p) => s + p.value, 0) ?? 0,
     icon: 'i-ph-currency-circle-dollar-fill',
-    color: 'text-success'
+    color: 'blue'
   },
   {
     title: 'Paid Transactions',
     value: paymentStatusData.data.value?.find((d) => d.name === 'Paid')?.value ?? 0,
     icon: 'i-ph-check-circle-fill',
-    color: 'text-success'
+    color: 'green'
   },
   {
     title: 'Pending',
     value: paymentStatusData.data.value?.find((d) => d.name === 'Pending')?.value ?? 0,
     icon: 'i-ph-clock-fill',
-    color: 'text-warning'
+    color: 'yellow'
   },
   {
     title: 'Expired',
     value: paymentStatusData.data.value?.find((d) => d.name === 'Expired')?.value ?? 0,
     icon: 'i-ph-x-circle-fill',
-    color: 'text-error'
+    color: 'red'
   }
 ])
 </script>
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <h1 class="text-lg font-semibold">Revenue Analytics</h1>
+    <div class="flex justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 
@@ -69,23 +68,24 @@ const statCards = computed<AnalyticsStat[]>(() => [
       <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
     </div>
 
-    <LazyAnalyticsLineChart
-      :data="revenueTrendData.data.value ?? []"
-      title="Revenue Trend"
-      :height="300"
-    />
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <LazyAnalyticsBarChart
-        :data="revenueBreakdownData.data.value ?? []"
-        title="Revenue by Academy"
-        :height="280"
-      />
-      <LazyAnalyticsDonutChart
-        :data="paymentStatusData.data.value ?? []"
-        title="Payment Status"
-        :height="280"
-      />
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
+      <div class="lg:col-span-3 flex">
+        <LazyAnalyticsLineChart
+          :data="revenueTrendData.data.value ?? []"
+          title="Revenue Trend"
+          :height="380"
+          class="w-full h-full"
+        />
+      </div>
+      <div class="lg:col-span-2 flex">
+        <LazyAnalyticsDonutChart
+          :data="revenueByTypeData.data.value ?? []"
+          title="Revenue by Type"
+          :height="320"
+          :value-formatter="formatPriceCompact"
+          class="w-full h-full"
+        />
+      </div>
     </div>
   </div>
 </template>

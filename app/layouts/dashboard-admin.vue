@@ -52,15 +52,19 @@ function isActive(to: string, exact = false) {
 }
 
 const mainLinks = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'Dashboard',
-    icon: 'i-ph-squares-four-duotone',
-    to: '/admin',
-    active: isActive('/admin', true),
-    onSelect: () => {
-      open.value = false
-    }
-  },
+  ...(hasPermission('admin.dashboard')
+    ? [
+        {
+          label: 'Dashboard',
+          icon: 'i-ph-squares-four-duotone',
+          to: '/admin',
+          active: isActive('/admin', true),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []),
   ...(hasPermission('admin.transactions')
     ? [
         {
@@ -269,7 +273,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
       </template>
 
       <template #default="{ collapsed }">
-        <div>
+        <div v-if="mainLinks.length">
           <p v-if="!collapsed" class="px-6.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
             Main
           </p>

@@ -62,13 +62,13 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => [
 const { isLoggedIn } = useAuth()
 const { checkEnrollment } = useAcademyPayment()
 const isEnrolled = ref(false)
-const hasPendingPayment = ref(false)
+const pendingPricingId = ref<number | null>(null)
 
 if (isLoggedIn.value) {
   try {
     const result = await checkEnrollment(academy.value.id)
     isEnrolled.value = result.enrolled
-    hasPendingPayment.value = result.hasPendingPayment ?? false
+    pendingPricingId.value = result.pending_pricing_id ?? null
   } catch {
     // silently fail — enrollment check is not critical
   }
@@ -123,6 +123,16 @@ function nextTestimonial() {
             separatorIcon: 'text-white/60'
           }"
         />
+        <div
+          v-if="academy.image_url"
+          class="lg:hidden -mx-4 -mt-4 md:-mx-6 md:-mt-6 mb-6 aspect-square overflow-hidden rounded-xl bg-white/10"
+        >
+          <img
+            :src="academy.image_url"
+            :alt="academy.title"
+            class="w-full h-full object-cover"
+          />
+        </div>
         <div class="w-full md:w-3/4 text-white">
           <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold mb-4">
             {{ academy.title }}
@@ -198,9 +208,11 @@ function nextTestimonial() {
                   type="multiple"
                   :items="syllabusItems"
                   :ui="{
-                    item: 'border-none',
+                    root: 'space-y-4',
+                    item: 'bg-slate-50 rounded-xl border-none px-6',
                     trigger:
-                      'py-4 hover:no-underline hover:bg-slate-50 rounded-lg data-[state=open]:rounded-b-none group'
+                      'py-4 hover:no-underline cursor-pointer group',
+                    body: 'pb-4'
                   }"
                 >
                   <template #default="{ index }">
@@ -223,12 +235,12 @@ function nextTestimonial() {
                   <template #body="{ index }">
                     <div
                       v-if="academy.themes[index]?.topics?.length"
-                      class="pb-4 space-y-2"
+                      class="space-y-2"
                     >
                       <div
                         v-for="topic in academy.themes[index]!.topics"
                         :key="topic.id"
-                        class="flex items-center gap-3 px-4 py-2.5 bg-slate-50 rounded-lg"
+                        class="flex items-center gap-3 px-4 py-2.5 bg-white rounded-lg"
                       >
                         <div
                           class="size-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-semibold shrink-0"
@@ -360,7 +372,7 @@ function nextTestimonial() {
                 <div class="space-y-0">
                   <h2 class="block md:hidden text-2xl font-bold mb-4 px-6 pt-6">Apply Programs</h2>
                   <div
-                    class="w-full aspect-square overflow-hidden bg-slate-100 flex items-center justify-center rounded-lg"
+                    class="hidden lg:flex w-full aspect-square overflow-hidden bg-slate-100 items-center justify-center rounded-lg"
                   >
                     <img
                       v-if="academy.image_url"
@@ -389,7 +401,7 @@ function nextTestimonial() {
                           :academy="academy"
                           :academy-slug="academySlug"
                           :is-enrolled="isEnrolled"
-                          :has-pending-payment="hasPendingPayment"
+                          :pending-pricing-id="pendingPricingId"
                         />
                       </template>
                     </UTabs>
@@ -401,7 +413,7 @@ function nextTestimonial() {
                         :academy="academy"
                         :academy-slug="academySlug"
                         :is-enrolled="isEnrolled"
-                        :has-pending-payment="hasPendingPayment"
+                        :pending-pricing-id="pendingPricingId"
                       />
                     </div>
                   </template>

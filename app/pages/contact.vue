@@ -96,7 +96,7 @@ const submitForm = () => {
               :rows="4"
               size="lg"
             />
-            <UButton type="submit" color="primary" size="lg"> Send Message </UButton>
+            <UButton type="submit" color="primary" size="lg" block class="justify-center"> Send Message </UButton>
           </form>
         </div>
       </div>

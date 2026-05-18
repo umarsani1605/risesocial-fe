@@ -15,8 +15,7 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [userGrowthData, registrationsTrendData, userDistributionData] = await Promise.all([
-  useAsyncData('analytics:user-growth', () => analytics.fetchUserGrowth(dateRange.value.period)),
+const [registrationsTrendData, userDistributionData] = await Promise.all([
   useAsyncData('analytics:registrations-trend', () =>
     analytics.fetchRegistrationsTrend(dateRange.value.period)
   ),
@@ -26,58 +25,35 @@ const [userGrowthData, registrationsTrendData, userDistributionData] = await Pro
 watch(
   () => dateRange.value.period,
   async () => {
-    await Promise.all([userGrowthData.refresh(), registrationsTrendData.refresh()])
+    await registrationsTrendData.refresh()
   }
 )
 
-const statCards = computed<AnalyticsStat[]>(() => {
-  const lastPoint = userGrowthData.data.value?.at(-1)
-  const firstPoint = userGrowthData.data.value?.[0]
-  const trend =
-    firstPoint && lastPoint && firstPoint.value > 0
-      ? Math.round(((lastPoint.value - firstPoint.value) / firstPoint.value) * 100)
-      : 0
-  return [
-    {
-      title: 'Total Users',
-      value: lastPoint?.value ?? 0,
-      icon: 'i-ph-users-fill',
-      trend,
-      trendLabel: 'in period',
-      color: 'text-blue-500'
-    },
-    {
-      title: 'New Registrations',
-      value: registrationsTrendData.data.value?.reduce((s, p) => s + p.value, 0) ?? 0,
-      icon: 'i-ph-user-plus-fill',
-      color: 'text-success'
-    },
-    {
-      title: 'Total Enrollments',
-      value: userDistributionData.data.value?.reduce((s, d) => s + d.value, 0) ?? 0,
-      icon: 'i-ph-student-fill',
-      color: 'text-primary'
-    }
-  ]
-})
+const statCards = computed<AnalyticsStat[]>(() => [
+  {
+    title: 'New Registrations',
+    value: registrationsTrendData.data.value?.reduce((s, p) => s + p.value, 0) ?? 0,
+    icon: 'i-ph-user-plus-fill',
+    color: 'green'
+  },
+  {
+    title: 'Students Enrollment',
+    value: userDistributionData.data.value?.reduce((s, d) => s + d.value, 0) ?? 0,
+    icon: 'i-ph-student-fill',
+    color: 'blue'
+  }
+])
 </script>
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <h1 class="text-lg font-semibold">User Analytics</h1>
+    <div class="flex justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
     </div>
-
-    <LazyAnalyticsAreaChart
-      :data="userGrowthData.data.value ?? []"
-      title="User Growth"
-      :height="300"
-    />
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <LazyAnalyticsLineChart
@@ -87,7 +63,7 @@ const statCards = computed<AnalyticsStat[]>(() => {
       />
       <LazyAnalyticsBarChart
         :data="userDistributionData.data.value ?? []"
-        title="Enrollments by Academy"
+        title="Students Enrollment"
         :height="280"
       />
     </div>

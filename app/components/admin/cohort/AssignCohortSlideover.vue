@@ -34,9 +34,7 @@ const hasCertificate = computed(() => !!props.placement?.certificate)
 
 const isUnassignConfirmOpen = ref(false)
 
-const currentCohort = computed(() =>
-  props.cohorts.find((c) => c.id === props.placement?.cohort_id)
-)
+const currentCohort = computed(() => props.cohorts.find((c) => c.id === props.placement?.cohort_id))
 
 function confirmUnassign() {
   emit('drop')
@@ -195,7 +193,9 @@ function selectCohort(id: number) {
               :label="confirmLabel"
               color="primary"
               :loading="isAssigning"
-              :disabled="!selectedCohortId || isCurrentCohortSelected || isDroppingStudent || hasCertificate"
+              :disabled="
+                !selectedCohortId || isCurrentCohortSelected || isDroppingStudent || hasCertificate
+              "
               @click="emit('confirm')"
             />
           </div>
@@ -216,8 +216,8 @@ function selectCohort(id: number) {
         <template v-else>this student</template>
         from
         <span v-if="currentCohort" class="font-semibold">{{ currentCohort.name }}</span>
-        <template v-else>their current cohort</template>? Their enrollment and payment will be
-        kept — they can be reassigned to any cohort later.
+        <template v-else>their current cohort</template>? They can be reassigned to any cohort
+        later.
       </p>
     </template>
     <template #footer>

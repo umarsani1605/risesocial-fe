@@ -8,9 +8,13 @@ const locationText = computed(() => formatLocation(props.job.location))
 
 <template>
   <NuxtLink :to="`/opportunities/${job.company.slug}/${job.slug}`" class="block group">
-    <UCard class="h-full rounded-2xl ring-default transition-all duration-300 ease-out will-change-transform group-hover:-translate-y-1 group-hover:shadow-md">
+    <UCard
+      class="h-full rounded-2xl ring-default transition-all duration-300 ease-out will-change-transform group-hover:-translate-y-1 group-hover:shadow-md"
+    >
       <div class="flex w-full gap-6">
-        <div class="size-20 sm:size-24 md:size-28 shrink-0 flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-[1.02]">
+        <div
+          class="size-20 sm:size-24 md:size-28 shrink-0 flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+        >
           <NuxtImg
             v-if="job.company.logo_url"
             :src="job.company.logo_url"
@@ -25,7 +29,11 @@ const locationText = computed(() => formatLocation(props.job.location))
 
         <div class="flex-1 flex flex-col justify-between min-w-0 overflow-hidden">
           <div class="space-y-2 min-w-0">
-            <h3 class="font-bold text-default line-clamp-2 transition-colors duration-300 ease-out group-hover:text-highlighted">{{ job.title }}</h3>
+            <h3
+              class="font-bold text-default line-clamp-2 transition-colors duration-300 ease-out group-hover:text-highlighted"
+            >
+              {{ job.title }}
+            </h3>
             <p class="text-sm text-muted line-clamp-1">{{ job.company.name }}</p>
             <UBadge
               v-if="job.company.industry"
@@ -35,15 +43,15 @@ const locationText = computed(() => formatLocation(props.job.location))
             >
               {{ job.company.industry }}
             </UBadge>
-            <div class="mt-auto flex gap-2 text-sm text-muted">
-              <div class="flex items-center min-w-0 shrink-0">
+            <div class="mt-auto flex flex-col gap-2 text-sm text-muted">
+              <div class="flex items-center min-w-0">
                 <UIcon name="i-ph-calendar-bold" class="size-4 mr-2 shrink-0 text-muted" />
                 <span v-if="job.valid_until" class="whitespace-nowrap">
                   Deadline: {{ formatDate(job.valid_until) }}
                 </span>
                 <span v-else class="whitespace-nowrap text-muted">No deadline</span>
               </div>
-              <div class="flex items-center min-w-0 flex-1">
+              <div class="flex items-center min-w-0">
                 <UIcon name="i-ph-map-pin-bold" class="size-4 mr-2 shrink-0 text-muted" />
                 <span class="line-clamp-1">{{ locationText }}</span>
               </div>

@@ -94,8 +94,7 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between flex-wrap gap-3">
-      <h1 class="text-lg font-semibold">Program Analytics</h1>
+    <div class="flex justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 

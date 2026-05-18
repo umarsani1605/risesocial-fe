@@ -28,6 +28,7 @@ interface PaymentStatusResponse {
 interface EnrollmentCheckResponse {
   enrolled: boolean
   hasPendingPayment?: boolean
+  pending_pricing_id?: number | null
   enrollment_id?: number
   status?: string
   payment_status?: string | null
