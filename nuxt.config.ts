@@ -42,6 +42,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: '',
+      assetsBaseUrl: process.env.NUXT_PUBLIC_ASSETS_BASE_URL || 'https://assets.risesocial.org',
       partykitHost: '',
       whatsappNumber: process.env.NUXT_PUBLIC_WHATSAPP_NUMBER || '6285111032928',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',

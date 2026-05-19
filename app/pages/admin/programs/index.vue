@@ -11,15 +11,25 @@ definePageMeta({
 useSeoMeta({ title: 'Rise Young Leaders Scholarship - Rise Social' })
 
 const { api } = useApi()
-const { public: { apiBaseUrl } } = useRuntimeConfig()
+const { public: { apiBaseUrl, assetsBaseUrl } } = useRuntimeConfig()
 
 function getFileUrl(filePath?: string | null): string {
   if (!filePath) return ''
+
+  // Already a full URL → return as-is (R2 URL or any pre-built URL)
+  if (/^https?:\/\//i.test(filePath)) return filePath
+
+  // Legacy absolute disk path (contains "/uploads/") → strip and prepend backend
   const idx = filePath.indexOf('/uploads/')
-  if (idx === -1) return ''
-  const rel = filePath.slice(idx + '/uploads/'.length)
-  const encoded = rel.split('/').map(encodeURIComponent).join('/')
-  return `${apiBaseUrl}/uploads/${encoded}`
+  if (idx !== -1) {
+    const rel = filePath.slice(idx + '/uploads/'.length)
+    const encoded = rel.split('/').map(encodeURIComponent).join('/')
+    return `${apiBaseUrl}/uploads/${encoded}`
+  }
+
+  // Plain relative path (new R2 uploads, e.g. "ryls/headshots/foo.png") → prepend R2 base
+  const encoded = filePath.split('/').map(encodeURIComponent).join('/')
+  return `${assetsBaseUrl}/${encoded}`
 }
 
 const [{ data: rawRegistrations }, { data: rawDrafts }] = await Promise.all([
