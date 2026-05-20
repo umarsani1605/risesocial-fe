@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAdminPermission('admin.academy')
 
 const items = ref<AcademyTestimonial[]>(structuredClone(props.initialData))
 const isModalOpen = ref(false)
@@ -92,7 +93,7 @@ const columns: TableColumn<AcademyTestimonial>[] = [
   <div class="space-y-6 pt-6">
     <div class="flex items-center justify-between gap-3 px-6">
       <h3 class="text-lg font-semibold">Testimonials</h3>
-      <UButton label="Add" color="primary" class="shrink-0" @click="openAdd" />
+      <UButton v-if="canEdit" label="Add" color="primary" class="shrink-0" @click="openAdd" />
     </div>
     <div class="overflow-x-auto border-t border-default">
       <UTable
@@ -112,7 +113,7 @@ const columns: TableColumn<AcademyTestimonial>[] = [
           </div>
         </template>
         <template #actions-cell="{ row }">
-          <div class="flex items-center gap-2 justify-end">
+          <div v-if="canEdit" class="flex items-center gap-2 justify-end">
             <UButton
               size="sm"
               color="primary"

@@ -11,6 +11,7 @@ definePageMeta({
 const route = useRoute()
 const toast = useToast()
 const { api } = useApi()
+const { canEdit, isViewer } = useAdminPermission('admin.jobs')
 
 const jobId = Number(route.params.id)
 const { data: jobData, error: jobError } = await useAsyncData(`admin:job:${jobId}`, () =>
@@ -73,9 +74,10 @@ async function onSave() {
       <div class="flex flex-wrap items-center justify-between">
         <div class="flex items-center gap-2">
           <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/jobs" />
-          <h2 class="text-xl font-semibold">Edit Job</h2>
+          <h2 class="text-xl font-semibold">{{ canEdit ? 'Edit' : 'Detail' }} Job</h2>
         </div>
         <UButton
+          v-if="canEdit"
           type="submit"
           icon="i-ph-floppy-disk-bold"
           label="Save Job"
@@ -85,7 +87,7 @@ async function onSave() {
         />
       </div>
 
-      <div class="p-4 space-y-4">
+      <fieldset :disabled="isViewer" class="p-4 space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UFormField name="title" label="Title" required>
             <UInput v-model="form.title" placeholder="Job title" class="w-full" />
@@ -145,7 +147,7 @@ async function onSave() {
             class="w-full"
           />
         </UFormField>
-      </div>
+      </fieldset>
     </UForm>
   </AdminCard>
 </template>

@@ -12,7 +12,7 @@ useSeoMeta({ title: 'Students - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
-const { canEdit } = useAuth()
+const { canEdit } = useAdminPermission('admin.cohort')
 
 const {
   data: rawData,
@@ -267,7 +267,7 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
         variant: 'light',
         size: 'sm',
         leadingIcon: isPlaced ? 'i-ph-arrows-left-right-bold' : 'i-ph-plus-bold',
-        disabled: !canEdit('admin.cohort') || hasCert,
+        disabled: !canEdit.value || hasCert,
         onClick: () => openAssignModal(row.original)
       })
     }

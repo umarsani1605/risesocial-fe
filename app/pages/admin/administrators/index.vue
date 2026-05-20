@@ -11,7 +11,7 @@ useSeoMeta({ title: 'Administrators - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
-const { canEdit } = useAuth()
+const { canEdit } = useAdminPermission('admin.users')
 
 const { data: rawUsers, refresh } = await useAsyncData('admin:administrators', () =>
   api<ApiResponse<UserProfile[]>>('/admin/users')
@@ -227,7 +227,7 @@ const columns: TableColumn<UserProfile>[] = [
   >
     <template #toolbar-right>
       <UButton
-        v-if="canEdit('admin.users')"
+        v-if="canEdit"
         label="Add New"
         icon="i-ph-plus-bold"
         color="primary"
@@ -254,7 +254,7 @@ const columns: TableColumn<UserProfile>[] = [
     title="Administrator Detail"
     description="Edit administrator information."
     :show-permissions="true"
-    :show-delete="canEdit('admin.users')"
+    :show-delete="canEdit"
     delete-label="Hapus"
     :role-items="[
       { label: 'User', value: 'USER' },

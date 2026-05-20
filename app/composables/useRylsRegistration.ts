@@ -22,7 +22,7 @@ interface PaymentData {
   id: string | null
   type: PaymentType
   status: PaymentStatus
-  paymentProof: File | null
+  paymentProof: File | string | null
   midtransData: Record<string, unknown> | null
 }
 
@@ -59,6 +59,7 @@ export const useRylsRegistration = createSharedComposable(() => {
   const headshotFile = useState<File | string | null>('ryls:headshotFile', () => null)
   const readPolicies = useState<YesNoEmpty>('ryls:readPolicies', () => '')
   const payment = useState<PaymentData>('ryls:payment', defaultPayment)
+  const submissionCompleted = useState<boolean>('ryls:submissionCompleted', () => false)
 
   // Getters
   const getAllRegistrationData = computed(() => ({
@@ -118,7 +119,7 @@ export const useRylsRegistration = createSharedComposable(() => {
     payment.value = { ...payment.value, type }
   }
 
-  const setPaymentProof = (file: File) => {
+  const setPaymentProof = (file: File | string | null) => {
     payment.value = { ...payment.value, paymentProof: file }
   }
 
@@ -128,6 +129,14 @@ export const useRylsRegistration = createSharedComposable(() => {
 
   const setMidtransData = (data: Record<string, unknown>) => {
     payment.value = { ...payment.value, midtransData: data }
+  }
+
+  const setPayment = (payload: Partial<PaymentData>) => {
+    payment.value = { ...payment.value, ...payload }
+  }
+
+  const setSubmissionCompleted = (value: boolean) => {
+    submissionCompleted.value = value
   }
 
   const resetPayment = () => {
@@ -143,6 +152,7 @@ export const useRylsRegistration = createSharedComposable(() => {
     needVisa.value = ''
     headshotFile.value = null
     readPolicies.value = ''
+    submissionCompleted.value = false
     // preserve payment.id — matches original store behaviour
     payment.value = { ...payment.value, status: null, type: null, paymentProof: null, midtransData: null }
   }
@@ -158,6 +168,7 @@ export const useRylsRegistration = createSharedComposable(() => {
     headshotFile,
     readPolicies,
     payment,
+    submissionCompleted,
     // Getters
     getAllRegistrationData,
     getStep1Data,
@@ -167,11 +178,13 @@ export const useRylsRegistration = createSharedComposable(() => {
     setStep1,
     setFullyFundedData,
     setSelfFundedData,
+    setPayment,
     setPaymentStatus,
     setPaymentType,
     setPaymentProof,
     setPaymentId,
     setMidtransData,
+    setSubmissionCompleted,
     resetPayment,
     resetAll,
   })

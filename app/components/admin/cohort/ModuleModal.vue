@@ -277,7 +277,6 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
               color="neutral"
               size="sm"
               :icon="showAssignment ? 'i-ph-minus-bold' : 'i-ph-plus-bold'"
-              class="pt-3"
               @click="toggleAssignment"
             />
             <div
@@ -365,7 +364,6 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
               color="neutral"
               size="sm"
               :icon="showAttachment ? 'i-ph-minus-bold' : 'i-ph-plus-bold'"
-              class="pt-3"
               @click="toggleAttachment"
             />
             <div

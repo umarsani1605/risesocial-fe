@@ -1,45 +1,48 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'empty-white' })
 
 useSeoMeta({ title: 'Registration Complete - Rise Social' })
 useHead({ bodyAttrs: { class: 'ryls-blue-theme' } })
 
 const store = useRylsRegistration()
 const router = useRouter()
+const { trackMetaEvent } = useMetaTracking()
 
-if (store.payment.status !== 'PAID') {
+if (!store.submissionCompleted || store.payment.status !== 'PAID') {
   router.push('/programs/rise-young-leaders-summit/registration')
 }
 
-try {
-  const { proxy } = useScriptMetaPixel()
-  if (store.step1.scholarshipType === 'FULLY_FUNDED') {
-    proxy.fbq('track', 'Lead', {
-      content_name: 'Fully Funded',
-      value: 15.0,
-      currency: 'USD',
-    })
-  }
-  else {
-    proxy.fbq('track', 'Lead', {
-      content_name: 'Self Funded',
-      value: 750,
-      currency: 'USD',
-    })
-  }
-}
-catch {
-  // module not available
-}
+onMounted(() => {
+  const [firstName, ...lastNameParts] = store.step1.fullName.trim().split(/\s+/)
+  const isFullyFunded = store.step1.scholarshipType === 'FULLY_FUNDED'
+
+  void trackMetaEvent({
+    eventName: 'Lead',
+    customData: {
+      content_name: isFullyFunded ? 'Fully Funded' : 'Self Funded',
+      content_category: 'RYLS Registration',
+      value: isFullyFunded ? 15 : 750,
+      currency: 'USD'
+    },
+    userData: {
+      email: store.step1.email,
+      phone: store.step1.whatsapp,
+      firstName,
+      lastName: lastNameParts.join(' ')
+    }
+  })
+  store.setSubmissionCompleted(false)
+})
 
 function onBack() {
+  store.resetAll()
   router.push('/')
 }
 </script>
 
 <template>
-  <section class="mx-auto max-w-xl px-6 py-24 md:py-32">
-    <div class="text-center space-y-8">
+  <UPageSection :ui="{ container: 'py-24 md:py-32' }">
+    <div class="mx-auto max-w-xl text-center space-y-8">
       <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center">
         <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -63,5 +66,5 @@ function onBack() {
         Back to Home
       </UButton>
     </div>
-  </section>
+  </UPageSection>
 </template>

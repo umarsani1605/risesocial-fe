@@ -13,6 +13,7 @@ definePageMeta({
 const route = useRoute()
 const toast = useToast()
 const { api } = useApi()
+const { canEdit, isViewer } = useAdminPermission('admin.academy')
 
 const academySlug = route.params.slug as string
 const { data: sourceData, error: sourceError } = await useAsyncData(
@@ -254,7 +255,7 @@ async function onDelete() {
             variant="ghost"
             to="/admin/academies"
           />
-          <h2 class="min-w-0 truncate text-lg font-semibold sm:text-xl">Edit {{ pageTitle }}</h2>
+          <h2 class="min-w-0 truncate text-lg font-semibold sm:text-xl">{{ canEdit ? 'Edit' : 'Detail' }} {{ pageTitle }}</h2>
           <UBadge
             :color="
               currentStatus === 'ACTIVE'
@@ -274,7 +275,7 @@ async function onDelete() {
             "
           />
         </div>
-        <UDropdownMenu :items="headerMenuItems">
+        <UDropdownMenu v-if="canEdit" :items="headerMenuItems">
           <UButton
             icon="i-ph-dots-three-vertical-bold"
             color="neutral"
@@ -298,24 +299,25 @@ async function onDelete() {
           class="w-full justify-center sm:w-auto"
         />
         <UButton
-          v-if="currentStatus === 'ACTIVE'"
+          v-if="canEdit && currentStatus === 'ACTIVE'"
           label="Switch to Draft"
           color="neutral"
           variant="light"
           :loading="isSwitchingToDraft"
           :disabled="isSwitchingToDraft"
-          @click="onSwitchToDraft"
           class="flex-1 justify-center sm:flex-none"
+          @click="onSwitchToDraft"
         />
         <UButton
+          v-if="canEdit"
           :label="saveButtonLabel"
           color="primary"
           :loading="isHeaderSaving || isValidating"
           :disabled="isHeaderSaving || isValidating"
-          @click="onHeaderSave"
           class="justify-center"
+          @click="onHeaderSave"
         />
-        <UDropdownMenu :items="headerMenuItems">
+        <UDropdownMenu v-if="canEdit" :items="headerMenuItems">
           <UButton
             icon="i-ph-dots-three-vertical-bold"
             color="neutral"
@@ -367,22 +369,25 @@ async function onDelete() {
                   @submit="onSectionSave"
                   :validate-on="['submit']"
                 >
-                  <div class="mb-6 flex items-center justify-between gap-3">
-                    <h3 class="text-lg font-semibold">Basic Information</h3>
-                    <UButton
-                      type="submit"
-                      label="Save"
-                      color="primary"
-                      :loading="isSectionSaving"
-                      :disabled="isSectionSaving"
-                      class="shrink-0"
+                  <fieldset :disabled="isViewer" class="contents">
+                    <div class="mb-6 flex items-center justify-between gap-3">
+                      <h3 class="text-lg font-semibold">Basic Information</h3>
+                      <UButton
+                        v-if="canEdit"
+                        type="submit"
+                        label="Save"
+                        color="primary"
+                        :loading="isSectionSaving"
+                        :disabled="isSectionSaving"
+                        class="shrink-0"
+                      />
+                    </div>
+                    <AdminAcademyFormBasicInfo
+                      ref="formRef"
+                      v-model="form"
+                      :initial-image-url="source.image_url"
                     />
-                  </div>
-                  <AdminAcademyFormBasicInfo
-                    ref="formRef"
-                    v-model="form"
-                    :initial-image-url="source.image_url"
-                  />
+                  </fieldset>
                 </UForm>
               </div>
 
@@ -442,6 +447,7 @@ async function onDelete() {
     </UTabs>
 
     <div
+      v-if="canEdit"
       class="sticky bottom-0 z-20 border-t border-default bg-default/95 p-3 backdrop-blur lg:hidden"
     >
       <UButton

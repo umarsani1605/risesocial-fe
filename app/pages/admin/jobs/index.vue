@@ -11,7 +11,8 @@ definePageMeta({
 useSeoMeta({ title: 'Jobs Management - Rise Social' })
 
 const { api } = useApi()
-const { canEdit } = useAuth()
+const { canEdit } = useAdminPermission('admin.jobs')
+const AdminRowAction = resolveComponent('AdminRowAction')
 const { data: rawJobs, refresh: refreshJobs } = await useAsyncData('admin:jobs', () =>
   api<PaginatedResponse<Job>>('/admin/jobs')
 )
@@ -368,15 +369,11 @@ const columns: TableColumn<Job>[] = [
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-2' }, [
-        h(UButton, {
-          label: 'Edit',
-          size: 'sm',
-          color: 'primary',
-          variant: 'light',
-          leadingIcon: 'i-ph-pencil-simple-bold',
-          to: `/admin/jobs/${row.original.id}/edit`
+        h(AdminRowAction, {
+          to: `/admin/jobs/${row.original.id}/edit`,
+          canEdit: canEdit.value
         }),
-        canEdit('admin.jobs') && h(UButton, {
+        canEdit.value && h(UButton, {
           label: 'Delete',
           size: 'sm',
           color: 'error',
@@ -467,7 +464,7 @@ const columns: TableColumn<Job>[] = [
 
             <UButton color="primary" icon="i-ph-gear-bold" @click="syncSettingsOpen = true" />
           </UFieldGroup>
-          <UButton v-if="canEdit('admin.jobs')" label="Add Job" icon="i-ph-plus-bold" color="primary" to="/admin/jobs/create" />
+          <UButton v-if="canEdit" label="Add Job" icon="i-ph-plus-bold" color="primary" to="/admin/jobs/create" />
         </div>
       </div>
     </template>

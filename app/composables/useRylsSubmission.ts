@@ -48,19 +48,16 @@ export const useRylsSubmission = () => {
         },
       }
 
-      // Add FULLY_FUNDED conditional fields
-      if (scholarshipType === 'FULLY_FUNDED') {
-        body.essayTopic = store.essayTopic
-        body.essayFileId = Number(store.essayFile)
-        body.essayDescription = store.essayDescription
-      }
-
       // Add SELF_FUNDED conditional fields
       if (scholarshipType === 'SELF_FUNDED') {
         body.passportNumber = store.passportNumber
         body.needVisa = store.needVisa
         body.headshotFileId = Number(store.headshotFile)
         body.readPolicies = store.readPolicies
+      }
+
+      if (store.payment.id) {
+        body.paymentId = Number(store.payment.id)
       }
 
       if (resumeToken) body.resumeToken = resumeToken

@@ -37,6 +37,7 @@ const emit = defineEmits<{
 
 const formRef = useTemplateRef('detailForm')
 const { isSuperAdmin } = useAuth()
+const { canEdit, isViewer } = useAdminPermission('admin.users')
 const { api } = useApi()
 const toast = useToast()
 
@@ -280,6 +281,7 @@ function handleSubmit() {
           class="space-y-0"
           @submit="handleSubmit"
         >
+          <fieldset :disabled="isViewer" class="contents">
           <div class="p-6 space-y-4">
             <p class="text-xs font-bold uppercase tracking-wide">User Information</p>
 
@@ -500,6 +502,7 @@ function handleSubmit() {
           <div class="p-6">
             <p class="text-xs font-bold uppercase tracking-wide mb-4">Skills</p>
           </div> -->
+          </fieldset>
         </UForm>
       </div>
 
@@ -508,7 +511,7 @@ function handleSubmit() {
       </div>
     </template>
 
-    <template #footer>
+    <template v-if="canEdit" #footer>
       <UButton
         v-if="showDelete"
         :label="deleteLabel"

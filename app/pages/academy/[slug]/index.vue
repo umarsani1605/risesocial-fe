@@ -38,13 +38,18 @@ if (academy.value.pixel_id) {
     // meta pixel script unavailable
   }
 }
+const { trackMetaEvent } = useMetaTracking({ pixelProxy: metaPixelProxy })
 
 onMounted(() => {
-  metaPixelProxy?.fbq('track', 'ViewContent', {
-    content_name: academy.value.title,
-    content_category: 'Academy',
-    content_ids: [String(academy.value.id)],
-    content_type: 'product'
+  void trackMetaEvent({
+    eventName: 'ViewContent',
+    pixelId: academy.value.pixel_id,
+    customData: {
+      content_name: academy.value.title,
+      content_category: 'Academy',
+      content_ids: [String(academy.value.id)],
+      content_type: 'product'
+    }
   })
 })
 

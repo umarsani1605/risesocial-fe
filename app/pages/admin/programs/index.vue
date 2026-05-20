@@ -15,9 +15,9 @@ const { public: { apiBaseUrl } } = useRuntimeConfig()
 
 function getFileUrl(filePath?: string | null): string {
   if (!filePath) return ''
-  const idx = filePath.indexOf('/uploads/')
-  if (idx === -1) return ''
-  const rel = filePath.slice(idx + '/uploads/'.length)
+  const rel = filePath.includes('/uploads/')
+    ? filePath.slice(filePath.indexOf('/uploads/') + '/uploads/'.length)
+    : filePath.replace(/^\/+/, '')
   const encoded = rel.split('/').map(encodeURIComponent).join('/')
   return `${apiBaseUrl}/uploads/${encoded}`
 }
@@ -221,6 +221,10 @@ function formatDraftDiscoverSource(source?: string | null, otherText?: string | 
   return DISCOVER_SOURCE_LABEL[source] ?? source
 }
 
+function normalizePaymentMethod(method?: string | null) {
+  return method?.toUpperCase() ?? ''
+}
+
 const draftColumns: TableColumn<RylsDraft>[] = [
   {
     id: 'no',
@@ -281,17 +285,14 @@ const draftColumns: TableColumn<RylsDraft>[] = [
       )
   },
   {
+    accessorFn: row =>
+      formatDraftDiscoverSource(
+        row.form_data?.step1?.discoverSource as string | undefined,
+        row.form_data?.step1?.discoverOtherText as string | undefined
+      ),
     id: 'discover_source',
     header: 'Discover Source',
-    cell: ({ row }) =>
-      h(
-        'span',
-        { class: 'text-sm' },
-        formatDraftDiscoverSource(
-          row.original.form_data?.step1?.discoverSource as string | undefined,
-          row.original.form_data?.step1?.discoverOtherText as string | undefined
-        )
-      )
+    cell: ({ row }) => h('span', { class: 'text-sm' }, row.getValue('discover_source'))
   },
   {
     id: 'scholarship_type',
@@ -311,14 +312,10 @@ const draftColumns: TableColumn<RylsDraft>[] = [
     }
   },
   {
+    accessorFn: row => STEP_LABELS[row.current_step] ?? `Step ${row.current_step}`,
     id: 'current_step',
     header: 'Progress',
-    cell: ({ row }) =>
-      h(
-        UBadge,
-        { variant: 'outline', color: 'primary', class: 'whitespace-nowrap' },
-        () => STEP_LABELS[row.original.current_step] ?? `Step ${row.original.current_step}`
-      )
+    cell: ({ row }) => h('span', { class: 'text-sm whitespace-nowrap' }, row.getValue('current_step'))
   },
   {
     id: 'updated_at',
@@ -428,7 +425,7 @@ const columns: TableColumn<RylsRegistration>[] = [
     cell: ({ row }) => {
       const payment = row.original.payments?.[0]
       if (!payment) return h('span', { class: 'text-muted' }, '–')
-      const method = payment.payment_method
+      const method = normalizePaymentMethod(payment.payment_method)
       const logoMap: Record<string, string> = {
         MIDTRANS: '/images/payment-logo/midtrans.png',
         PAYPAL: '/images/payment-logo/paypal.png'
@@ -454,9 +451,10 @@ const columns: TableColumn<RylsRegistration>[] = [
 
       const linkClass =
         'inline-flex items-center gap-1 text-primary text-sm hover:underline max-w-52 truncate'
+      const method = normalizePaymentMethod(payment.payment_method)
 
       if (
-        (payment.payment_method === 'PAYPAL' || payment.payment_method === 'BANK_TRANSFER') &&
+        (method === 'PAYPAL' || method === 'BANK_TRANSFER') &&
         payment.payment_proof?.file_path
       ) {
         const href = getFileUrl(payment.payment_proof.file_path)
@@ -468,7 +466,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         }
       }
 
-      if (payment.payment_method === 'MIDTRANS') {
+      if (method === 'MIDTRANS') {
         const orderId =
           payment.transaction?.midtrans_data?.midtrans_order_id ??
           payment.transaction?.transaction_code
@@ -540,6 +538,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         v-model:search="search"
         :data="filteredData"
         :columns="columns"
+        :column-pinning="{ right: ['actions'] }"
         search-placeholder="Search name or email..."
         search-class="w-full sm:w-52"
         pinned-shadow

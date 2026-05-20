@@ -14,6 +14,8 @@ useSeoMeta({ title: 'Cohorts - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAdminPermission('admin.cohort')
+const AdminRowAction = resolveComponent('AdminRowAction')
 
 const [
   { data: cohortsData, refresh },
@@ -118,13 +120,9 @@ const columns: TableColumn<AdminCohort>[] = [
     header: () => h('div', 'Actions'),
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
-      h(UButton, {
-        label: 'Detail',
-        color: 'primary',
-        variant: 'light',
-        size: 'sm',
-        leadingIcon: 'i-ph-magnifying-glass-bold',
-        to: `/admin/cohorts/${row.original.id}`
+      h(AdminRowAction, {
+        to: `/admin/cohorts/${row.original.id}`,
+        canEdit: canEdit.value
       })
   }
 ]
@@ -206,7 +204,7 @@ async function onAddCohort() {
       </div>
     </template>
     <template #toolbar-right>
-      <UButton label="Add New" icon="i-ph-plus-bold" color="primary" @click="isAddOpen = true" />
+      <UButton v-if="canEdit" label="Add New" icon="i-ph-plus-bold" color="primary" @click="isAddOpen = true" />
     </template>
   </AdminDataTable>
 

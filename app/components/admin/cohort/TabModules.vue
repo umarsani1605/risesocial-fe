@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   modules: AdminCohortModule[]
+  canEdit?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -44,6 +45,7 @@ function toggleAll() {
   <div class="space-y-3 pt-4 min-h-[400px]">
     <div class="flex items-center justify-between px-2 mb-4">
       <UButton
+        v-if="canEdit"
         label="Add Module"
         icon="i-ph-plus-bold"
         color="primary"
@@ -56,7 +58,7 @@ function toggleAll() {
         icon="i-ph-arrows-down-up"
         color="neutral"
         variant="link"
-        class="w-36"
+        class="ml-auto w-36"
         @click="toggleAll"
       />
     </div>
@@ -74,6 +76,7 @@ function toggleAll() {
       :key="module.id"
       :module="module"
       :is-open="isOpen(module.id)"
+      :can-edit="canEdit"
       @toggle="toggleModule(module.id)"
       @edit="emit('edit-module', $event)"
       @delete="emit('delete-module', $event)"

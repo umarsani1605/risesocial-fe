@@ -3,9 +3,26 @@ import { SCHOLARSHIP_TYPE_LABEL, DISCOVER_SOURCE_LABEL, PAYMENT_TYPE_LABEL } fro
 
 const open = defineModel<boolean>('open', { required: true })
 
-defineProps<{
+const props = defineProps<{
   registration: RylsRegistration | null
 }>()
+
+const { public: { apiBaseUrl } } = useRuntimeConfig()
+
+function normalizePaymentMethod(method?: string | null) {
+  return method?.toUpperCase() ?? ''
+}
+
+function getFileUrl(filePath?: string | null): string {
+  if (!filePath) return ''
+  const rel = filePath.includes('/uploads/')
+    ? filePath.slice(filePath.indexOf('/uploads/') + '/uploads/'.length)
+    : filePath.replace(/^\/+/, '')
+  const encoded = rel.split('/').map(encodeURIComponent).join('/')
+  return `${apiBaseUrl}/uploads/${encoded}`
+}
+
+const paymentProofUrl = computed(() => getFileUrl(props.registration?.payments?.[0]?.payment_proof?.file_path))
 </script>
 
 <template>
@@ -20,59 +37,64 @@ defineProps<{
         <!-- Section 1: Personal Information -->
         <div class="p-6">
           <p class="text-xs font-bold uppercase tracking-wide mb-4">Personal Information</p>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-2 text-sm">
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Full Name</span>
               <span class="font-medium">{{ registration.full_name }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Email</span>
               <span>{{ registration.email }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">WhatsApp</span>
               <span>{{ registration.whatsapp ?? '–' }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Gender</span>
               <span>{{ registration.gender === 'FEMALE' ? 'Female' : 'Male' }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Date of Birth</span>
               <span>{{ formatDate(registration.date_of_birth) }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Residence</span>
               <span>{{ registration.residence ?? '–' }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Nationality</span>
               <span class="capitalize">{{ registration.nationality }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Second Nationality</span>
               <span :class="registration.second_nationality ? '' : 'text-muted'">
                 {{ registration.second_nationality ?? '–' }}
               </span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Institution</span>
               <span>{{ registration.institution ?? '–' }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Discover Source</span>
               <span>{{
                 DISCOVER_SOURCE_LABEL[registration.discover_source] ?? registration.discover_source
               }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Scholarship Type</span>
-              <span>{{
-                SCHOLARSHIP_TYPE_LABEL[registration.scholarship_type] ??
-                registration.scholarship_type
-              }}</span>
+              <div>
+                <UBadge
+                  color="primary"
+                  :variant="registration.scholarship_type === 'FULLY_FUNDED' ? 'solid' : 'outline'"
+                  class="whitespace-nowrap"
+                >
+                  {{ SCHOLARSHIP_TYPE_LABEL[registration.scholarship_type] ?? registration.scholarship_type }}
+                </UBadge>
+              </div>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Registration Date</span>
               <span>{{ formatDatetime(registration.created_at) }}</span>
             </div>
@@ -84,39 +106,39 @@ defineProps<{
         <!-- Section 2: Payment Information -->
         <div v-if="registration.payments?.[0]" class="p-6">
           <p class="text-xs font-bold uppercase tracking-wide mb-4">Payment Information</p>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-2 text-sm">
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Payment Type</span>
               <img
-                v-if="registration.payments[0].payment_method === 'MIDTRANS'"
+                v-if="normalizePaymentMethod(registration.payments[0].payment_method) === 'MIDTRANS'"
                 src="/images/payment-logo/midtrans.png"
                 alt="Midtrans"
                 class="h-5 object-contain"
               />
               <img
-                v-else-if="registration.payments[0].payment_method === 'PAYPAL'"
+                v-else-if="normalizePaymentMethod(registration.payments[0].payment_method) === 'PAYPAL'"
                 src="/images/payment-logo/paypal.png"
                 alt="PayPal"
                 class="h-5 object-contain"
               />
               <span v-else class="font-medium">{{
-                PAYMENT_TYPE_LABEL[registration.payments[0].payment_method] ??
+                PAYMENT_TYPE_LABEL[normalizePaymentMethod(registration.payments[0].payment_method)] ??
                 registration.payments[0].payment_method
               }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Payment Status</span>
               <span class="capitalize">{{
                 registration.payments[0].status?.toLowerCase() ?? '–'
               }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Amount</span>
               <span class="font-medium">{{
                 formatPrice(registration.payments[0].transaction?.amount)
               }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Payment Date</span>
               <span>{{
                 registration.payments[0].transaction?.paid_at
@@ -124,18 +146,19 @@ defineProps<{
                   : '–'
               }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <span class="text-muted">Payment Proof</span>
-              <span v-if="!registration.payments[0].payment_proof" class="text-muted">–</span>
-              <div v-else>
-                <UButton
-                  icon="i-ph-download-simple-bold"
-                  label="Download"
-                  size="sm"
-                  color="neutral"
-                  variant="light"
-                />
-              </div>
+              <span v-if="!registration.payments[0].payment_proof || !paymentProofUrl" class="text-muted">–</span>
+              <a
+                v-else
+                :href="paymentProofUrl"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center gap-1 text-primary hover:underline"
+              >
+                <UIcon name="i-ph-arrow-square-out-bold" class="size-4 shrink-0" />
+                <span class="truncate">Payment Proof</span>
+              </a>
             </div>
           </div>
         </div>

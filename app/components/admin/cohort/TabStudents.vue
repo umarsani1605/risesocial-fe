@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
   enrollments: AdminCohortPlacement[]
+  canEdit?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -95,7 +96,7 @@ const columns: TableColumn<AdminCohortPlacement>[] = [
       </template>
 
       <template #actions-cell="{ row }">
-        <div class="flex justify-end gap-2">
+        <div v-if="canEdit" class="flex justify-end gap-2">
           <UButton
             label="Move Cohort"
             color="primary"

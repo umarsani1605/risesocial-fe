@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAdminPermission('admin.cohort')
 
 const items = ref<AdminCohort[]>([])
 const loading = ref(false)
@@ -59,7 +60,7 @@ const columns: TableColumn<AdminCohort>[] = [
 
 <template>
   <div class="space-y-4">
-    <div class="flex justify-end">
+    <div v-if="canEdit" class="flex justify-end">
       <UButton
         label="Add Cohort"
         color="primary"
@@ -95,12 +96,9 @@ const columns: TableColumn<AdminCohort>[] = [
         </template>
         <template #actions-cell="{ row }">
           <div class="flex items-center gap-2 justify-end">
-            <UButton
-              label="Detail"
-              icon="i-ph-magnifying-glass-bold"
-              size="sm"
-              variant="light"
+            <AdminRowAction
               :to="`/admin/cohorts/${row.original.id}`"
+              :can-edit="canEdit"
             />
           </div>
         </template>

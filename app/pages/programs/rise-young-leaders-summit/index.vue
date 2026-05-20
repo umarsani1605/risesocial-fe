@@ -24,6 +24,7 @@ try {
 catch {
   // @nuxtjs/scripts meta pixel not available
 }
+const { trackMetaEvent } = useMetaTracking({ pixelProxy: metaPixelProxy })
 
 const scrollToSection = (id: string) => {
   if (import.meta.client) {
@@ -159,12 +160,13 @@ const speakers: RylsSpeaker[] = [
 ]
 
 async function handleRegisterButton(packageType: string) {
-  if (metaPixelProxy) {
-    metaPixelProxy.fbq('track', 'ViewContent', {
+  void trackMetaEvent({
+    eventName: 'RYLSRegisterClick',
+    customData: {
       content_name: packageType,
       content_category: 'RYLS Registration'
-    })
-  }
+    }
+  })
 
   await navigateTo('https://risesocial.org/programs/rise-young-leaders-summit/registration', {
     open: {
@@ -174,12 +176,13 @@ async function handleRegisterButton(packageType: string) {
 }
 
 async function handleGuidebookButton() {
-  if (metaPixelProxy) {
-    metaPixelProxy.fbq('track', 'ViewContent', {
+  void trackMetaEvent({
+    eventName: 'RYLSGuidebookClick',
+    customData: {
       content_name: 'Guidebook',
       content_category: 'RYLS Guidebook'
-    })
-  }
+    }
+  })
 
   await navigateTo('https://drive.google.com/drive/folders/1oWVXmlb5uHuJjh3WGe0tMpigNQAM519n?usp=drive_link', {
     open: {
@@ -235,7 +238,7 @@ const pricingBenefits = {
   <div>
     <!-- Hero Section -->
     <section class="bg-white py-24 lg:py-12 lg:pt-36 overflow-x-clip overflow-y-visible">
-      <div class="container mx-auto px-4 relative">
+      <UContainer class="relative">
         <div class="flex flex-col-reverse lg:flex-row gap-12 items-stretch">
           <div class="flex-1 pt-24 space-y-6 lg:space-y-8 text-center lg:text-left">
             <h2 class="text-xl text-slate-700 font-semibold">International Climate Change Leadership Forum</h2>
@@ -283,12 +286,12 @@ const pricingBenefits = {
             </div>
           </div>
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- About Section -->
     <section class="bg-transparent py-16 lg:py-24">
-      <div class="container mx-auto px-4 space-y-8 lg:space-y-16">
+      <UContainer class="space-y-8 lg:space-y-16">
         <div class="text-center max-w-4xl mx-auto mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-6">Be the Force Behind World's Green Revolution</h2>
           <p class="text-base lg:text-lg">
@@ -332,12 +335,12 @@ const pricingBenefits = {
             <span class="text-center">Expand your impact by collaborating with global peers, exchanging cultures, and co-creating solutions that matter beyond borders.</span>
           </div>
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- Quote Section -->
     <section class="bg-white relative overflow-hidden">
-      <div class="container mx-auto px-4 relative z-10">
+      <UContainer class="relative z-10">
         <div class="max-w-4xl mx-auto text-center">
           <div class="mb-8">
             <svg class="size-8 mx-auto text-sky-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -352,7 +355,7 @@ const pricingBenefits = {
           </blockquote>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- Eligibility Section -->
@@ -411,7 +414,7 @@ const pricingBenefits = {
         </div>
       </div>
 
-      <div class="relative z-10 container mx-auto px-4">
+      <UContainer class="relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-12 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Are You Eligible?</h2>
           <p class="text-lg">We're looking for passionate individuals ready to drive real change in their communities and beyond.</p>
@@ -458,12 +461,12 @@ const pricingBenefits = {
             <p class="text-base text-muted">Open to all nationalities, across Southeast Asia and beyond.</p>
           </div>
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- Program Highlights Section -->
     <section class="py-16 lg:py-24 bg-white text-slate-800 relative z-20">
-      <div class="relative z-10 container mx-auto px-4">
+      <UContainer class="relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Program Highlights</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
@@ -539,12 +542,12 @@ const pricingBenefits = {
             </div>
           </div>
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- Speakers Section -->
     <section class="py-16 lg:py-24 mb-16 bg-white text-slate-800 relative z-20">
-      <div class="container mx-auto px-4">
+      <UContainer>
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Previous Speakers</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
@@ -587,7 +590,7 @@ const pricingBenefits = {
             </template>
           </UCarousel>
         </ClientOnly>
-      </div>
+      </UContainer>
     </section>
 
     <!-- How to Apply Section -->
@@ -665,7 +668,7 @@ const pricingBenefits = {
           />
         </div>
       </div>
-      <div class="container mx-auto px-4 relative z-30">
+      <UContainer class="relative z-30">
         <div class="max-w-4xl mx-auto text-center">
           <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">How to Apply</h2>
@@ -698,12 +701,12 @@ const pricingBenefits = {
             </div>
           </div>
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- Scholarship Opportunity Section -->
     <section id="scholarship" class="py-16 lg:py-24 bg-white">
-      <div class="container mx-auto px-4">
+      <UContainer>
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Scholarship Opportunity</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
@@ -798,12 +801,12 @@ const pricingBenefits = {
             </div>
           </UCard>
         </div>
-      </div>
+      </UContainer>
     </section>
 
     <!-- Gallery Section -->
     <section id="gallery" class="py-12 lg:py-16 bg-slate-50">
-      <div class="container mx-auto px-4">
+      <UContainer>
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Gallery</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full" />
@@ -828,7 +831,7 @@ const pricingBenefits = {
             />
           </div>
         </div>
-      </div>
+      </UContainer>
 
       <!-- Lightbox Modal -->
       <UModal
@@ -881,7 +884,7 @@ const pricingBenefits = {
 
     <!-- Hear from Our Alumni Section -->
     <section class="py-12 lg:py-16 bg-white">
-      <div class="container mx-auto px-4">
+      <UContainer>
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Hear from Our Alumni</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full mt-4" />
@@ -928,12 +931,12 @@ const pricingBenefits = {
             </template>
           </UCarousel>
         </ClientOnly>
-      </div>
+      </UContainer>
     </section>
 
     <!-- FAQ Section -->
     <section class="py-12 lg:py-16 bg-white relative">
-      <div class="container mx-auto px-4 relative z-30">
+      <UContainer class="relative z-30">
         <div class="text-center max-w-3xl mx-auto mb-10 lg:mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
           <div class="w-24 h-1 bg-sky-400 mx-auto rounded-full mt-4" />
@@ -948,7 +951,7 @@ const pricingBenefits = {
             }"
           />
         </div>
-      </div>
+      </UContainer>
       <div class="absolute inset-0 opacity-5 z-10">
         <div class="absolute -bottom-4 left-4 h-96 z-20">
           <NuxtImg

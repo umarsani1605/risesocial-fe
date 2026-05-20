@@ -2,7 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'empty-white' })
 
 useSeoMeta({ title: 'RYLS Registration - Rise Social' })
 useHead({ bodyAttrs: { class: 'ryls-blue-theme' } })
@@ -13,6 +13,8 @@ const toast = useToast()
 const { saveDraft, loadDraft, isDraftLoading } = useRylsDraft()
 const hasDraftRestored = ref(false)
 const isSavingDraft = ref(false)
+const isRestoreReady = ref(false)
+const formRenderKey = ref(0)
 
 const genderValues = GENDER_OPTIONS.map(o => o.value) as [string, ...string[]]
 const discoverValues = DISCOVER_SOURCES.map(o => o.value) as [string, ...string[]]
@@ -63,36 +65,107 @@ const state = reactive<Partial<Schema>>({
   scholarshipType: store.step1.scholarshipType || undefined,
 })
 
+function applyStep1ToState(payload: Partial<Schema>) {
+  Object.assign(state, {
+    fullName: payload.fullName || '',
+    email: payload.email || '',
+    residence: payload.residence || '',
+    nationality: payload.nationality || '',
+    secondNationality: payload.secondNationality || '',
+    whatsapp: payload.whatsapp || '',
+    institution: payload.institution || '',
+    dateOfBirth: payload.dateOfBirth || '',
+    gender: payload.gender || undefined,
+    discoverSource: payload.discoverSource || undefined,
+    discoverOtherText: payload.discoverOtherText || '',
+    scholarshipType: payload.scholarshipType || undefined,
+  })
+}
+
+function getStringValue(record: Record<string, unknown>, ...keys: string[]) {
+  for (const key of keys) {
+    const value = record[key]
+    if (typeof value === 'string') {
+      return value
+    }
+  }
+  return ''
+}
+
+function getYesNoValue(record: Record<string, unknown>, ...keys: string[]): 'YES' | 'NO' | '' {
+  for (const key of keys) {
+    const value = record[key]
+    if (value === 'YES' || value === 'NO') {
+      return value
+    }
+    if (typeof value === 'boolean') {
+      return value ? 'YES' : 'NO'
+    }
+  }
+  return ''
+}
+
 onMounted(async () => {
-  const draft = await loadDraft()
-  if (draft?.formData) {
-    const fd = draft.formData as Record<string, unknown>
-    if (fd.step1) {
-      store.setStep1(fd.step1 as Parameters<typeof store.setStep1>[0])
-      const s1 = fd.step1 as Record<string, string>
-      state.fullName = s1.fullName || ''
-      state.email = s1.email || ''
-      state.residence = s1.residence || ''
-      state.nationality = s1.nationality || ''
-      state.secondNationality = s1.secondNationality || ''
-      state.whatsapp = s1.whatsapp || ''
-      state.institution = s1.institution || ''
-      state.dateOfBirth = s1.dateOfBirth || ''
-      state.gender = s1.gender || undefined
-      state.discoverSource = s1.discoverSource || undefined
-      state.discoverOtherText = s1.discoverOtherText || ''
-      state.scholarshipType = s1.scholarshipType || undefined
+  store.setSubmissionCompleted(false)
+  try {
+    if (store.step1.fullName) {
+      applyStep1ToState(store.step1)
+      return
     }
-    if (fd.passportNumber) {
-      store.setSelfFundedData({
-        passportNumber: fd.passportNumber as string,
-        needVisa: (fd.needVisa as 'YES' | 'NO' | '') || '',
-        headshotFile: (fd.headshotFile as string) || '',
-        readPolicies: (fd.readPolicies as 'YES' | 'NO' | '') || '',
-      })
+
+    const draft = await loadDraft()
+    if (draft?.formData) {
+      const fd = draft.formData as Record<string, unknown>
+      const step1Source = (fd.step1 && typeof fd.step1 === 'object'
+        ? fd.step1
+        : fd) as Record<string, unknown>
+
+      const normalizedStep1 = {
+        fullName: getStringValue(step1Source, 'fullName', 'full_name'),
+        email: getStringValue(step1Source, 'email'),
+        residence: getStringValue(step1Source, 'residence'),
+        nationality: getStringValue(step1Source, 'nationality'),
+        secondNationality: getStringValue(step1Source, 'secondNationality', 'second_nationality'),
+        whatsapp: getStringValue(step1Source, 'whatsapp'),
+        institution: getStringValue(step1Source, 'institution'),
+        dateOfBirth: getStringValue(step1Source, 'dateOfBirth', 'date_of_birth'),
+        gender: getStringValue(step1Source, 'gender'),
+        discoverSource: getStringValue(step1Source, 'discoverSource', 'discover_source'),
+        discoverOtherText: getStringValue(step1Source, 'discoverOtherText', 'discover_other_text'),
+        scholarshipType: getStringValue(step1Source, 'scholarshipType', 'scholarship_type'),
+      }
+
+      if (normalizedStep1.fullName || normalizedStep1.email || normalizedStep1.scholarshipType) {
+        store.setStep1(normalizedStep1)
+        applyStep1ToState(normalizedStep1)
+      }
+      const passportNumber = getStringValue(fd, 'passportNumber', 'passport_number')
+      if (passportNumber) {
+        store.setSelfFundedData({
+          passportNumber,
+          needVisa: getYesNoValue(fd, 'needVisa', 'need_visa'),
+          headshotFile: getStringValue(fd, 'headshotFile', 'headshot_file', 'headshotFileId', 'headshot_file_id') || '',
+          readPolicies: getYesNoValue(fd, 'readPolicies', 'read_policies'),
+        })
+      }
+      if (fd.payment && typeof fd.payment === 'object') {
+        const payment = fd.payment as Record<string, unknown>
+        store.setPayment({
+          id: typeof payment.id === 'string' ? payment.id : null,
+          type: (payment.type as typeof store.payment.type) || null,
+          status: (payment.status as typeof store.payment.status) || 'PENDING',
+          paymentProof: typeof payment.paymentProof === 'string' ? payment.paymentProof : null,
+          midtransData: (payment.midtransData as Record<string, unknown> | null) || null,
+        })
+      }
+
+      hasDraftRestored.value = true
     }
-    hasDraftRestored.value = true
-    toast.add({ title: 'Saved progress restored', color: 'success' })
+  }
+  finally {
+    await nextTick()
+    formRenderKey.value += 1
+    isRestoreReady.value = true
   }
 })
 
@@ -123,7 +196,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
   isSavingDraft.value = true
   try {
-    await saveDraft(1, { step1: values }, values.email, values.scholarshipType)
+    await saveDraft(2, { step1: values }, values.email, values.scholarshipType)
   }
   catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error, 'An error occurred'), color: 'error' })
@@ -134,47 +207,61 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 
   const base = '/programs/rise-young-leaders-summit/registration'
-  if (values.scholarshipType === 'FULLY_FUNDED') {
-    router.push(`${base}/payment`)
-  }
-  else if (values.scholarshipType === 'SELF_FUNDED') {
-    router.push(`${base}/self-funded`)
-  }
+  router.push(`${base}/payment`)
 }
 </script>
 
 <template>
-  <section class="mx-auto max-w-xl px-6 py-10 md:py-12">
-    <div class="mb-6">
-      <NuxtImg
-        src="/images/rise-young-leaders/2026/banner_ryls.jpg"
-        alt="Rise Young Leaders Summit Japan 2026 banner"
-        class="w-full rounded-xl object-cover max-h-64 md:max-h-80"
-      />
-    </div>
-    <header class="space-y-3 my-8">
-      <h1 class="text-2xl md:text-3xl font-semibold mb-6">
-        Rise Young Leaders Summit Japan 2026 - International Climate Change Leadership Forum
-      </h1>
-      <div class="text-sm space-y-2">
-        Hello Rise Peeps, please fill out this form with accurate information and make sure you have a good internet connection.
+  <UPageSection :ui="{ container: 'py-10 md:py-12' }">
+    <div class="mx-auto max-w-xl">
+      <div class="mb-6">
+        <NuxtImg
+          src="/images/rise-young-leaders/2026/banner_ryls.jpg"
+          alt="Rise Young Leaders Summit Japan 2026 banner"
+          class="w-full rounded-xl object-cover max-h-64 md:max-h-80"
+        />
       </div>
-    </header>
+      <header class="space-y-3 my-8">
+        <h1 class="text-2xl md:text-3xl font-semibold mb-6">
+          Rise Young Leaders Summit Japan 2026 - International Climate Change Leadership Forum
+        </h1>
+        <div class="text-sm space-y-2">
+          Hello Rise Peeps, please fill out this form with accurate information and make sure you have a good internet connection.
+        </div>
+      </header>
 
-    <hr class="my-6 border-gray-200">
+      <hr class="my-6 border-gray-200">
 
-    <div v-if="isDraftLoading" class="py-12 text-center text-sm text-gray-400">
-      Loading saved progress...
-    </div>
+      <div v-if="isDraftLoading || !isRestoreReady" class="space-y-6 py-2" aria-hidden="true">
+        <div class="grid grid-cols-1 gap-6">
+          <div class="space-y-3">
+            <div class="h-4 w-28 rounded bg-gray-100" />
+            <div class="h-11 w-full rounded-xl bg-gray-100" />
+          </div>
+          <div class="space-y-3">
+            <div class="h-4 w-20 rounded bg-gray-100" />
+            <div class="h-11 w-full rounded-xl bg-gray-100" />
+          </div>
+          <div class="space-y-3">
+            <div class="h-4 w-40 rounded bg-gray-100" />
+            <div class="h-11 w-full rounded-xl bg-gray-100" />
+          </div>
+          <div class="space-y-3">
+            <div class="h-4 w-24 rounded bg-gray-100" />
+            <div class="h-11 w-full rounded-xl bg-gray-100" />
+          </div>
+        </div>
+      </div>
 
-    <UForm
-      v-else
-      :schema="schema"
-      :state="state"
-      class="space-y-8 text-gray-700"
-      @submit="onSubmit"
-    >
-      <div class="grid grid-cols-1 gap-6">
+      <UForm
+        :key="formRenderKey"
+        v-else
+        :schema="schema"
+        :state="state"
+        class="space-y-8 text-gray-700"
+        @submit="onSubmit"
+      >
+        <div class="grid grid-cols-1 gap-6">
         <UFormField label="Full Name" name="fullName" required>
           <UInput v-model="state.fullName" placeholder="Your full name" class="w-full" />
         </UFormField>
@@ -256,12 +343,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           />
         </UFormField>
 
-        <div class="flex items-center justify-end gap-3 pt-2">
-          <UButton type="submit" class="px-6" :loading="isSavingDraft" :disabled="isSavingDraft">
-            Next
-          </UButton>
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <UButton type="submit" class="px-6" :loading="isSavingDraft" :disabled="isSavingDraft">
+              Next
+            </UButton>
+          </div>
         </div>
-      </div>
-    </UForm>
-  </section>
+      </UForm>
+    </div>
+  </UPageSection>
 </template>

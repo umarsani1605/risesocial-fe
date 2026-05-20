@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 
 const props = defineProps<{
   mentors: AdminCohortMentor[]
+  canEdit?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -49,7 +50,7 @@ const columns: TableColumn<AdminCohortMentor>[] = [
 
 <template>
   <div class="pt-6 min-h-[400px]">
-    <div class="flex justify-end mb-4">
+    <div v-if="canEdit" class="flex justify-end mb-4">
       <UButton
         label="Add"
         icon="i-ph-plus-bold"
@@ -90,7 +91,7 @@ const columns: TableColumn<AdminCohortMentor>[] = [
       </template>
 
       <template #actions-cell="{ row }">
-        <div class="flex items-center gap-2 justify-end">
+        <div v-if="canEdit" class="flex items-center gap-2 justify-end">
           <UButton
             size="sm"
             color="primary"

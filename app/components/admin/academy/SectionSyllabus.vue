@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAdminPermission('admin.academy')
 
 const themes = ref<AcademyTheme[]>(structuredClone(props.initialData))
 
@@ -178,7 +179,7 @@ const columns: TableColumn<SyllabusRow>[] = [
 
 <template>
   <div class="space-y-4">
-    <div class="flex justify-end">
+    <div v-if="canEdit" class="flex justify-end">
       <UButton
         label="Add Theme"
         color="primary"
@@ -236,7 +237,7 @@ const columns: TableColumn<SyllabusRow>[] = [
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center gap-2 justify-end">
+          <div v-if="canEdit" class="flex items-center gap-2 justify-end">
             <template v-if="row.original._kind === 'theme'">
               <UButton
                 size="sm"

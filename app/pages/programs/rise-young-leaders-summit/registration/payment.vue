@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'empty-white' })
 
 useSeoMeta({ title: 'RYLS Payment - Rise Social' })
 useHead({ bodyAttrs: { class: 'ryls-blue-theme' } })
@@ -12,37 +12,22 @@ const {
   openSnapEmbed,
   error: paymentError
 } = useRylsPayment()
-const { uploadPaymentProof, uploadError } = useRylsFileUpload()
-const { submit } = useRylsSubmission()
-const { loadDraft, deleteDraft, resumeToken } = useRylsDraft()
+const { uploadPaymentProof, uploadError, uploadProgress, isUploading } = useRylsFileUpload()
+const { saveDraft } = useRylsDraft()
+const { trackMetaEvent } = useMetaTracking()
 
-const proofFile = ref<File | null>(null)
-const proofFileId = ref<string | null>(null)
 const paypalClicked = ref(false)
 const snapDisplayed = ref(false)
 const isMidtransProcessing = ref(false)
+const isPaypalProcessing = ref(false)
+const isSubmitting = ref(false)
 const midtransError = ref('')
 const validationError = ref(false)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 
-onMounted(async () => {
-  if (!store.step1.fullName) {
-    const draft = await loadDraft()
-    if (draft?.formData) {
-      const fd = draft.formData as Record<string, unknown>
-      if (fd.step1) store.setStep1(fd.step1 as Parameters<typeof store.setStep1>[0])
-      if (fd.passportNumber) {
-        store.setSelfFundedData({
-          passportNumber: fd.passportNumber as string,
-          needVisa: (fd.needVisa as 'YES' | 'NO' | '') || '',
-          headshotFile: (fd.headshotFile as string) || '',
-          readPolicies: (fd.readPolicies as 'YES' | 'NO' | '') || '',
-        })
-      }
-    }
-    else {
-      router.push('/programs/rise-young-leaders-summit/registration')
-    }
+onMounted(() => {
+  if (!store.step1.fullName || !store.step1.scholarshipType) {
+    router.push('/programs/rise-young-leaders-summit/registration')
   }
 })
 
@@ -50,12 +35,16 @@ const resetFileInput = () => {
   if (fileInputRef.value) {
     fileInputRef.value.value = ''
   }
-  proofFile.value = null
-  proofFileId.value = null
 }
 
 const createPaypalTransaction = async (e: Event) => {
+  if (isPaypalProcessing.value || isUploading.value || isMidtransProcessing.value || isSubmitting.value) {
+    return
+  }
+
   try {
+    isPaypalProcessing.value = true
+    validationError.value = false
     store.setPaymentType('PAYPAL')
 
     const input = e.target as HTMLInputElement
@@ -64,8 +53,6 @@ const createPaypalTransaction = async (e: Event) => {
       resetFileInput()
       return
     }
-
-    proofFile.value = file
 
     const savedFile = await uploadPaymentProof(file)
     if (!savedFile?.id) {
@@ -86,15 +73,26 @@ const createPaypalTransaction = async (e: Event) => {
     store.setPaymentProof(savedFile.id as unknown as File)
     store.setMidtransData(null as unknown as Record<string, unknown>)
   } catch (error: unknown) {
-    store.setPaymentStatus('FAILED')
+    store.setPayment({
+      id: null,
+      type: 'PAYPAL',
+      status: 'FAILED',
+      paymentProof: null,
+      midtransData: null,
+    })
     toast.add({ title: getApiErrorMessage(error, 'An error occurred'), color: 'error' })
     resetFileInput()
   } finally {
+    isPaypalProcessing.value = false
     validationError.value = false
   }
 }
 
 const createMidtransTransaction = async () => {
+  if (isMidtransProcessing.value || isPaypalProcessing.value || isUploading.value || isSubmitting.value) {
+    return
+  }
+
   try {
     validationError.value = false
     isMidtransProcessing.value = true
@@ -139,16 +137,20 @@ const createMidtransTransaction = async () => {
   } catch (error: unknown) {
     const message = getApiErrorMessage(error, 'Failed to process payment')
     midtransError.value = message
-    store.setPaymentStatus('FAILED')
+    store.setPayment({
+      id: null,
+      type: 'MIDTRANS',
+      status: 'FAILED',
+      paymentProof: null,
+      midtransData: null,
+    })
     toast.add({ title: message, color: 'error' })
   } finally {
     isMidtransProcessing.value = false
-    store.setPaymentType('MIDTRANS')
-    store.setPaymentStatus('PENDING')
   }
 }
 
-const onBack = () => router.back()
+const onBack = () => router.push('/programs/rise-young-leaders-summit/registration')
 
 const openPayPal = () => {
   validationError.value = false
@@ -158,53 +160,87 @@ const openPayPal = () => {
   }
 }
 
+function getRylsUserData() {
+  const [firstName, ...lastNameParts] = store.step1.fullName.trim().split(/\s+/)
+
+  return {
+    email: store.step1.email,
+    phone: store.step1.whatsapp,
+    firstName,
+    lastName: lastNameParts.join(' ')
+  }
+}
+
+function getScholarshipLabel() {
+  return store.step1.scholarshipType === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded'
+}
+
 const onSubmit = async () => {
-  try {
-    const { proxy } = useScriptMetaPixel()
-    if (store.step1.scholarshipType === 'FULLY_FUNDED') {
-      proxy.fbq('track', 'CompleteRegistrationStep2', {
-        content_name: 'Fully Funded'
-      })
-    } else {
-      proxy.fbq('track', 'CompleteRegistrationStep3', {
-        content_name: 'Self Funded'
-      })
-    }
-  } catch {
-    // module not available
+  if (isSubmitting.value || isPaypalProcessing.value || isMidtransProcessing.value || isUploading.value) {
+    return
   }
 
+  isSubmitting.value = true
   try {
     if (!store.payment.type || store.payment.status !== 'PAID') {
       validationError.value = true
       return
     }
 
-    const submission = await submit(resumeToken.value ?? undefined)
-
-    if (submission) {
-      const scholarshipType = store.step1.scholarshipType
-      await deleteDraft()
-      store.resetAll()
-      if (scholarshipType === 'FULLY_FUNDED') {
-        router.push('/programs/rise-young-leaders-summit/registration/fully-funded')
-      }
-      else {
-        router.push('/programs/rise-young-leaders-summit/registration/success')
-      }
+    const paymentSnapshot = {
+      id: store.payment.id,
+      type: store.payment.type,
+      status: store.payment.status,
+      paymentProof: typeof store.payment.paymentProof === 'string' ? store.payment.paymentProof : null,
+      midtransData: store.payment.midtransData,
     }
+
+    const draftSaved = await saveDraft(
+      3,
+      {
+        step1: store.getStep1Data,
+        payment: paymentSnapshot,
+      },
+      store.step1.email,
+      store.step1.scholarshipType,
+    )
+
+    if (!draftSaved) {
+      toast.add({ title: 'Failed to save progress', color: 'error' })
+      return
+    }
+
+    const scholarshipType = store.step1.scholarshipType
+    void trackMetaEvent({
+      eventName: scholarshipType === 'FULLY_FUNDED' ? 'CompleteRegistrationStep2' : 'CompleteRegistrationStep3',
+      customData: {
+        content_name: getScholarshipLabel(),
+        content_category: 'RYLS Registration'
+      },
+      userData: getRylsUserData()
+    })
+
+    if (scholarshipType === 'FULLY_FUNDED') {
+      await router.push('/programs/rise-young-leaders-summit/registration/fully-funded')
+      return
+    }
+
+    await router.push('/programs/rise-young-leaders-summit/registration/self-funded')
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error, 'Failed to submit registration'), color: 'error' })
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>
 
 <template>
-  <section class="mx-auto max-w-xl px-6 py-10 md:py-12">
-    <div
-      v-if="midtransError || paymentError"
-      class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
-    >
+  <UPageSection :ui="{ container: 'py-10 md:py-12' }">
+    <div class="mx-auto max-w-xl">
+      <div
+        v-if="midtransError || paymentError"
+        class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+      >
       <div class="flex">
         <div class="flex-shrink-0">
           <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -221,41 +257,41 @@ const onSubmit = async () => {
           </h3>
         </div>
       </div>
-    </div>
+      </div>
 
-    <div class="mb-6">
-      <NuxtImg
-        src="/images/rise-young-leaders/2026/banner_ryls.jpg"
-        alt="Rise Young Leaders Summit Japan 2026 banner"
-        class="w-full rounded-xl object-cover max-h-64 md:max-h-80"
-      />
-    </div>
+      <div class="mb-6">
+        <NuxtImg
+          src="/images/rise-young-leaders/2026/banner_ryls.jpg"
+          alt="Rise Young Leaders Summit Japan 2026 banner"
+          class="w-full rounded-xl object-cover max-h-64 md:max-h-80"
+        />
+      </div>
 
-    <header class="space-y-3 my-8">
-      <h1 class="text-2xl md:text-3xl font-semibold mb-4">Complete Your Registration Payment</h1>
-      <p class="text-sm text-gray-700">
-        To complete your registration, please proceed with the payment using one of the following
-        methods. International participants are recommended to use PayPal or Credit Card.
-      </p>
-    </header>
+      <header class="space-y-3 my-8">
+        <h1 class="text-2xl md:text-3xl font-semibold mb-4">Complete Your Registration Payment</h1>
+        <p class="text-sm text-gray-700">
+          To complete your registration, please proceed with the payment using one of the following
+          methods. International participants are recommended to use PayPal or Credit Card.
+        </p>
+      </header>
 
-    <hr class="my-6 border-gray-200" />
+      <hr class="my-6 border-gray-200" />
 
-    <div class="flex items-center justify-between mb-6 text-gray-700">
-      <p class="text-sm">
-        Your selection:
-        <span class="font-bold">{{
-          store.getStep1Data.scholarshipType === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded'
-        }}</span>
-      </p>
-      <p class="font-bold text-lg">
-        {{ store.getStep1Data.scholarshipType === 'FULLY_FUNDED' ? '$10' : '$800' }}
-      </p>
-    </div>
+      <div class="flex items-center justify-between mb-6 text-gray-700">
+        <p class="text-sm">
+          Your selection:
+          <span class="font-bold">{{
+            store.getStep1Data.scholarshipType === 'FULLY_FUNDED' ? 'Fully Funded' : 'Self Funded'
+          }}</span>
+        </p>
+        <p class="font-bold text-lg">
+          {{ store.getStep1Data.scholarshipType === 'FULLY_FUNDED' ? '$10' : '$800' }}
+        </p>
+      </div>
 
-    <hr class="my-6 border-gray-200" />
+      <hr class="my-6 border-gray-200" />
 
-    <form class="space-y-8 text-gray-700" @submit.prevent="onSubmit">
+      <form class="space-y-8 text-gray-700" @submit.prevent="onSubmit">
       <div class="space-y-6 p-4 border rounded-lg border-gray-100">
         <div
           class="flex flex-col-reverse md:flex-row items-start md:items-center justify-start md:justify-between gap-4"
@@ -270,8 +306,10 @@ const onSubmit = async () => {
           </p>
           <UButton
             type="button"
+            color="neutral"
             variant="outline"
             class="flex items-center gap-2"
+            :disabled="isPaypalProcessing || isMidtransProcessing || isUploading || isSubmitting"
             @click="openPayPal"
           >
             <UIcon name="i-ph-arrow-square-out-bold" class="size-6" />
@@ -285,12 +323,22 @@ const onSubmit = async () => {
               ref="fileInputRef"
               type="file"
               accept="application/pdf,image/jpeg,image/jpg,image/png"
-              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200"
+              :disabled="isPaypalProcessing || isMidtransProcessing || isUploading || isSubmitting"
               @change="createPaypalTransaction"
             />
             <p v-if="uploadError" class="text-sm text-red-600 mt-2">
               {{ uploadError }}
             </p>
+          </div>
+          <div v-if="isUploading" class="space-y-2">
+            <p class="text-sm text-gray-600">Uploading payment proof...</p>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                :style="{ width: uploadProgress + '%' }"
+              />
+            </div>
           </div>
         </div>
         <div v-if="validationError" class="text-sm text-red-600 mt-2">
@@ -316,8 +364,9 @@ const onSubmit = async () => {
           </p>
           <UButton
             v-if="!snapDisplayed"
-            :disabled="isMidtransProcessing"
+            :disabled="isMidtransProcessing || isPaypalProcessing || isUploading || isSubmitting"
             type="button"
+            color="neutral"
             variant="outline"
             class="flex items-center gap-2"
             @click="createMidtransTransaction"
@@ -341,14 +390,27 @@ const onSubmit = async () => {
         >.
       </p>
 
-      <div class="flex justify-end gap-4 pt-4">
-        <UButton type="button" variant="outline" @click="onBack"> Back </UButton>
-        <UButton type="submit">
-          {{ store.step1.scholarshipType === 'FULLY_FUNDED' ? 'Next' : 'Submit' }}
-        </UButton>
-      </div>
-    </form>
-  </section>
+        <div class="flex justify-end gap-4 pt-4">
+          <UButton
+            type="button"
+            color="neutral"
+            variant="outline"
+            :disabled="isPaypalProcessing || isMidtransProcessing || isUploading || isSubmitting"
+            @click="onBack"
+          >
+            Back
+          </UButton>
+          <UButton
+            type="submit"
+            :loading="isSubmitting"
+            :disabled="isPaypalProcessing || isMidtransProcessing || isUploading || isSubmitting"
+          >
+            {{ isSubmitting ? 'Processing...' : isUploading ? 'Uploading...' : 'Next' }}
+          </UButton>
+        </div>
+      </form>
+    </div>
+  </UPageSection>
 </template>
 
 <style>

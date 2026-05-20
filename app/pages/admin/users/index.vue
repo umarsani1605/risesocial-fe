@@ -11,7 +11,7 @@ useSeoMeta({ title: 'All Users - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
-const { canEdit } = useAuth()
+const { canEdit } = useAdminPermission('admin.users')
 
 const { data: rawUsers, refresh } = await useAsyncData('admin:users', () =>
   api<ApiResponse<UserProfile[]>>('/admin/users')
@@ -311,7 +311,7 @@ const columns: TableColumn<AdminUser>[] = [
           :disabled="isExporting"
           @click="exportExcel"
         />
-        <UButton v-if="canEdit('admin.users')" label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
+        <UButton v-if="canEdit" label="Add New" icon="i-ph-plus-bold" color="primary" @click="openCreate" />
       </div>
     </template>
   </AdminDataTable>
@@ -340,7 +340,7 @@ const columns: TableColumn<AdminUser>[] = [
     v-model:open="isDetailOpen"
     :user="selectedUserDetail"
     :loading="isDetailSaving"
-    :show-delete="canEdit('admin.users')"
+    :show-delete="canEdit"
     delete-label="Hapus User"
     @submit="onSaveDetail"
     @delete="

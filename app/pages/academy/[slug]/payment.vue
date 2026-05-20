@@ -44,6 +44,7 @@ if (academy.value.pixel_id) {
     // meta pixel script unavailable
   }
 }
+const { trackMetaEvent } = useMetaTracking({ pixelProxy: metaPixelProxy })
 
 useSeoMeta({
   title: computed(() => `Payment - ${academy.value.title} - Rise Social`)
@@ -86,12 +87,22 @@ const customerForm = reactive<PaymentCustomer>({
 
 // Check if already enrolled (do not auto-open snap — user must submit form first)
 onMounted(async () => {
-  metaPixelProxy?.fbq('track', 'InitiateCheckout', {
-    content_ids: [String(pricing.value!.id)],
-    content_name: academy.value.title,
-    content_type: 'product',
-    value: pricing.value!.discount_price,
-    currency: 'IDR'
+  void trackMetaEvent({
+    eventName: 'InitiateCheckout',
+    pixelId: academy.value.pixel_id,
+    customData: {
+      content_ids: [String(pricing.value!.id)],
+      content_name: academy.value.title,
+      content_type: 'product',
+      value: pricing.value!.discount_price,
+      currency: 'IDR'
+    },
+    userData: {
+      email: customerForm.email,
+      phone: customerForm.phone,
+      firstName: customerForm.first_name,
+      lastName: customerForm.last_name
+    }
   })
 
   try {
@@ -122,12 +133,23 @@ const onPay = async (formState: PaymentCustomer) => {
         if (transactionCode.value)
           await syncTransactionStatus(transactionCode.value).catch(() => {})
         paymentStatus.value = 'paid'
-        metaPixelProxy?.fbq('track', 'Purchase', {
-          content_ids: [String(pricing.value!.id)],
-          content_name: academy.value.title,
-          content_type: 'product',
-          value: pricing.value!.discount_price,
-          currency: 'IDR'
+        void trackMetaEvent({
+          eventName: 'Purchase',
+          eventId: transactionCode.value ?? undefined,
+          pixelId: academy.value.pixel_id,
+          customData: {
+            content_ids: [String(pricing.value!.id)],
+            content_name: academy.value.title,
+            content_type: 'product',
+            value: pricing.value!.discount_price,
+            currency: 'IDR'
+          },
+          userData: {
+            email: customerForm.email,
+            phone: customerForm.phone,
+            firstName: customerForm.first_name,
+            lastName: customerForm.last_name
+          }
         })
         toast.add({ title: 'Enrollment successful', color: 'success' })
         redirectCountdown.value = 3

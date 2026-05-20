@@ -2,6 +2,7 @@
 defineProps<{
   module: AdminCohortModule
   isOpen: boolean
+  canEdit?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -122,7 +123,7 @@ function getStatus(module: AdminCohortModule) {
       </div>
     </template>
 
-    <template #footer>
+    <template v-if="canEdit" #footer>
       <div class="flex justify-end gap-2">
         <UButton
           label="Delete"

@@ -21,6 +21,7 @@ const cohortId = route.params.id as string
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit, isViewer } = useAdminPermission('admin.cohort')
 const { data: cohortRaw, error: cohortError } = await useAsyncData(`admin-cohort-${cohortId}`, () =>
   api<ApiResponse<AdminCohortDetail>>(`/admin/cohorts/${cohortId}`)
 )
@@ -111,7 +112,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       <div class="flex items-center gap-3 min-w-0">
         <UButton icon="i-ph-arrow-left-bold" color="neutral" variant="ghost" to="/admin/cohorts" />
         <h1 class="text-base font-semibold text-highlighted truncate">
-          {{ cohort.detail?.academy?.title }} — {{ cohort.detail?.name }}
+          {{ canEdit ? '' : 'Detail · ' }}{{ cohort.detail?.academy?.title }} — {{ cohort.detail?.name }}
         </h1>
         <UBadge
           :label="COHORT_PHASE_LABEL[currentPhase]"
@@ -121,7 +122,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
         />
       </div>
 
-      <div class="flex items-center gap-2 shrink-0">
+      <div v-if="canEdit" class="flex items-center gap-2 shrink-0">
         <UButton
           label="Complete Cohort"
           color="primary"
@@ -164,10 +165,12 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
               :state="cohort.editCohortForm as any"
               @submit="cohort.onEditCohort"
             >
-              <AdminCohortFormBasicInfo v-model="cohort.editCohortForm" />
+              <fieldset :disabled="isViewer" class="contents">
+                <AdminCohortFormBasicInfo v-model="cohort.editCohortForm" />
+              </fieldset>
             </UForm>
 
-            <div class="mt-6 flex justify-end max-w-5xl">
+            <div v-if="canEdit" class="mt-6 flex justify-end max-w-5xl">
               <UButton
                 label="Save information"
                 color="primary"
@@ -183,6 +186,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       <template #modules>
         <AdminCohortTabModules
           :modules="cohort.detail?.modules ?? []"
+          :can-edit="canEdit"
           @add-module="cohortModules.isAddModuleOpen = true"
           @edit-module="cohortModules.openEditModule"
           @delete-module="cohortModules.confirmDeleteModule"
@@ -198,6 +202,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       <template #students>
         <AdminCohortTabStudents
           :enrollments="cohortEnrollments.enrollments"
+          :can-edit="canEdit"
           @invite="cohortEnrollments.openInviteStudentModal"
           @remove="() => {}"
           @generate-cert="cohortEnrollments.openGenerateCertModal"
@@ -210,6 +215,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       <template #mentors>
         <AdminCohortTabMentors
           :mentors="cohort.detail?.mentors ?? []"
+          :can-edit="canEdit"
           @invite="cohortMentors.openAddMentorModal"
           @edit="cohortMentors.openEditMentorModal"
           @remove="cohortMentors.confirmDeleteMentor"

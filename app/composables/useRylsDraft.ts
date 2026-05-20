@@ -19,6 +19,35 @@ interface DraftData {
   email: string
 }
 
+function normalizeDraftFormData(input: unknown): Record<string, unknown> {
+  if (input && typeof input === 'object' && !Array.isArray(input)) {
+    return input as Record<string, unknown>
+  }
+
+  if (typeof input === 'string') {
+    try {
+      const parsed = JSON.parse(input) as unknown
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>
+      }
+    }
+    catch {
+      // ignore malformed draft payloads and fall through to empty object
+    }
+  }
+
+  return {}
+}
+
+function serializeDraftFormData(input: Record<string, unknown>): Record<string, unknown> {
+  try {
+    return JSON.parse(JSON.stringify(input)) as Record<string, unknown>
+  }
+  catch {
+    return {}
+  }
+}
+
 export const useRylsDraft = () => {
   const { api } = useApi()
 
@@ -41,7 +70,7 @@ export const useRylsDraft = () => {
     isDraftSaving.value = true
     draftError.value = null
     try {
-      const body: DraftPayload = { email, step, formData }
+      const body: DraftPayload = { email, step, formData: serializeDraftFormData(formData) }
       if (resumeToken.value) body.resumeToken = resumeToken.value
       if (scholarshipType) body.scholarshipType = scholarshipType
 
@@ -74,7 +103,14 @@ export const useRylsDraft = () => {
         `/ryls/registrations/draft/resume/${resumeToken.value}`,
       )
       if (response?.success === true) {
-        return response.data ?? null
+        if (!response.data) {
+          return null
+        }
+
+        return {
+          ...response.data,
+          formData: normalizeDraftFormData(response.data.formData),
+        }
       }
       draftError.value = response?.message ?? 'Failed to load draft'
       resumeToken.value = null

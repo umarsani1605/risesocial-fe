@@ -11,7 +11,8 @@ definePageMeta({
 
 const { api } = useApi()
 const toast = useToast()
-const { canEdit } = useAuth()
+const { canEdit } = useAdminPermission('admin.academy')
+const AdminRowAction = resolveComponent('AdminRowAction')
 
 const { data: rawAcademies, refresh, pending: isAcademiesPending } = await useAsyncData('admin:academies', () =>
   api<ApiResponse<AdminAcademy[]>>('/admin/academies')
@@ -121,13 +122,9 @@ const columns: TableColumn<AdminAcademy>[] = [
     header: () => h('div', 'Actions'),
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
-      h(UButton, {
-        label: 'Edit',
-        size: 'sm',
-        color: 'primary',
-        variant: 'light',
-        leadingIcon: 'i-ph-pencil-simple-bold',
-        to: `/admin/academies/${row.original.slug}/edit`
+      h(AdminRowAction, {
+        to: `/admin/academies/${row.original.slug}/edit`,
+        canEdit: canEdit.value
       })
   }
 ]
@@ -157,7 +154,7 @@ const columns: TableColumn<AdminAcademy>[] = [
     </template>
     <template #toolbar-right>
       <UButton
-        v-if="canEdit('admin.academy')"
+        v-if="canEdit"
         label="Add New"
         icon="i-ph-plus-bold"
         color="primary"
