@@ -18,8 +18,9 @@ const {
   data: rawData,
   status,
   refresh
-} = await useAsyncData('admin:students', () =>
-  api<ApiResponse<AcademyEnrollmentItem[]>>('/admin/academy-enrollments?limit=500')
+} = useLazyAsyncData('admin:students', () =>
+  api<ApiResponse<AcademyEnrollmentItem[]>>('/admin/academy-enrollments?limit=500'),
+  { server: false, default: () => ({ data: [] }) }
 )
 
 const enrollments = computed(() => rawData.value?.data ?? [])
@@ -301,7 +302,7 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
       v-model:search="search"
       :data="filteredData"
       :columns="columns"
-      :loading="status === 'pending'"
+      :loading="status === 'idle' || status === 'pending'"
       search-placeholder="Search by name or email..."
       search-class="w-full sm:w-72"
       table-class="px-4 sm:px-6"

@@ -2,9 +2,10 @@ export function useAdminCohort(cohortId: string) {
   const { api } = useApi()
   const toast = useToast()
 
-  const { data: cohortData, refresh: refreshCohort } = useAsyncData(
+  const { data: cohortData, refresh: refreshCohort, status: cohortStatus, error: cohortError } = useLazyAsyncData(
     `admin-cohort-${cohortId}`,
-    () => api<ApiResponse<AdminCohortDetail>>(`/admin/cohorts/${cohortId}`)
+    () => api<ApiResponse<AdminCohortDetail>>(`/admin/cohorts/${cohortId}`),
+    { server: false }
   )
 
   const detail = computed(() => cohortData.value?.data)
@@ -57,6 +58,8 @@ export function useAdminCohort(cohortId: string) {
 
   return reactive({
     detail,
+    cohortStatus,
+    cohortError,
     refreshCohort,
     // edit + delete cohort
     editCohortForm,

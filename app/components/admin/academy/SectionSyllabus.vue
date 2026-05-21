@@ -11,7 +11,7 @@ const { api } = useApi()
 const toast = useToast()
 const { canEdit } = useAdminPermission('admin.academy')
 
-const themes = ref<AcademyTheme[]>(structuredClone(props.initialData))
+const themes = ref<AcademyTheme[]>(structuredClone(toRaw(props.initialData)))
 
 // Use reactive Set so .has()/.add()/.delete() trigger computed recomputation
 const expandedThemes = reactive(new Set<number>(themes.value[0] ? [themes.value[0].id] : []))
@@ -77,7 +77,7 @@ const topicNextOrder = ref(1)
 watch(
   () => props.initialData,
   (val) => {
-    themes.value = structuredClone(val)
+    themes.value = structuredClone(toRaw(val))
   },
   { deep: true }
 )

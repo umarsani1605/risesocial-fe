@@ -1,87 +1,133 @@
 function periodToQuery(dateRange: AnalyticsDateRange): string {
-  const s = dateRange.start.toISOString().split('T')[0]
-  const e = dateRange.end.toISOString().split('T')[0]
-  return `startDate=${s}&endDate=${e}`
+  return new URLSearchParams(dateRangeToQuery(dateRange)).toString()
+}
+
+function dateRangeToQuery(dateRange?: AnalyticsDateRange): Record<string, string> {
+  if (!dateRange) return {}
+
+  return {
+    period: dateRange.period,
+    startDate: dateRange.start.toISOString().slice(0, 10),
+    endDate: dateRange.end.toISOString().slice(0, 10)
+  }
+}
+
+function periodToDateRange(period: AnalyticsPeriod = '30d'): AnalyticsDateRange {
+  const end = new Date()
+  const start = new Date(end)
+  const daysByPeriod: Record<Exclude<AnalyticsPeriod, 'custom'>, number> = {
+    '7d': 7,
+    '30d': 30,
+    '3m': 90,
+    '6m': 180,
+    '1y': 365
+  }
+
+  start.setDate(end.getDate() - ((daysByPeriod[period as Exclude<AnalyticsPeriod, 'custom'>] ?? 30) - 1))
+
+  return {
+    period,
+    start,
+    end
+  }
+}
+
+function normalizeDateRange(input?: AnalyticsDateRange | AnalyticsPeriod): AnalyticsDateRange {
+  if (!input || typeof input === 'string') return periodToDateRange(input)
+  return input
 }
 
 export const useAnalytics = () => {
   const { api } = useApi()
-  const mock = useAnalyticsMock()
 
   const fetchOverview = async (): Promise<AnalyticsOverview> => {
-    // TODO: return (await api<ApiResponse<AnalyticsOverview>>('/admin/analytics/overview')).data
-    return mock.getOverview()
+    return (await api<ApiResponse<AnalyticsOverview>>('/admin/analytics/overview')).data
   }
 
-  const fetchRevenueTrend = async (period: AnalyticsPeriod = '30d'): Promise<TimeSeriesPoint[]> => {
-    return mock.getRevenueTrend(period)
+  const fetchRevenueTrend = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<TimeSeriesPoint[]> => {
+    const res = await api<ApiResponse<TimeSeriesPoint[]>>('/admin/analytics/revenue/trend', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchRevenueBreakdown = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getRevenueBreakdown()
+  const fetchRevenueBreakdown = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    return fetchRevenueByType(dateRange)
   }
 
-  const fetchPaymentStatusBreakdown = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getPaymentStatusBreakdown()
+  const fetchPaymentStatusBreakdown = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    const res = await api<ApiResponse<CategoryBreakdown[]>>('/admin/analytics/revenue/payment-status', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchRevenueByType = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getRevenueByType()
+  const fetchRevenueByType = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    const res = await api<ApiResponse<CategoryBreakdown[]>>('/admin/analytics/revenue/by-type', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchUserGrowth = async (period: AnalyticsPeriod = '30d'): Promise<TimeSeriesPoint[]> => {
-    return mock.getUserGrowth(period)
+  const fetchUserGrowth = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<TimeSeriesPoint[]> => {
+    return fetchRegistrationsTrend(dateRange)
   }
 
-  const fetchRegistrationsTrend = async (period: AnalyticsPeriod = '30d'): Promise<TimeSeriesPoint[]> => {
-    return mock.getRegistrationsTrend(period)
+  const fetchRegistrationsTrend = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<TimeSeriesPoint[]> => {
+    const res = await api<ApiResponse<TimeSeriesPoint[]>>('/admin/analytics/users/registrations-trend', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchUserDistribution = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getUserDistribution()
+  const fetchUserDistribution = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    const res = await api<ApiResponse<CategoryBreakdown[]>>('/admin/analytics/users/distribution', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchEnrollmentByAcademy = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getEnrollmentByAcademy()
+  const fetchEnrollmentByAcademy = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    const res = await api<ApiResponse<CategoryBreakdown[]>>('/admin/analytics/academies/enrollments', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchCohortFillRates = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getCohortFillRates()
+  const fetchCohortFillRates = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    const res = await api<ApiResponse<CategoryBreakdown[]>>('/admin/analytics/academies/cohort-students', {
+      query: dateRangeToQuery(normalizeDateRange(dateRange))
+    })
+    return res.data
   }
 
-  const fetchCompletionRates = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getCompletionRates()
+  const fetchRylsTrend = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<TimeSeriesPoint[]> => {
+    const trend = await fetchRylsAnalyticsTrend(normalizeDateRange(dateRange))
+    return trend.map((point) => ({ date: point.date, value: point.count }))
   }
 
-  const fetchRylsTrend = async (period: AnalyticsPeriod = '30d'): Promise<TimeSeriesPoint[]> => {
-    return mock.getRylsTrend(period)
-  }
-
-  const fetchScholarshipBreakdown = async (): Promise<CategoryBreakdown[]> => {
-    return mock.getScholarshipBreakdown()
-  }
-
-  const fetchJobPostingStats = async (period: AnalyticsPeriod = '30d'): Promise<TimeSeriesPoint[]> => {
-    return mock.getJobPostingStats(period)
+  const fetchScholarshipBreakdown = async (dateRange?: AnalyticsDateRange | AnalyticsPeriod): Promise<CategoryBreakdown[]> => {
+    const demographics = await fetchRylsAnalyticsDemographics(normalizeDateRange(dateRange))
+    return demographics.byScholarshipType.map((item) => ({ name: item.name, value: item.count }))
   }
 
   const fetchRylsAnalyticsSummary = async (dateRange: AnalyticsDateRange): Promise<RylsAnalyticsSummary> => {
     const res = await api<ApiResponse<RylsAnalyticsSummary>>(
-      `/admin/ryls/registrations/analytics/summary?${periodToQuery(dateRange)}`
+      `/admin/analytics/programs/summary?${periodToQuery(dateRange)}`
     )
     return res.data
   }
 
   const fetchRylsAnalyticsTrend = async (dateRange: AnalyticsDateRange): Promise<RylsAnalyticsTrendPoint[]> => {
     const res = await api<ApiResponse<RylsAnalyticsTrendPoint[]>>(
-      `/admin/ryls/registrations/analytics/trend?${periodToQuery(dateRange)}`
+      `/admin/analytics/programs/trend?${periodToQuery(dateRange)}`
     )
     return res.data
   }
 
   const fetchRylsAnalyticsDemographics = async (dateRange: AnalyticsDateRange): Promise<RylsAnalyticsDemographics> => {
     const res = await api<ApiResponse<RylsAnalyticsDemographics>>(
-      `/admin/ryls/registrations/analytics/demographics?${periodToQuery(dateRange)}`
+      `/admin/analytics/programs/demographics?${periodToQuery(dateRange)}`
     )
     return res.data
   }
@@ -97,10 +143,8 @@ export const useAnalytics = () => {
     fetchUserDistribution,
     fetchEnrollmentByAcademy,
     fetchCohortFillRates,
-    fetchCompletionRates,
     fetchRylsTrend,
     fetchScholarshipBreakdown,
-    fetchJobPostingStats,
     fetchRylsAnalyticsSummary,
     fetchRylsAnalyticsTrend,
     fetchRylsAnalyticsDemographics,

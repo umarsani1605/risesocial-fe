@@ -8,6 +8,7 @@ const props = defineProps<{
   color?: string
   xLabel?: string
   yLabel?: string
+  loading?: boolean
 }>()
 
 const chartData = computed(() =>
@@ -41,7 +42,14 @@ const tooltipTitleFormatter = (data: Record<string, unknown>) => {
     <template v-if="title" #header>
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>
-    <div :style="{ height: `${height ?? 280}px` }">
+    <div
+      v-if="loading"
+      :style="{ height: `${height ?? 280}px` }"
+      class="flex items-center justify-center text-muted"
+    >
+      <UIcon name="i-ph-circle-notch-bold" class="size-6 animate-spin" />
+    </div>
+    <div v-else :style="{ height: `${height ?? 280}px` }">
       <AreaChart
         :data="chartData"
         :categories="categories"

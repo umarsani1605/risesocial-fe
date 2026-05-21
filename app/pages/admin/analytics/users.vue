@@ -15,18 +15,26 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [registrationsTrendData, userDistributionData] = await Promise.all([
-  useAsyncData('analytics:registrations-trend', () =>
-    analytics.fetchRegistrationsTrend(dateRange.value.period)
-  ),
-  useAsyncData('analytics:user-distribution', () => analytics.fetchUserDistribution())
-])
+const registrationsTrendData = useLazyAsyncData(
+  'analytics:registrations-trend',
+  () => analytics.fetchRegistrationsTrend(dateRange.value),
+  { server: false, default: () => [] }
+)
+const userDistributionData = useLazyAsyncData(
+  'analytics:user-distribution',
+  () => analytics.fetchUserDistribution(dateRange.value),
+  { server: false, default: () => [] }
+)
 
 watch(
-  () => dateRange.value.period,
+  dateRange,
   async () => {
-    await registrationsTrendData.refresh()
-  }
+    await Promise.all([
+      registrationsTrendData.refresh(),
+      userDistributionData.refresh()
+    ])
+  },
+  { deep: true }
 )
 
 const statCards = computed<AnalyticsStat[]>(() => [
@@ -43,6 +51,14 @@ const statCards = computed<AnalyticsStat[]>(() => [
     color: 'blue'
   }
 ])
+
+const isRegistrationsLoading = computed(() =>
+  registrationsTrendData.status.value === 'idle' || registrationsTrendData.status.value === 'pending'
+)
+const isUserDistributionLoading = computed(() =>
+  userDistributionData.status.value === 'idle' || userDistributionData.status.value === 'pending'
+)
+const isStatsLoading = computed(() => isRegistrationsLoading.value || isUserDistributionLoading.value)
 </script>
 
 <template>
@@ -52,7 +68,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" :loading="isStatsLoading" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,11 +76,13 @@ const statCards = computed<AnalyticsStat[]>(() => [
         :data="registrationsTrendData.data.value ?? []"
         title="New Registrations"
         :height="280"
+        :loading="isRegistrationsLoading"
       />
       <LazyAnalyticsBarChart
         :data="userDistributionData.data.value ?? []"
         title="Students Enrollment"
         :height="280"
+        :loading="isUserDistributionLoading"
       />
     </div>
   </div>

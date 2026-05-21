@@ -15,19 +15,32 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [revenueTrendData, paymentStatusData, revenueByTypeData] = await Promise.all([
-  useAsyncData('analytics:revenue-trend', () =>
-    analytics.fetchRevenueTrend(dateRange.value.period)
-  ),
-  useAsyncData('analytics:payment-status', () => analytics.fetchPaymentStatusBreakdown()),
-  useAsyncData('analytics:revenue-by-type', () => analytics.fetchRevenueByType())
-])
+const revenueTrendData = useLazyAsyncData(
+  'analytics:revenue-trend',
+  () => analytics.fetchRevenueTrend(dateRange.value),
+  { server: false, default: () => [] }
+)
+const paymentStatusData = useLazyAsyncData(
+  'analytics:payment-status',
+  () => analytics.fetchPaymentStatusBreakdown(dateRange.value),
+  { server: false, default: () => [] }
+)
+const revenueByTypeData = useLazyAsyncData(
+  'analytics:revenue-by-type',
+  () => analytics.fetchRevenueByType(dateRange.value),
+  { server: false, default: () => [] }
+)
 
 watch(
-  () => dateRange.value.period,
+  dateRange,
   async () => {
-    await revenueTrendData.refresh()
-  }
+    await Promise.all([
+      revenueTrendData.refresh(),
+      paymentStatusData.refresh(),
+      revenueByTypeData.refresh()
+    ])
+  },
+  { deep: true }
 )
 
 const statCards = computed<AnalyticsStat[]>(() => [
@@ -56,6 +69,17 @@ const statCards = computed<AnalyticsStat[]>(() => [
     color: 'red'
   }
 ])
+
+const isTrendLoading = computed(() =>
+  revenueTrendData.status.value === 'idle' || revenueTrendData.status.value === 'pending'
+)
+const isPaymentStatusLoading = computed(() =>
+  paymentStatusData.status.value === 'idle' || paymentStatusData.status.value === 'pending'
+)
+const isRevenueByTypeLoading = computed(() =>
+  revenueByTypeData.status.value === 'idle' || revenueByTypeData.status.value === 'pending'
+)
+const isStatsLoading = computed(() => isTrendLoading.value || isPaymentStatusLoading.value)
 </script>
 
 <template>
@@ -65,7 +89,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
     </div>
 
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" :loading="isStatsLoading" />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
@@ -75,6 +99,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
           title="Revenue Trend"
           :height="380"
           class="w-full h-full"
+          :loading="isTrendLoading"
         />
       </div>
       <div class="lg:col-span-2 flex">
@@ -84,6 +109,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
           :height="320"
           :value-formatter="formatPriceCompact"
           class="w-full h-full"
+          :loading="isRevenueByTypeLoading"
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ const props = defineProps<{
   height?: number
   colors?: string[]
   valueFormatter?: (value: number) => string
+  loading?: boolean
 }>()
 
 const formatValue = (v: number) => (props.valueFormatter ? props.valueFormatter(v) : formatNumber(v))
@@ -41,7 +42,14 @@ const radius = computed(() => Math.floor((props.height ?? 280) / 2) - 20)
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>
 
-    <div :style="{ height: `${height ?? 280}px` }" class="relative">
+    <div
+      v-if="loading"
+      :style="{ height: `${height ?? 280}px` }"
+      class="flex items-center justify-center text-muted"
+    >
+      <UIcon name="i-ph-circle-notch-bold" class="size-6 animate-spin" />
+    </div>
+    <div v-else :style="{ height: `${height ?? 280}px` }" class="relative">
       <DonutChart
         :data="donutData"
         :categories="donutCategories"
@@ -61,7 +69,16 @@ const radius = computed(() => Math.floor((props.height ?? 280) / 2) - 20)
       </DonutChart>
     </div>
 
-    <div v-if="data.length" class="mt-4 space-y-2">
+    <div v-if="loading" class="mt-4 space-y-2">
+      <div v-for="i in 4" :key="i" class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <USkeleton class="size-2.5 rounded-full" />
+          <USkeleton class="h-4 w-24" />
+        </div>
+        <USkeleton class="h-4 w-12" />
+      </div>
+    </div>
+    <div v-else-if="data.length" class="mt-4 space-y-2">
       <div
         v-for="(item, i) in data"
         :key="item.name"

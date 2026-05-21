@@ -17,16 +17,20 @@ const toast = useToast()
 const { canEdit } = useAdminPermission('admin.cohort')
 const AdminRowAction = resolveComponent('AdminRowAction')
 
-const [
-  { data: cohortsData, refresh },
-  { data: academiesData }
-] = await Promise.all([
-  useAsyncData('admin-cohorts', () => api<ApiResponse<AdminCohort[]>>('/admin/cohorts')),
-  useAsyncData('admin-academy-list', () => api<ApiResponse<AdminAcademy[]>>('/admin/academies'))
-])
+const { data: cohortsData, refresh, status: cohortsStatus } = useLazyAsyncData(
+  'admin-cohorts',
+  () => api<ApiResponse<AdminCohort[]>>('/admin/cohorts'),
+  { server: false, default: () => ({ data: [] }) }
+)
+const { data: academiesData } = useLazyAsyncData(
+  'admin-academy-list',
+  () => api<ApiResponse<AdminAcademy[]>>('/admin/academies'),
+  { server: false, default: () => ({ data: [] }) }
+)
 
 const cohorts = computed(() => cohortsData.value?.data ?? [])
 const academies = computed(() => academiesData.value?.data ?? [])
+const isCohortsLoading = computed(() => cohortsStatus.value === 'idle' || cohortsStatus.value === 'pending')
 
 const route = useRoute()
 
@@ -188,6 +192,7 @@ async function onAddCohort() {
     search-class="w-full sm:w-80"
     table-class="px-4 sm:px-6"
     :column-pinning="{}"
+    :loading="isCohortsLoading"
   >
     <template #toolbar-left>
       <div class="flex w-full sm:w-auto gap-2">

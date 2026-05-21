@@ -21,17 +21,21 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [summaryData, trendData, demographicsData] = await Promise.all([
-  useAsyncData('analytics:programs-summary', () =>
-    analytics.fetchRylsAnalyticsSummary(dateRange.value).catch(() => null)
-  ),
-  useAsyncData('analytics:programs-trend', () =>
-    analytics.fetchRylsAnalyticsTrend(dateRange.value).catch(() => [])
-  ),
-  useAsyncData('analytics:programs-demographics', () =>
-    analytics.fetchRylsAnalyticsDemographics(dateRange.value).catch(() => null)
-  )
-])
+const summaryData = useLazyAsyncData(
+  'analytics:programs-summary',
+  () => analytics.fetchRylsAnalyticsSummary(dateRange.value).catch(() => null),
+  { server: false, default: () => null }
+)
+const trendData = useLazyAsyncData(
+  'analytics:programs-trend',
+  () => analytics.fetchRylsAnalyticsTrend(dateRange.value).catch(() => []),
+  { server: false, default: () => [] }
+)
+const demographicsData = useLazyAsyncData(
+  'analytics:programs-demographics',
+  () => analytics.fetchRylsAnalyticsDemographics(dateRange.value).catch(() => null),
+  { server: false, default: () => null }
+)
 
 watch(
   dateRange,
@@ -90,6 +94,12 @@ const genderChartData = computed<CategoryBreakdown[]>(() =>
 const ageChartData = computed<CategoryBreakdown[]>(() =>
   (demographicsData.data.value?.byAgeRange ?? []).map((a) => ({ name: a.name, value: a.count }))
 )
+
+const isSummaryLoading = computed(() => summaryData.status.value === 'idle' || summaryData.status.value === 'pending')
+const isTrendLoading = computed(() => trendData.status.value === 'idle' || trendData.status.value === 'pending')
+const isDemographicsLoading = computed(() =>
+  demographicsData.status.value === 'idle' || demographicsData.status.value === 'pending'
+)
 </script>
 
 <template>
@@ -100,11 +110,16 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
 
     <!-- Stat Cards -->
     <div class="grid grid-cols-2 gap-4">
-      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" :loading="isSummaryLoading" />
     </div>
 
     <!-- Submission Trend -->
-    <AnalyticsAreaChart :data="trendChartData" title="Submission Trend" :height="288" />
+    <AnalyticsAreaChart
+      :data="trendChartData"
+      title="Submission Trend"
+      :height="288"
+      :loading="isTrendLoading"
+    />
 
     <!-- Scholarship + Discover Source -->
     <div class="flex flex-col md:flex-row items-stretch gap-4">
@@ -114,6 +129,7 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
           :data="scholarshipChartData"
           title="Scholarship Type"
           :height="288"
+          :loading="isDemographicsLoading"
         />
       </div>
       <div class="flex-2">
@@ -122,6 +138,7 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
           :data="discoverSourceChartData"
           title="Discover Source"
           :height="288"
+          :loading="isDemographicsLoading"
         />
       </div>
     </div>
@@ -134,6 +151,7 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
           :data="ageChartData"
           title="Age Range"
           :height="288"
+          :loading="isDemographicsLoading"
         />
       </div>
       <div class="flex-1">
@@ -142,6 +160,7 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
           :data="genderChartData"
           title="Gender"
           :height="288"
+          :loading="isDemographicsLoading"
         />
       </div>
     </div>
@@ -152,6 +171,7 @@ const ageChartData = computed<CategoryBreakdown[]>(() =>
       :data="nationalityChartData"
       title="Nationality (Top 10)"
       :height="288"
+      :loading="isDemographicsLoading"
     />
   </div>
 </template>

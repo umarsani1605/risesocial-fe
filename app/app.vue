@@ -18,14 +18,6 @@ useSeoMeta({
   twitterCard: 'summary_large_image'
 })
 
-const { data: navigation } = await useAsyncData(
-  'navigation',
-  () => queryCollectionNavigation('docs'),
-  {
-    transform: (data) => data.find((item) => item.path === '/docs')?.children || []
-  }
-)
-provide('navigation', navigation)
 </script>
 
 <template>

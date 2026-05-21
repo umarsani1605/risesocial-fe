@@ -14,31 +14,51 @@ const { api } = useApi()
 const { canEdit, isViewer } = useAdminPermission('admin.jobs')
 
 const jobId = Number(route.params.id)
-const { data: jobData, error: jobError } = await useAsyncData(`admin:job:${jobId}`, () =>
-  api<ApiResponse<Job>>(`/admin/jobs/${jobId}`)
+const { data: jobData, error: jobError, status: jobStatus } = useLazyAsyncData(`admin:job:${jobId}`, () =>
+  api<ApiResponse<Job>>(`/admin/jobs/${jobId}`),
+  { server: false }
 )
 
-if (jobError.value || !jobData.value?.data) {
-  throw createError({ statusCode: 404, message: 'Job not found' })
-}
+const job = computed(() => jobData.value?.data)
+const isJobLoading = computed(() => jobStatus.value === 'idle' || jobStatus.value === 'pending')
 
-const job = jobData.value.data
+watchEffect(() => {
+  if (jobError.value) {
+    throw createError({ statusCode: 404, message: 'Job not found' })
+  }
+})
 
-useSeoMeta({ title: `Edit Job – ${job.title} | Rise Social` })
+useSeoMeta({
+  title: () => `Edit Job – ${job.value?.title ?? 'Loading'} | Rise Social`
+})
 
 // ── Form state ─────────────────────────────────────────────────────────────────
 
 const form = reactive<AdminJobForm>({
-  title: job.title,
-  description: job.description ?? '',
-  company: job.company.name,
-  location: [job.location?.city, job.location?.country].filter(Boolean).join(', '),
-  slug: job.slug,
-  employment_type: job.employment_type,
-  seniority_level: job.seniority_level ?? '',
-  is_remote: job.location?.is_remote ?? false,
-  valid_until: job.valid_until ? job.valid_until.split('T')[0]! : '',
-  external_url: job.external_url ?? ''
+  title: '',
+  description: '',
+  company: '',
+  location: '',
+  slug: '',
+  employment_type: '',
+  seniority_level: '',
+  is_remote: false,
+  valid_until: '',
+  external_url: ''
+})
+
+watchEffect(() => {
+  if (!job.value) return
+  form.title = job.value.title
+  form.description = job.value.description ?? ''
+  form.company = job.value.company.name
+  form.location = [job.value.location?.city, job.value.location?.country].filter(Boolean).join(', ')
+  form.slug = job.value.slug
+  form.employment_type = job.value.employment_type
+  form.seniority_level = job.value.seniority_level ?? ''
+  form.is_remote = job.value.location?.is_remote ?? false
+  form.valid_until = job.value.valid_until ? job.value.valid_until.split('T')[0]! : ''
+  form.external_url = job.value.external_url ?? ''
 })
 
 const remoteOptions = [
@@ -68,7 +88,17 @@ async function onSave() {
 </script>
 
 <template>
-  <AdminCard :ui="{ body: 'p-0' }">
+  <div v-if="isJobLoading" class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <USkeleton class="size-8 rounded-md" />
+        <USkeleton class="h-7 w-36" />
+      </div>
+      <USkeleton class="h-9 w-28 rounded-md" />
+    </div>
+    <USkeleton class="h-[520px] w-full rounded-lg" />
+  </div>
+  <AdminCard v-else :ui="{ body: 'p-0' }">
     <!-- Page Header -->
     <UForm :schema="jobEditSchema" :state="form" @submit="onSave" :validate-on="['submit']">
       <div class="flex flex-wrap items-center justify-between">

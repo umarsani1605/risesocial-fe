@@ -14,9 +14,11 @@ const toast = useToast()
 const { canEdit } = useAdminPermission('admin.academy')
 const AdminRowAction = resolveComponent('AdminRowAction')
 
-const { data: rawAcademies, refresh, pending: isAcademiesPending } = await useAsyncData('admin:academies', () =>
-  api<ApiResponse<AdminAcademy[]>>('/admin/academies')
+const { data: rawAcademies, status: academiesStatus } = useLazyAsyncData('admin:academies', () =>
+  api<ApiResponse<AdminAcademy[]>>('/admin/academies'),
+  { server: false, default: () => ({ data: [] }) }
 )
+const isAcademiesLoading = computed(() => academiesStatus.value === 'idle' || academiesStatus.value === 'pending')
 
 const createModalOpen = ref(false)
 const isCreating = ref(false)
@@ -135,7 +137,7 @@ const columns: TableColumn<AdminAcademy>[] = [
     v-model:search="search"
     :data="filteredData"
     :columns="columns"
-    :loading="isAcademiesPending"
+    :loading="isAcademiesLoading"
     search-class="w-full sm:w-56"
   >
     <template #toolbar-left>

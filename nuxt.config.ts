@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+/* eslint-disable nuxt/nuxt-config-keys-order */
 export default defineNuxtConfig({
   
   modules: [
@@ -56,8 +57,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/docs': { redirect: '/docs/getting-started', prerender: false },
-    '/admin/**': { robots: false },
+    '/admin/**': { ssr: false, robots: false },
     '/dashboard/**': { robots: false },
     '/login': { robots: false },
     '/register': { robots: false },
@@ -71,7 +71,7 @@ export default defineNuxtConfig({
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
       }
     }
-  },
+  } as any,
 
   compatibilityDate: '2024-07-11',
 

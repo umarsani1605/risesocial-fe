@@ -16,19 +16,37 @@ const { api } = useApi()
 const { canEdit, isViewer } = useAdminPermission('admin.academy')
 
 const academySlug = route.params.slug as string
-const { data: sourceData, error: sourceError } = await useAsyncData(
+const { data: sourceData, error: sourceError, status: sourceStatus } = useLazyAsyncData(
   `admin:academy:${academySlug}`,
-  () => api<ApiResponse<Academy>>(`/admin/academies/${academySlug}`)
+  () => api<ApiResponse<Academy>>(`/admin/academies/${academySlug}`),
+  { server: false }
 )
 
-if (sourceError.value || !sourceData.value?.data) {
-  throw createError({ statusCode: 404, message: 'Academy not found' })
-}
+const source = shallowReactive<Academy>({
+  id: 0,
+  title: '',
+  slug: '',
+  description: '',
+  duration: '',
+  format: '',
+  category: '',
+  image_url: '',
+  certificate: false,
+  portfolio: false,
+  status: 'DRAFT',
+  pixel_id: '',
+  pricing: [],
+  features: [],
+  instructors: [],
+  themes: [],
+  testimonials: [],
+  faqs: [],
+  has_cohort: false
+})
 
-const source = sourceData.value.data
-
-const pageTitle = ref(source.title)
-const currentStatus = ref<AcademyStatus>(source.status)
+const pageTitle = ref('')
+const currentStatus = ref<AcademyStatus>('DRAFT')
+const isSourceLoading = computed(() => sourceStatus.value === 'idle' || sourceStatus.value === 'pending')
 
 const isArchiveConfirmOpen = ref(false)
 const isArchiving = ref(false)
@@ -68,7 +86,9 @@ const academyTabItems = ACADEMY_TAB_ITEMS.map((item) => ({
         : 'i-ph-users-three-duotone'
 }))
 
-useSeoMeta({ title: `Edit Academy – ${source.title} | Rise Social` })
+useSeoMeta({
+  title: () => `Edit Academy – ${source.title || 'Loading'} | Rise Social`
+})
 
 const sectionIds = [
   'section-basic',
@@ -99,7 +119,7 @@ onMounted(() => {
   function updateActive() {
     if (isScrollingProgrammatically) return
     const triggerY = container!.getBoundingClientRect().top + container!.clientHeight * 0.3
-    let current = sectionIds[0]
+    let current = sectionIds[0]!
     for (const id of sectionIds) {
       const el = document.getElementById(id)
       if (el && el.getBoundingClientRect().top <= triggerY) current = id
@@ -133,14 +153,35 @@ const tocItems = computed(() =>
 )
 
 const form = reactive({
-  title: source.title,
-  description: source.description ?? '',
-  duration: source.duration ?? '',
-  format: source.format ?? '',
-  category: source.category ?? '',
-  certificate: source.certificate ? 'Yes' : 'No',
-  portfolio: source.portfolio ? 'Yes' : 'No',
-  pixel_id: source.pixel_id ?? ''
+  title: '',
+  description: '',
+  duration: '',
+  format: '',
+  category: '',
+  certificate: 'No',
+  portfolio: 'No',
+  pixel_id: '',
+  status: 'DRAFT' as AcademyStatus
+})
+
+watchEffect(() => {
+  if (sourceError.value) {
+    throw createError({ statusCode: 404, message: 'Academy not found' })
+  }
+
+  if (!sourceData.value?.data) return
+  Object.assign(source, sourceData.value.data)
+  pageTitle.value = source.title
+  currentStatus.value = source.status
+  form.title = source.title
+  form.description = source.description ?? ''
+  form.duration = source.duration ?? ''
+  form.format = source.format ?? ''
+  form.category = source.category ?? ''
+  form.certificate = source.certificate ? 'Yes' : 'No'
+  form.portfolio = source.portfolio ? 'Yes' : 'No'
+  form.pixel_id = source.pixel_id ?? ''
+  form.status = source.status
 })
 
 const formRef = useTemplateRef('formRef')
@@ -244,6 +285,20 @@ async function onDelete() {
 
 <template>
   <div class="flex flex-col flex-1 min-h-0">
+    <div v-if="isSourceLoading" class="space-y-6">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <USkeleton class="size-8 rounded-md" />
+          <USkeleton class="h-7 w-72" />
+          <USkeleton class="h-7 w-20 rounded-full" />
+        </div>
+        <USkeleton class="h-9 w-36 rounded-md" />
+      </div>
+      <USkeleton class="h-10 w-full rounded-md" />
+      <USkeleton class="h-[520px] w-full rounded-lg" />
+    </div>
+
+    <template v-else>
     <div
       class="mb-6 flex shrink-0 flex-col gap-3 px-1 lg:flex-row lg:items-center lg:justify-between"
     >
@@ -525,5 +580,6 @@ async function onDelete() {
         />
       </template>
     </UModal>
+    </template>
   </div>
 </template>

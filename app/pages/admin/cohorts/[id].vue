@@ -22,12 +22,6 @@ const cohortId = route.params.id as string
 const { api } = useApi()
 const toast = useToast()
 const { canEdit, isViewer } = useAdminPermission('admin.cohort')
-const { data: cohortRaw, error: cohortError } = await useAsyncData(`admin-cohort-${cohortId}`, () =>
-  api<ApiResponse<AdminCohortDetail>>(`/admin/cohorts/${cohortId}`)
-)
-if (cohortError.value || !cohortRaw.value?.data) {
-  throw createError({ statusCode: 404, message: 'Cohort not found' })
-}
 
 const cohort = useAdminCohort(cohortId)
 
@@ -44,9 +38,12 @@ const cohortMentors = useAdminCohortMentors({
 
 const formRef = useTemplateRef('formRef')
 
-const currentStatus = ref<string>(cohortRaw.value!.data!.status)
+const currentStatus = ref<string>('ongoing')
 const isCompleting = ref(false)
 const isCompleteModalOpen = ref(false)
+const isCohortLoading = computed(() =>
+  cohort.cohortStatus === 'idle' || cohort.cohortStatus === 'pending'
+)
 
 const currentPhase = computed(() =>
   getCohortPhase({
@@ -73,6 +70,12 @@ watchEffect(() => {
   cohort.editCohortForm.start_date = cohort.detail.start_date?.split('T')[0] ?? ''
   cohort.editCohortForm.end_date = cohort.detail.end_date?.split('T')[0] ?? ''
   currentStatus.value = cohort.detail.status
+})
+
+watchEffect(() => {
+  if (cohort.cohortError) {
+    throw createError({ statusCode: 404, message: 'Cohort not found' })
+  }
 })
 
 async function onCompleteConfirm() {
@@ -107,6 +110,20 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
 
 <template>
   <div class="flex flex-col flex-1 min-h-0">
+    <div v-if="isCohortLoading" class="space-y-6">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <USkeleton class="size-8 rounded-md" />
+          <USkeleton class="h-6 w-72" />
+          <USkeleton class="h-6 w-24 rounded-full" />
+        </div>
+        <USkeleton class="h-9 w-36 rounded-md" />
+      </div>
+      <USkeleton class="h-10 w-full rounded-md" />
+      <USkeleton class="h-[420px] w-full rounded-lg" />
+    </div>
+
+    <template v-else>
     <!-- Header: back · title · badge · lifecycle actions · ellipsis (delete only) -->
     <div class="flex items-center justify-between gap-3 px-1 shrink-0 mb-6">
       <div class="flex items-center gap-3 min-w-0">
@@ -222,7 +239,6 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
         />
       </template>
     </UTabs>
-  </div>
 
   <AdminCohortModuleModal
     v-model:open="cohortModules.isAddModuleOpen"
@@ -341,4 +357,6 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       />
     </template>
   </UModal>
+    </template>
+  </div>
 </template>

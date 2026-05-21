@@ -43,15 +43,24 @@ const queryParams = computed(() => ({
   ...(typeFilter.value !== 'all' && { product_type: typeFilter.value })
 }))
 
-const { data: txData } = await useAsyncData(
+const { data: txData, status: txStatus } = useLazyAsyncData(
   'admin-transactions',
   () =>
     api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: queryParams.value }),
-  { watch: [queryParams] }
+  {
+    watch: [queryParams],
+    server: false,
+    default: (): PaginatedResponse<AdminTransaction> => ({
+      success: true,
+      data: [],
+      meta: { page: 1, limit: limit.value, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+    })
+  }
 )
 
 const transactions = computed(() => txData.value?.data ?? [])
 const meta = computed(() => txData.value?.meta)
+const isTransactionsLoading = computed(() => txStatus.value === 'idle' || txStatus.value === 'pending')
 
 function resetFilters() {
   searchInput.value = ''
@@ -188,6 +197,7 @@ function openDetail(id: number) {
     :table-ui="{ td: 'align-top' }"
     table-class="px-4 sm:px-6"
     :column-pinning="{}"
+    :loading="isTransactionsLoading"
   >
     <template #toolbar>
       <div class="flex flex-wrap items-center justify-between gap-3">

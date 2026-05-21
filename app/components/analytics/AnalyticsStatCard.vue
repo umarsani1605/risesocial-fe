@@ -3,6 +3,7 @@ import { ICON_COLOR } from '@/constants/iconColor'
 
 const props = defineProps<{
   stat: AnalyticsStat
+  loading?: boolean
 }>()
 
 const iconColor = computed(() => ICON_COLOR[props.stat.color ?? ''] ?? ICON_COLOR.gray!)
@@ -24,7 +25,21 @@ const trendColor = computed(() => ((props.stat.trend ?? 0) >= 0 ? 'success' : 'e
 
 <template>
   <UCard class="shadow-none!" :ui="{ body: 'p-4!' }">
-    <div class="flex gap-6">
+    <div v-if="loading" class="flex gap-6">
+      <USkeleton class="size-12 rounded-xl" />
+      <div class="flex flex-1 flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <USkeleton class="h-4 w-28" />
+          <USkeleton class="size-8 rounded-md" />
+        </div>
+        <USkeleton class="h-9 w-32" />
+        <div class="flex items-center gap-2">
+          <USkeleton class="h-6 w-14 rounded-full" />
+          <USkeleton class="h-4 w-20" />
+        </div>
+      </div>
+    </div>
+    <div v-else class="flex gap-6">
       <div
         class="size-12 flex items-center justify-center rounded-xl border"
         :class="iconColor.bg + ' ' + iconColor.border"

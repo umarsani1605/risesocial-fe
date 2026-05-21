@@ -186,14 +186,14 @@ function nextTestimonial() {
                   <div
                     v-for="feature in academy.features"
                     :key="feature.id"
-                    class="flex flex-col md:flex-row gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                    class="flex flex-col md:flex-row gap-4 p-4 sm:p-6 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                   >
-                    <div class="shrink-0">
+                    <div class="shrink-0 md:w-10 flex justify-start">
                       <UIcon
                         :name="
                           feature.icon?.startsWith('i-') ? feature.icon : `i-ph-${feature.icon}-fill`
                         "
-                        class="size-12 md:size-6 text-primary"
+                        class="size-10 text-primary"
                       />
                     </div>
                     <div>
@@ -228,7 +228,7 @@ function nextTestimonial() {
                         {{ index + 1 }}
                       </div>
                       <div class="flex-1">
-                        <h3 class="text-lg font-bold mb-1">
+                        <h3 class="text-base font-bold mb-1">
                           {{ academy.themes[index]?.title }}
                         </h3>
                         <p class="text-base text-muted">
@@ -360,7 +360,8 @@ function nextTestimonial() {
                     root: 'space-y-4',
                     item: 'bg-slate-50 rounded-xl border-none px-6',
                     trigger:
-                      'text-lg font-medium text-muted hover:text-slate-800 transition-colors cursor-pointer py-3',
+                      'py-4 hover:no-underline cursor-pointer group',
+                    label: 'text-base font-bold text-default',
                     body: 'text-base text-muted pb-4'
                   }"
                 />

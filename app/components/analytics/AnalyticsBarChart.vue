@@ -6,6 +6,7 @@ const props = defineProps<{
   title?: string
   height?: number
   color?: string
+  loading?: boolean
 }>()
 
 const chartData = computed(() => props.data.map((d) => ({ name: d.name, value: d.value })))
@@ -37,7 +38,14 @@ const yFormatter = (value: number) => {
     <template v-if="title" #header>
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>
-    <div :style="{ height: `${height ?? 280}px` }">
+    <div
+      v-if="loading"
+      :style="{ height: `${height ?? 280}px` }"
+      class="flex items-center justify-center text-muted"
+    >
+      <UIcon name="i-ph-circle-notch-bold" class="size-6 animate-spin" />
+    </div>
+    <div v-else :style="{ height: `${height ?? 280}px` }">
       <BarChart
         :data="chartData"
         :categories="categories"

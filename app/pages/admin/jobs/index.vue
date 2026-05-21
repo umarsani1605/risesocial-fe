@@ -13,14 +13,17 @@ useSeoMeta({ title: 'Jobs Management - Rise Social' })
 const { api } = useApi()
 const { canEdit } = useAdminPermission('admin.jobs')
 const AdminRowAction = resolveComponent('AdminRowAction')
-const { data: rawJobs, refresh: refreshJobs } = await useAsyncData('admin:jobs', () =>
-  api<PaginatedResponse<Job>>('/admin/jobs')
+const { data: rawJobs, refresh: refreshJobs, status: jobsStatus } = useLazyAsyncData('admin:jobs', () =>
+  api<PaginatedResponse<Job>>('/admin/jobs'),
+  { server: false, default: () => ({ data: [] }) }
 )
-const { data: rateLimitRaw, refresh: refreshRateLimit } = await useAsyncData(
+const { data: rateLimitRaw, refresh: refreshRateLimit } = useLazyAsyncData(
   'admin:jobs:rate-limit',
-  () => api<ApiResponse<RateLimitData>>('/admin/system/settings/linkedin/rate-limit')
+  () => api<ApiResponse<RateLimitData>>('/admin/system/settings/linkedin/rate-limit'),
+  { server: false }
 )
 const rateLimit = computed(() => rateLimitRaw.value?.data)
+const isJobsLoading = computed(() => jobsStatus.value === 'idle' || jobsStatus.value === 'pending')
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -387,7 +390,13 @@ const columns: TableColumn<Job>[] = [
 </script>
 
 <template>
-  <AdminDataTable ref="dataTableRef" :data="filteredData" :columns="columns" pinned-shadow>
+  <AdminDataTable
+    ref="dataTableRef"
+    :data="filteredData"
+    :columns="columns"
+    :loading="isJobsLoading"
+    pinned-shadow
+  >
     <template #toolbar>
       <div class="flex flex-wrap items-center justify-between">
         <!-- Left: Search + Filters -->

@@ -9,15 +9,22 @@ const open = ref(false)
 
 const { user, logout, fullName, initials, hasPermission } = useAuth()
 
-const { data: studentBadgeRaw } = await useAsyncData(ADMIN_STUDENTS_NAV_BADGE_ASYNC_KEY, async () => {
-  if (!hasPermission('admin.academy')) {
-    return { data: [] as Array<{ completed_at: string | null; placement: unknown | null }> }
-  }
+const { data: studentBadgeRaw } = useLazyAsyncData(
+  ADMIN_STUDENTS_NAV_BADGE_ASYNC_KEY,
+  async () => {
+    if (!hasPermission('admin.academy')) {
+      return { data: [] as Array<{ completed_at: string | null; placement: unknown | null }> }
+    }
 
-  return api<ApiResponse<Array<{ completed_at: string | null; placement: unknown | null }>>>(
-    '/admin/academy-enrollments?limit=500'
-  )
-})
+    return api<ApiResponse<Array<{ completed_at: string | null; placement: unknown | null }>>>(
+      '/admin/academy-enrollments?limit=500'
+    )
+  },
+  {
+    server: false,
+    default: () => ({ data: [] as Array<{ completed_at: string | null; placement: unknown | null }> })
+  }
+)
 
 const unassignedStudentsCount = computed(
   () => studentBadgeRaw.value?.data.filter((item) => !item.completed_at && !item.placement).length ?? 0
@@ -214,8 +221,6 @@ const userLinks = computed<NavigationMenuItem[]>(() =>
       ]
     : []
 )
-
-const currentYear = new Date().getFullYear()
 
 const navMenuUi = {
   item: 'relative px-4 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:w-1 after:h-[90%] after:rounded-r-full after:transition-colors has-[[aria-current=page]]:after:bg-primary'

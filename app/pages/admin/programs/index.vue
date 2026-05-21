@@ -22,17 +22,26 @@ function getFileUrl(filePath?: string | null): string {
   return `${apiBaseUrl}/uploads/${encoded}`
 }
 
-const [{ data: rawRegistrations }, { data: rawDrafts }] = await Promise.all([
-  useAsyncData('admin:ryls', () => api<ApiResponse<RylsListResponse>>('/admin/ryls/registrations')),
-  useAsyncData('admin:ryls-drafts', () =>
+const { data: rawRegistrations, status: registrationsStatus } = useLazyAsyncData(
+  'admin:ryls',
+  () => api<ApiResponse<RylsListResponse>>('/admin/ryls/registrations'),
+  { server: false, default: () => ({ data: { registrations: [] } }) }
+)
+const { data: rawDrafts, status: draftsStatus } = useLazyAsyncData(
+  'admin:ryls-drafts',
+  () =>
     api<ApiResponse<{ drafts: RylsDraft[]; pagination: { total: number } }>>(
       '/admin/ryls/registrations/drafts'
-    )
-  )
-])
+    ),
+  { server: false, default: () => ({ data: { drafts: [], pagination: { total: 0 } } }) }
+)
 
 const allRegistrations = computed(() => rawRegistrations.value?.data?.registrations ?? [])
 const allDrafts = computed(() => rawDrafts.value?.data?.drafts ?? [])
+const isRegistrationsLoading = computed(() =>
+  registrationsStatus.value === 'idle' || registrationsStatus.value === 'pending'
+)
+const isDraftsLoading = computed(() => draftsStatus.value === 'idle' || draftsStatus.value === 'pending')
 
 const rylsNationalityOptions = computed(() => {
   const nats = [...new Set(allRegistrations.value.map((r) => r.nationality))]
@@ -542,6 +551,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         search-placeholder="Search name or email..."
         search-class="w-full sm:w-52"
         pinned-shadow
+        :loading="isRegistrationsLoading"
       >
         <template #toolbar-left>
           <div class="flex flex-wrap w-full sm:w-auto gap-2">
@@ -587,6 +597,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         :columns="draftColumns"
         search-placeholder="Search email or name..."
         search-class="w-full sm:w-52"
+        :loading="isDraftsLoading"
       >
         <template #toolbar-left>
           <div class="flex flex-wrap w-full sm:w-auto gap-2">

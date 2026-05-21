@@ -15,10 +15,27 @@ const dateRange = ref<AnalyticsDateRange>({
   end: new Date()
 })
 
-const [enrollmentData, cohortFillData] = await Promise.all([
-  useAsyncData('analytics:enrollment-by-academy', () => analytics.fetchEnrollmentByAcademy()),
-  useAsyncData('analytics:cohort-fill-rates', () => analytics.fetchCohortFillRates())
-])
+const enrollmentData = useLazyAsyncData(
+  'analytics:enrollment-by-academy',
+  () => analytics.fetchEnrollmentByAcademy(dateRange.value),
+  { server: false, default: () => [] }
+)
+const cohortFillData = useLazyAsyncData(
+  'analytics:cohort-students',
+  () => analytics.fetchCohortFillRates(dateRange.value),
+  { server: false, default: () => [] }
+)
+
+watch(
+  dateRange,
+  async () => {
+    await Promise.all([
+      enrollmentData.refresh(),
+      cohortFillData.refresh()
+    ])
+  },
+  { deep: true }
+)
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
@@ -28,12 +45,16 @@ const statCards = computed<AnalyticsStat[]>(() => [
     color: 'blue'
   },
   {
-    title: 'Active Cohorts',
+    title: 'Cohorts with Students',
     value: cohortFillData.data.value?.length ?? 0,
     icon: 'i-ph-list-dashes-fill',
     color: 'green'
   }
 ])
+
+const isLoading = computed(() =>
+  [enrollmentData.status.value, cohortFillData.status.value].some((status) => status === 'idle' || status === 'pending')
+)
 </script>
 
 <template>
@@ -43,13 +64,21 @@ const statCards = computed<AnalyticsStat[]>(() => [
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
+      <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" :loading="isLoading" />
     </div>
 
     <LazyAnalyticsBarChart
       :data="enrollmentData.data.value ?? []"
       title="Enrollments by Academy"
       :height="300"
+      :loading="isLoading"
+    />
+
+    <LazyAnalyticsBarChart
+      :data="cohortFillData.data.value ?? []"
+      title="Students by Cohort"
+      :height="300"
+      :loading="isLoading"
     />
   </div>
 </template>

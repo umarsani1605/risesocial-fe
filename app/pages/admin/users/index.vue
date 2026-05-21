@@ -13,9 +13,11 @@ const { api } = useApi()
 const toast = useToast()
 const { canEdit } = useAdminPermission('admin.users')
 
-const { data: rawUsers, refresh } = await useAsyncData('admin:users', () =>
-  api<ApiResponse<UserProfile[]>>('/admin/users')
+const { data: rawUsers, refresh, status: usersStatus } = useLazyAsyncData('admin:users', () =>
+  api<ApiResponse<UserProfile[]>>('/admin/users'),
+  { server: false, default: () => ({ data: [] }) }
 )
+const isUsersLoading = computed(() => usersStatus.value === 'idle' || usersStatus.value === 'pending')
 
 const UButton = resolveComponent('UButton')
 const UAvatar = resolveComponent('UAvatar')
@@ -103,7 +105,7 @@ const editForm = reactive({
   role: '' as string
 })
 
-function openEdit(user: AdminUser) {
+function _openEdit(user: AdminUser) {
   editingUser.value = user
   editForm.first_name = user.first_name
   editForm.last_name = user.last_name
@@ -298,6 +300,7 @@ const columns: TableColumn<AdminUser>[] = [
     v-model:search="search"
     :data="filteredData"
     :columns="columns"
+    :loading="isUsersLoading"
     search-placeholder="Search name or email..."
   >
     <template #toolbar-right>

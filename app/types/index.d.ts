@@ -1,19 +1,4 @@
-import type { ParsedContent } from '@nuxt/content'
-import type { Avatar, Badge, Link } from '#ui/types'
 import type { AvatarProps } from '@nuxt/ui'
-
-export interface BlogPost extends ParsedContent {
-  title: string
-  description: string
-  date: string
-  image?: HTMLImageElement
-  badge?: Badge
-  authors?: ({
-    name: string
-    description?: string
-    avatar: Avatar
-  } & Link)[]
-}
 
 export interface Notification {
   id: number
@@ -27,14 +12,27 @@ export interface Notification {
 }
 
 // ── Jobs Types (see app/types/jobs.ts) ───────────────────────────────────────
-export type { Job, JobCompany, JobCompanyDetail, JobLocation, JobType, ExperienceLevel, AdminJobForm } from './jobs'
+export type { Job, JobCompany, JobCompanyDetail, JobLocation, JobType, ExperienceLevel, AdminJobForm, RateLimitData } from './jobs'
 
 // ── Academy Types (see app/types/academy.ts) ─────────────────────────────────
 export type {
   Academy, AdminAcademy, AcademyForm, AcademyStatus, AdminCohort,
   AcademyPricing, AcademyFeature, AcademyInstructor,
-  AcademyTopic, AcademyTopicForm, AcademyTheme, AcademyTestimonial, AcademyFaq
+  AcademyTopic, AcademyTopicForm, AcademyTheme, AcademyTestimonial, AcademyFaq, SyllabusRow
 } from './academy'
+
+export interface PaginatedResponse<T = unknown> {
+  success: true
+  data: T[]
+  meta: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
+}
 
 // ── Cohort Types (Admin) — defined in cohort.d.ts as ambient globals ────────
 

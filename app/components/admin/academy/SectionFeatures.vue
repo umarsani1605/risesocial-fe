@@ -11,7 +11,7 @@ const { api } = useApi()
 const toast = useToast()
 const { canEdit } = useAdminPermission('admin.academy')
 
-const items = ref<AcademyFeature[]>(structuredClone(props.initialData))
+const items = ref<AcademyFeature[]>(structuredClone(toRaw(props.initialData)))
 const isModalOpen = ref(false)
 const editingItem = ref<AcademyFeature | null>(null)
 
@@ -22,7 +22,7 @@ const isDeleting = ref(false)
 watch(
   () => props.initialData,
   (val) => {
-    items.value = structuredClone(val)
+    items.value = structuredClone(toRaw(val))
   },
   { deep: true }
 )

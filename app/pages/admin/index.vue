@@ -36,11 +36,13 @@ const UBadge = resolveComponent('UBadge')
 const { api } = useApi()
 const analytics = useAnalytics()
 
-const { data: overviewData, pending: isOverviewPending } = await useAsyncData('admin:analytics-overview', () =>
-  analytics.fetchOverview()
+const { data: overviewData, status: overviewStatus } = useLazyAsyncData('admin:analytics-overview', () =>
+  analytics.fetchOverview(),
+  { server: false }
 )
 
 const overview = computed(() => overviewData.value)
+const isOverviewLoading = computed(() => overviewStatus.value === 'idle' || overviewStatus.value === 'pending')
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
@@ -81,11 +83,13 @@ const statCards = computed<AnalyticsStat[]>(() => [
   }
 ])
 
-const { data: txData } = await useAsyncData('admin:recent-transactions', () =>
-  api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: { limit: 5, page: 1 } })
+const { data: txData, status: txStatus } = useLazyAsyncData('admin:recent-transactions', () =>
+  api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: { limit: 5, page: 1 } }),
+  { server: false }
 )
 
 const recentTransactions = computed(() => txData.value?.data ?? [])
+const isTxLoading = computed(() => txStatus.value === 'idle' || txStatus.value === 'pending')
 
 const columns: TableColumn<AdminTransaction>[] = [
   {
@@ -176,28 +180,28 @@ const columns: TableColumn<AdminTransaction>[] = [
 <template>
   <div class="flex flex-col gap-4">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <template v-if="isOverviewPending">
-        <USkeleton v-for="i in 4" :key="i" class="h-28 rounded-xl" />
-      </template>
-      <template v-else>
-        <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" />
-      </template>
+      <AnalyticsStatCard
+        v-for="stat in statCards"
+        :key="stat.title"
+        :stat="stat"
+        :loading="isOverviewLoading"
+      />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <AnalyticsAreaChart
-        v-if="overview?.revenueTrend?.length"
-        :data="overview.revenueTrend"
+        :data="overview?.revenueTrend ?? []"
         title="Revenue Trend (30d)"
         color="primary"
         :height="300"
+        :loading="isOverviewLoading"
       />
       <AnalyticsAreaChart
-        v-if="overview?.usersTrend?.length"
-        :data="overview.usersTrend"
-        title="RYLS Registrations Trend (30d)"
+        :data="overview?.usersTrend ?? []"
+        title="User Growth Trend (30d)"
         color="primary"
         :height="300"
+        :loading="isOverviewLoading"
       />
     </div>
 
@@ -219,6 +223,9 @@ const columns: TableColumn<AdminTransaction>[] = [
           <UTable
             :data="recentTransactions"
             :columns="columns"
+            :loading="isTxLoading"
+            loading-color="primary"
+            loading-animation="carousel"
             :ui="{ td: 'align-top' }"
             class="px-4 sm:px-6"
           />

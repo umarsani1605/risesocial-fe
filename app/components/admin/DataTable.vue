@@ -100,6 +100,8 @@ defineExpose({
         :data="data"
         :columns="columns"
         :loading="loading"
+        loading-color="primary"
+        loading-animation="carousel"
         :ui="mergedTableUi"
         :class="tableClass"
         v-bind="$attrs"
