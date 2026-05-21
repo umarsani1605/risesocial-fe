@@ -74,6 +74,12 @@ export const useRylsSubmission = () => {
 
       // Handle success
       submissionSuccess.value = true
+      capturePostHogEvent('ryls.registration_submitted', {
+        registration_id: response.data?.registrationId ?? null,
+        submission_id: response.data?.submissionId ?? null,
+        scholarship_type: scholarshipType,
+        payment_id: store.payment.id ? Number(store.payment.id) : null,
+      })
       return response.data || {}
     }
     catch (error: unknown) {

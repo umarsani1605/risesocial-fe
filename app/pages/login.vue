@@ -51,7 +51,13 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     isLoading.value = true
     errorMessage.value = ''
-    await login({ email: payload.data.email, password: payload.data.password })
+    const res = await login({ email: payload.data.email, password: payload.data.password })
+    identifyPostHogUser(res.data.user)
+    capturePostHogEvent('auth.login_succeeded', {
+      user_id: res.data.user.id,
+      role: res.data.user.role,
+      method: 'password'
+    })
     const redirect = route.query.redirect as string | undefined
     const safeRedirect = redirect && redirect.startsWith('/') ? redirect : undefined
     if (safeRedirect) {

@@ -119,6 +119,14 @@ const createMidtransTransaction = async () => {
         store.setPaymentStatus('PAID')
         store.setPaymentProof(null as unknown as File)
         store.setMidtransData(result)
+        capturePostHogEvent('ryls.payment_completed', {
+          payment_id: transaction.payment_id,
+          transaction_code: transaction.transaction_code,
+          amount: transaction.amount,
+          currency: transaction.currency,
+          scholarship_type: store.step1.scholarshipType,
+          payment_method: 'midtrans',
+        })
       },
       onPending: () => {
         store.setPaymentType('MIDTRANS')
@@ -129,6 +137,15 @@ const createMidtransTransaction = async () => {
         const errMsg = (err as Record<string, unknown>).message
         midtransError.value =
           (typeof errMsg === 'string' ? errMsg : '') || 'Payment failed. Please try again.'
+        capturePostHogEvent('ryls.payment_failed', {
+          payment_id: transaction.payment_id,
+          transaction_code: transaction.transaction_code,
+          amount: transaction.amount,
+          currency: transaction.currency,
+          scholarship_type: store.step1.scholarshipType,
+          payment_method: 'midtrans',
+          error_message: midtransError.value
+        })
       },
       onClose: () => {
         snapDisplayed.value = false

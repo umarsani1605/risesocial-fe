@@ -104,6 +104,14 @@ onMounted(async () => {
       lastName: customerForm.last_name
     }
   })
+  capturePostHogEvent('academy.checkout_started', {
+    academy_id: academy.value.id,
+    academy_slug: academySlug,
+    academy_title: academy.value.title,
+    pricing_id: pricingId,
+    pricing_name: pricing.value!.name,
+    price: pricing.value!.discount_price
+  })
 
   try {
     const result = await checkEnrollment(academy.value.id)
@@ -126,6 +134,14 @@ const onPay = async (formState: PaymentCustomer) => {
 
     transactionCode.value = result.transaction_code
     snapDisplayed.value = true
+    capturePostHogEvent('academy.payment_initiated', {
+      academy_id: academy.value.id,
+      academy_title: academy.value.title,
+      pricing_id: pricingId,
+      price: pricing.value!.discount_price,
+      transaction_code: result.transaction_code,
+      currency: result.currency
+    })
     await nextTick()
 
     openSnapEmbed(result.token, {
@@ -133,6 +149,14 @@ const onPay = async (formState: PaymentCustomer) => {
         if (transactionCode.value)
           await syncTransactionStatus(transactionCode.value).catch(() => {})
         paymentStatus.value = 'paid'
+        capturePostHogEvent('academy.payment_completed', {
+          academy_id: academy.value.id,
+          academy_title: academy.value.title,
+          pricing_id: pricingId,
+          price: pricing.value!.discount_price,
+          currency: 'IDR',
+          transaction_code: transactionCode.value
+        })
         void trackMetaEvent({
           eventName: 'Purchase',
           eventId: transactionCode.value ?? undefined,
@@ -165,6 +189,13 @@ const onPay = async (formState: PaymentCustomer) => {
         paymentStatus.value = 'failed'
         const errMsg =
           typeof err?.message === 'string' ? err.message : 'Payment failed. Please try again.'
+        capturePostHogEvent('academy.payment_failed', {
+          academy_id: academy.value.id,
+          academy_title: academy.value.title,
+          pricing_id: pricingId,
+          transaction_code: transactionCode.value,
+          error_message: errMsg
+        })
         toast.add({ title: errMsg as string, color: 'error' })
       },
       onClose: () => {

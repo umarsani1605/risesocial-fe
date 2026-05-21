@@ -16,6 +16,12 @@ const isSavingDraft = ref(false)
 const isRestoreReady = ref(false)
 const formRenderKey = ref(0)
 
+onMounted(() => {
+  capturePostHogEvent('ryls.registration_viewed', {
+    page: 'registration_start'
+  })
+})
+
 const genderValues = GENDER_OPTIONS.map(o => o.value) as [string, ...string[]]
 const discoverValues = DISCOVER_SOURCES.map(o => o.value) as [string, ...string[]]
 const scholarshipValues = SCHOLARSHIP_TYPES.map(o => o.value) as [string, ...string[]]
@@ -254,8 +260,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       </div>
 
       <UForm
-        :key="formRenderKey"
         v-else
+        :key="formRenderKey"
         :schema="schema"
         :state="state"
         class="space-y-8 text-gray-700"

@@ -84,6 +84,11 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       }
     })
     setSession(res.data.token, res.data.user)
+    identifyPostHogUser(res.data.user)
+    capturePostHogEvent('auth.signup_succeeded', {
+      user_id: res.data.user.id,
+      role: res.data.user.role
+    })
     await navigateTo('/dashboard')
   } catch (e: unknown) {
     errorMessage.value = getApiErrorMessage(e)

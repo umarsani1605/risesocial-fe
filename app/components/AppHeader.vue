@@ -87,7 +87,17 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
     {
       label: 'Logout',
       icon: 'i-ph-sign-out-bold',
-      onSelect: () => logout()
+      onSelect: async () => {
+        capturePostHogEvent('auth.logout', {
+          user_id: user.value?.id,
+          role: user.value?.role ?? null
+        })
+        try {
+          await logout()
+        } finally {
+          resetPostHogUser()
+        }
+      }
     }
   ]
 ])

@@ -160,6 +160,11 @@ const speakers: RylsSpeaker[] = [
 ]
 
 async function handleRegisterButton(packageType: string) {
+  capturePostHogEvent('ryls.registration_cta_clicked', {
+    package_type: packageType,
+    page: 'ryls_landing'
+  })
+
   void trackMetaEvent({
     eventName: 'RYLSRegisterClick',
     customData: {

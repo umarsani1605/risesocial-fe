@@ -111,6 +111,14 @@ const parsedDescription = computed(() => {
 
 const handleApply = () => {
   if (job.value?.external_url) {
+    capturePostHogEvent('job.apply_clicked', {
+      job_id: job.value.id,
+      job_title: job.value.title,
+      company_name: job.value.company?.name,
+      company_slug: companySlug,
+      employment_type: job.value.employment_type,
+      seniority_level: job.value.seniority_level
+    })
     window.open(job.value.external_url, '_blank', 'noopener,noreferrer')
   }
 }

@@ -82,6 +82,15 @@ export const useRylsDraft = () => {
       if (response?.success === true && response?.data?.resumeToken) {
         resumeToken.value = response.data.resumeToken
       }
+
+      if (response?.success === true) {
+        capturePostHogEvent('ryls.registration_draft_saved', {
+          step,
+          scholarship_type: scholarshipType ?? null,
+          resume_token: response?.data?.resumeToken ?? resumeToken.value ?? null
+        })
+      }
+
       return response?.success === true
     }
     catch (error: unknown) {

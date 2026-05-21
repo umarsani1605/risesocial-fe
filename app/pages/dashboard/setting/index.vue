@@ -90,6 +90,10 @@ const onSave = async () => {
     if (avatarFile.value) fd.append('image', avatarFile.value)
 
     await api('/users/account', { method: 'PUT', body: fd })
+    capturePostHogEvent('user.account_updated', {
+      user_id: user.value?.id,
+      has_avatar_change: !!avatarFile.value
+    })
     toast.add({ title: 'Account updated', color: 'success' })
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })

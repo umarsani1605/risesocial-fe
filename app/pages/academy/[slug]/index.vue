@@ -51,6 +51,12 @@ onMounted(() => {
       content_type: 'product'
     }
   })
+  capturePostHogEvent('academy.viewed', {
+    academy_id: academy.value.id,
+    academy_slug: academySlug,
+    academy_title: academy.value.title,
+    academy_category: academy.value.category
+  })
 })
 
 useSeoMeta({
