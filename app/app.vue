@@ -13,8 +13,8 @@ useHead({
 
 useSeoMeta({
   titleTemplate: '%s - Rise Social',
-  ogImage: '/og-image.png',
-  twitterImage: '/og-image.png',
+  ogImage: '/logo.png',
+  twitterImage: '/logo.png',
   twitterCard: 'summary_large_image'
 })
 

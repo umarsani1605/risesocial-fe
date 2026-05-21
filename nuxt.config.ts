@@ -29,6 +29,10 @@ export default defineNuxtConfig({
     defaultLocale: 'en'
   },
 
+  ogImage: {
+    enabled: false
+  },
+
   ui: {
     experimental: {
       componentDetection: true
@@ -73,6 +77,10 @@ export default defineNuxtConfig({
 
   hub: {
     blob: true
+  },
+
+  nitro: {
+    handlers: []
   },
 
   vite: {
