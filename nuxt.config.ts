@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxthub/core',
     'nuxt-charts',
-    '@nuxtjs/seo'
+    '@nuxtjs/seo',
+    '@posthog/nuxt'
   ],
   
   imports: {
@@ -52,7 +53,23 @@ export default defineNuxtConfig({
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
       midtransClientKey: process.env.MIDTRANS_MODE === 'PRODUCTION'
         ? process.env.MIDTRANS_CLIENT_KEY
-        : process.env.MIDTRANS_SANDBOX_CLIENT_KEY
+        : process.env.MIDTRANS_SANDBOX_CLIENT_KEY,
+      posthog: {
+        publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
+        host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com'
+      }
+    }
+  },
+
+  posthogConfig: {
+    publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
+    host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
+    clientConfig: {
+      capture_exceptions: true,
+      __add_tracing_headers: ['localhost', 'risesocial.org']
+    },
+    serverConfig: {
+      enableExceptionAutocapture: true
     }
   },
 
