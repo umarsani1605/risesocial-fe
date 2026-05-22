@@ -47,7 +47,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: '',
+      apiBaseUrl: 'https://api-dev.risesocial.org',
       partykitHost: '',
       whatsappNumber: process.env.NUXT_PUBLIC_WHATSAPP_NUMBER || '6285111032928',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
@@ -55,11 +55,11 @@ export default defineNuxtConfig({
         process.env.MIDTRANS_MODE === 'PRODUCTION'
           ? process.env.MIDTRANS_CLIENT_KEY
           : process.env.MIDTRANS_SANDBOX_CLIENT_KEY,
-      metaPixelId: process.env.META_PIXEL_ID || '',
-      metaPixel2Id: process.env.META_PIXEL_ID_2 || '',
+      metaPixelId: process.env.META_PIXEL_ID || '779046444865930',
+      metaPixel2Id: process.env.META_PIXEL_ID_2 || '1446243567200775',
       scripts: {
         metaPixel: {
-          id: process.env.META_PIXEL_ID || ''
+          id: process.env.META_PIXEL_ID || '779046444865930'
         }
       },
       posthog: {
@@ -72,7 +72,7 @@ export default defineNuxtConfig({
   scripts: {
     registry: {
       metaPixel: {
-        id: process.env.META_PIXEL_ID || ''
+        id: process.env.META_PIXEL_ID || '779046444865930'
       }
     }
   },
@@ -91,8 +91,6 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/programs/rise-young-leaders-summit': { prerender: true },
-    '/programs': { prerender: true },
-    '/about-us': { prerender: true },
     '/admin/**': { ssr: false, robots: false },
     '/dashboard/**': { robots: false },
     '/login': { robots: false },
