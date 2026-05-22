@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 /* eslint-disable nuxt/nuxt-config-keys-order */
 export default defineNuxtConfig({
-  
   modules: [
     '@nuxt/eslint',
     '@nuxt/image',
@@ -13,13 +12,13 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     '@posthog/nuxt'
   ],
-  
+
   imports: {
     dirs: ['constants', 'schemas']
   },
 
   devtools: {
-    enabled: process.env.NODE_ENV !== 'production',
+    enabled: process.env.NODE_ENV !== 'production'
   },
 
   css: ['~/assets/css/main.css'],
@@ -27,7 +26,8 @@ export default defineNuxtConfig({
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://risesocial.org',
     name: 'Rise Social',
-    description: 'Discover 40,000+ green job opportunities, sustainability academies, and youth leadership programs across Southeast Asia.',
+    description:
+      'Discover 40,000+ green job opportunities, sustainability academies, and youth leadership programs across Southeast Asia.',
     defaultLocale: 'en'
   },
 
@@ -51,12 +51,28 @@ export default defineNuxtConfig({
       partykitHost: '',
       whatsappNumber: process.env.NUXT_PUBLIC_WHATSAPP_NUMBER || '6285111032928',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
-      midtransClientKey: process.env.MIDTRANS_MODE === 'PRODUCTION'
-        ? process.env.MIDTRANS_CLIENT_KEY
-        : process.env.MIDTRANS_SANDBOX_CLIENT_KEY,
+      midtransClientKey:
+        process.env.MIDTRANS_MODE === 'PRODUCTION'
+          ? process.env.MIDTRANS_CLIENT_KEY
+          : process.env.MIDTRANS_SANDBOX_CLIENT_KEY,
+      metaPixelId: process.env.META_PIXEL_ID || '',
+      metaPixel2Id: process.env.META_PIXEL_ID_2 || '',
+      scripts: {
+        metaPixel: {
+          id: process.env.META_PIXEL_ID || ''
+        }
+      },
       posthog: {
         publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
         host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com'
+      }
+    }
+  },
+
+  scripts: {
+    registry: {
+      metaPixel: {
+        id: process.env.META_PIXEL_ID || ''
       }
     }
   },
@@ -74,6 +90,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // '/programs/rise-young-leaders-summit': { prerender: true },
     '/admin/**': { ssr: false, robots: false },
     '/dashboard/**': { robots: false },
     '/login': { robots: false },
@@ -85,7 +102,7 @@ export default defineNuxtConfig({
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
       }
     }
   } as any,
@@ -102,9 +119,7 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: [
-        '@nuxt/ui > prosemirror-state'
-      ]
+      include: ['@nuxt/ui > prosemirror-state']
     }
   },
 

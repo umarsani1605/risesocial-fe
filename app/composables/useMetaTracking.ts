@@ -67,10 +67,20 @@ function getMetaPixelProxy() {
   }
 }
 
+let secondaryPixelInitialized = false
+
+function initSecondaryPixel(proxy: MetaPixelProxy | undefined, pixel2Id: string) {
+  if (!import.meta.client || !proxy || !pixel2Id || secondaryPixelInitialized) return
+  secondaryPixelInitialized = true
+  proxy.fbq('init', pixel2Id)
+}
+
 export function useMetaTracking(options: MetaTrackingOptions = {}) {
   const config = useRuntimeConfig()
   const apiBaseUrl = options.apiBaseUrl ?? config.public.apiBaseUrl
+  const metaPixel2Id = (config.public.metaPixel2Id as string | undefined) ?? ''
   const defaultPixelProxy = options.pixelProxy ?? getMetaPixelProxy()
+  initSecondaryPixel(defaultPixelProxy, metaPixel2Id)
 
   async function trackMetaEvent(input: TrackMetaEventInput) {
     const eventId = input.eventId ?? options.eventIdFactory?.() ?? generateEventId()
