@@ -312,7 +312,7 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
         <USelect
           v-model="academyFilter"
           :items="academyOptions"
-          class="flex-1 sm:flex-none sm:w-48"
+          class="flex-1 sm:flex-none sm:w-44"
         />
       </template>
     </AdminDataTable>

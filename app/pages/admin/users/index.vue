@@ -301,7 +301,8 @@ const columns: TableColumn<AdminUser>[] = [
     :data="filteredData"
     :columns="columns"
     :loading="isUsersLoading"
-    search-placeholder="Search name or email..."
+    search-placeholder="Search by name or email..."
+    search-class="w-full sm:w-72"
   >
     <template #toolbar-right>
       <div class="flex items-center gap-2">

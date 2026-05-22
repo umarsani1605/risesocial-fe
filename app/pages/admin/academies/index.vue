@@ -138,19 +138,20 @@ const columns: TableColumn<AdminAcademy>[] = [
     :data="filteredData"
     :columns="columns"
     :loading="isAcademiesLoading"
-    search-class="w-full sm:w-56"
+    search-placeholder="Search by title..."
+    search-class="w-full sm:w-72"
   >
     <template #toolbar-left>
       <div class="flex w-full sm:w-auto gap-2">
         <USelect
           v-model="categoryFilter"
           :items="categoryOptions"
-          class="flex-1 sm:flex-none sm:w-40"
+          class="flex-1 sm:flex-none sm:w-44"
         />
         <USelect
           v-model="statusFilter"
           :items="statusOptions"
-          class="flex-1 sm:flex-none sm:w-36"
+          class="flex-1 sm:flex-none sm:w-44"
         />
       </div>
     </template>

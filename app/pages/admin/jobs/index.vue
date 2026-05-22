@@ -404,8 +404,8 @@ const columns: TableColumn<Job>[] = [
           <UInput
             v-model="search"
             icon="i-ph-magnifying-glass-bold"
-            placeholder="Search title or company..."
-            class="w-full sm:w-56"
+            placeholder="Search by title or company..."
+            class="w-full sm:w-72"
           />
 
           <AdminJobsFiltersPopover

@@ -83,7 +83,7 @@ const genderItems = [
 ] as const
 
 const rowClass =
-  'grid grid-cols-[minmax(0,180px)_minmax(0,1fr)] gap-x-6 gap-y-2 text-sm items-center'
+  'grid grid-cols-[minmax(0,180px)_minmax(0,1fr)] gap-x-6 gap-y-3 text-sm items-center'
 
 const timestampRows = computed(() => {
   if (!props.user) return []
@@ -282,7 +282,7 @@ function handleSubmit() {
           @submit="handleSubmit"
         >
           <fieldset :disabled="isViewer" class="contents">
-          <div class="p-6 space-y-4">
+          <div class="p-6 space-y-5">
             <p class="text-xs font-bold uppercase tracking-wide">User Information</p>
 
             <div class="space-y-4">
@@ -443,7 +443,7 @@ function handleSubmit() {
 
           <USeparator />
 
-          <div class="p-6 space-y-4">
+          <div class="p-6 space-y-5">
             <p class="text-xs font-bold uppercase tracking-wide">Role</p>
             <div :class="rowClass">
               <span class="text-muted">Role</span>
@@ -456,7 +456,7 @@ function handleSubmit() {
           <template v-if="canManagePermissions">
             <USeparator />
 
-            <div class="p-6 space-y-4">
+            <div class="p-6 space-y-5">
               <p class="text-xs font-bold uppercase tracking-wide">Permissions</p>
               <div class="space-y-3">
                 <div

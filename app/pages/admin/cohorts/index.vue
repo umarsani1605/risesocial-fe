@@ -188,8 +188,8 @@ async function onAddCohort() {
     v-model:search="search"
     :data="filteredData"
     :columns="columns"
-    search-placeholder="Search name, description, or academy"
-    search-class="w-full sm:w-80"
+    search-placeholder="Search by name, description, or academy..."
+    search-class="w-full sm:w-72"
     table-class="px-4 sm:px-6"
     :column-pinning="{}"
     :loading="isCohortsLoading"
@@ -204,7 +204,7 @@ async function onAddCohort() {
         <USelect
           v-model="statusFilter"
           :items="statusOptions"
-          class="flex-1 sm:flex-none sm:w-36"
+          class="flex-1 sm:flex-none sm:w-44"
         />
       </div>
     </template>
