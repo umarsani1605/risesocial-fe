@@ -90,7 +90,9 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // '/programs/rise-young-leaders-summit': { prerender: true },
+    '/programs/rise-young-leaders-summit': { prerender: true },
+    '/programs': { prerender: true },
+    '/about-us': { prerender: true },
     '/admin/**': { ssr: false, robots: false },
     '/dashboard/**': { robots: false },
     '/login': { robots: false },
