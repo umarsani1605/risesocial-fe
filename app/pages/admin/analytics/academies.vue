@@ -58,7 +58,7 @@ const isLoading = computed(() =>
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="flex flex-col gap-4">
     <div class="flex justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>

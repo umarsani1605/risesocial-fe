@@ -61,7 +61,7 @@ const dateLabel = computed(() => {
         v-for="preset in presets"
         :key="preset.period"
         :label="preset.label"
-        size="xs"
+        size="sm"
         :color="isPresetActive(preset) ? 'primary' : 'neutral'"
         :variant="isPresetActive(preset) ? 'solid' : 'ghost'"
         class="px-3"

@@ -22,15 +22,11 @@ interface AnalyticsStat {
 
 interface AnalyticsOverview {
   totalRevenue: number
-  totalRevenueTrend: number
   totalUsers: number
-  totalUsersTrend: number
-  activeCohorts: number
-  activeCohortsTrend: number
+  activeAcademies: number
   rylsRegistrations: number
-  rylsRegistrationsTrend: number
   revenueTrend: TimeSeriesPoint[]   // 30d mini chart
-  usersTrend: TimeSeriesPoint[]     // 30d mini chart
+  rylsTrend: TimeSeriesPoint[]      // 30d mini chart
 }
 
 type AnalyticsPeriod = '7d' | '30d' | '3m' | '6m' | '1y' | 'custom'

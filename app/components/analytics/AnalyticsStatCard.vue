@@ -51,7 +51,7 @@ const trendColor = computed(() => ((props.stat.trend ?? 0) >= 0 ? 'success' : 'e
           <div class="flex items-center gap-2">
             <div class="text-sm text-gray-400">{{ stat.title }}</div>
           </div>
-          <UButton :to="stat.to" variant="ghost" color="neutral" size="sm" class="p-2!">
+          <UButton v-if="stat.to" :to="stat.to" variant="ghost" color="neutral" size="sm" class="p-2!">
             <UIcon name="i-ph-arrow-up-right-bold" class="size-3.5" />
           </UButton>
         </div>
