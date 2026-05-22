@@ -46,7 +46,7 @@ const isOverviewLoading = computed(() => overviewStatus.value === 'idle' || over
 
 const statCards = computed<AnalyticsStat[]>(() => [
   {
-    title: 'Total Revenue',
+    title: 'Revenue (7d)',
     value: overview.value?.totalRevenue ?? 0,
     icon: 'ph:wallet',
     trend: overview.value?.totalRevenueTrend,
@@ -73,7 +73,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
     to: '/admin/cohorts'
   },
   {
-    title: 'RYLS Registrations',
+    title: 'RYLS Registrations (7d)',
     value: overview.value?.rylsRegistrations ?? 0,
     icon: 'ph:medal',
     trend: overview.value?.rylsRegistrationsTrend,
