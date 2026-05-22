@@ -19,7 +19,7 @@ const {
   status,
   refresh
 } = useLazyAsyncData('admin:students', () =>
-  api<ApiResponse<AcademyEnrollmentItem[]>>('/admin/academy-enrollments?limit=500'),
+  api<ApiResponse<AcademyEnrollmentItem[]>>('/admin/academy-enrollments'),
   { server: false, default: () => ({ data: [] }) }
 )
 
@@ -251,7 +251,7 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
     cell: ({ row }) => {
       const e = row.original
       const label = e.completed_at ? 'Completed' : e.placement ? 'Assigned' : 'Not Assigned'
-      const color = e.completed_at ? 'primary' : e.placement ? 'success' : 'warning'
+      const color = e.completed_at ? 'success' : e.placement ? 'warning' : 'neutral'
       return h(UBadge, { variant: 'subtle', color }, () => label)
     }
   },

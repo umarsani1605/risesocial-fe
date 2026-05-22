@@ -104,7 +104,7 @@ const formatPaymentMethod = (method: string | null) => {
       </template>
       <template #items-cell="{ row }">
         <span class="text-sm font-medium">
-          {{ row.original.items?.[0]?.product_name ?? row.original.product_type }}
+          {{ formatProductName(row.original.product_type, row.original.items?.[0]?.product_name) ?? row.original.product_type }}
         </span>
       </template>
       <template #amount-cell="{ row }">
@@ -163,7 +163,7 @@ const formatPaymentMethod = (method: string | null) => {
                 :key="`${item.product_name}-${item.total_price}`"
                 class="flex justify-between text-sm py-1"
               >
-                <span class="text-muted">{{ item.product_name }}</span>
+                <span class="text-muted">{{ formatProductName(selectedTransaction.product_type, item.product_name) }}</span>
                 <span>{{ formatPrice(item.total_price) }}</span>
               </div>
             </div>

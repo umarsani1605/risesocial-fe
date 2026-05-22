@@ -22,6 +22,13 @@ export const PRODUCT_TYPE_LABEL: Record<string, string> = {
   'Rise Young Leaders Scholarship': 'RYLS Registration',
 }
 
+export function formatProductName(_productType: string | null | undefined, productName: string | null | undefined) {
+  if (!productName) return null
+  // Legacy records still hold "Rise Young Leaders Scholarship Fully/Self Funded".
+  // Normalize to the current "RYLS Fully/Self Funded" form so listings stay consistent.
+  return productName.replace(/^Rise Young Leaders Scholarship\s+/i, 'RYLS ')
+}
+
 export const PAYMENT_METHOD_LABEL: Record<string, string> = {
   bca_va: 'BCA Virtual Account',
   bni_va: 'BNI Virtual Account',
@@ -43,7 +50,7 @@ export const PAYMENT_METHOD_LABEL: Record<string, string> = {
 
 export const PROVIDER_LABEL: Record<string, string> = {
   midtrans: 'Midtrans',
-  paypal_manual: 'PayPal Manual',
+  paypal_manual: 'PayPal',
 }
 
 export const TRANSACTION_STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'info'> = {

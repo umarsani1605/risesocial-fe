@@ -14,7 +14,7 @@ const { api } = useApi()
 const { canEdit } = useAdminPermission('admin.jobs')
 const AdminRowAction = resolveComponent('AdminRowAction')
 const { data: rawJobs, refresh: refreshJobs, status: jobsStatus } = useLazyAsyncData('admin:jobs', () =>
-  api<PaginatedResponse<Job>>('/admin/jobs'),
+  api<ApiResponse<Job[]>>('/admin/jobs'),
   { server: false, default: () => ({ data: [] }) }
 )
 const { data: rateLimitRaw, refresh: refreshRateLimit } = useLazyAsyncData(
@@ -461,7 +461,7 @@ const columns: TableColumn<Job>[] = [
                     <UButton
                       label="No"
                       color="neutral"
-                      variant="outline"
+                      variant="light"
                       size="sm"
                       @click="confirmSyncOpen = false"
                     />

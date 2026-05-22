@@ -6,7 +6,8 @@ import {
   TRANSACTION_STATUS_COLOR,
   PRODUCT_TYPE_ITEMS,
   PRODUCT_TYPE_LABEL,
-  PAYMENT_METHOD_LABEL
+  PAYMENT_METHOD_LABEL,
+  formatProductName
 } from '@/constants/transaction'
 
 definePageMeta({
@@ -23,50 +24,52 @@ const toast = useToast()
 // ── Filters ───────────────────────────────────────────────────────────────────
 
 const searchInput = ref('')
-const search = refDebounced(searchInput, 300)
+const search = refDebounced(searchInput, 200)
 const statusFilter = ref('all')
 const typeFilter = ref('all')
-const page = ref(1)
 
 const statusOptions = [{ label: 'All Status', value: 'all' }, ...TRANSACTION_STATUS_ITEMS]
 const typeOptions = [{ label: 'All Types', value: 'all' }, ...PRODUCT_TYPE_ITEMS]
 
-// ── Data Fetching ─────────────────────────────────────────────────────────────
-
-const limit = ref(10)
-
-const queryParams = computed(() => ({
-  page: page.value,
-  limit: limit.value,
-  ...(search.value && { search: search.value }),
-  ...(statusFilter.value !== 'all' && { status: statusFilter.value }),
-  ...(typeFilter.value !== 'all' && { product_type: typeFilter.value })
-}))
+// ── Data Fetching (client-side filter + pagination) ───────────────────────────
 
 const { data: txData, status: txStatus } = useLazyAsyncData(
   'admin-transactions',
-  () =>
-    api<PaginatedResponse<AdminTransaction>>('/admin/transactions', { query: queryParams.value }),
+  () => api<ApiResponse<AdminTransaction[]>>('/admin/transactions'),
   {
-    watch: [queryParams],
     server: false,
-    default: (): PaginatedResponse<AdminTransaction> => ({
-      success: true,
-      data: [],
-      meta: { page: 1, limit: limit.value, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
-    })
+    default: (): ApiResponse<AdminTransaction[]> => ({ success: true, data: [] })
   }
 )
 
 const transactions = computed(() => txData.value?.data ?? [])
-const meta = computed(() => txData.value?.meta)
 const isTransactionsLoading = computed(() => txStatus.value === 'idle' || txStatus.value === 'pending')
+
+const filteredTransactions = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  return transactions.value.filter((tx) => {
+    if (statusFilter.value !== 'all' && tx.status !== statusFilter.value) return false
+    if (typeFilter.value !== 'all' && tx.product_type !== typeFilter.value) return false
+    if (q) {
+      const haystack = [
+        tx.transaction_code,
+        tx.customer_name,
+        tx.customer_email,
+        tx.customer_phone
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+      if (!haystack.includes(q)) return false
+    }
+    return true
+  })
+})
 
 function resetFilters() {
   searchInput.value = ''
   statusFilter.value = 'all'
   typeFilter.value = 'all'
-  page.value = 1
 }
 
 // ── Table ─────────────────────────────────────────────────────────────────────
@@ -98,13 +101,14 @@ const columns: TableColumn<AdminTransaction>[] = [
     cell: ({ row }) => {
       const tx = row.original
       const label = PRODUCT_TYPE_LABEL[tx.product_type] ?? tx.product_type
+      const productName = formatProductName(tx.product_type, tx.product_name)
       return h('div', { class: 'text-sm space-y-0.5 max-w-48' }, [
         h('span', { class: 'font-medium block truncate', title: label }, label),
-        tx.product_name
+        productName
           ? h(
               'span',
-              { class: 'text-muted text-sm block truncate', title: tx.product_name },
-              tx.product_name
+              { class: 'text-muted text-sm block truncate', title: productName },
+              productName
             )
           : null
       ])
@@ -192,7 +196,7 @@ function openDetail(id: number) {
 
 <template>
   <AdminDataTable
-    :data="transactions"
+    :data="filteredTransactions"
     :columns="columns"
     :table-ui="{ td: 'align-top' }"
     table-class="px-4 sm:px-6"
@@ -211,7 +215,7 @@ function openDetail(id: number) {
           <USelect v-model="statusFilter" :items="statusOptions" class="w-full sm:w-40" />
           <USelect v-model="typeFilter" :items="typeOptions" class="w-full sm:w-56" />
           <UButton
-            v-if="searchInput || statusFilter || typeFilter"
+            v-if="searchInput || statusFilter !== 'all' || typeFilter !== 'all'"
             label="Reset"
             color="neutral"
             variant="ghost"
@@ -226,36 +230,6 @@ function openDetail(id: number) {
           :loading="isExporting"
           :disabled="isExporting"
           @click="exportExcel"
-        />
-      </div>
-    </template>
-
-    <template #footer>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div class="flex items-center gap-4">
-          <USelect
-            :model-value="limit"
-            :items="[10, 25, 50, 100]"
-            size="sm"
-            class="w-20"
-            @update:model-value="
-              (val: number) => {
-                limit = Number(val)
-                page = 1
-              }
-            "
-          />
-          <p class="text-sm text-muted shrink-0">
-            Showing {{ (page - 1) * limit + 1 }} to
-            {{ Math.min(page * limit, meta?.total ?? 0) }} of {{ meta?.total ?? 0 }} entries
-          </p>
-        </div>
-        <UPagination
-          v-model:page="page"
-          :total="meta?.total ?? 0"
-          :items-per-page="limit"
-          variant="ghost"
-          size="sm"
         />
       </div>
     </template>

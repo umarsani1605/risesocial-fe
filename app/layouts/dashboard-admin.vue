@@ -17,17 +17,20 @@ const { data: studentBadgeRaw } = useLazyAsyncData(
     }
 
     return api<ApiResponse<Array<{ completed_at: string | null; placement: unknown | null }>>>(
-      '/admin/academy-enrollments?limit=500'
+      '/admin/academy-enrollments'
     )
   },
   {
     server: false,
-    default: () => ({ data: [] as Array<{ completed_at: string | null; placement: unknown | null }> })
+    default: () => ({
+      data: [] as Array<{ completed_at: string | null; placement: unknown | null }>
+    })
   }
 )
 
 const unassignedStudentsCount = computed(
-  () => studentBadgeRaw.value?.data.filter((item) => !item.completed_at && !item.placement).length ?? 0
+  () =>
+    studentBadgeRaw.value?.data.filter((item) => !item.completed_at && !item.placement).length ?? 0
 )
 
 const menuItems: DropdownMenuItem[][] = [
@@ -357,7 +360,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
     <UDashboardPanel
       id="main"
       :ui="{
-        body: 'p-4 sm:p-6 pb-0'
+        body: 'p-4 sm:p-6 flex flex-col gap-0!'
       }"
     >
       <template #header>
