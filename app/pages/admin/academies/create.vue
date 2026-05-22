@@ -133,7 +133,7 @@ async function onSave() {
             <UButton
               label="Go to Information"
               color="primary"
-              variant="outline"
+              variant="light"
               @click="activeTab = '0'"
             />
           </div>

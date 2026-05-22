@@ -95,7 +95,7 @@ useSeoMeta({
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <!-- Mobile: drawer trigger -->
       <div class="lg:hidden">
-        <UButton variant="outline" block @click="isFilterOpen = true">
+        <UButton variant="light" block @click="isFilterOpen = true">
           <UIcon name="i-ph-funnel-bold" class="size-4 mr-2" />
           Show Filters
           <UBadge v-if="hasActiveFilters" color="primary" class="ml-2">Active</UBadge>
@@ -186,7 +186,7 @@ useSeoMeta({
                 <UIcon name="i-ph-magnifying-glass-bold" class="mr-2 size-4" />
                 Apply Filters
               </UButton>
-              <UButton v-if="hasActiveFilters" variant="outline" block @click="handleClearFilters">
+              <UButton v-if="hasActiveFilters" variant="light" block @click="handleClearFilters">
                 <UIcon name="i-ph-x-bold" class="mr-2 size-4" />
                 Clear All
               </UButton>
@@ -263,7 +263,7 @@ useSeoMeta({
               Search Jobs
             </UButton>
 
-            <UButton v-if="hasActiveFilters" variant="outline" block @click="handleClearFilters">
+            <UButton v-if="hasActiveFilters" variant="light" block @click="handleClearFilters">
               <UIcon name="i-ph-x-bold" class="size-4 mr-2" />
               Clear All Filters
             </UButton>
@@ -282,7 +282,7 @@ useSeoMeta({
           <UIcon name="i-ph-magnifying-glass-minus-bold" class="size-16 text-muted mx-auto mb-4" />
           <h3 class="text-xl font-semibold mb-2">No jobs found</h3>
           <p class="text-muted mb-4">Try adjusting your search criteria or clear all filters</p>
-          <UButton variant="outline" @click="handleClearFilters">
+          <UButton variant="light" @click="handleClearFilters">
             <UIcon name="i-ph-arrow-clockwise-bold" class="mr-2 size-4" />
             Clear all filters
           </UButton>

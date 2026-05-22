@@ -53,7 +53,7 @@ const onEnroll = () => {
         label="Go to Academy"
         icon="i-ph-squares-four-bold"
         color="primary"
-        variant="outline"
+        variant="light"
         size="md"
         to="/dashboard/academy"
         class="flex items-center justify-center w-full rounded-lg"

@@ -531,7 +531,7 @@ async function onDelete() {
         <UButton
           label="Cancel"
           color="neutral"
-          variant="outline"
+          variant="light"
           :disabled="isArchiving"
           @click="isArchiveConfirmOpen = false"
         />
@@ -575,7 +575,7 @@ async function onDelete() {
         <UButton
           label="Back"
           color="neutral"
-          variant="outline"
+          variant="light"
           @click="isValidationModalOpen = false"
         />
       </template>

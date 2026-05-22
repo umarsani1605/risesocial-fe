@@ -46,7 +46,7 @@ const enrollments = computed(() =>
       <UIcon name="i-ph-graduation-cap-bold" class="size-12 text-muted mx-auto mb-3" />
       <p class="font-medium mb-1">No programs yet</p>
       <p class="text-sm text-muted mb-4">Explore our academy programs and start learning</p>
-      <UButton to="/academy" color="primary" variant="outline" size="sm"> Explore Academy </UButton>
+      <UButton to="/academy" color="primary" variant="light" size="sm"> Explore Academy </UButton>
     </div>
 
     <div v-else class="flex flex-col gap-4">

@@ -181,7 +181,7 @@ async function setPermissionLevel(key: string, level: AdminAccessLevel | 'none')
       <UButton
         label="Cancel"
         color="neutral"
-        variant="outline"
+        variant="light"
         :disabled="loading"
         @click="emit('cancel')"
       />

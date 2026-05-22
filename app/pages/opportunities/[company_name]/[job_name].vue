@@ -257,7 +257,7 @@ useSeoMeta({
           </div>
 
           <ULink :to="`/opportunities/${job.company?.slug}`">
-            <UButton variant="outline" color="neutral" block>View Company Profile</UButton>
+            <UButton variant="light" color="neutral" block>View Company Profile</UButton>
           </ULink>
         </UCard>
       </div>
@@ -274,7 +274,7 @@ useSeoMeta({
             />
           </div>
           <div class="text-center">
-            <UButton variant="outline" @click="router.push('/opportunities')">
+            <UButton variant="light" @click="router.push('/opportunities')">
               See All Jobs
             </UButton>
           </div>

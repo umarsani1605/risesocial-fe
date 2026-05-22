@@ -303,7 +303,7 @@ function nextTestimonial() {
                   <div class="flex gap-2">
                     <UButton
                       color="neutral"
-                      variant="outline"
+                      variant="light"
                       icon="i-ph-caret-left-bold"
                       size="sm"
                       class="rounded-full"
@@ -311,7 +311,7 @@ function nextTestimonial() {
                     />
                     <UButton
                       color="neutral"
-                      variant="outline"
+                      variant="light"
                       icon="i-ph-caret-right-bold"
                       size="sm"
                       class="rounded-full"

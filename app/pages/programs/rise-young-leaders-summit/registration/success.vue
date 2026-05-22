@@ -62,7 +62,7 @@ function onBack() {
           See you in Japan! 🇯🇵
         </p>
       </div>
-      <UButton type="button" variant="outline" size="sm" @click="onBack">
+      <UButton type="button" variant="light" size="sm" @click="onBack">
         Back to Home
       </UButton>
     </div>

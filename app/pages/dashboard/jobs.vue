@@ -42,7 +42,7 @@ const latestJobs = computed(() => jobsData.value?.data ?? [])
       <UIcon name="i-ph-briefcase-bold" class="size-12 text-muted mx-auto mb-3" />
       <p class="font-medium mb-1">No jobs yet</p>
       <p class="text-sm text-muted mb-4">Explore our jobs and find your dream job</p>
-      <UButton to="/opportunities" color="primary" variant="outline" size="sm">
+      <UButton to="/opportunities" color="primary" variant="light" size="sm">
         Explore Jobs
       </UButton>
     </div>

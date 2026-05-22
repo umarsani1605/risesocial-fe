@@ -141,7 +141,7 @@ async function save() {
               label="Upload Photo"
               size="sm"
               color="neutral"
-              variant="outline"
+              variant="light"
               @click="avatarInputRef?.click()"
             />
           </div>
@@ -164,7 +164,7 @@ async function save() {
       <div class="flex items-center justify-between w-full">
         <UCheckbox v-if="!item" v-model="addMore" label="Add more" />
         <div class="flex gap-2 ml-auto">
-          <UButton label="Cancel" color="neutral" variant="outline" @click="emit('update:open', false)" />
+          <UButton label="Cancel" color="neutral" variant="light" @click="emit('update:open', false)" />
           <UButton label="Save" color="primary" :loading="loading" :disabled="loading" @click="formRef?.submit()" />
         </div>
       </div>

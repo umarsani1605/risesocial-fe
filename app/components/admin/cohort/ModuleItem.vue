@@ -33,7 +33,7 @@ function getStatus(module: AdminCohortModule) {
           v-if="!module.is_published"
           label="Draft"
           color="primary"
-          variant="outline"
+          variant="light"
           class="shrink-0"
         />
       </div>

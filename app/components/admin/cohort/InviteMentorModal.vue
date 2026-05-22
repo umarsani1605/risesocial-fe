@@ -118,7 +118,7 @@ function close() {
               label="Upload Photo"
               size="sm"
               color="neutral"
-              variant="outline"
+              variant="light"
               @click="avatarInputRef?.click()"
             />
           </div>
@@ -139,7 +139,7 @@ function close() {
       <UButton
         label="Cancel"
         color="neutral"
-        variant="outline"
+        variant="light"
         :disabled="loading"
         @click="close"
       />

@@ -129,7 +129,7 @@ async function save() {
           <UButton
             label="Cancel"
             color="neutral"
-            variant="outline"
+            variant="light"
             @click="emit('update:open', false)"
           />
           <UButton

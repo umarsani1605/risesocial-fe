@@ -319,7 +319,7 @@ function handleSubmit() {
                     />
                     <UButton
                       type="button"
-                      variant="outline"
+                      variant="light"
                       color="neutral"
                       size="sm"
                       @click="onPickAvatar"

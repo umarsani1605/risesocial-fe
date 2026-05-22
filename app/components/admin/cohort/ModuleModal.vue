@@ -484,7 +484,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
           <UButton
             label="Cancel"
             color="neutral"
-            variant="outline"
+            variant="light"
             :disabled="loading"
             @click="close"
           />

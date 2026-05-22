@@ -298,7 +298,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       </div>
 
         <div class="flex justify-end gap-3 pt-2">
-          <UButton type="button" variant="outline" class="px-6" :disabled="isUploadingFile || isSubmitting" @click="onBack">
+          <UButton type="button" variant="light" class="px-6" :disabled="isUploadingFile || isSubmitting" @click="onBack">
             Back
           </UButton>
           <UButton

@@ -24,7 +24,7 @@ const emit = defineEmits<{
       <UButton
         label="Cancel"
         color="neutral"
-        variant="outline"
+        variant="light"
         :disabled="loading"
         @click="open = false"
       />

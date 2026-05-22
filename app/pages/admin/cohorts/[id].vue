@@ -344,7 +344,7 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
       <UButton
         label="Cancel"
         color="neutral"
-        variant="outline"
+        variant="light"
         :disabled="isCompleting"
         @click="isCompleteModalOpen = false"
       />

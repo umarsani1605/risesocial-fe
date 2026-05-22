@@ -172,7 +172,7 @@ const featuresData: FeatureItem[] = [
           <UButton
             to="/contact"
             size="lg"
-            variant="outline"
+            variant="light"
             class="border-[#0a5c5b] text-[#0a5c5b] hover:bg-[#0a5c5b] hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
           >
             Contact Our Team

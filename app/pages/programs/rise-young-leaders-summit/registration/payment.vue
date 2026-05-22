@@ -324,7 +324,7 @@ const onSubmit = async () => {
           <UButton
             type="button"
             color="neutral"
-            variant="outline"
+            variant="light"
             class="flex items-center gap-2"
             :disabled="isPaypalProcessing || isMidtransProcessing || isUploading || isSubmitting"
             @click="openPayPal"
@@ -384,7 +384,7 @@ const onSubmit = async () => {
             :disabled="isMidtransProcessing || isPaypalProcessing || isUploading || isSubmitting"
             type="button"
             color="neutral"
-            variant="outline"
+            variant="light"
             class="flex items-center gap-2"
             @click="createMidtransTransaction"
           >
@@ -411,7 +411,7 @@ const onSubmit = async () => {
           <UButton
             type="button"
             color="neutral"
-            variant="outline"
+            variant="light"
             :disabled="isPaypalProcessing || isMidtransProcessing || isUploading || isSubmitting"
             @click="onBack"
           >

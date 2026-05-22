@@ -176,7 +176,7 @@ function selectCohort(id: number) {
               label="Unassign"
               icon="i-ph-user-minus-bold"
               color="error"
-              variant="outline"
+              variant="light"
               :loading="isDroppingStudent"
               :disabled="isAssigning || hasCertificate"
               @click="isUnassignConfirmOpen = true"
@@ -185,7 +185,7 @@ function selectCohort(id: number) {
             <UButton
               label="Cancel"
               color="neutral"
-              variant="outline"
+              variant="light"
               :disabled="isAssigning || isDroppingStudent"
               @click="emit('update:open', false)"
             />
@@ -224,7 +224,7 @@ function selectCohort(id: number) {
       <UButton
         label="Cancel"
         color="neutral"
-        variant="outline"
+        variant="light"
         :disabled="isDroppingStudent"
         @click="isUnassignConfirmOpen = false"
       />

@@ -77,7 +77,7 @@ async function save() {
       </UForm>
     </template>
     <template #footer>
-      <UButton label="Cancel" color="neutral" variant="outline" :disabled="loading" @click="emit('update:open', false)" />
+      <UButton label="Cancel" color="neutral" variant="light" :disabled="loading" @click="emit('update:open', false)" />
       <UButton label="Add Cohort" color="primary" :loading="loading" :disabled="loading" @click="formRef?.submit()" />
     </template>
   </UModal>

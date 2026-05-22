@@ -105,7 +105,7 @@ const onNext = async () => {
       <hr class="my-6 border-gray-200">
 
       <div class="flex justify-end gap-3 pt-8">
-        <UButton type="button" variant="outline" class="px-6" @click="onBack">
+        <UButton type="button" variant="light" class="px-6" @click="onBack">
           Back
         </UButton>
         <UButton type="button" class="px-6" :loading="isSubmitting" :disabled="isSubmitting || submitted" @click="onNext">

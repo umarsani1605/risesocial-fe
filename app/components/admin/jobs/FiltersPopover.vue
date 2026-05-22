@@ -34,7 +34,7 @@ const statusFilterOptions = [
       label="Filters"
       leading-icon="i-ph-sliders-horizontal-bold"
       color="neutral"
-      variant="outline"
+      variant="light"
     >
       <template v-if="activeFilterCount > 0" #trailing>
         <span

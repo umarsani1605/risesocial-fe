@@ -124,7 +124,7 @@ const onSave = async () => {
             @change="onAvatarFileChange"
           />
           <UButton
-            variant="outline"
+            variant="light"
             color="neutral"
             size="sm"
             leading-icon="i-ph-image-square-bold"
@@ -133,7 +133,7 @@ const onSave = async () => {
             Change Avatar
           </UButton>
           <UButton
-            variant="outline"
+            variant="light"
             color="neutral"
             size="sm"
             leading-icon="i-ph-trash-simple-bold"
