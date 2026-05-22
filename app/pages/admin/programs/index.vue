@@ -53,6 +53,7 @@ const rylsNationalityOptions = computed(() => {
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
+const UIcon = resolveComponent('UIcon')
 
 const route = useRoute()
 
@@ -83,8 +84,7 @@ const genderOptions = [
 const paymentTypeOptions = [
   { label: 'All Payments', value: 'all' },
   { label: 'PayPal', value: 'PAYPAL' },
-  { label: 'Midtrans', value: 'MIDTRANS' },
-  { label: 'Bank Transfer', value: 'BANK_TRANSFER' }
+  { label: 'Midtrans', value: 'MIDTRANS' }
 ]
 
 const idFilter = computed(() => (route.query.id ? Number(route.query.id) : null))
@@ -237,7 +237,7 @@ function normalizePaymentMethod(method?: string | null) {
 const draftColumns: TableColumn<RylsDraft>[] = [
   {
     id: 'no',
-    header: 'No',
+    header: '#',
     cell: ({ row }) => h('span', { class: 'text-muted' }, row.index + 1)
   },
   {
@@ -342,7 +342,7 @@ function openDetail(reg: RylsRegistration) {
 const columns: TableColumn<RylsRegistration>[] = [
   {
     id: 'no',
-    header: 'No',
+    header: '#',
     cell: ({ row }) =>
       h(
         'span',
@@ -445,7 +445,7 @@ const columns: TableColumn<RylsRegistration>[] = [
           src: logo,
           alt: PAYMENT_TYPE_LABEL[method] ?? method,
           title: PAYMENT_TYPE_LABEL[method] ?? method,
-          class: 'h-5 object-contain'
+          class: 'h-6 object-contain'
         })
       }
       return h('span', { class: 'text-sm whitespace-nowrap' }, PAYMENT_TYPE_LABEL[method] ?? method)
@@ -462,14 +462,11 @@ const columns: TableColumn<RylsRegistration>[] = [
         'inline-flex items-center gap-1 text-primary text-sm hover:underline max-w-52 truncate'
       const method = normalizePaymentMethod(payment.payment_method)
 
-      if (
-        (method === 'PAYPAL' || method === 'BANK_TRANSFER') &&
-        payment.payment_proof?.file_path
-      ) {
+      if (method === 'PAYPAL' && payment.payment_proof?.file_path) {
         const href = getFileUrl(payment.payment_proof.file_path)
         if (href) {
           return h('a', { href, target: '_blank', rel: 'noopener', class: linkClass }, [
-            h('span', { class: 'i-ph-arrow-square-out-bold size-3 shrink-0' }),
+            h(UIcon, { name: 'i-ph-arrow-square-out-bold', class: 'size-3.5 shrink-0' }),
             h('span', { class: 'truncate' }, 'Payment Proof')
           ])
         }
@@ -482,7 +479,7 @@ const columns: TableColumn<RylsRegistration>[] = [
         if (orderId) {
           const href = `https://dashboard.midtrans.com/beta/transactions?type=order_id&query=${orderId}`
           return h('a', { href, target: '_blank', rel: 'noopener', class: linkClass }, [
-            h('span', { class: 'i-ph-arrow-square-out-bold size-3 shrink-0' }),
+            h(UIcon, { name: 'i-ph-arrow-square-out-bold', class: 'size-3.5 shrink-0' }),
             h('span', { class: 'truncate', title: orderId }, orderId)
           ])
         }
@@ -548,8 +545,8 @@ const columns: TableColumn<RylsRegistration>[] = [
         :data="filteredData"
         :columns="columns"
         :column-pinning="{ right: ['actions'] }"
-        search-placeholder="Search name or email..."
-        search-class="w-full sm:w-52"
+        search-placeholder="Search by name or email..."
+        search-class="w-full sm:w-72"
         pinned-shadow
         :loading="isRegistrationsLoading"
       >
@@ -558,22 +555,22 @@ const columns: TableColumn<RylsRegistration>[] = [
             <USelect
               v-model="scholarshipFilter"
               :items="scholarshipOptions"
-              class="flex-1 sm:flex-none sm:w-36"
+              class="flex-1 sm:flex-none sm:w-44"
             />
             <USelect
               v-model="genderFilter"
               :items="genderOptions"
-              class="flex-1 sm:flex-none sm:w-32"
+              class="flex-1 sm:flex-none sm:w-44"
             />
             <USelect
               v-model="nationalityFilter"
               :items="rylsNationalityOptions"
-              class="flex-1 sm:flex-none sm:w-36"
+              class="flex-1 sm:flex-none sm:w-44"
             />
             <USelect
               v-model="paymentTypeFilter"
               :items="paymentTypeOptions"
-              class="flex-1 sm:flex-none sm:w-36"
+              class="flex-1 sm:flex-none sm:w-44"
             />
           </div>
         </template>
@@ -595,8 +592,8 @@ const columns: TableColumn<RylsRegistration>[] = [
         v-model:search="draftSearch"
         :data="filteredDrafts"
         :columns="draftColumns"
-        search-placeholder="Search email or name..."
-        search-class="w-full sm:w-52"
+        search-placeholder="Search by name or email..."
+        search-class="w-full sm:w-72"
         :loading="isDraftsLoading"
       >
         <template #toolbar-left>
@@ -604,12 +601,12 @@ const columns: TableColumn<RylsRegistration>[] = [
             <USelect
               v-model="draftStepFilter"
               :items="draftStepOptions"
-              class="flex-1 sm:flex-none sm:w-36"
+              class="flex-1 sm:flex-none sm:w-44"
             />
             <USelect
               v-model="draftScholarshipFilter"
               :items="draftScholarshipOptions"
-              class="flex-1 sm:flex-none sm:w-36"
+              class="flex-1 sm:flex-none sm:w-44"
             />
           </div>
         </template>

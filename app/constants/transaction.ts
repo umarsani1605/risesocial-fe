@@ -50,7 +50,19 @@ export const PAYMENT_METHOD_LABEL: Record<string, string> = {
 
 export const PROVIDER_LABEL: Record<string, string> = {
   midtrans: 'Midtrans',
+  paypal: 'PayPal',
+  // legacy value from before paypal_manual → paypal rename
   paypal_manual: 'PayPal',
+}
+
+export const PROVIDER_ITEMS = [
+  { label: 'Midtrans', value: 'midtrans' },
+  { label: 'PayPal', value: 'paypal' },
+]
+
+/** True for both the current "paypal" and legacy "paypal_manual" provider values. */
+export function isPaypalProvider(provider: string | null | undefined) {
+  return provider === 'paypal' || provider === 'paypal_manual'
 }
 
 export const TRANSACTION_STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral' | 'info'> = {

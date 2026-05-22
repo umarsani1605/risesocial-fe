@@ -84,6 +84,23 @@ function getScholarshipLabel(type: string) {
   return SCHOLARSHIP_TYPES.find((s) => s.value === type)?.label ?? type
 }
 
+const PROVIDER_LOGO: Record<string, string> = {
+  midtrans: '/images/payment-logo/midtrans.png',
+  paypal: '/images/payment-logo/paypal.png',
+  paypal_manual: '/images/payment-logo/paypal.png'
+}
+
+const providerLogo = computed(() => {
+  const provider = detail.value?.provider
+  return provider ? (PROVIDER_LOGO[provider] ?? null) : null
+})
+
+const providerLabel = computed(() => {
+  const provider = detail.value?.provider
+  if (!provider) return '—'
+  return PROVIDER_LABEL[provider] ?? provider
+})
+
 const detailRows = computed(() => {
   if (!detail.value) return []
   const d = detail.value
@@ -91,7 +108,6 @@ const detailRows = computed(() => {
     { label: 'Transaction Code', value: d.transaction_code },
     { label: 'Amount', value: formatPrice(d.amount) },
     { label: 'Status', value: TRANSACTION_STATUS_LABEL[d.status] ?? d.status },
-    { label: 'Provider', value: PROVIDER_LABEL[d.provider] ?? d.provider },
     {
       label: 'Payment Method',
       value: d.payment_method ? (PAYMENT_METHOD_LABEL[d.payment_method] ?? d.payment_method) : '—'
@@ -132,11 +148,24 @@ const customerRows = computed(() => {
       <div v-else-if="detail">
         <!-- Section 1: Transaction Details -->
         <div class="p-6">
-          <p class="text-xs font-bold uppercase tracking-wide mb-4">Transaction Details</p>
-          <div class="space-y-2">
-            <div v-for="row in detailRows" :key="row.label" class="grid grid-cols-2 gap-2 text-sm">
+          <p class="text-xs font-bold uppercase tracking-wide mb-5">Transaction Details</p>
+          <div class="space-y-3">
+            <div v-for="row in detailRows" :key="row.label" class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">{{ row.label }}</span>
               <span>{{ row.value }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              <span class="text-muted">Provider</span>
+              <span>
+                <img
+                  v-if="providerLogo"
+                  :src="providerLogo"
+                  :alt="providerLabel"
+                  :title="providerLabel"
+                  class="h-4 object-contain"
+                >
+                <template v-else>{{ providerLabel }}</template>
+              </span>
             </div>
           </div>
         </div>
@@ -145,9 +174,9 @@ const customerRows = computed(() => {
 
         <!-- Section 2: Customer Details -->
         <div class="p-6">
-          <p class="text-xs font-bold uppercase tracking-wide mb-4">Customer Details</p>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-2 text-sm">
+          <p class="text-xs font-bold uppercase tracking-wide mb-5">Customer Details</p>
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">User</span>
               <span v-if="!detail.customer_details.user_id">Guest</span>
               <NuxtLink
@@ -163,7 +192,7 @@ const customerRows = computed(() => {
             <div
               v-for="row in customerRows"
               :key="row.label"
-              class="grid grid-cols-2 gap-2 text-sm"
+              class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm"
             >
               <span class="text-muted">{{ row.label }}</span>
               <span>{{ row.value }}</span>
@@ -175,21 +204,17 @@ const customerRows = computed(() => {
 
         <!-- Section 3: Product Details -->
         <div class="p-6">
-          <p class="text-xs font-bold uppercase tracking-wide mb-4">Product Details</p>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-2 text-sm">
+          <p class="text-xs font-bold uppercase tracking-wide mb-5">Product Details</p>
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Product Name</span>
               <span>{{ formatProductName(detail.product_details.type, detail.product_details.items[0]?.product_name) }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <span class="text-muted">Quantity</span>
-              <span>{{ detail.product_details.items[0]?.quantity }}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Unit Price</span>
               <span>{{ formatPrice(detail.product_details.items[0]?.unit_price ?? 0) }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Total</span>
               <span>{{ formatPrice(detail.product_details.items[0]?.total_price ?? 0) }}</span>
             </div>
@@ -201,12 +226,12 @@ const customerRows = computed(() => {
         <div class="p-6">
           <!-- RYLS Registration sub-section -->
           <div v-if="detail.product_details.ryls_registration" class="space-y-2">
-            <p class="text-xs font-bold uppercase tracking-wide mb-4">RYLS Registration</p>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <p class="text-xs font-bold uppercase tracking-wide mb-5">RYLS Registration</p>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Registration ID</span>
               <span>{{ detail.product_details.ryls_registration.id }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Full Name</span>
               <NuxtLink
                 :to="`/admin/programs/ryls?id=${detail.product_details.ryls_registration.id}`"
@@ -217,7 +242,7 @@ const customerRows = computed(() => {
                 <UIcon name="i-ph-arrow-square-out-bold" class="size-3" />
               </NuxtLink>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Scholarship Type</span>
               <span>{{
                 getScholarshipLabel(detail.product_details.ryls_registration.scholarship_type)

@@ -13,6 +13,5 @@ export const DISCOVER_SOURCE_LABEL: Record<string, string> = {
 
 export const PAYMENT_TYPE_LABEL: Record<string, string> = {
   PAYPAL: 'PayPal',
-  BANK_TRANSFER: 'Bank Transfer',
   MIDTRANS: 'Midtrans'
 }

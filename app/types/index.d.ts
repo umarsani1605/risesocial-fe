@@ -185,6 +185,8 @@ export interface AdminTransaction {
   status: string
   provider: string
   payment_method: string | null
+  midtrans_order_id: string | null
+  payment_proof_path: string | null
   created_at: string
 }
 
