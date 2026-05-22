@@ -3,7 +3,8 @@ import type { AdminTransactionDetail } from '@/types'
 import {
   TRANSACTION_STATUS_LABEL,
   PAYMENT_METHOD_LABEL,
-  PROVIDER_LABEL
+  PROVIDER_LABEL,
+  formatProductName
 } from '@/constants/transaction'
 import { SCHOLARSHIP_TYPES } from '@/utils/ryls'
 
@@ -14,9 +15,15 @@ const props = defineProps<{
 }>()
 
 const { api } = useApi()
+const toast = useToast()
 
 const isLoading = ref(false)
 const detail = ref<AdminTransactionDetail | null>(null)
+const isSyncing = ref(false)
+const isUpdateModalOpen = ref(false)
+const isUpdatingStatus = ref(false)
+
+const isMidtrans = computed(() => detail.value?.provider === 'midtrans')
 
 watch(
   () => props.transactionId,
@@ -32,6 +39,41 @@ watch(
     }
   }
 )
+
+async function onCheckStatus() {
+  if (!detail.value) return
+  isSyncing.value = true
+  try {
+    const res = await api<ApiResponse<AdminTransactionDetail>>(
+      `/admin/transactions/${detail.value.id}/check-status`,
+      { method: 'POST' }
+    )
+    detail.value = res.data
+    toast.add({ title: 'Transaction status checked', color: 'success' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isSyncing.value = false
+  }
+}
+
+async function onConfirmUpdate(newStatus: string) {
+  if (!detail.value) return
+  isUpdatingStatus.value = true
+  try {
+    const res = await api<ApiResponse<AdminTransactionDetail>>(
+      `/admin/transactions/${detail.value.id}/update-status`,
+      { method: 'POST', body: { status: newStatus } }
+    )
+    detail.value = res.data
+    isUpdateModalOpen.value = false
+    toast.add({ title: 'Transaction status updated', color: 'success' })
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isUpdatingStatus.value = false
+  }
+}
 
 function fmt(dt: string | null) {
   if (!dt) return '—'
@@ -137,7 +179,7 @@ const customerRows = computed(() => {
           <div class="space-y-2">
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Product Name</span>
-              <span>{{ detail.product_details.items[0]?.product_name }}</span>
+              <span>{{ formatProductName(detail.product_details.type, detail.product_details.items[0]?.product_name) }}</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <span class="text-muted">Quantity</span>
@@ -185,5 +227,36 @@ const customerRows = computed(() => {
         </div>
       </div>
     </template>
+
+    <template v-if="detail" #footer>
+      <div class="flex w-full justify-end gap-2">
+        <UButton
+          label="Change Status"
+          color="primary"
+          :variant="isMidtrans ? 'light' : 'solid'"
+          icon="i-ph-pencil-simple-bold"
+          :disabled="isSyncing || isUpdatingStatus"
+          @click="isUpdateModalOpen = true"
+        />
+        <UButton
+          v-if="isMidtrans"
+          label="Check Status"
+          color="primary"
+          variant="solid"
+          icon="i-ph-arrows-clockwise-bold"
+          :loading="isSyncing"
+          :disabled="isSyncing || isUpdatingStatus"
+          @click="onCheckStatus"
+        />
+      </div>
+    </template>
   </USlideover>
+
+  <AdminTransactionUpdateStatusModal
+    v-if="detail"
+    v-model:open="isUpdateModalOpen"
+    :current-status="detail.status"
+    :loading="isUpdatingStatus"
+    @confirm="onConfirmUpdate"
+  />
 </template>
