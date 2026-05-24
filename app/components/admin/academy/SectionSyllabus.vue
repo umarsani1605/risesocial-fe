@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AcademyTheme, AcademyTopicForm, SyllabusRow } from '@/types'
 import type { TableColumn } from '@nuxt/ui'
+import { themeHasSubtopics } from '@/utils/academySyllabus'
 
 const props = defineProps<{
   academyId: number
@@ -30,7 +31,8 @@ const flatData = computed<SyllabusRow[]>(() => {
       _kind: 'theme',
       order: theme.order,
       title: theme.title,
-      description: theme.description
+      description: theme.description,
+      has_children: themeHasSubtopics(theme)
     })
     if (expandedThemes.has(theme.id)) {
       for (const topic of theme.topics) {
@@ -99,9 +101,8 @@ function openEditTheme(row: SyllabusRow) {
   isThemeModalOpen.value = true
 }
 
-function onThemeSaved(newThemeId?: number) {
+function onThemeSaved() {
   refresh()
-  if (newThemeId) expandedThemes.add(newThemeId)
 }
 
 function openAddTopic(themeId: number) {
@@ -143,10 +144,10 @@ async function executeDelete() {
     if (kind === 'theme') {
       await api(`/admin/academies/${props.academyId}/themes/${item.id}`, { method: 'DELETE' })
       expandedThemes.delete(item.id)
-      toast.add({ title: 'Theme deleted', color: 'success' })
+      toast.add({ title: 'Topic deleted', color: 'success' })
     } else {
       await api(`/admin/academies/${props.academyId}/topics/${item.id}`, { method: 'DELETE' })
-      toast.add({ title: 'Topic deleted', color: 'success' })
+      toast.add({ title: 'Subtopic deleted', color: 'success' })
     }
     await refresh()
     isDeleteModalOpen.value = false
@@ -160,19 +161,23 @@ async function executeDelete() {
 const columns: TableColumn<SyllabusRow>[] = [
   {
     id: 'expand',
-    meta: { class: { th: 'w-px', td: 'w-px' } }
+    meta: { class: { th: 'w-px', td: 'w-px align-top' } }
   },
   {
     accessorKey: 'order',
     header: 'Order',
-    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap align-top' } }
   },
-  { accessorKey: 'title', header: 'Title' },
-  { accessorKey: 'description', header: 'Description' },
+  { accessorKey: 'title', header: 'Title', meta: { class: { td: 'align-top' } } },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    meta: { class: { th: 'max-w-[650px]', td: 'align-top' } }
+  },
   {
     id: 'actions',
     header: () => h('div', 'Actions'),
-    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap align-top' } }
   }
 ]
 </script>
@@ -181,7 +186,7 @@ const columns: TableColumn<SyllabusRow>[] = [
   <div class="space-y-4">
     <div v-if="canEdit" class="flex justify-end">
       <UButton
-        label="Add Theme"
+        label="Add Topic"
         color="primary"
         leading-icon="i-ph-plus-bold"
         @click="openAddTheme"
@@ -193,7 +198,7 @@ const columns: TableColumn<SyllabusRow>[] = [
         :data="flatData"
         :columns="columns"
         :meta="tableMeta"
-        empty="No themes added yet. Click + Add Theme to get started."
+        empty="No topics added yet. Click + Add Topic to get started."
         class="px-0 overflow-visible"
       >
         <template #expand-cell="{ row }">
@@ -206,6 +211,7 @@ const columns: TableColumn<SyllabusRow>[] = [
             variant="ghost"
             size="xs"
             square
+            :disabled="!row.original.has_children"
             @click="toggleTheme(row.original.id)"
           />
         </template>
@@ -233,7 +239,12 @@ const columns: TableColumn<SyllabusRow>[] = [
         </template>
 
         <template #description-cell="{ row }">
-          <span class="text-sm text-muted">{{ row.original.description }}</span>
+          <span
+            class="line-clamp-2 whitespace-normal text-sm text-muted"
+            :title="row.original.description"
+          >
+            {{ row.original.description }}
+          </span>
         </template>
 
         <template #actions-cell="{ row }">
@@ -243,7 +254,7 @@ const columns: TableColumn<SyllabusRow>[] = [
                 size="sm"
                 color="primary"
                 variant="light"
-                label="Add Topic"
+                label="Add Subtopic"
                 leading-icon="i-ph-plus-bold"
                 @click="openAddTopic(row.original.id)"
               />

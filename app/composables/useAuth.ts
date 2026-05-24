@@ -1,5 +1,10 @@
+import { getAuthCookieOptions } from '../utils/auth'
+
 export const useAuth = createSharedComposable(() => {
-  const cookieOptions = { sameSite: 'lax' as const, maxAge: 60 * 60 * 24 * 7, secure: true }
+  const cookieOptions = getAuthCookieOptions({
+    isHttps: import.meta.client ? window.location.protocol === 'https:' : false,
+    isProduction: import.meta.dev === false
+  })
   const token = useCookie<string | null>('auth_token', cookieOptions)
   const user = useCookie<UserProfile | null>('auth_user', { ...cookieOptions, default: () => null })
 

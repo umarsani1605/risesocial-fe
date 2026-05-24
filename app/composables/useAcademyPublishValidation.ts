@@ -32,9 +32,7 @@ export function useAcademyPublishValidation(academySlug: string) {
       if (!d.instructors?.length) errors.push('At least 1 instructor is required')
       if (!d.testimonials?.length) errors.push('At least 1 testimonial is required')
       if (!d.faqs?.length) errors.push('At least 1 FAQ is required')
-      if (!d.themes?.length) errors.push('At least 1 syllabus theme is required')
-      const totalTopics = d.themes?.reduce((sum, t) => sum + (t.topics?.length ?? 0), 0) ?? 0
-      if (totalTopics < 1) errors.push('At least 1 topic is required')
+      if (!d.themes?.length) errors.push('At least 1 syllabus topic is required')
 
       if (errors.length > 0) {
         validationErrors.value = errors

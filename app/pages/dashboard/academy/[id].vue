@@ -93,7 +93,7 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
       />
     </div>
 
-    <UCard v-if="cohort.status === 'completed' && certificateUrl">
+    <UCard v-if="certificateUrl">
       <div class="flex items-center gap-6">
         <UIcon name="i-ph-certificate-duotone" class="size-10 text-primary" />
         <div class="flex-1 min-w-0">

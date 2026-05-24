@@ -52,7 +52,7 @@ async function save() {
         body
       })
       emit('saved')
-      toast.add({ title: 'Theme saved', color: 'success' })
+      toast.add({ title: 'Topic saved', color: 'success' })
       emit('update:open', false)
     } else {
       const res = await api<ApiResponse<AcademyTheme>>(
@@ -60,7 +60,7 @@ async function save() {
         { method: 'POST', body }
       )
       emit('saved', res.data.id)
-      toast.add({ title: 'Theme saved', color: 'success' })
+      toast.add({ title: 'Topic saved', color: 'success' })
       if (addMore.value) {
         form.title = ''
         form.description = ''
@@ -79,7 +79,7 @@ async function save() {
 <template>
   <UModal
     :open="open"
-    :title="item ? 'Edit Theme' : 'Add Theme'"
+    :title="item ? 'Edit Topic' : 'Add Topic'"
     :ui="{ footer: 'justify-end' }"
     @update:open="emit('update:open', $event)"
   >
@@ -89,7 +89,7 @@ async function save() {
           <UInput v-model="form.title" placeholder="e.g. Introduction to Carbon Accounting" class="w-full" />
         </UFormField>
         <UFormField name="description" label="Description">
-          <UTextarea v-model="form.description" placeholder="Theme description" :rows="3" class="w-full" />
+          <UTextarea v-model="form.description" placeholder="Topic description" :rows="3" class="w-full" />
         </UFormField>
         <UFormField name="order" label="Order">
           <UInput v-model="form.order" type="number" placeholder="1" class="w-full" />

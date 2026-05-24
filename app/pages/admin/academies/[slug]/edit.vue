@@ -495,7 +495,7 @@ async function onDelete() {
       <template #cohorts>
         <div class="relative flex h-full">
           <div class="flex-1 overflow-y-auto py-6 pr-4">
-            <AdminAcademySectionCohorts :academy-id="source.id" />
+            <AdminAcademySectionCohorts :academy-id="source.id" :academy-title="source.title" />
           </div>
         </div>
       </template>

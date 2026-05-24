@@ -60,7 +60,7 @@ async function save() {
       await api(`/admin/academies/${props.academyId}/topics`, { method: 'POST', body })
     }
     emit('saved')
-    toast.add({ title: 'Topic saved', color: 'success' })
+    toast.add({ title: 'Subtopic saved', color: 'success' })
     if (addMore.value) {
       form.title = ''
       form.description = ''
@@ -78,20 +78,20 @@ async function save() {
 <template>
   <UModal
     :open="open"
-    :title="item ? 'Edit Topic' : 'Add Topic'"
+    :title="item ? 'Edit Subtopic' : 'Add Subtopic'"
     :ui="{ footer: 'justify-end' }"
     @update:open="emit('update:open', $event)"
   >
     <template #body>
       <UForm ref="formRef" :schema="topicFormSchema" :state="form" class="space-y-4" @submit="save" :validate-on="['submit']">
-        <UFormField v-if="!defaultThemeId" label="Theme">
-          <USelect v-model="form.theme_id" :items="themes" placeholder="Select theme" class="w-full" />
+        <UFormField v-if="!item && !defaultThemeId" label="Topic">
+          <USelect v-model="form.theme_id" :items="themes" placeholder="Select topic" class="w-full" />
         </UFormField>
         <UFormField name="title" label="Title" required>
           <UInput v-model="form.title" placeholder="e.g. What is Carbon Accounting?" class="w-full" />
         </UFormField>
         <UFormField name="description" label="Description">
-          <UTextarea v-model="form.description" placeholder="Topic description" :rows="3" class="w-full" />
+          <UTextarea v-model="form.description" placeholder="Subtopic description" :rows="3" class="w-full" />
         </UFormField>
         <UFormField name="order" label="Order">
           <UInput v-model="form.order" type="number" placeholder="1" class="w-full" />

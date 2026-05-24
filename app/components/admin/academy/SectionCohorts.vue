@@ -6,6 +6,7 @@ import { getCohortPhase } from '@/utils/cohort'
 
 const props = defineProps<{
   academyId: number
+  academyTitle: string
 }>()
 
 const { api } = useApi()
@@ -15,6 +16,42 @@ const { canEdit } = useAdminPermission('admin.cohort')
 const items = ref<AdminCohort[]>([])
 const loading = ref(false)
 const isModalOpen = ref(false)
+const isAdding = ref(false)
+const addForm = reactive<{
+  academy_id: number | undefined
+  name: string
+  description: string
+  start_date: string
+  end_date: string
+  copy_from_academy: boolean
+}>({
+  academy_id: props.academyId,
+  name: '',
+  description: '',
+  start_date: '',
+  end_date: '',
+  copy_from_academy: false
+})
+
+const academySelectItems = computed(() => [
+  {
+    label: props.academyTitle,
+    value: props.academyId
+  }
+])
+
+function resetAddForm() {
+  addForm.academy_id = props.academyId
+  addForm.name = ''
+  addForm.description = ''
+  addForm.start_date = ''
+  addForm.end_date = ''
+  addForm.copy_from_academy = false
+}
+
+watch(isModalOpen, (open) => {
+  if (open) resetAddForm()
+})
 
 async function fetchCohorts() {
   loading.value = true
@@ -31,6 +68,31 @@ async function fetchCohorts() {
 }
 
 onMounted(fetchCohorts)
+
+async function onAddCohort() {
+  isAdding.value = true
+  try {
+    await api('/admin/cohorts', {
+      method: 'POST',
+      body: {
+        academy_id: props.academyId,
+        name: addForm.name,
+        description: addForm.description || null,
+        start_date: addForm.start_date,
+        end_date: addForm.end_date,
+        copy_from_academy: addForm.copy_from_academy
+      }
+    })
+    toast.add({ title: 'Cohort created', color: 'success' })
+    isModalOpen.value = false
+    resetAddForm()
+    await fetchCohorts()
+  } catch (error: unknown) {
+    toast.add({ title: getApiErrorMessage(error), color: 'error' })
+  } finally {
+    isAdding.value = false
+  }
+}
 
 const columns: TableColumn<AdminCohort>[] = [
   {
@@ -106,9 +168,13 @@ const columns: TableColumn<AdminCohort>[] = [
     </div>
   </div>
 
-  <AdminAcademyCohortModal
+  <AdminCohortCreateModal
     v-model:open="isModalOpen"
-    :academy-id="academyId"
-    @saved="fetchCohorts"
+    v-model:form="addForm"
+    :loading="isAdding"
+    :academy-items="academySelectItems"
+    :fixed-academy-id="academyId"
+    title="Add Cohort"
+    @submit="onAddCohort"
   />
 </template>

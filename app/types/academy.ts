@@ -77,6 +77,7 @@ export interface SyllabusRow {
   title: string
   description: string
   theme_id?: number
+  has_children?: boolean
 }
 
 // ── Main types ────────────────────────────────────────────────────────────────

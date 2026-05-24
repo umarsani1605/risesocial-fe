@@ -12,14 +12,26 @@ const form = defineModel<{
   copy_from_academy: boolean
 }>('form', { required: true })
 
-defineProps<{
+const props = defineProps<{
   loading?: boolean
   academyItems: { label: string; value: number }[]
+  fixedAcademyId?: number
+  title?: string
 }>()
+const { academyItems, fixedAcademyId, title } = toRefs(props)
 const emit = defineEmits<{ submit: [] }>()
 const formRef = useTemplateRef('formRef')
 const startDateInput = useTemplateRef('startDateInput')
 const endDateInput = useTemplateRef('endDateInput')
+
+watch(
+  () => [open.value, props.fixedAcademyId] as const,
+  ([isOpen, fixedAcademyId]) => {
+    if (!isOpen || !fixedAcademyId) return
+    form.value.academy_id = fixedAcademyId
+  },
+  { immediate: true }
+)
 
 function stringToCalendarDate(s: string): CalendarDate | null {
   if (!s) return null
@@ -44,7 +56,11 @@ const endDate = computed({
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Add New Cohort" :ui="{ footer: 'justify-end' }">
+  <UModal
+    v-model:open="open"
+    :title="title ?? 'Add New Cohort'"
+    :ui="{ footer: 'justify-end' }"
+  >
     <template #body>
       <UForm
         :validate-on="['submit']"
@@ -62,6 +78,7 @@ const endDate = computed({
               :items="academyItems"
               placeholder="Select Academy"
               class="w-full"
+              :disabled="!!fixedAcademyId"
             />
           </UFormField>
           <UFormField name="copy_from_academy">

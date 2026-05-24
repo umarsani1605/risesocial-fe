@@ -84,6 +84,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       }"
     >
       <UAuthForm
+        method="post"
         :schema="schema"
         :fields="fields"
         title="Login to Your Account"

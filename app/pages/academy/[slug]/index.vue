@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AccordionItem, BreadcrumbItem, TabsItem } from '@nuxt/ui'
 import type { Academy } from '@/types'
+import { buildAdaptiveSyllabusItems } from '@/utils/academySyllabus'
 
 definePageMeta({
   layout: 'default'
@@ -85,9 +86,7 @@ if (isLoggedIn.value) {
   }
 }
 
-const syllabusItems = computed<AccordionItem[]>(() =>
-  (academy.value.themes ?? []).map((theme) => ({ value: `theme-${theme.id}` }))
-)
+const adaptiveSyllabusItems = computed(() => buildAdaptiveSyllabusItems(academy.value.themes ?? []))
 
 const faqItems = computed<AccordionItem[]>(() =>
   (academy.value.faqs ?? []).map((faq) => ({
@@ -106,6 +105,15 @@ const pricingTabs = computed<TabsItem[]>(() =>
 
 const testimonialItems = computed(() => academy.value.testimonials ?? [])
 const testimonialCarousel = useTemplateRef('testimonialCarousel')
+const openSyllabusIds = ref<Set<number>>(new Set())
+
+function toggleSyllabus(id: number) {
+  if (openSyllabusIds.value.has(id)) {
+    openSyllabusIds.value.delete(id)
+  } else {
+    openSyllabusIds.value.add(id)
+  }
+}
 
 function prevTestimonial() {
   testimonialCarousel.value?.emblaApi?.value?.scrollPrev()
@@ -215,54 +223,78 @@ function nextTestimonial() {
             <UCard v-if="academy.themes.length > 0">
               <div class="p-4 sm:p-8">
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">Syllabus</h2>
-                <UAccordion
-                  type="multiple"
-                  :items="syllabusItems"
-                  :ui="{
-                    root: 'space-y-4',
-                    item: 'bg-slate-50 rounded-xl border-none px-6',
-                    trigger:
-                      'py-4 hover:no-underline cursor-pointer group',
-                    body: 'pb-4'
-                  }"
-                >
-                  <template #default="{ index }">
-                    <div class="flex items-start gap-4 text-left w-full">
+                <div class="space-y-4">
+                  <div
+                    v-for="item in adaptiveSyllabusItems"
+                    :key="item.id"
+                    class="bg-slate-50 rounded-xl"
+                  >
+                    <button
+                      v-if="item.hasSubtopics"
+                      type="button"
+                      class="w-full flex items-start gap-4 text-left px-6 py-4 group"
+                      @click="toggleSyllabus(item.id)"
+                    >
                       <div
                         class="hidden md:flex size-8 bg-primary text-white rounded-full items-center justify-center text-sm font-bold shrink-0 mt-0.5"
                       >
-                        {{ index + 1 }}
+                        {{ item.order }}
                       </div>
                       <div class="flex-1">
                         <h3 class="text-base font-bold mb-1">
-                          {{ academy.themes[index]?.title }}
+                          {{ item.title }}
                         </h3>
                         <p class="text-base text-muted">
-                          {{ academy.themes[index]?.description }}
+                          {{ item.description }}
+                        </p>
+                      </div>
+                      <UIcon
+                        name="i-ph-caret-down-bold"
+                        class="size-5 text-muted transition-transform duration-250 shrink-0 mt-1"
+                        :class="{ 'rotate-180': openSyllabusIds.has(item.id) }"
+                      />
+                    </button>
+
+                    <div v-else class="flex items-start gap-4 text-left w-full px-6 py-4">
+                      <div
+                        class="hidden md:flex size-8 bg-primary text-white rounded-full items-center justify-center text-sm font-bold shrink-0 mt-0.5"
+                      >
+                        {{ item.order }}
+                      </div>
+                      <div class="flex-1">
+                        <h3 class="text-base font-bold mb-1">
+                          {{ item.title }}
+                        </h3>
+                        <p class="text-base text-muted">
+                          {{ item.description }}
                         </p>
                       </div>
                     </div>
-                  </template>
-                  <template #body="{ index }">
+
                     <div
-                      v-if="academy.themes[index]?.topics?.length"
-                      class="space-y-2"
+                      v-if="item.hasSubtopics"
+                      class="grid transition-[grid-template-rows] duration-250 ease-in-out"
+                      :class="openSyllabusIds.has(item.id) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
                     >
-                      <div
-                        v-for="topic in academy.themes[index]!.topics"
-                        :key="topic.id"
-                        class="flex items-center gap-3 px-4 py-2.5 bg-white rounded-lg"
-                      >
-                        <div
-                          class="size-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-semibold shrink-0"
-                        >
-                          {{ topic.order }}
+                      <div class="overflow-hidden">
+                        <div class="space-y-2 px-6 pb-4">
+                          <div
+                            v-for="topic in item.subtopics"
+                            :key="topic.id"
+                            class="flex items-center gap-3 px-4 py-2.5 bg-white rounded-lg"
+                          >
+                            <div
+                              class="size-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-semibold shrink-0"
+                            >
+                              {{ topic.order }}
+                            </div>
+                            <span class="text-base">{{ topic.title }}</span>
+                          </div>
                         </div>
-                        <span class="text-base">{{ topic.title }}</span>
                       </div>
                     </div>
-                  </template>
-                </UAccordion>
+                  </div>
+                </div>
               </div>
             </UCard>
             <UCard v-if="(academy.instructors?.length ?? 0) > 0" class="py-8">
@@ -419,7 +451,7 @@ function nextTestimonial() {
                     </UTabs>
                   </template>
                   <template v-else-if="(academy.pricing?.length ?? 0) === 1">
-                    <div class="px-6 pb-6 pt-4">
+                    <div class="pt-6">
                       <AcademyPricingContent
                         :tier="academy.pricing[0]!"
                         :academy="academy"
