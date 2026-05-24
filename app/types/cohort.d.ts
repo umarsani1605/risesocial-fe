@@ -67,6 +67,7 @@ interface AdminCohortPlacement {
   academy_id: number
   user_id: number
   status: string
+  completed_at?: string | null
   placed_at: string | null
   user: {
     id: number

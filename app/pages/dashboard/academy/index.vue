@@ -16,7 +16,8 @@ const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, compl
 
 const enrollments = computed(() =>
   [...(enrollmentsData.value?.data ?? [])].sort(
-    (a, b) => (STATUS_ORDER[a.cohort?.status ?? ''] ?? 99) - (STATUS_ORDER[b.cohort?.status ?? ''] ?? 99)
+    (a, b) =>
+      (STATUS_ORDER[a.cohort?.status ?? ''] ?? 99) - (STATUS_ORDER[b.cohort?.status ?? ''] ?? 99)
   )
 )
 </script>
@@ -42,11 +43,24 @@ const enrollments = computed(() =>
       </div>
     </template>
 
-    <div v-if="enrollments.length === 0" class="text-center py-8">
-      <UIcon name="i-ph-graduation-cap-bold" class="size-12 text-muted mx-auto mb-3" />
-      <p class="font-medium mb-1">No programs yet</p>
-      <p class="text-sm text-muted mb-4">Explore our academy programs and start learning</p>
-      <UButton to="/academy" color="primary" variant="light" size="sm"> Explore Academy </UButton>
+    <div
+      v-if="enrollments.length === 0"
+      class="flex flex-col items-center justify-center py-12 text-center gap-4 rounded-xl"
+    >
+      <div
+        class="size-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center"
+      >
+        <UIcon name="i-ph-graduation-cap-bold-duotone" class="size-8 text-slate-400" />
+      </div>
+      <div>
+        <p class="text-base font-semibold text-slate-800">No programs yet</p>
+        <p class="text-sm text-slate-500 mt-2 max-w-sm leading-relaxed">
+          Explore our academy programs and start learning.
+        </p>
+      </div>
+      <UButton to="/academy" color="primary" variant="solid" size="sm" class="mt-2">
+        Explore Academy
+      </UButton>
     </div>
 
     <div v-else class="flex flex-col gap-4">

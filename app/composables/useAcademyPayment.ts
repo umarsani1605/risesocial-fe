@@ -6,7 +6,7 @@
 import type { PaymentCustomer } from '@/schemas/user'
 
 interface EnrollmentResponse {
-  enrollment_id: number
+  enrollment_id: number | null
   transaction_code: string
   amount: number
   currency: string

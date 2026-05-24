@@ -23,7 +23,9 @@ const {
   { server: false, default: () => ({ data: [] }) }
 )
 
-const enrollments = computed(() => rawData.value?.data ?? [])
+const enrollments = computed(() =>
+  (rawData.value?.data ?? []).filter((enrollment) => enrollment.transaction?.status === 'paid')
+)
 
 // ── Filters ──────────────────────────────────────────────────
 const search = ref('')
@@ -116,6 +118,7 @@ function toPlacementAdapter(enrollment: AcademyEnrollmentItem): AdminCohortPlace
     academy_id: enrollment.academy_id,
     user_id: enrollment.user_id,
     status: enrollment.completed_at ? 'completed' : 'active',
+    completed_at: enrollment.completed_at,
     placed_at: null,
     user: enrollment.user,
     certificate: enrollment.placement?.certificate
@@ -261,14 +264,14 @@ const columns: TableColumn<AcademyEnrollmentItem>[] = [
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) => {
       const isPlaced = !!row.original.placement
-      const hasCert = !!row.original.placement?.certificate
+      const isCompleted = !!row.original.completed_at
       return h(UButton, {
         label: isPlaced ? 'Move Cohort' : 'Assign Cohort',
         color: 'primary',
         variant: 'light',
         size: 'sm',
         leadingIcon: isPlaced ? 'i-ph-arrows-left-right-bold' : 'i-ph-plus-bold',
-        disabled: !canEdit.value || hasCert,
+        disabled: !canEdit.value || isCompleted,
         onClick: () => openAssignModal(row.original)
       })
     }

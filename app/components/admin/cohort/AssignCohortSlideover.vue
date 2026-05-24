@@ -30,7 +30,7 @@ const isCurrentCohortSelected = computed(
   () => isTransferMode.value && props.selectedCohortId === props.placement?.cohort_id
 )
 
-const hasCertificate = computed(() => !!props.placement?.certificate)
+const isCompleted = computed(() => props.placement?.status === 'completed')
 
 const isUnassignConfirmOpen = ref(false)
 
@@ -87,12 +87,12 @@ function selectCohort(id: number) {
 
         <div class="flex-1 overflow-y-auto p-4 space-y-8">
           <UAlert
-            v-if="hasCertificate"
+            v-if="isCompleted"
             color="primary"
             variant="subtle"
             icon="i-ph-certificate-bold"
             title="Academy completed"
-            description="This student has already completed the academy and received a certificate. Transfer and unassign are disabled."
+            description="This student has already completed the academy. Transfer and unassign are disabled."
           />
           <div v-if="placement" class="flex flex-col gap-2">
             <p class="font-bold mb-2">Student Details</p>
@@ -120,8 +120,15 @@ function selectCohort(id: number) {
               <UIcon name="i-ph-spinner-gap-bold" class="size-6 animate-spin text-muted" />
             </div>
 
-            <div v-else-if="cohorts.length === 0" class="py-6 text-center text-sm text-muted">
-              No cohorts available for this academy.
+            <div v-else-if="cohorts.length === 0" class="py-6 text-center">
+              <p class="text-sm text-muted">No cohorts available for this academy.</p>
+              <UButton
+                to="/admin/cohorts"
+                label="Add Cohort"
+                variant="light"
+                size="sm"
+                class="mt-4"
+              />
             </div>
 
             <div v-else class="space-y-2">
@@ -178,7 +185,7 @@ function selectCohort(id: number) {
               color="error"
               variant="light"
               :loading="isDroppingStudent"
-              :disabled="isAssigning || hasCertificate"
+              :disabled="isAssigning || isCompleted"
               @click="isUnassignConfirmOpen = true"
             />
             <div class="flex-1" />
@@ -194,7 +201,7 @@ function selectCohort(id: number) {
               color="primary"
               :loading="isAssigning"
               :disabled="
-                !selectedCohortId || isCurrentCohortSelected || isDroppingStudent || hasCertificate
+                !selectedCohortId || isCurrentCohortSelected || isDroppingStudent || isCompleted
               "
               @click="emit('confirm')"
             />

@@ -164,37 +164,37 @@ export default defineAppConfig({
           color: 'primary',
           variant: 'light',
           class:
-            'text-gray-500 hover:text-primary hover:bg-primary-50 hover:border-primary-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+            'text-gray-500 hover:text-primary hover:bg-primary-50 hover:border-primary-100 disabled:hover:bg-white disabled:hover:border-default disabled:hover:text-gray-500 aria-disabled:hover:bg-white aria-disabled:hover:border-default aria-disabled:hover:text-gray-500'
         },
         {
           color: 'neutral',
           variant: 'light',
           class:
-            'text-gray-500 hover:text-neutral hover:bg-neutral-50 hover:border-neutral-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+            'text-gray-500 hover:text-neutral hover:bg-neutral-50 hover:border-neutral-100 disabled:hover:bg-white disabled:hover:border-default disabled:hover:text-gray-500 aria-disabled:hover:bg-white aria-disabled:hover:border-default aria-disabled:hover:text-gray-500'
         },
         {
           color: 'success',
           variant: 'light',
           class:
-            'text-gray-500 hover:text-success hover:bg-success-50 hover:border-success-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+            'text-gray-500 hover:text-success hover:bg-success-50 hover:border-success-100 disabled:hover:bg-white disabled:hover:border-default disabled:hover:text-gray-500 aria-disabled:hover:bg-white aria-disabled:hover:border-default aria-disabled:hover:text-gray-500'
         },
         {
           color: 'warning',
           variant: 'light',
           class:
-            'text-gray-500 hover:text-warning hover:bg-warning-50 hover:border-warning-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+            'text-gray-500 hover:text-warning hover:bg-warning-50 hover:border-warning-100 disabled:hover:bg-white disabled:hover:border-default disabled:hover:text-gray-500 aria-disabled:hover:bg-white aria-disabled:hover:border-default aria-disabled:hover:text-gray-500'
         },
         {
           color: 'error',
           variant: 'light',
           class:
-            'text-gray-500 hover:text-error hover:bg-error-50 hover:border-error-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+            'text-gray-500 hover:text-error hover:bg-error-50 hover:border-error-100 disabled:hover:bg-white disabled:hover:border-default disabled:hover:text-gray-500 aria-disabled:hover:bg-white aria-disabled:hover:border-default aria-disabled:hover:text-gray-500'
         },
         {
           color: 'info',
           variant: 'light',
           class:
-            'text-gray-500 hover:text-info hover:bg-info-50 hover:border-info-100 hover:disabled:bg-white hover:disabled:border-default hover:disabled:text-gray-500'
+            'text-gray-500 hover:text-info hover:bg-info-50 hover:border-info-100 disabled:hover:bg-white disabled:hover:border-default disabled:hover:text-gray-500 aria-disabled:hover:bg-white aria-disabled:hover:border-default aria-disabled:hover:text-gray-500'
         },
         {
           color: 'primary',

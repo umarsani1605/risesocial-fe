@@ -137,12 +137,16 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
           </template>
           <div
             v-if="recentEnrollments.length === 0"
-            class="flex flex-col items-center justify-center py-10 text-center gap-4 rounded-xl"
+            class="flex flex-col items-center justify-center py-12 text-center gap-4 rounded-xl"
           >
-            <UIcon name="i-ph-graduation-cap-bold" class="size-12 py-8 text-slate-400" />
+            <div
+              class="size-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center"
+            >
+              <UIcon name="i-ph-graduation-cap-duotone" class="size-8 text-slate-400" />
+            </div>
             <div>
-              <p class="font-semibold text-slate-800">No active program</p>
-              <p class="text-sm text-slate-500 mt-1 max-w-xs">
+              <p class="text-base font-semibold text-slate-800">No active program</p>
+              <p class="text-sm text-slate-500 mt-2 max-w-sm leading-relaxed">
                 You are not currently enrolled in any learning program.
               </p>
             </div>
@@ -164,7 +168,7 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
       <div class="lg:col-span-4 flex flex-col gap-6">
         <UCard
           class="border border-default/50"
-          :class="'basis-0 grow-[3]'"
+          :class="'lg:basis-0 lg:grow-[3]'"
           :ui="{ header: 'p-0!', body: 'p-4!' }"
         >
           <template #header>
@@ -192,21 +196,21 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
               class="py-10 text-center flex flex-col items-center gap-3"
             >
               <div
-                class="size-14 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center"
+                class="size-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center"
               >
-                <UIcon name="i-ph-calendar-blank-duotone" class="size-7 text-slate-400" />
+                <UIcon name="i-ph-calendar-blank-duotone" class="size-8 text-slate-400" />
               </div>
               <div>
-                <p class="text-sm font-semibold text-slate-700">No upcoming schedules</p>
-                <p class="text-xs text-slate-500 mt-1">Enjoy your free time!</p>
+                <p class="text-base font-semibold text-slate-700">No upcoming schedules</p>
+                <p class="text-sm text-slate-500 mt-1">Enjoy your free time!</p>
               </div>
             </div>
           </div>
         </UCard>
 
         <UCard
-          class="border border-default/50"
-          :class="'basis-0 grow-[2]'"
+          class="border border-default/50 min-h-[220px]"
+          :class="'lg:basis-0 lg:grow-[2]'"
           :ui="{ header: 'p-0!', body: 'p-4!' }"
         >
           <template #header>
@@ -223,7 +227,7 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
 
           <NuxtLink
             to="/programs/rise-young-leaders-summit"
-            class="flex items-center gap-4 p-2 rounded-lg hover:bg-slate-50 transition-colors"
+            class="flex min-h-[140px] gap-4 p-2 rounded-lg hover:bg-slate-50 transition-colors"
           >
             <NuxtImg
               src="/images/rise_young_leader.png"
