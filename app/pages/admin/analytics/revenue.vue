@@ -2,18 +2,15 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Revenue Analytics',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.transactions'
 })
 
 useSeoMeta({ title: 'Revenue Analytics - Rise Social' })
 
 const analytics = useAnalytics()
 
-const dateRange = ref<AnalyticsDateRange>({
-  period: '30d',
-  start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-  end: new Date()
-})
+const dateRange = ref<AnalyticsDateRange>(periodToDateRange('30d'))
 
 const revenueTrendData = useLazyAsyncData(
   'analytics:revenue-trend',
@@ -84,11 +81,11 @@ const isStatsLoading = computed(() => isTrendLoading.value || isPaymentStatusLoa
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex justify-end">
+    <div class="flex justify-start lg:justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
       <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" :loading="isStatsLoading" />
     </div>
 

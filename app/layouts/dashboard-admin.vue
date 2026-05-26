@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
+import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
 import { ADMIN_STUDENTS_NAV_BADGE_ASYNC_KEY } from '@/utils/adminStudents'
 
 const route = useRoute()
@@ -7,12 +7,12 @@ const { api } = useApi()
 
 const open = ref(false)
 
-const { user, logout, fullName, initials, hasPermission } = useAuth()
+const { user, logout, fullName, initials, hasPermission, isSuperAdmin } = useAuth()
 
 const { data: studentBadgeRaw } = useLazyAsyncData(
   ADMIN_STUDENTS_NAV_BADGE_ASYNC_KEY,
   async () => {
-    if (!hasPermission('admin.academy')) {
+    if (!hasPermission('admin.cohort')) {
       return { data: [] as Array<{ completed_at: string | null; placement: unknown | null }> }
     }
 
@@ -39,13 +39,6 @@ const menuItems: DropdownMenuItem[][] = [
       label: 'Back to Home',
       icon: 'i-ph-house-bold',
       to: '/'
-    }
-  ],
-  [
-    {
-      label: 'Settings',
-      icon: 'i-ph-gear-bold',
-      to: '/dashboard/setting'
     }
   ],
   [
@@ -130,23 +123,10 @@ const analyticsLinks = computed<NavigationMenuItem[]>(() => [
         }
       ]
     : []),
-  ...(hasPermission('admin.academy')
-    ? [
-        {
-          label: 'Academies',
-          icon: 'i-ph-graduation-cap-duotone',
-          to: '/admin/analytics/academies',
-          active: isActive('/admin/analytics/academies'),
-          onSelect: () => {
-            open.value = false
-          }
-        }
-      ]
-    : []),
   ...(hasPermission('admin.ryls')
     ? [
         {
-          label: 'Programs',
+          label: 'Rise Young Leaders',
           icon: 'i-ph-medal-duotone',
           to: '/admin/analytics/programs',
           active: isActive('/admin/analytics/programs'),
@@ -158,8 +138,8 @@ const analyticsLinks = computed<NavigationMenuItem[]>(() => [
     : [])
 ])
 
-const academyLinks = computed<NavigationMenuItem[]>(() =>
-  hasPermission('admin.academy')
+const academyLinks = computed<NavigationMenuItem[]>(() => [
+  ...(hasPermission('admin.academy')
     ? [
         {
           label: 'All Academy',
@@ -169,7 +149,11 @@ const academyLinks = computed<NavigationMenuItem[]>(() =>
           onSelect: () => {
             open.value = false
           }
-        },
+        }
+      ]
+    : []),
+  ...(hasPermission('admin.cohort')
+    ? [
         {
           label: 'Cohorts',
           icon: 'i-ph-list-dashes-duotone',
@@ -197,11 +181,11 @@ const academyLinks = computed<NavigationMenuItem[]>(() =>
           }
         }
       ]
-    : []
-)
+    : [])
+])
 
-const userLinks = computed<NavigationMenuItem[]>(() =>
-  hasPermission('admin.users')
+const userLinks = computed<NavigationMenuItem[]>(() => [
+  ...(hasPermission('admin.users')
     ? [
         {
           label: 'All Users',
@@ -211,7 +195,11 @@ const userLinks = computed<NavigationMenuItem[]>(() =>
           onSelect: () => {
             open.value = false
           }
-        },
+        }
+      ]
+    : []),
+  ...(isSuperAdmin.value
+    ? [
         {
           label: 'Administrator',
           icon: 'i-ph-shield-duotone',
@@ -222,8 +210,8 @@ const userLinks = computed<NavigationMenuItem[]>(() =>
           }
         }
       ]
-    : []
-)
+    : [])
+])
 
 const navMenuUi = {
   item: 'relative px-4 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:w-1 after:h-[90%] after:rounded-r-full after:transition-colors has-[[aria-current=page]]:after:bg-primary'
@@ -253,8 +241,10 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
       v-model:open="open"
       resizable
       collapsible
+      :toggle="false"
       :default-size="14"
-      class="bg-white"
+      :min-size="18"
+      class="bg-white min-w-[240px]"
       :ui="{
         header: 'border-b border-default h-18!',
         body: 'py-8 px-0',
@@ -262,21 +252,32 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
       }"
     >
       <template #header="{ collapsed }">
-        <div class="flex items-center h-14 w-full" :class="collapsed ? 'justify-center' : 'px-1'">
-          <NuxtLink to="/admin" class="flex items-center justify-center w-full">
+        <div
+          class="flex items-center h-14 w-full gap-2"
+          :class="collapsed ? 'justify-center' : 'justify-between px-1'"
+        >
+          <NuxtLink to="/admin" class="flex items-center shrink-0">
             <NuxtImg
               src="/images/logo_admin.png"
               alt="Rise Social"
-              class="h-8 w-auto"
+              class="h-8 w-auto shrink-0"
               :class="collapsed ? 'hidden' : 'block'"
             />
             <NuxtImg
               v-if="collapsed"
               src="/images/logo_small.png"
               alt="Rise Social"
-              class="h-8 w-auto"
+              class="h-8 w-auto shrink-0"
             />
           </NuxtLink>
+          <UButton
+            v-if="!collapsed"
+            icon="i-ph-x-bold"
+            color="neutral"
+            variant="ghost"
+            class="lg:hidden"
+            @click="open = false"
+          />
         </div>
       </template>
 
@@ -367,6 +368,7 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
         <UDashboardNavbar
           :title="(route.meta.navbarTitle as string) || ''"
           :icon="(route.meta.navbarIcon as string) || undefined"
+          toggle-side="right"
           :ui="{ right: 'gap-3' }"
           class="bg-white h-18!"
         >

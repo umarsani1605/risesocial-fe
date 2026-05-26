@@ -2,18 +2,15 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'User Analytics',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.users'
 })
 
 useSeoMeta({ title: 'User Analytics - Rise Social' })
 
 const analytics = useAnalytics()
 
-const dateRange = ref<AnalyticsDateRange>({
-  period: '30d',
-  start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-  end: new Date()
-})
+const dateRange = ref<AnalyticsDateRange>(periodToDateRange('30d'))
 
 const registrationsTrendData = useLazyAsyncData(
   'analytics:registrations-trend',
@@ -63,7 +60,7 @@ const isStatsLoading = computed(() => isRegistrationsLoading.value || isUserDist
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex justify-end">
+    <div class="flex justify-start lg:justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 

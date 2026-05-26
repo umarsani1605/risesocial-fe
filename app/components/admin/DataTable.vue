@@ -73,7 +73,7 @@ defineExpose({
   <AdminCard :ui="{ root: 'overflow-scroll', body: 'p-0!' }">
     <template #header>
       <slot v-if="$slots.toolbar" name="toolbar" />
-      <div v-else class="flex flex-wrap items-center justify-between">
+      <div v-else class="flex flex-wrap items-center justify-between gap-y-4">
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <UInput
             v-if="search !== undefined"
@@ -85,7 +85,7 @@ defineExpose({
           />
           <slot name="toolbar-left" />
         </div>
-        <div class="mt-2 w-full sm:mt-0 sm:w-auto">
+        <div class="w-full sm:w-auto">
           <slot name="toolbar-right" />
         </div>
       </div>

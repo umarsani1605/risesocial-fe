@@ -3,6 +3,12 @@ import type { TableColumn } from '@nuxt/ui'
 import type { AdminTransaction } from '@/types'
 import { PRODUCT_TYPE_LABEL, PAYMENT_METHOD_LABEL, PROVIDER_LABEL, formatProductName } from '@/constants/transaction'
 
+const PROVIDER_LOGO: Record<string, { src: string; class: string }> = {
+  midtrans: { src: '/images/payment-logo/midtrans.png', class: 'h-3.5 object-contain' },
+  paypal: { src: '/images/payment-logo/paypal.png', class: 'h-4 object-contain' },
+  paypal_manual: { src: '/images/payment-logo/paypal.png', class: 'h-4 object-contain' }
+}
+
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Dashboard',
@@ -12,16 +18,8 @@ definePageMeta({
     () => {
       const { hasPermission } = useAuth()
       if (hasPermission('admin.dashboard')) return
-      const fallback: Array<{ key: string; to: string }> = [
-        { key: 'admin.transactions', to: '/admin/transactions' },
-        { key: 'admin.ryls', to: '/admin/programs' },
-        { key: 'admin.academy', to: '/admin/academies' },
-        { key: 'admin.users', to: '/admin/users' },
-        { key: 'admin.jobs', to: '/admin/jobs' },
-        { key: 'admin.statistics', to: '/admin/analytics/revenue' }
-      ]
-      const target = fallback.find((entry) => hasPermission(entry.key))
-      if (target) return navigateTo(target.to, { replace: true })
+      const target = getAdminFallbackPath(hasPermission)
+      return navigateTo(target ?? '/', { replace: true })
     }
   ]
 })
@@ -152,27 +150,26 @@ const columns: TableColumn<AdminTransaction>[] = [
     }
   },
   {
-    accessorKey: 'provider',
-    header: 'Provider',
-    cell: ({ row }) => {
-      const provider = row.getValue('provider') as string | null
-      return h(
-        'span',
-        { class: 'text-sm' },
-        provider ? (PROVIDER_LABEL[provider] ?? provider) : '—'
-      )
-    }
-  },
-  {
     accessorKey: 'payment_method',
     header: 'Method',
     cell: ({ row }) => {
-      const method = row.getValue('payment_method') as string | null
-      return h(
-        'span',
-        { class: 'text-sm' },
-        method ? (PAYMENT_METHOD_LABEL[method] ?? method) : '—'
-      )
+      const tx = row.original
+      const providerLabel = PROVIDER_LABEL[tx.provider] ?? tx.provider
+      const providerLogo = PROVIDER_LOGO[tx.provider]
+      const methodLabel = tx.payment_method
+        ? (PAYMENT_METHOD_LABEL[tx.payment_method] ?? tx.payment_method)
+        : ''
+      return h('div', { class: 'text-sm space-y-2' }, [
+        providerLogo
+          ? h('img', {
+              src: providerLogo.src,
+              alt: providerLabel,
+              title: providerLabel,
+              class: providerLogo.class
+            })
+          : h('div', { class: 'font-medium' }, providerLabel),
+        h('div', { class: 'text-muted' }, methodLabel)
+      ])
     }
   },
   {
@@ -199,7 +196,7 @@ const columns: TableColumn<AdminTransaction>[] = [
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
       <AnalyticsStatCard
         v-for="stat in statCards"
         :key="stat.title"
@@ -208,7 +205,7 @@ const columns: TableColumn<AdminTransaction>[] = [
       />
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <AnalyticsAreaChart
         :data="overview?.revenueTrend ?? []"
         title="Revenue Trend"

@@ -2,18 +2,14 @@
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Academy Analytics',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'superadmin']
 })
 
 useSeoMeta({ title: 'Academy Analytics - Rise Social' })
 
 const analytics = useAnalytics()
 
-const dateRange = ref<AnalyticsDateRange>({
-  period: '30d',
-  start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-  end: new Date()
-})
+const dateRange = ref<AnalyticsDateRange>(periodToDateRange('30d'))
 
 const enrollmentData = useLazyAsyncData(
   'analytics:enrollment-by-academy',
@@ -59,7 +55,7 @@ const isLoading = computed(() =>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex justify-end">
+    <div class="flex justify-start lg:justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 

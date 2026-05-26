@@ -7,19 +7,16 @@ const GENDER_LABEL_MAP = Object.fromEntries(GENDER_OPTIONS.map((g) => [g.value, 
 
 definePageMeta({
   layout: 'dashboard-admin',
-  navbarTitle: 'Program Analytics',
-  middleware: ['auth', 'admin']
+  navbarTitle: 'Rise Young Leaders Analytics',
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.ryls'
 })
 
-useSeoMeta({ title: 'Program Analytics - Rise Social' })
+useSeoMeta({ title: 'Rise Young Leaders Analytics - Rise Social' })
 
 const analytics = useAnalytics()
 
-const dateRange = ref<AnalyticsDateRange>({
-  period: '30d',
-  start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-  end: new Date()
-})
+const dateRange = ref<AnalyticsDateRange>(periodToDateRange('30d'))
 
 const summaryData = useLazyAsyncData(
   'analytics:programs-summary',
@@ -104,7 +101,7 @@ const isDemographicsLoading = computed(() =>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex justify-end">
+    <div class="flex justify-start lg:justify-end">
       <AnalyticsTimeRangeFilter v-model="dateRange" />
     </div>
 
@@ -117,7 +114,7 @@ const isDemographicsLoading = computed(() =>
     <AnalyticsAreaChart
       :data="trendChartData"
       title="Submission Trend"
-      :height="288"
+      :height="280"
       :loading="isTrendLoading"
     />
 
@@ -170,7 +167,7 @@ const isDemographicsLoading = computed(() =>
       class="h-full"
       :data="nationalityChartData"
       title="Nationality (Top 10)"
-      :height="288"
+      :height="240"
       :loading="isDemographicsLoading"
     />
   </div>

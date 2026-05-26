@@ -5,7 +5,8 @@ import type { Job, RateLimitData } from '@/types'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Jobs Management',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.jobs'
 })
 
 useSeoMeta({ title: 'Jobs Management - Rise Social' })
@@ -398,9 +399,9 @@ const columns: TableColumn<Job>[] = [
     pinned-shadow
   >
     <template #toolbar>
-      <div class="flex flex-wrap items-center justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-y-4">
         <!-- Left: Search + Filters -->
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <UInput
             v-model="search"
             icon="i-ph-magnifying-glass-bold"
@@ -423,7 +424,7 @@ const columns: TableColumn<Job>[] = [
         </div>
 
         <!-- Right: Add Job + Sync button group -->
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div class="flex flex-wrap flex-row-reverse lg:flex-row items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto">
           <div class="hidden sm:block h-4 w-px bg-default" />
           <UTooltip :text="rateLimitText">
             <div class="flex items-center gap-1.5 cursor-default select-none">

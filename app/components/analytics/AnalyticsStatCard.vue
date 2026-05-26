@@ -25,7 +25,7 @@ const trendColor = computed(() => ((props.stat.trend ?? 0) >= 0 ? 'success' : 'e
 
 <template>
   <UCard class="shadow-none!" :ui="{ body: 'p-4!' }">
-    <div v-if="loading" class="flex gap-6">
+    <div v-if="loading" class="flex flex-col lg:flex-row gap-4 lg:gap-6">
       <USkeleton class="size-12 rounded-xl" />
       <div class="flex flex-1 flex-col gap-2">
         <div class="flex items-center justify-between gap-2">
@@ -39,7 +39,7 @@ const trendColor = computed(() => ((props.stat.trend ?? 0) >= 0 ? 'success' : 'e
         </div>
       </div>
     </div>
-    <div v-else class="flex gap-6">
+    <div v-else class="flex flex-col lg:flex-row gap-4 lg:gap-6">
       <div
         class="size-12 flex items-center justify-center rounded-xl border"
         :class="iconColor.bg + ' ' + iconColor.border"
