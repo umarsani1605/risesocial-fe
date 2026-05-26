@@ -36,11 +36,11 @@ const featuresData: FeatureItem[] = [
 <template>
   <div class="bg-slate-50">
     <!-- Hero Section -->
-    <UPageSection class="bg-white py-8 lg:py-12">
-      <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
+    <UPageSection class="bg-white py-4 lg:py-8">
+      <div class="flex flex-col-reverse lg:flex-row gap-4 lg:gap-8 items-start lg:items-center">
         <!-- Left Content -->
         <div class="flex-1 space-y-6 lg:space-y-8">
-          <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold text-slate-800 leading-tight">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-800 leading-tight">
             Rise & Thrive: Youth Empowerment Program
           </h1>
           <div class="space-y-3 lg:space-y-4">
@@ -59,6 +59,7 @@ const featuresData: FeatureItem[] = [
               target="_blank"
               external
               size="lg"
+              color="neutral"
               class="bg-[#0a5c5b] hover:bg-[#095351] text-white"
             >
               Collaborate with Us!
@@ -100,8 +101,8 @@ const featuresData: FeatureItem[] = [
     </UPageSection>
 
     <!-- Content Section 1 -->
-    <UPageSection class="bg-white py-8 lg:py-12">
-      <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
+    <UPageSection class="bg-white py-4 lg:py-8">
+      <div class="flex flex-col lg:flex-row gap-4 lg:gap-8 items-start lg:items-center">
         <div class="relative flex-1 flex items-start justify-start">
           <NuxtImg
             src="/images/programs/rise-and-thrive/rise_and_thrive_2.jpg"
@@ -125,8 +126,8 @@ const featuresData: FeatureItem[] = [
     </UPageSection>
 
     <!-- Content Section 2 -->
-    <UPageSection class="bg-white py-8 lg:py-12">
-      <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
+    <UPageSection class="bg-white py-4 lg:py-8">
+      <div class="flex flex-col-reverse lg:flex-row gap-4 lg:gap-8 items-start lg:items-center">
         <div class="flex-1 space-y-6 lg:space-y-8">
           <div class="space-y-3 lg:space-y-4">
             <p class="text-base lg:text-lg text-muted leading-relaxed">
@@ -138,7 +139,7 @@ const featuresData: FeatureItem[] = [
             </p>
           </div>
         </div>
-        <div class="relative flex-1 flex items-end justify-end">
+        <div class="relative flex-1 flex items-start justify-start lg:items-end lg:justify-end">
           <NuxtImg
             src="/images/programs/rise-and-thrive/rise_and_thrive_3.jpg"
             alt="Rise & Thrive: Youth Empowerment Program"
@@ -150,21 +151,22 @@ const featuresData: FeatureItem[] = [
     </UPageSection>
 
     <!-- CTA Section -->
-    <UPageSection class="bg-white py-8 lg:py-12">
+    <UPageSection class="bg-white py-4 lg:py-8">
       <div
-        class="text-center bg-gradient-to-r from-[#0a5c5b]/10 to-[#095351]/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12"
+        class="bg-gradient-to-r from-[#0a5c5b]/10 to-[#095351]/10 rounded-2xl lg:rounded-3xl p-6 sm:p-8 lg:p-12"
       >
         <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-default mb-3 lg:mb-4">
           Ready to Accelerate Your Sustainability Career?
         </h3>
-        <p class="text-base lg:text-lg text-muted mb-4 lg:mb-6 max-w-2xl mx-auto">
+        <p class="text-base lg:text-lg text-muted mb-4 lg:mb-6 max-w-2xl">
           Join our comprehensive bootcamp programs and get direct access to job opportunities with
           our hiring partners
         </p>
-        <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
+        <div class="flex flex-row gap-3 lg:gap-4">
           <UButton
             to="/programs"
             size="lg"
+            color="neutral"
             class="bg-[#0a5c5b] text-white hover:bg-[#095351] text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
           >
             View All Programs
@@ -173,6 +175,7 @@ const featuresData: FeatureItem[] = [
             to="/contact"
             size="lg"
             variant="light"
+            color="neutral"
             class="border-[#0a5c5b] text-[#0a5c5b] hover:bg-[#0a5c5b] hover:text-white text-sm lg:text-base px-6 lg:px-8 py-2 lg:py-3"
           >
             Contact Our Team

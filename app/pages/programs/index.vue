@@ -190,7 +190,7 @@ const testimonialsItems = [
       </UCarousel>
     </UPageSection>
     <UPageSection class="bg-slate-50" :ui="{ container: 'pb-0!', title: 'text-2xl lg:text-3xl' }">
-      <div class="flex flex-col lg:flex-row gap-8 lg:gap-24 items-center">
+      <div class="flex flex-col-reverse lg:flex-row gap-8 lg:gap-24 items-center">
         <div class="w-64 sm:w-80 lg:w-[40rem]">
           <NuxtImg
             src="/images/rise_mobile_app.png"

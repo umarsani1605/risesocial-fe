@@ -144,7 +144,7 @@ function nextTestimonial() {
         />
         <div
           v-if="academy.image_url"
-          class="lg:hidden -mx-4 -mt-4 md:-mx-6 md:-mt-6 mb-6 aspect-square overflow-hidden rounded-xl bg-white/10"
+          class="lg:hidden -mx-4 -mt-4 md:-mx-6 md:mt-0 mb-6 aspect-square overflow-hidden rounded-2xl bg-white/10"
         >
           <img
             :src="academy.image_url"
@@ -152,7 +152,7 @@ function nextTestimonial() {
             class="w-full h-full object-cover"
           />
         </div>
-        <div class="w-full md:w-3/4 text-white">
+        <div class="w-full md:w-3/4 lg:w-2/3 xl:w-3/4 text-white">
           <h1 class="text-2xl sm:text-3xl lg:text-5xl font-bold mb-4">
             {{ academy.title }}
           </h1>
@@ -181,20 +181,20 @@ function nextTestimonial() {
         </div>
       </div>
       <div class="relative">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 md:pr-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:pr-6">
           <!-- Left Column - Content -->
-          <div class="lg:col-span-3 space-y-8">
+          <div class="lg:col-span-2 xl:col-span-3 space-y-8">
             <!-- About Program -->
-            <UCard v-if="academy.description" class="py-8">
-              <div class="px-8">
+            <UCard v-if="academy.description">
+              <div>
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">About Program</h2>
                 <p class="text-base text-muted leading-relaxed">{{ academy.description }}</p>
               </div>
             </UCard>
 
             <!-- What You'll Get -->
-            <UCard v-if="(academy.features?.length ?? 0) > 0" class="py-8">
-              <div class="px-4 sm:px-8">
+            <UCard v-if="(academy.features?.length ?? 0) > 0">
+              <div>
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">What You'll Get</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div
@@ -221,7 +221,7 @@ function nextTestimonial() {
 
             <!-- Syllabus -->
             <UCard v-if="academy.themes.length > 0">
-              <div class="p-4 sm:p-8">
+              <div>
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">Syllabus</h2>
                 <div class="space-y-4">
                   <div
@@ -297,21 +297,21 @@ function nextTestimonial() {
                 </div>
               </div>
             </UCard>
-            <UCard v-if="(academy.instructors?.length ?? 0) > 0" class="py-8">
-              <div class="px-8">
+            <UCard v-if="(academy.instructors?.length ?? 0) > 0">
+              <div>
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">Instructors</h2>
                 <div class="space-y-8">
                   <div
                     v-for="instructor in academy.instructors"
                     :key="instructor.id"
-                    class="flex flex-col lg:flex-row gap-4 lg:gap-12 items-start lg:items-center"
+                    class="flex flex-col md:flex-row gap-4 md:gap-8 lg:gap-12 items-start md:items-center"
                   >
                     <UAvatar
                       :src="instructor.avatar_url ?? undefined"
                       :alt="instructor.name"
                       :text="instructor.name.charAt(0)"
                       :ui="{
-                        root: 'size-20 lg:size-32 rounded-full',
+                        root: 'size-20 md:size-28 lg:size-32 rounded-full shrink-0',
                         fallback: 'bg-primary/15 text-primary text-2xl lg:text-4xl'
                       }"
                     />
@@ -328,8 +328,8 @@ function nextTestimonial() {
                 </div>
               </div>
             </UCard>
-            <UCard v-if="testimonialItems.length > 0" class="py-8">
-              <div class="px-8">
+            <UCard v-if="testimonialItems.length > 0">
+              <div>
                 <div class="flex items-center justify-between mb-6">
                   <h2 class="text-2xl sm:text-3xl font-bold">Alumni Testimonials</h2>
                   <div class="flex gap-2">
@@ -389,8 +389,8 @@ function nextTestimonial() {
                 </UCarousel>
               </div>
             </UCard>
-            <UCard v-if="faqItems.length > 0" class="py-8">
-              <div class="px-8">
+            <UCard v-if="faqItems.length > 0">
+              <div>
                 <h2 class="text-2xl sm:text-3xl font-bold mb-6">Frequently Asked Questions</h2>
                 <UAccordion
                   :items="faqItems"
@@ -407,14 +407,14 @@ function nextTestimonial() {
             </UCard>
           </div>
           <div class="lg:col-span-1 relative">
-            <div class="w-full transition-all duration-300 md:sticky md:top-24 md:-mt-66">
+            <div class="w-full transition-all duration-300 lg:sticky lg:top-24 lg:-mt-66">
               <UCard
                 :ui="{
                   body: 'p-4!'
                 }"
               >
                 <div class="space-y-0">
-                  <h2 class="block md:hidden text-2xl font-bold mb-4 px-6 pt-6">Apply Programs</h2>
+                  <h2 class="block lg:hidden text-2xl sm:text-3xl font-bold mb-6">Apply Programs</h2>
                   <div
                     class="hidden lg:flex w-full aspect-square overflow-hidden bg-slate-100 items-center justify-center rounded-lg"
                   >
