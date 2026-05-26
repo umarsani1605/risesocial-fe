@@ -191,16 +191,16 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
         class="space-y-4"
         @submit="emit('submit')"
       >
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2"
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2"
             >Title <span class="text-red-500">*</span></label
           >
           <UFormField name="title" class="flex-1">
             <UInput v-model="form.title" placeholder="Module Title" class="w-full" />
           </UFormField>
         </div>
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2">Description</label>
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2">Description</label>
           <UFormField name="description" class="flex-1">
             <UTextarea
               v-model="form.description"
@@ -210,8 +210,8 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
             />
           </UFormField>
         </div>
-        <div class="flex gap-4 items-start">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2"
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-start">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2"
             >Session Date <span class="text-red-500">*</span></label
           >
           <div class="flex-1 flex gap-2">
@@ -252,24 +252,24 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
           </div>
         </div>
 
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2"
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2"
             >Meeting Link <span class="text-red-500">*</span></label
           >
           <UFormField name="meetingLink" class="flex-1">
             <UInput v-model="form.meetingLink" placeholder="Meeting Link" class="w-full" />
           </UFormField>
         </div>
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2"
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2"
             >Attendance Link <span class="text-red-500">*</span></label
           >
           <UFormField name="attendanceLink" class="flex-1">
             <UInput v-model="form.attendanceLink" placeholder="Attendance Link" class="w-full" />
           </UFormField>
         </div>
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2">Assignment</label>
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2">Assignment</label>
           <div class="flex-1 space-y-2">
             <UButton
               :label="showAssignment ? 'Remove Assignment' : 'Add Assignment'"
@@ -355,8 +355,8 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
           </div>
         </div>
 
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2">Attachment</label>
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2">Attachment</label>
           <div class="flex-1 space-y-2">
             <UButton
               :label="showAttachment ? 'Remove Attachment' : 'Add Attachment'"
@@ -456,8 +456,8 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
           </div>
         </div>
 
-        <div class="flex gap-4">
-          <label class="text-sm font-medium w-40 shrink-0 pt-2">Status</label>
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <label class="text-sm font-medium sm:w-40 sm:shrink-0 sm:pt-2">Status</label>
           <URadioGroup
             v-model="publishStatus"
             :items="[

@@ -36,6 +36,14 @@ function toggleAll() {
 
 defineExpose({ isAnyOpen, toggleAll })
 
+function getAttachmentHref(attachment: { type: string; file_url: string | null; url: string | null }) {
+  if (attachment.type === 'file') return attachment.file_url ?? undefined
+  const raw = attachment.url?.trim()
+  if (!raw) return undefined
+  if (/^https?:\/\//i.test(raw) || raw.startsWith('//') || raw.startsWith('mailto:')) return raw
+  return `https://${raw}`
+}
+
 function formatSessionTime(module: CohortModule) {
   if (!module.session_start_time) return null
   const date = formatDateLong(module.session_start_time)
@@ -80,7 +88,7 @@ function formatSessionTime(module: CohortModule) {
             <a
               v-for="attachment in module.attachments"
               :key="attachment.id"
-              :href="attachment.type === 'file' ? attachment.file_url : attachment.url"
+              :href="getAttachmentHref(attachment)"
               target="_blank"
               class="max-w-72 flex items-center gap-2 border border-default rounded-lg overflow-hidden hover:border-slate-200 hover:bg-slate-50 transition-colors"
             >

@@ -16,6 +16,14 @@ const now = useNow({ interval: 60_000 })
 function getStatus(module: AdminCohortModule) {
   return computeModuleStatus(module, now.value)
 }
+
+function getAttachmentHref(attachment: { type: string; file_url: string | null; url: string | null }) {
+  if (attachment.type === 'file') return attachment.file_url ?? undefined
+  const raw = attachment.url?.trim()
+  if (!raw) return undefined
+  if (/^https?:\/\//i.test(raw) || raw.startsWith('//') || raw.startsWith('mailto:')) return raw
+  return `https://${raw}`
+}
 </script>
 
 <template>
@@ -32,8 +40,8 @@ function getStatus(module: AdminCohortModule) {
         <UBadge
           v-if="!module.is_published"
           label="Draft"
-          color="primary"
-          variant="light"
+          color="warning"
+          variant="subtle"
           class="shrink-0"
         />
       </div>
@@ -111,7 +119,7 @@ function getStatus(module: AdminCohortModule) {
             <AdminCohortAttachmentItem
               v-for="att in module.attachments"
               :key="att.id"
-              :href="att.file_url ?? undefined"
+              :href="getAttachmentHref(att)"
               :name="att.label || att.url || att.file_path || ''"
               :background="getAttachmentStyle(att).background"
               :foreground="getAttachmentStyle(att).foreground"
@@ -124,19 +132,20 @@ function getStatus(module: AdminCohortModule) {
     </template>
 
     <template v-if="canEdit" #footer>
-      <div class="flex justify-end gap-2">
+      <div class="flex justify-start gap-2">
+        <UButton
+          label="Edit Module"
+          icon="i-ph-pencil-simple-bold"
+          color="primary"
+          variant="subtle"
+          @click.stop="emit('edit', module)"
+        />
         <UButton
           label="Delete"
           icon="i-ph-trash-simple-bold"
           color="error"
           variant="light"
           @click.stop="emit('delete', module.id)"
-        />
-        <UButton
-          label="Edit Module"
-          icon="i-ph-pencil-simple-bold"
-          variant="light"
-          @click.stop="emit('edit', module)"
         />
       </div>
     </template>
