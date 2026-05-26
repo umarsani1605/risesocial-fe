@@ -7,7 +7,8 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Edit Academy',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.academy'
 })
 
 const route = useRoute()

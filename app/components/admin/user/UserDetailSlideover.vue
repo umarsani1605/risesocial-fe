@@ -22,7 +22,7 @@ const props = withDefaults(
     description: 'Edit user information.',
     showPermissions: false,
     showDelete: false,
-    deleteLabel: 'Hapus',
+    deleteLabel: 'Delete',
     roleItems: () => [
       { label: 'User', value: 'USER' },
       { label: 'Admin', value: 'ADMIN' }
@@ -105,6 +105,7 @@ const avatarPreviewUrl = ref('')
 const registry = ref<AdminPermissionResource[]>([])
 const userPermissions = ref<UserAdminPermission[]>([])
 const isSavingPermission = ref<string | null>(null)
+const assignableRegistry = computed(() => getAssignableAdminPermissions(registry.value))
 
 const canManagePermissions = computed(
   () => props.showPermissions && !!props.userId && isSuperAdmin.value
@@ -460,7 +461,7 @@ function handleSubmit() {
               <p class="text-xs font-bold uppercase tracking-wide">Permissions</p>
               <div class="space-y-3">
                 <div
-                  v-for="resource in registry"
+                  v-for="resource in assignableRegistry"
                   :key="resource.key"
                   class="grid grid-cols-[minmax(0,180px)_minmax(0,1fr)] gap-x-6 gap-y-2 text-sm items-center"
                 >
@@ -522,7 +523,7 @@ function handleSubmit() {
         @click="emit('delete')"
       />
       <UButton
-        label="Ubah"
+          label="Save Changes"
         color="primary"
         icon="i-ph-pencil-simple-bold"
         :loading="loading"

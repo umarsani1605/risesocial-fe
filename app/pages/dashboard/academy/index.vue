@@ -63,7 +63,7 @@ const enrollments = computed(() =>
       </UButton>
     </div>
 
-    <div v-else class="flex flex-col gap-4">
+    <div v-else class="flex flex-col gap-8 md:gap-4">
       <DashboardAcademyEnrollmentItem
         v-for="enrollment in enrollments"
         :key="enrollment.id"

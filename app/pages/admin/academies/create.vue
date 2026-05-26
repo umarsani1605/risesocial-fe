@@ -6,7 +6,9 @@ import { academyFormSchema } from '@/schemas/academy'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Add Academy',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.academy',
+  requiredPermissionLevel: 'EDITOR'
 })
 
 useSeoMeta({ title: 'Add New Academy | Rise Social' })

@@ -11,7 +11,8 @@ import { getCohortPhase } from '@/utils/cohort'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Cohort Details',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.cohort'
 })
 
 useSeoMeta({ title: 'Cohort Detail - Rise Social' })
@@ -57,7 +58,6 @@ const placementCount = computed(() => cohort.detail?.enrollment_count ?? 0)
 const tabItems: TabsItem[] = [
   { label: 'Information', slot: 'information', icon: 'i-ph-info-duotone' },
   { label: 'Modules', slot: 'modules', icon: 'i-ph-stack-duotone' },
-  { label: 'Statistics', slot: 'statistics', icon: 'i-ph-chart-line-duotone' },
   { label: 'Students', slot: 'students', icon: 'i-ph-users-duotone' },
   { label: 'Mentors', slot: 'mentors', icon: 'i-ph-user-duotone' }
 ]
@@ -208,12 +208,6 @@ const ellipsisItems = computed<DropdownMenuItem[][]>(() => [
           @edit-module="cohortModules.openEditModule"
           @delete-module="cohortModules.confirmDeleteModule"
         />
-      </template>
-
-      <template #statistics>
-        <div class="py-8 sm:py-16 text-center text-muted text-sm min-h-[200px] sm:min-h-[400px]">
-          On Planning...
-        </div>
       </template>
 
       <template #students>

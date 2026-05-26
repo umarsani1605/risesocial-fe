@@ -28,7 +28,8 @@ function getFileUrl(filePath?: string | null): string {
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Transactions',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.transactions'
 })
 
 useSeoMeta({ title: 'Transactions - Rise Social' })
@@ -46,7 +47,7 @@ const providerFilter = ref('all')
 
 const statusOptions = [{ label: 'All Status', value: 'all' }, ...TRANSACTION_STATUS_ITEMS]
 const typeOptions = [{ label: 'All Types', value: 'all' }, ...PRODUCT_TYPE_ITEMS]
-const providerOptions = [{ label: 'All Providers', value: 'all' }, ...PROVIDER_ITEMS]
+const providerOptions = [{ label: 'All Payments', value: 'all' }, ...PROVIDER_ITEMS]
 
 // ── Data Fetching (client-side filter + pagination) ───────────────────────────
 
@@ -103,10 +104,10 @@ const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
 const UIcon = resolveComponent('UIcon')
 
-const PROVIDER_LOGO: Record<string, string> = {
-  midtrans: '/images/payment-logo/midtrans.png',
-  paypal: '/images/payment-logo/paypal.png',
-  paypal_manual: '/images/payment-logo/paypal.png'
+const PROVIDER_LOGO: Record<string, { src: string; class: string }> = {
+  midtrans: { src: '/images/payment-logo/midtrans.png', class: 'h-3.5 object-contain' },
+  paypal: { src: '/images/payment-logo/paypal.png', class: 'h-4 object-contain' },
+  paypal_manual: { src: '/images/payment-logo/paypal.png', class: 'h-4 object-contain' }
 }
 
 const columns: TableColumn<AdminTransaction>[] = [
@@ -169,10 +170,10 @@ const columns: TableColumn<AdminTransaction>[] = [
       return h('div', { class: 'text-sm space-y-2' }, [
         providerLogo
           ? h('img', {
-              src: providerLogo,
+              src: providerLogo.src,
               alt: providerLabel,
               title: providerLabel,
-              class: 'h-3 object-contain'
+              class: providerLogo.class
             })
           : h('div', { class: 'font-medium' }, providerLabel),
         h('div', { class: 'text-muted' }, methodLabel)

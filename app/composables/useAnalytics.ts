@@ -12,7 +12,7 @@ function dateRangeToQuery(dateRange?: AnalyticsDateRange): Record<string, string
   }
 }
 
-function periodToDateRange(period: AnalyticsPeriod = '30d'): AnalyticsDateRange {
+export function periodToDateRange(period: AnalyticsPeriod = '30d'): AnalyticsDateRange {
   const end = new Date()
   const start = new Date(end)
   const daysByPeriod: Record<Exclude<AnalyticsPeriod, 'custom'>, number> = {

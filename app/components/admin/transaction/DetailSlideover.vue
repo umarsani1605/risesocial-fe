@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const { api } = useApi()
 const toast = useToast()
+const { canEdit } = useAdminPermission('admin.transactions')
 
 const isLoading = ref(false)
 const detail = ref<AdminTransactionDetail | null>(null)
@@ -155,7 +156,7 @@ const customerRows = computed(() => {
               <span>{{ row.value }}</span>
             </div>
             <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-              <span class="text-muted">Provider</span>
+              <span class="text-muted">Payment</span>
               <span>
                 <img
                   v-if="providerLogo"
@@ -234,7 +235,7 @@ const customerRows = computed(() => {
             <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <span class="text-muted">Full Name</span>
               <NuxtLink
-                :to="`/admin/programs/ryls?id=${detail.product_details.ryls_registration.id}`"
+                :to="`/admin/programs?id=${detail.product_details.ryls_registration.id}`"
                 target="_blank"
                 class="text-primary hover:underline flex items-center gap-1"
               >
@@ -253,7 +254,7 @@ const customerRows = computed(() => {
       </div>
     </template>
 
-    <template v-if="detail" #footer>
+    <template v-if="detail && canEdit" #footer>
       <div class="flex w-full justify-end gap-2">
         <UButton
           label="Change Status"
@@ -278,7 +279,7 @@ const customerRows = computed(() => {
   </USlideover>
 
   <AdminTransactionUpdateStatusModal
-    v-if="detail"
+    v-if="detail && canEdit"
     v-model:open="isUpdateModalOpen"
     :current-status="detail.status"
     :loading="isUpdatingStatus"

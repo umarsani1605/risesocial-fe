@@ -7,7 +7,8 @@ import { getCohortPhase } from '@/utils/cohort'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Cohorts',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.cohort'
 })
 
 useSeoMeta({ title: 'Cohorts - Rise Social' })

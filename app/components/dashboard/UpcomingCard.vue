@@ -31,7 +31,7 @@ const displayDate = computed(() => {
     class="flex gap-4 group items-center p-2 rounded-xl hover:bg-slate-100/50 transition-colors cursor-pointer"
   >
     <div
-      class="flex flex-col items-center justify-center size-16 rounded-xl bg-white border border-default"
+      class="flex flex-col items-center justify-center size-18 rounded-xl bg-white border border-default"
     >
       <span
         class="text-[10px] font-bold uppercase tracking-widest text-slate-500 leading-none mb-1"

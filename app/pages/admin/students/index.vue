@@ -5,7 +5,8 @@ import { refreshAdminStudentSurfaces } from '@/utils/adminStudents'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Students',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.cohort'
 })
 
 useSeoMeta({ title: 'Students - Rise Social' })

@@ -38,7 +38,7 @@ const tooltipTitleFormatter = (data: Record<string, unknown>) => {
 </script>
 
 <template>
-  <UCard class="shadow-none!">
+  <UCard :ui="{ root: 'shadow-none! overflow-visible' }">
     <template v-if="title" #header>
       <p class="text-sm font-semibold">{{ title }}</p>
     </template>
@@ -58,6 +58,7 @@ const tooltipTitleFormatter = (data: Record<string, unknown>) => {
         :y-formatter="yFormatter"
         :tooltip-title-formatter="tooltipTitleFormatter"
         :hide-legend="true"
+        :y-grid-line="true"
         :x-num-ticks="6"
         :x-label="xLabel"
         :y-label="yLabel"

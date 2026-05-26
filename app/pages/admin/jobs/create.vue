@@ -5,7 +5,9 @@ import { jobCreateSchema } from '@/schemas/job'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Create Job',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.jobs',
+  requiredPermissionLevel: 'EDITOR'
 })
 
 useSeoMeta({ title: 'Create Job | Rise Social' })

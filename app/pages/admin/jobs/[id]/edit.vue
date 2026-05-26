@@ -5,7 +5,8 @@ import { jobEditSchema } from '@/schemas/job'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Edit Job',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.jobs'
 })
 
 const route = useRoute()

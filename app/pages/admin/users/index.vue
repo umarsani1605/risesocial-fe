@@ -4,7 +4,8 @@ import type { TableColumn } from '@nuxt/ui'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'All Users',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.users'
 })
 
 useSeoMeta({ title: 'All Users - Rise Social' })
@@ -345,7 +346,7 @@ const columns: TableColumn<AdminUser>[] = [
     :user="selectedUserDetail"
     :loading="isDetailSaving"
     :show-delete="canEdit"
-    delete-label="Hapus User"
+    delete-label="Delete User"
     @submit="onSaveDetail"
     @delete="
       () => {

@@ -6,7 +6,8 @@ import { ACADEMY_STATUS_FILTER_OPTIONS, ACADEMY_STATUS_COLOR } from '@/constants
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'All Academy',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.academy'
 })
 
 const { api } = useApi()

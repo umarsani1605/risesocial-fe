@@ -38,6 +38,7 @@ const showPermissions = computed(
 const registry = ref<AdminPermissionResource[]>([])
 const userPermissions = ref<UserAdminPermission[]>([])
 const isSavingPermission = ref<string | null>(null)
+const assignableRegistry = computed(() => getAssignableAdminPermissions(registry.value))
 
 async function loadPermissions() {
   if (!showPermissions.value) return
@@ -151,7 +152,7 @@ async function setPermissionLevel(key: string, level: AdminAccessLevel | 'none')
             <p class="text-sm font-semibold text-highlighted mb-3">Permissions</p>
             <div class="space-y-1">
               <div
-                v-for="resource in registry"
+                v-for="resource in assignableRegistry"
                 :key="resource.key"
                 class="flex items-center justify-between gap-3 py-1.5"
               >

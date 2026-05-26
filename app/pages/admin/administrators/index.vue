@@ -4,7 +4,7 @@ import type { TableColumn } from '@nuxt/ui'
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Administrators',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'superadmin']
 })
 
 useSeoMeta({ title: 'Administrators - Rise Social' })
@@ -259,7 +259,7 @@ const columns: TableColumn<UserProfile>[] = [
     description="Edit administrator information."
     :show-permissions="true"
     :show-delete="canEdit"
-    delete-label="Hapus"
+    delete-label="Delete"
     :role-items="[
       { label: 'User', value: 'USER' },
       { label: 'Admin', value: 'ADMIN' }

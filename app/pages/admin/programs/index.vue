@@ -5,7 +5,8 @@ import { SCHOLARSHIP_TYPE_LABEL, DISCOVER_SOURCE_LABEL, PAYMENT_TYPE_LABEL } fro
 definePageMeta({
   layout: 'dashboard-admin',
   navbarTitle: 'Rise Young Leaders',
-  middleware: ['auth', 'admin']
+  middleware: ['auth', 'admin', 'admin-permission'],
+  requiredPermission: 'admin.ryls'
 })
 
 useSeoMeta({ title: 'Rise Young Leaders Scholarship - Rise Social' })

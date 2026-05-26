@@ -51,8 +51,8 @@ export default defineAppConfig({
       slots: {
         root: ['rounded-xl shadow-subtle'],
         header: ['p-6! pb-0! border-none'],
-        body: ['border-none'],
-        footer: ['pt-0! border-none']
+        body: ['p-6! border-none'],
+        footer: ['p-6! pt-0! border-none']
       }
     },
     carousel: {
