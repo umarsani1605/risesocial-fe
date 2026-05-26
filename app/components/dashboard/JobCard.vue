@@ -9,9 +9,9 @@ const locationText = computed(() => formatLocation(props.job.location ?? {}))
 <template>
   <NuxtLink
     :to="`/opportunities/${job.company.slug}/${job.slug}`"
-    class="flex gap-4 group items-stretch justify-between p-3 rounded-xl hover:bg-slate-100/50 transition-colors cursor-pointer"
+    class="flex flex-col sm:flex-row gap-4 group items-stretch justify-between p-3 rounded-xl hover:bg-slate-100/50 transition-colors cursor-pointer"
   >
-    <div class="size-20 sm:size-24 md:size-28 shrink-0 flex items-center justify-center">
+    <div class="w-full aspect-video sm:w-auto sm:aspect-auto sm:size-24 md:size-28 shrink-0 flex items-center justify-center overflow-hidden">
       <NuxtImg
         v-if="job.company.logo_url"
         :src="job.company.logo_url"

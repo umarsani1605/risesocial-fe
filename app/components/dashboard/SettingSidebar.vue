@@ -12,18 +12,34 @@ const settingLinks: NavigationMenuItem[] = [
 <template>
   <UCard class="min-h-[300px] border border-default/50" :ui="{ header: 'p-0!', body: 'p-0!' }">
     <div class="flex flex-col sm:flex-row gap-4">
-      <aside class="w-full sm:w-64 border-r border-default/50 p-6">
+      <aside
+        class="w-full sm:w-64 border-b sm:border-b-0 sm:border-r border-default/50 p-4 sm:p-6"
+      >
+        <UNavigationMenu
+          :items="settingLinks"
+          orientation="horizontal"
+          highlight-color="primary"
+          class="sm:hidden"
+          :ui="{
+            root: 'max-w-full',
+            list: 'flex-nowrap overflow-x-auto scrollbar-hide gap-2',
+            item: 'shrink-0',
+            link: 'rounded-lg text-sm whitespace-nowrap px-3! py-2!',
+            linkLabel: 'overflow-visible text-clip'
+          }"
+        />
         <UNavigationMenu
           :items="settingLinks"
           orientation="vertical"
           highlight-color="primary"
+          class="hidden sm:flex"
           :ui="{
             list: 'gap-1.5',
             link: 'rounded-lg text-sm'
           }"
         />
       </aside>
-      <div class="flex-1 flex flex-col gap-4 p-6">
+      <div class="flex-1 min-w-0 flex flex-col gap-4 p-6">
         <slot />
       </div>
     </div>

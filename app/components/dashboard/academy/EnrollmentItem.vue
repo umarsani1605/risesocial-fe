@@ -16,7 +16,9 @@ const progressPercentage = computed(() => {
   return Math.round((props.enrollment.completed_modules / props.enrollment.total_modules) * 100)
 })
 
-const cohortPhase = computed(() => (props.enrollment.cohort ? getCohortPhase(props.enrollment.cohort) : null))
+const cohortPhase = computed(() =>
+  props.enrollment.cohort ? getCohortPhase(props.enrollment.cohort) : null
+)
 </script>
 
 <template>
@@ -25,8 +27,10 @@ const cohortPhase = computed(() => (props.enrollment.cohort ? getCohortPhase(pro
     v-if="!enrollment.cohort"
     class="group flex gap-4 items-stretch justify-between p-3 rounded-xl hover:bg-slate-100/50 transition-colors"
   >
-    <div class="flex gap-6 w-4xl">
-      <div class="size-28 shrink-0 rounded-lg overflow-hidden">
+    <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:w-4xl w-full">
+      <div
+        class="w-full aspect-video sm:size-36 sm:aspect-square shrink-0 rounded-lg overflow-hidden"
+      >
         <NuxtImg
           :src="academy?.image_url ?? ''"
           :alt="academy?.title ?? ''"
@@ -46,8 +50,10 @@ const cohortPhase = computed(() => (props.enrollment.cohort ? getCohortPhase(pro
     :to="`/dashboard/academy/${enrollment.cohort.id}`"
     class="flex gap-4 group items-stretch justify-between p-3 rounded-xl hover:bg-slate-100/50 transition-colors cursor-pointer"
   >
-    <div class="flex gap-6 w-4xl">
-      <div class="size-28 shrink-0 rounded-lg overflow-hidden">
+    <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:w-4xl w-full">
+      <div
+        class="w-full aspect-video sm:size-36 sm:aspect-square shrink-0 rounded-lg overflow-hidden"
+      >
         <NuxtImg
           :src="academy?.image_url ?? ''"
           :alt="academy?.title ?? ''"

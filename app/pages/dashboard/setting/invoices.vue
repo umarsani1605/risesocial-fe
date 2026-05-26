@@ -30,7 +30,12 @@ const columns: TableColumn<UserTransaction>[] = [
   { accessorKey: 'items', header: 'Product' },
   { accessorKey: 'amount', header: 'Amount' },
   { accessorKey: 'status', header: 'Status' },
-  { accessorKey: 'payment_method', header: 'Method' }
+  { accessorKey: 'payment_method', header: 'Method' },
+  {
+    id: 'actions',
+    header: 'Actions',
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+  }
 ]
 
 const loadTransactions = async () => {
@@ -58,11 +63,11 @@ const detailOpen = ref(false)
 const detailLoading = ref(false)
 const selectedTransaction = ref<UserTransactionDetail | null>(null)
 
-const onRowClick = async (_e: Event, row: { original: UserTransaction }) => {
+const openDetail = async (transaction: UserTransaction) => {
   detailOpen.value = true
   detailLoading.value = true
   try {
-    selectedTransaction.value = await fetchTransactionDetail(row.original.transaction_code)
+    selectedTransaction.value = await fetchTransactionDetail(transaction.transaction_code)
   } catch {
     toast.add({ title: 'Failed to load transaction detail', color: 'error' })
     detailOpen.value = false
@@ -91,14 +96,16 @@ const formatPaymentMethod = (method: string | null) => {
       />
     </div>
 
-    <UTable
+    <div
       v-if="isLoading || transactions.length > 0"
-      :data="transactions"
-      :columns="columns"
-      :loading="isLoading"
-      class="w-full p-0! overflow-visible"
-      @select="onRowClick"
+      class="overflow-x-auto"
     >
+      <UTable
+        :data="transactions"
+        :columns="columns"
+        :loading="isLoading"
+        class="w-full"
+      >
       <template #created_at-cell="{ row }">
         <span class="text-sm">{{ formatDatetime(row.original.created_at) }}</span>
       </template>
@@ -123,7 +130,18 @@ const formatPaymentMethod = (method: string | null) => {
           formatPaymentMethod(row.original.payment_method)
         }}</span>
       </template>
-    </UTable>
+      <template #actions-cell="{ row }">
+        <UButton
+          label="Detail"
+          color="primary"
+          variant="light"
+          size="sm"
+          leading-icon="i-ph-magnifying-glass-bold"
+          @click="openDetail(row.original)"
+        />
+      </template>
+      </UTable>
+    </div>
 
     <div v-if="totalPages > 1" class="flex justify-center">
       <UPagination v-model="page" :total="total" :items-per-page="limit" />

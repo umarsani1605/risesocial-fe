@@ -107,7 +107,7 @@ const onSave = async () => {
   <DashboardSettingSidebar>
     <h1 class="text-xl font-bold mb-2">Account Settings</h1>
     <UFormField label="Avatar">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-1">
+      <div class="flex flex-row items-center gap-4 sm:gap-6 mt-1">
         <UAvatar
           :src="currentAvatar"
           :text="initials"

@@ -121,7 +121,7 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
       />
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-1">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
       <div class="lg:col-span-8 space-y-6">
         <UCard class="h-full border border-default/50" :ui="{ header: 'p-0!', body: 'p-4!' }">
           <template #header>
@@ -167,8 +167,7 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
 
       <div class="lg:col-span-4 flex flex-col gap-6">
         <UCard
-          class="border border-default/50"
-          :class="'lg:basis-0 lg:grow-[3]'"
+          class="border border-default/50 min-h-[220px] md:min-h-[440px]"
           :ui="{ header: 'p-0!', body: 'p-4!' }"
         >
           <template #header>
@@ -210,7 +209,6 @@ const upcomingSessions = computed(() => upcomingData.value?.data ?? [])
 
         <UCard
           class="border border-default/50 min-h-[220px]"
-          :class="'lg:basis-0 lg:grow-[2]'"
           :ui="{ header: 'p-0!', body: 'p-4!' }"
         >
           <template #header>

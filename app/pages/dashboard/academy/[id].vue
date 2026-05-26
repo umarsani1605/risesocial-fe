@@ -59,8 +59,8 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
 <template>
   <div class="space-y-4">
     <div class="relative rounded-2xl bg-[#0E5C59] text-white p-2 overflow-hidden">
-      <div class="relative flex flex-col sm:flex-row gap-10 p-4">
-        <div class="shrink-0 rounded-xl overflow-hidden size-36">
+      <div class="relative flex flex-col sm:flex-row gap-6 md:gap-10 p-4">
+        <div class="shrink-0 rounded-xl overflow-hidden size-56 md:size-36">
           <NuxtImg
             :src="cohort.academy.image_url"
             :alt="cohort.academy.title"
@@ -68,7 +68,7 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
             loading="lazy"
           />
         </div>
-        <div class="flex flex-col justify-center gap-4 text-white">
+        <div class="flex flex-col justify-center px-2 md:px-0 gap-4 text-white">
           <div class="space-y-1">
             <p class="text-white/70 text-sm">{{ cohort.name }}</p>
             <h1 class="text-xl font-bold leading-snug">{{ cohort.academy.title }}</h1>
@@ -94,22 +94,27 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
     </div>
 
     <UCard v-if="certificateUrl">
-      <div class="flex items-center gap-6">
-        <UIcon name="i-ph-certificate-duotone" class="size-10 text-primary" />
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+        <UIcon name="i-ph-certificate-duotone" class="size-10 text-primary shrink-0" />
         <div class="flex-1 min-w-0">
           <p class="font-semibold text-base">Congratulation, you have completed this academy!</p>
           <p class="text-sm text-muted mt-0.5">
             Keep learning and applying sustainability practices to make positive impact!
           </p>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <UButton variant="ghost" :to="`/academy`"> Explore Academies </UButton>
+        <div
+          class="flex flex-row-reverse md:flex-col-reverse xl:flex-row flex-wrap-reverse md:flex-nowrap items-center md:items-stretch xl:items-center justify-end gap-2 sm:shrink-0"
+        >
+          <UButton variant="ghost" :to="`/academy`" class="whitespace-nowrap">
+            Explore Academies
+          </UButton>
           <UButton
             v-if="certificateUrl"
             :to="certificateUrl"
             target="_blank"
             variant="dashboard"
             leading-icon="i-ph-medal-bold"
+            class="whitespace-nowrap"
           >
             View Certificate
           </UButton>
@@ -120,7 +125,7 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
     <UCard v-if="cohort.academy.description">
       <template #header>
         <div class="flex items-center gap-2">
-          <UIcon name="i-ph-info-duotone" class="text-primary size-6 shrink-0" />
+          <UIcon name="i-ph-info-duotone" class="text-primary size-8 md:size-6 shrink-0" />
           <h2 class="text-lg font-semibold">Information</h2>
         </div>
       </template>
