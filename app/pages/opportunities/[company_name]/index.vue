@@ -113,7 +113,7 @@ useSeoMeta({
 
           <div class="flex-1 min-w-0 space-y-8">
             <h1 class="text-3xl font-bold">{{ company.name }}</h1>
-            <div class="grid gap-x-12 gap-y-4 md:grid-flow-col md:grid-rows-4 md:auto-cols-fr">
+            <div class="grid gap-x-12 gap-y-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:items-start">
               <div class="max-w-xl space-y-4">
                 <div v-if="company.industry" class="flex items-center">
                   <UIcon name="i-ph-building-bold" class="mr-2 size-4 shrink-0 text-muted" />

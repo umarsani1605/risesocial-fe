@@ -7,7 +7,7 @@ const { data: jobsData } = await useAsyncData('home:jobs', () =>
 )
 const jobs = computed(() => jobsData.value?.data ?? [])
 
-const heroCategories = ['Designer', 'Developer', 'Social Media', 'Writing', 'Project Manager']
+const heroCategories = ['Sustainability', 'ESG', 'Renewable', 'Climate', 'Carbon Accounting']
 
 const featuresItems = [
   {

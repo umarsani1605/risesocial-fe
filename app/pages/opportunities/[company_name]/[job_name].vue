@@ -65,7 +65,6 @@ const salaryDisplay = computed(() => {
     return raw
   }
 })
-
 const parsedDescription = computed(() => {
   const text = job.value?.description ?? ''
   const sections: Array<{ title: string; content: string }> = []
@@ -257,7 +256,7 @@ useSeoMeta({
           </div>
 
           <ULink :to="`/opportunities/${job.company?.slug}`">
-            <UButton variant="light" color="neutral" block>View Company Profile</UButton>
+            <UButton variant="light" color="primary" block>View Company Profile</UButton>
           </ULink>
         </UCard>
       </div>

@@ -89,7 +89,7 @@ const statusFilterOptions = [
           <USelect
             v-model="status"
             :items="statusFilterOptions"
-            placeholder="Active"
+            placeholder="All"
             class="w-full"
           />
         </UFormField>
