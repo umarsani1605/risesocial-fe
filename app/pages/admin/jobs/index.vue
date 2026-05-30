@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { Job, RateLimitData } from '@/types'
+import {
+  DEFAULT_SYNC_SCHEDULE,
+  LINKEDIN_SYNC_SCHEDULE_KEY,
+  type LinkedinSyncSchedule
+} from '@/schemas/jobSync'
 
 definePageMeta({
   layout: 'dashboard-admin',
@@ -14,10 +19,14 @@ useSeoMeta({ title: 'Jobs Management - Rise Social' })
 const { api } = useApi()
 const { canEdit } = useAdminPermission('admin.jobs')
 const AdminRowAction = resolveComponent('AdminRowAction')
-const { data: rawJobs, refresh: refreshJobs, status: jobsStatus } = useLazyAsyncData('admin:jobs', () =>
-  api<ApiResponse<Job[]>>('/admin/jobs'),
-  { server: false, default: () => ({ data: [] }) }
-)
+const {
+  data: rawJobs,
+  refresh: refreshJobs,
+  status: jobsStatus
+} = useLazyAsyncData('admin:jobs', () => api<ApiResponse<Job[]>>('/admin/jobs'), {
+  server: false,
+  default: () => ({ data: [] })
+})
 const { data: rateLimitRaw, refresh: refreshRateLimit } = useLazyAsyncData(
   'admin:jobs:rate-limit',
   () => api<ApiResponse<RateLimitData>>('/admin/system/settings/linkedin/rate-limit'),
@@ -84,17 +93,32 @@ const syncFilters = ref({
 
 const isSavingSettings = ref(false)
 
-onMounted(async () => {
+// ── Sync schedule ───────────────────────────────────────────────────────────
+const schedule = ref<LinkedinSyncSchedule>({ ...DEFAULT_SYNC_SCHEDULE })
+const lastSyncedAt = ref<string | null>(null)
+
+async function loadSetting<T>(key: string): Promise<T | null> {
   try {
-    const res = await api<ApiResponse<{ value: typeof syncFilters.value }>>(
-      '/admin/system/settings/linkedin_sync_filters'
-    )
-    if (res?.data?.value) {
-      Object.assign(syncFilters.value, res.data.value)
-    }
+    const res = await api<ApiResponse<{ value: T }>>(`/admin/system/settings/${key}`)
+    return res?.data?.value ?? null
   } catch {
     // setting belum pernah disimpan — pakai default
+    return null
   }
+}
+
+async function refreshLastSyncedAt() {
+  lastSyncedAt.value = await loadSetting<string>('linkedin_last_synced_at')
+}
+
+onMounted(async () => {
+  const [filters, savedSchedule] = await Promise.all([
+    loadSetting<typeof syncFilters.value>('linkedin_sync_filters'),
+    loadSetting<LinkedinSyncSchedule>(LINKEDIN_SYNC_SCHEDULE_KEY),
+    refreshLastSyncedAt()
+  ])
+  if (filters) Object.assign(syncFilters.value, filters)
+  if (savedSchedule) Object.assign(schedule.value, savedSchedule)
 })
 
 // ── Derived ───────────────────────────────────────────────────────────────────
@@ -106,9 +130,19 @@ const rateLimitText = computed(() => {
   return `Requests: ${req?.remaining ?? '–'}/${req?.limit ?? '–'} · Jobs: ${jobs?.remaining ?? '–'}/${jobs?.limit ?? '–'}`
 })
 
+// Next scheduled run, derived from the saved schedule + last sync time.
+const nextSyncAt = computed(() => computeNextSync(schedule.value, lastSyncedAt.value))
 const syncDateText = computed(() => {
-  const lastUpdated = rateLimit.value?.last_updated
-  return lastUpdated ? `Next Sync: ${formatDatetime(lastUpdated)}` : '–'
+  if (!schedule.value.enabled) return 'Next sync: Automatic sync is off'
+
+  const intervalLabel =
+    schedule.value.interval_weeks === 1
+      ? 'Every week'
+      : `Every ${schedule.value.interval_weeks} weeks`
+
+  return nextSyncAt.value
+    ? `Next sync: ${formatDatetime(nextSyncAt.value.toISOString())} · ${intervalLabel}`
+    : `Next sync: ${intervalLabel}`
 })
 
 const activeFilterCount = computed(
@@ -177,9 +211,11 @@ async function onConfirmSync() {
   confirmSyncOpen.value = false
   isSyncing.value = true
   try {
-    await api('/admin/jobs/sync-linkedin', { method: 'POST', body: { filter: syncFilters.value } })
-    await refreshJobs()
-    await refreshRateLimit()
+    await api('/admin/jobs/sync-linkedin', {
+      method: 'POST',
+      body: { filter: syncFilters.value, limit: schedule.value.job_limit }
+    })
+    await Promise.all([refreshJobs(), refreshRateLimit(), refreshLastSyncedAt()])
     toast.add({ title: 'Sync completed successfully.', color: 'success' })
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error, 'Sync failed'), color: 'error' })
@@ -191,10 +227,16 @@ async function onConfirmSync() {
 async function onSaveSyncSettings() {
   isSavingSettings.value = true
   try {
-    await api('/admin/system/settings/linkedin_sync_filters', {
-      method: 'PUT',
-      body: { value: syncFilters.value }
-    })
+    await Promise.all([
+      api('/admin/system/settings/linkedin_sync_filters', {
+        method: 'PUT',
+        body: { value: syncFilters.value }
+      }),
+      api(`/admin/system/settings/${LINKEDIN_SYNC_SCHEDULE_KEY}`, {
+        method: 'PUT',
+        body: { value: schedule.value }
+      })
+    ])
     toast.add({ title: 'Sync settings saved', color: 'success' })
     syncSettingsOpen.value = false
   } catch (error: unknown) {
@@ -229,10 +271,9 @@ async function onConfirmDelete() {
   }
 }
 
-const syncDate = computed(() => {
-  const d = rateLimit.value?.last_updated
-  return d ? formatDateLong(d) : '–'
-})
+const syncDate = computed(() =>
+  lastSyncedAt.value ? `Updated: ${formatDate(lastSyncedAt.value)}` : 'Updated: Never'
+)
 
 // ── Table columns ─────────────────────────────────────────────────────────────
 const columns: TableColumn<Job>[] = [
@@ -372,20 +413,25 @@ const columns: TableColumn<Job>[] = [
     header: () => h('div', 'Actions'),
     meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
     cell: ({ row }) =>
-      h('div', { class: 'flex items-center gap-2' }, [
-        h(AdminRowAction, {
-          to: `/admin/jobs/${row.original.id}/edit`,
-          canEdit: canEdit.value
-        }),
-        canEdit.value && h(UButton, {
-          label: 'Delete',
-          size: 'sm',
-          color: 'error',
-          variant: 'light',
-          leadingIcon: 'i-ph-trash-simple-bold',
-          onClick: () => openDeleteConfirm(row.original)
-        })
-      ].filter(Boolean))
+      h(
+        'div',
+        { class: 'flex items-center gap-2' },
+        [
+          h(AdminRowAction, {
+            to: `/admin/jobs/${row.original.id}/edit`,
+            canEdit: canEdit.value
+          }),
+          canEdit.value &&
+            h(UButton, {
+              label: 'Delete',
+              size: 'sm',
+              color: 'error',
+              variant: 'light',
+              leadingIcon: 'i-ph-trash-simple-bold',
+              onClick: () => openDeleteConfirm(row.original)
+            })
+        ].filter(Boolean)
+      )
   }
 ]
 </script>
@@ -424,7 +470,9 @@ const columns: TableColumn<Job>[] = [
         </div>
 
         <!-- Right: Add Job + Sync button group -->
-        <div class="flex flex-wrap flex-row-reverse lg:flex-row items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto">
+        <div
+          class="flex flex-wrap flex-row-reverse lg:flex-row items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto"
+        >
           <div class="hidden sm:block h-4 w-px bg-default" />
           <UTooltip :text="rateLimitText">
             <div class="flex items-center gap-1.5 cursor-default select-none">
@@ -464,9 +512,17 @@ const columns: TableColumn<Job>[] = [
                       color="neutral"
                       variant="light"
                       size="sm"
+                      class="rounded-lg! px-4!"
                       @click="confirmSyncOpen = false"
                     />
-                    <UButton label="Yes" color="primary" size="sm" @click="onConfirmSync" />
+                    <UButton
+                      label="Yes"
+                      color="primary"
+                      variant="solid"
+                      size="sm"
+                      class="rounded-lg! px-4!"
+                      @click="onConfirmSync"
+                    />
                   </div>
                 </div>
               </template>
@@ -474,7 +530,13 @@ const columns: TableColumn<Job>[] = [
 
             <UButton color="primary" icon="i-ph-gear-bold" @click="syncSettingsOpen = true" />
           </UFieldGroup>
-          <UButton v-if="canEdit" label="Add Job" icon="i-ph-plus-bold" color="primary" to="/admin/jobs/create" />
+          <UButton
+            v-if="canEdit"
+            label="Add Job"
+            icon="i-ph-plus-bold"
+            color="primary"
+            to="/admin/jobs/create"
+          />
         </div>
       </div>
     </template>
@@ -490,6 +552,7 @@ const columns: TableColumn<Job>[] = [
   <AdminJobsSyncSettingsModal
     v-model:open="syncSettingsOpen"
     v-model:sync-filters="syncFilters"
+    v-model:schedule="schedule"
     :loading="isSavingSettings"
     @save="onSaveSyncSettings"
     @cancel="onCloseSyncSettings"
