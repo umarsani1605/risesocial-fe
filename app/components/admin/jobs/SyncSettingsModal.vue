@@ -34,8 +34,8 @@ const emit = defineEmits<{
 <template>
   <UModal
     v-model:open="open"
-    title="LinkedIn Job Sync Settings"
-    description="Configure default search filters and the automatic sync schedule."
+    title="LinkedIn Job Update Settings"
+    description="Configure default search filters and the automatic update schedule."
     :ui="{ content: 'max-w-4xl', footer: 'justify-end' }"
   >
     <template #body>
@@ -103,7 +103,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="space-y-5 border-t border-default pt-6">
-          <USwitch v-model="schedule!.enabled" label="Enable Automatic Sync" />
+          <USwitch v-model="schedule!.enabled" label="Enable Automatic Update" />
           <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-5">
             <UFormField label="Number of Jobs">
               <USelect

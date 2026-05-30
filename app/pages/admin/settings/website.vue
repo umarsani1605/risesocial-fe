@@ -20,6 +20,7 @@ useSeoMeta({ title: 'Website Settings - Rise Social' })
 
 const { api } = useApi()
 const toast = useToast()
+const { invalidate: invalidateSiteSettings } = useSiteSettings()
 
 const form = reactive<WebsiteSettingsValues>({
   ...EMPTY_WEBSITE_CONTACT,
@@ -82,6 +83,8 @@ async function onSubmit() {
       })
     ])
 
+    await invalidateSiteSettings()
+
     toast.add({ title: 'Website settings saved', color: 'success' })
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error), color: 'error' })
@@ -115,7 +118,7 @@ async function onSubmit() {
             <UInput
               v-model="form.phone"
               icon="i-ph-phone-duotone"
-              placeholder="+62 812 3456 7890"
+              placeholder="+6281234567890"
               class="w-full"
             />
           </UFormField>
@@ -124,7 +127,7 @@ async function onSubmit() {
             <UInput
               v-model="form.email"
               icon="i-ph-envelope-duotone"
-              placeholder="hello@risesocial.org"
+              placeholder="contact@risesocial.org"
               class="w-full"
             />
           </UFormField>
@@ -181,6 +184,7 @@ async function onSubmit() {
               class="w-full"
             />
           </UFormField>
+
         </div>
       </div>
 

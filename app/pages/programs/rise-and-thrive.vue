@@ -9,6 +9,16 @@ useSeoMeta({
     "Rise Educator's Skills Accelerator is an online learning program started from 1 up to 5 months live class with experts and mentor to student get comprehensive understanding in various sustainability topic."
 })
 
+const { contact } = useSiteSettings()
+
+const DEFAULT_WHATSAPP_NUMBER = '6285864042289'
+
+const collaborationLink = computed(() => {
+  const digits = (contact.value.phone || '').replace(/\D/g, '')
+  const normalizedNumber = digits || DEFAULT_WHATSAPP_NUMBER
+  return `https://wa.me/${normalizedNumber}`
+})
+
 const featuresData: FeatureItem[] = [
   {
     id: 1,
@@ -55,7 +65,7 @@ const featuresData: FeatureItem[] = [
 
           <div class="pt-2 lg:pt-4">
             <UButton
-              to="https://wa.me/6285864042289"
+              :to="collaborationLink"
               target="_blank"
               external
               size="lg"

@@ -46,14 +46,14 @@ const filterEmploymentType = ref<string | undefined>(undefined)
 const filterSeniorityLevel = ref<string | undefined>(undefined)
 const filterIsRemote = ref<string | undefined>(undefined)
 const filterCountry = ref<string | undefined>(undefined)
-const filterStatus = ref<string | undefined>('active')
+const filterStatus = ref<string | undefined>('all')
 
 // Applied filter state
 const appliedEmploymentType = ref<string | undefined>(undefined)
 const appliedSeniorityLevel = ref<string | undefined>(undefined)
 const appliedIsRemote = ref<string | undefined>(undefined)
 const appliedCountry = ref<string | undefined>(undefined)
-const appliedStatus = ref<string | undefined>('active')
+const appliedStatus = ref<string | undefined>('all')
 
 const dataTableRef = ref()
 
@@ -133,7 +133,7 @@ const rateLimitText = computed(() => {
 // Next scheduled run, derived from the saved schedule + last sync time.
 const nextSyncAt = computed(() => computeNextSync(schedule.value, lastSyncedAt.value))
 const syncDateText = computed(() => {
-  if (!schedule.value.enabled) return 'Next sync: Automatic sync is off'
+  if (!schedule.value.enabled) return 'Next update: Automatic update is off'
 
   const intervalLabel =
     schedule.value.interval_weeks === 1
@@ -141,8 +141,8 @@ const syncDateText = computed(() => {
       : `Every ${schedule.value.interval_weeks} weeks`
 
   return nextSyncAt.value
-    ? `Next sync: ${formatDatetime(nextSyncAt.value.toISOString())} · ${intervalLabel}`
-    : `Next sync: ${intervalLabel}`
+    ? `Next update: ${formatDatetime(nextSyncAt.value.toISOString())} · ${intervalLabel}`
+    : `Next update: ${intervalLabel}`
 })
 
 const activeFilterCount = computed(
@@ -152,7 +152,7 @@ const activeFilterCount = computed(
       appliedSeniorityLevel.value,
       appliedIsRemote.value,
       appliedCountry.value,
-      appliedStatus.value && appliedStatus.value !== 'active' ? appliedStatus.value : undefined
+      appliedStatus.value && appliedStatus.value !== 'all' ? appliedStatus.value : undefined
     ].filter(Boolean).length
 )
 
@@ -198,12 +198,12 @@ function clearFilters() {
   filterSeniorityLevel.value = undefined
   filterIsRemote.value = undefined
   filterCountry.value = undefined
-  filterStatus.value = 'active'
+  filterStatus.value = 'all'
   appliedEmploymentType.value = undefined
   appliedSeniorityLevel.value = undefined
   appliedIsRemote.value = undefined
   appliedCountry.value = undefined
-  appliedStatus.value = 'active'
+  appliedStatus.value = 'all'
   filterPopoverOpen.value = false
 }
 
@@ -216,7 +216,7 @@ async function onConfirmSync() {
       body: { filter: syncFilters.value, limit: schedule.value.job_limit }
     })
     await Promise.all([refreshJobs(), refreshRateLimit(), refreshLastSyncedAt()])
-    toast.add({ title: 'Sync completed successfully.', color: 'success' })
+    toast.add({ title: 'Job update completed successfully.', color: 'success' })
   } catch (error: unknown) {
     toast.add({ title: getApiErrorMessage(error, 'Sync failed'), color: 'error' })
   } finally {
@@ -492,20 +492,20 @@ const columns: TableColumn<Job>[] = [
 
           <div class="hidden sm:block h-4 w-px bg-default" />
 
-          <!-- Sync Job + Settings button group -->
+          <!-- Job Update + Settings button group -->
           <UFieldGroup>
             <UPopover v-model:open="confirmSyncOpen">
               <UButton
                 color="primary"
                 leading-icon="i-ph-arrow-clockwise-bold"
-                :label="isSyncing ? 'Syncing...' : 'Sync Job'"
+                :label="isSyncing ? 'Updating...' : 'Update Jobs'"
                 :disabled="isSyncing"
                 :ui="{ leadingIcon: isSyncing ? 'animate-spin' : '' }"
               />
 
               <template #content>
                 <div class="p-4 w-56 space-y-3">
-                  <p class="text-sm">Perform manual job sync?</p>
+                  <p class="text-sm">Perform manual job update?</p>
                   <div class="flex justify-end gap-2">
                     <UButton
                       label="No"

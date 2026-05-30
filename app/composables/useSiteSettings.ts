@@ -53,5 +53,11 @@ export const useSiteSettings = () => {
   const contact = computed(() => data.value?.contact ?? FALLBACK.contact)
   const socialMedia = computed(() => data.value?.social_media ?? FALLBACK.social_media)
 
-  return { settings: data, contact, socialMedia, refresh, status }
+  async function invalidate() {
+    await $fetch('/api/site-settings/purge', { method: 'POST' })
+    clearNuxtData('site-settings')
+    await refreshNuxtData('site-settings')
+  }
+
+  return { settings: data, contact, socialMedia, refresh, invalidate, status }
 }

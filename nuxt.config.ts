@@ -49,7 +49,6 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: '',
       partykitHost: '',
-      whatsappNumber: process.env.NUXT_PUBLIC_WHATSAPP_NUMBER || '6285111032928',
       midtransMode: process.env.MIDTRANS_MODE || 'SANDBOX',
       midtransClientKey:
         process.env.MIDTRANS_MODE === 'PRODUCTION'

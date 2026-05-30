@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-/** Admin-configured schedule for the automatic LinkedIn job sync. */
+/** Admin-configured schedule for the automatic LinkedIn job update. */
 export const linkedinSyncScheduleSchema = z.object({
   enabled: z.boolean(),
   job_limit: z.number().int().min(1).max(100),
@@ -18,7 +18,7 @@ export const DEFAULT_SYNC_SCHEDULE: LinkedinSyncSchedule = {
   enabled: false,
   job_limit: 10,
   interval_weeks: 2,
-  day_of_week: 1,
+  day_of_week: 0,
   hour: 2,
   hide_after_weeks: 2
 }
@@ -38,13 +38,13 @@ export const SYNC_INTERVAL_OPTIONS = [
 ]
 
 export const DAY_OF_WEEK_OPTIONS = [
-  { label: 'Sunday', value: 0 },
-  { label: 'Monday', value: 1 },
-  { label: 'Tuesday', value: 2 },
-  { label: 'Wednesday', value: 3 },
-  { label: 'Thursday', value: 4 },
-  { label: 'Friday', value: 5 },
-  { label: 'Saturday', value: 6 }
+  { label: 'Monday', value: 0 },
+  { label: 'Tuesday', value: 1 },
+  { label: 'Wednesday', value: 2 },
+  { label: 'Thursday', value: 3 },
+  { label: 'Friday', value: 4 },
+  { label: 'Saturday', value: 5 },
+  { label: 'Sunday', value: 6 }
 ]
 
 export const HOUR_OPTIONS = Array.from({ length: 24 }, (_, h) => ({

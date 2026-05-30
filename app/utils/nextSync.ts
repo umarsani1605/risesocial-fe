@@ -3,6 +3,7 @@ import type { LinkedinSyncSchedule } from '@/schemas/jobSync'
 const MS_PER_DAY = 86_400_000
 /** Jakarta is UTC+7 year-round (no DST), so a fixed offset is exact. */
 const JAKARTA_OFFSET_MS = 7 * 60 * 60 * 1000
+const toMondayFirstDay = (utcDay: number) => (utcDay + 6) % 7
 
 /**
  * Next time the scheduled sync will run, mirroring the backend due-check
@@ -26,7 +27,7 @@ export function computeNextSync(
   // Scan forward up to 8 days (covers "later today" through "same weekday next week").
   for (let i = 0; i < 8; i++) {
     const probeJakarta = new Date(start + JAKARTA_OFFSET_MS + i * MS_PER_DAY)
-    if (probeJakarta.getUTCDay() !== schedule.day_of_week) continue
+    if (toMondayFirstDay(probeJakarta.getUTCDay()) !== schedule.day_of_week) continue
     const runUtc =
       Date.UTC(
         probeJakarta.getUTCFullYear(),

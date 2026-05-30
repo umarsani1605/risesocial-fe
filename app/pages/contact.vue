@@ -18,19 +18,29 @@ const form = reactive({
   message: ''
 })
 
-const toast = useToast()
+const mailtoHref = computed(() => {
+  const params = new URLSearchParams()
+  const subject = form.subject.trim()
+  const sender = form.email.trim()
+  const name = form.name.trim()
+  const message = form.message.trim()
 
-const submitForm = () => {
-  form.name = ''
-  form.email = ''
-  form.subject = ''
-  form.message = ''
-  toast.add({
-    title: 'Message sent',
-    description: 'Thanks for reaching out. We will get back to you soon.',
-    color: 'success'
-  })
-}
+  if (subject) params.set('subject', subject)
+
+  const bodyParts = [
+    name ? `Name: ${name}` : '',
+    sender ? `Email: ${sender}` : '',
+    '',
+    message
+  ].filter(Boolean)
+
+  if (bodyParts.length > 0) {
+    params.set('body', bodyParts.join('\n'))
+  }
+
+  const query = params.toString()
+  return `mailto:${contact.value.email}${query ? `?${query}` : ''}`
+})
 </script>
 
 <template>
@@ -49,21 +59,9 @@ const submitForm = () => {
       <div
         class="relative md:absolute left-0 right-0 bottom-0 md:translate-y-1/2 bg-white md:rounded-3xl md:shadow-xl p-8 lg:p-12 max-w-5xl mx-auto md:mx-auto md:left-1/2 md:-translate-x-1/2 md:w-full"
       >
-        <h1 class="text-3xl font-bold mb-8">Contact Us</h1>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           <div class="space-y-6">
-            <div v-if="contact.phone">
-              <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-ph-phone-bold" class="size-4 text-muted shrink-0" />
-                <h3 class="font-semibold">Phone</h3>
-              </div>
-              <a
-                :href="`tel:${contact.phone.replace(/\s+/g, '')}`"
-                class="pl-8 text-muted hover:text-primary transition-colors"
-              >
-                {{ contact.phone }}
-              </a>
-            </div>
+            <h1 class="text-3xl font-bold">Contact Us</h1>
             <div v-if="contact.email">
               <div class="flex items-center gap-4 mb-1">
                 <UIcon name="i-ph-envelope-bold" class="size-4 text-muted shrink-0" />
@@ -84,7 +82,7 @@ const submitForm = () => {
               <p class="pl-8 text-muted">{{ contact.address }}</p>
             </div>
           </div>
-          <form class="flex flex-col gap-4" @submit.prevent="submitForm">
+          <form class="flex flex-col gap-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <UInput v-model="form.name" type="text" placeholder="Your Name" required size="lg" />
               <UInput v-model="form.subject" type="text" placeholder="Subject" required size="lg" />
@@ -97,7 +95,16 @@ const submitForm = () => {
               :rows="4"
               size="lg"
             />
-            <UButton type="submit" color="primary" size="lg" block class="justify-center"> Send Message </UButton>
+            <UButton
+              v-if="contact.email"
+              :to="mailtoHref"
+              color="primary"
+              size="lg"
+              block
+              class="justify-center"
+            >
+              Send Message
+            </UButton>
           </form>
         </div>
       </div>

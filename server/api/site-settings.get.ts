@@ -1,3 +1,8 @@
+import {
+  SITE_SETTINGS_CACHE_NAME,
+  SITE_SETTINGS_CACHE_PUBLIC_KEY
+} from '../utils/siteSettingsCache'
+
 interface SiteSettings {
   contact: { phone: string; email: string; address: string }
   social_media: { instagram: string; facebook: string; linkedin: string; tiktok: string }
@@ -38,7 +43,7 @@ export default defineCachedEventHandler(
   {
     maxAge: 60 * 60, // serve cached for 1 hour
     swr: true, // then revalidate in the background
-    name: 'site-settings',
-    getKey: () => 'public'
+    name: SITE_SETTINGS_CACHE_NAME,
+    getKey: () => SITE_SETTINGS_CACHE_PUBLIC_KEY
   }
 )
