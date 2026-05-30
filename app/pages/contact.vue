@@ -9,6 +9,8 @@ useSeoMeta({
     'Get in touch with Rise Social. Send us a message or visit our office in Bandung, West Java.'
 })
 
+const { contact } = useSiteSettings()
+
 const form = reactive({
   name: '',
   email: '',
@@ -24,8 +26,8 @@ const submitForm = () => {
   form.subject = ''
   form.message = ''
   toast.add({
-    title: 'Pesan berhasil dikirim!',
-    description: 'Terima kasih telah menghubungi kami.',
+    title: 'Message sent',
+    description: 'Thanks for reaching out. We will get back to you soon.',
     color: 'success'
   })
 }
@@ -47,40 +49,39 @@ const submitForm = () => {
       <div
         class="relative md:absolute left-0 right-0 bottom-0 md:translate-y-1/2 bg-white md:rounded-3xl md:shadow-xl p-8 lg:p-12 max-w-5xl mx-auto md:mx-auto md:left-1/2 md:-translate-x-1/2 md:w-full"
       >
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Contact Us</h1>
+        <h1 class="text-3xl font-bold mb-8">Contact Us</h1>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           <div class="space-y-6">
-            <div>
+            <div v-if="contact.phone">
               <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-ph-instagram-logo-bold" class="size-4 text-gray-700 shrink-0" />
-                <h3 class="font-semibold text-gray-900">Instagram</h3>
+                <UIcon name="i-ph-phone-bold" class="size-4 text-muted shrink-0" />
+                <h3 class="font-semibold">Phone</h3>
               </div>
               <a
-                href="https://www.instagram.com/risesocial.official/"
-                target="_blank"
-                class="pl-8 text-gray-600 hover:text-primary transition-colors"
+                :href="`tel:${contact.phone.replace(/\s+/g, '')}`"
+                class="pl-8 text-muted hover:text-primary transition-colors"
               >
-                @risesocial.official
+                {{ contact.phone }}
               </a>
             </div>
-            <div>
+            <div v-if="contact.email">
               <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-ph-envelope-bold" class="size-4 text-gray-700 shrink-0" />
-                <h3 class="font-semibold text-gray-900">Email</h3>
+                <UIcon name="i-ph-envelope-bold" class="size-4 text-muted shrink-0" />
+                <h3 class="font-semibold">Email</h3>
               </div>
               <a
-                href="mailto:risesocial.official@gmail.com"
-                class="pl-8 text-gray-600 hover:text-primary transition-colors"
+                :href="`mailto:${contact.email}`"
+                class="pl-8 text-muted hover:text-primary transition-colors"
               >
-                risesocial.official@gmail.com
+                {{ contact.email }}
               </a>
             </div>
-            <div>
+            <div v-if="contact.address">
               <div class="flex items-center gap-4 mb-1">
-                <UIcon name="i-ph-map-pin-bold" class="size-4 text-gray-700 shrink-0" />
-                <h3 class="font-semibold text-gray-900">Address</h3>
+                <UIcon name="i-ph-map-pin-bold" class="size-4 text-muted shrink-0" />
+                <h3 class="font-semibold">Address</h3>
               </div>
-              <p class="pl-8 text-gray-600">Bandung, West Java 40286, ID</p>
+              <p class="pl-8 text-muted">{{ contact.address }}</p>
             </div>
           </div>
           <form class="flex flex-col gap-4" @submit.prevent="submitForm">

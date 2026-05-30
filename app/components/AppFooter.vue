@@ -58,19 +58,19 @@
         <div
           class="flex flex-col gap-2 md:flex-row justify-between items-center text-center md:text-left"
         >
-          <p class="text-xs sm:text-sm text-gray-400 order-2 md:order-1">
+          <p class="text-xs sm:text-sm text-slate-400 order-2 md:order-1">
             © {{ currentYear }} PT. Rise Edukasi Inspirasi. All Rights Reserved.
           </p>
           <div class="flex gap-4 text-xs order-1 md:order-2">
             <ULink
               to="/term-of-services"
-              class="text-gray-400 hover:text-primary transition-colors duration-300"
+              class="text-slate-400 hover:text-primary transition-colors duration-300"
             >
               Terms Of Services
             </ULink>
             <ULink
               to="/privacy-policy"
-              class="text-gray-400 hover:text-primary transition-colors duration-300"
+              class="text-slate-400 hover:text-primary transition-colors duration-300"
             >
               Privacy Policy
             </ULink>
@@ -84,27 +84,19 @@
 <script setup lang="ts">
 const currentYear = new Date().getFullYear()
 
-const socialMediaData = [
-  {
-    id: 'instagram',
-    name: 'Instagram',
-    url: 'https://www.instagram.com/risesocial_/',
-    icon: 'i-ph-instagram-logo-bold',
-    ariaLabel: 'Follow us on Instagram'
-  },
-  {
-    id: 'linkedin',
-    name: 'LinkedIn',
-    url: 'https://www.linkedin.com/company/rise-social-org/',
-    icon: 'i-mdi-linkedin',
-    ariaLabel: 'Follow us on LinkedIn'
-  },
-  {
-    id: 'tiktok',
-    name: 'TikTok',
-    url: 'https://www.tiktok.com/@risesocial_',
-    icon: 'i-ic-round-tiktok',
-    ariaLabel: 'Follow us on TikTok'
-  }
-]
+const { socialMedia } = useSiteSettings()
+
+const SOCIAL_LINKS = [
+  { id: 'instagram', icon: 'i-ph-instagram-logo-bold', ariaLabel: 'Follow us on Instagram' },
+  { id: 'facebook', icon: 'i-ph-facebook-logo-bold', ariaLabel: 'Follow us on Facebook' },
+  { id: 'linkedin', icon: 'i-mdi-linkedin', ariaLabel: 'Follow us on LinkedIn' },
+  { id: 'tiktok', icon: 'i-ic-round-tiktok', ariaLabel: 'Follow us on TikTok' }
+] as const
+
+// Only render channels that have a URL configured.
+const socialMediaData = computed(() =>
+  SOCIAL_LINKS.map((link) => ({ ...link, url: socialMedia.value[link.id] })).filter(
+    (link) => !!link.url
+  )
+)
 </script>
