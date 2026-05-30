@@ -6,6 +6,7 @@ const route = useRoute()
 const { api } = useApi()
 
 const open = ref(false)
+const isCollapsed = ref(false)
 
 const { user, logout, fullName, initials, hasPermission, isSuperAdmin } = useAuth()
 
@@ -93,43 +94,14 @@ const mainLinks = computed<NavigationMenuItem[]>(() => [
           }
         }
       ]
-    : [])
-])
-
-const analyticsLinks = computed<NavigationMenuItem[]>(() => [
-  ...(hasPermission('admin.transactions')
-    ? [
-        {
-          label: 'Revenue',
-          icon: 'i-ph-chart-line-duotone',
-          to: '/admin/analytics/revenue',
-          active: isActive('/admin/analytics/revenue'),
-          onSelect: () => {
-            open.value = false
-          }
-        }
-      ]
     : []),
-  ...(hasPermission('admin.users')
+  ...(hasPermission('admin.broadcast')
     ? [
         {
-          label: 'Users',
-          icon: 'i-ph-users-three-duotone',
-          to: '/admin/analytics/users',
-          active: isActive('/admin/analytics/users'),
-          onSelect: () => {
-            open.value = false
-          }
-        }
-      ]
-    : []),
-  ...(hasPermission('admin.ryls')
-    ? [
-        {
-          label: 'Rise Young Leaders',
-          icon: 'i-ph-medal-duotone',
-          to: '/admin/analytics/programs',
-          active: isActive('/admin/analytics/programs'),
+          label: 'Email Broadcast',
+          icon: 'i-ph-envelope-simple-duotone',
+          to: '/admin/broadcasts',
+          active: isActive('/admin/broadcasts'),
           onSelect: () => {
             open.value = false
           }
@@ -137,6 +109,14 @@ const analyticsLinks = computed<NavigationMenuItem[]>(() => [
       ]
     : [])
 ])
+
+const canViewStatistics = computed(
+  () =>
+    hasPermission('admin.transactions') ||
+    hasPermission('admin.users') ||
+    hasPermission('admin.ryls') ||
+    isSuperAdmin.value
+)
 
 const academyLinks = computed<NavigationMenuItem[]>(() => [
   ...(hasPermission('admin.academy')
@@ -213,6 +193,35 @@ const userLinks = computed<NavigationMenuItem[]>(() => [
     : [])
 ])
 
+const othersLinks = computed<NavigationMenuItem[]>(() => [
+  ...(canViewStatistics.value
+    ? [
+        {
+          label: 'Statistics',
+          icon: 'i-ph-chart-bar-duotone',
+          to: '/admin/analytics',
+          active: isActive('/admin/analytics'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : []),
+  ...(isSuperAdmin.value
+    ? [
+        {
+          label: 'Settings',
+          icon: 'i-ph-gear-six-duotone',
+          to: '/admin/settings/website',
+          active: isActive('/admin/settings/website'),
+          onSelect: () => {
+            open.value = false
+          }
+        }
+      ]
+    : [])
+])
+
 const navMenuUi = {
   item: 'relative px-4 after:absolute after:left-0 after:top-1/2 after:-translate-y-1/2 after:w-1 after:h-[90%] after:rounded-r-full after:transition-colors has-[[aria-current=page]]:after:bg-primary'
 }
@@ -239,12 +248,13 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
     <UDashboardSidebar
       id="default"
       v-model:open="open"
+      v-model:collapsed="isCollapsed"
       resizable
       collapsible
       :toggle="false"
       :default-size="14"
       :min-size="18"
-      class="bg-white min-w-[240px]"
+      :class="['bg-white', isCollapsed ? 'min-w-16' : 'min-w-[240px]']"
       :ui="{
         header: 'border-b border-default h-18!',
         body: 'py-8 px-0',
@@ -333,13 +343,13 @@ const jobLinks = computed<NavigationMenuItem[]>(() =>
           />
         </div>
 
-        <div v-if="analyticsLinks.length">
+        <div v-if="othersLinks.length">
           <p v-if="!collapsed" class="px-6.5 mb-2 font-medium text-xs text-dimmed tracking-wider">
-            Statistics
+            Others
           </p>
           <UNavigationMenu
             :collapsed="collapsed"
-            :items="analyticsLinks"
+            :items="othersLinks"
             :ui="navMenuUi"
             orientation="vertical"
             tooltip

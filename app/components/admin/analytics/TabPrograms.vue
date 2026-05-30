@@ -5,18 +5,11 @@ import { DISCOVER_SOURCES, GENDER_OPTIONS } from '@/utils/ryls'
 const DISCOVER_SOURCE_MAP = Object.fromEntries(DISCOVER_SOURCES.map((s) => [s.value, s.label]))
 const GENDER_LABEL_MAP = Object.fromEntries(GENDER_OPTIONS.map((g) => [g.value, g.label]))
 
-definePageMeta({
-  layout: 'dashboard-admin',
-  navbarTitle: 'Rise Young Leaders Analytics',
-  middleware: ['auth', 'admin', 'admin-permission'],
-  requiredPermission: 'admin.ryls'
-})
-
-useSeoMeta({ title: 'Rise Young Leaders Analytics - Rise Social' })
+const props = defineProps<{ dateRange: AnalyticsDateRange }>()
 
 const analytics = useAnalytics()
 
-const dateRange = ref<AnalyticsDateRange>(periodToDateRange('30d'))
+const dateRange = computed(() => props.dateRange)
 
 const summaryData = useLazyAsyncData(
   'analytics:programs-summary',
@@ -101,10 +94,6 @@ const isDemographicsLoading = computed(() =>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex justify-start lg:justify-end">
-      <AnalyticsTimeRangeFilter v-model="dateRange" />
-    </div>
-
     <!-- Stat Cards -->
     <div class="grid grid-cols-2 gap-4">
       <AnalyticsStatCard v-for="stat in statCards" :key="stat.title" :stat="stat" :loading="isSummaryLoading" />

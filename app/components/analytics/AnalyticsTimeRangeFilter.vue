@@ -61,7 +61,7 @@ const dateLabel = computed(() => {
         v-for="preset in presets"
         :key="preset.period"
         :label="preset.label"
-        size="sm"
+        size="xs"
         :color="isPresetActive(preset) ? 'primary' : 'neutral'"
         :variant="isPresetActive(preset) ? 'solid' : 'ghost'"
         class="px-3"
@@ -71,10 +71,10 @@ const dateLabel = computed(() => {
 
     <UPopover :content="{ align: 'start' }" :modal="true">
       <UButton
-        color="neutral"
-        variant="light"
+        :color="selected.period === 'custom' ? 'primary' : 'primary'"
+        :variant="selected.period === 'custom' ? 'solid' : 'light'"
+        size="sm"
         icon="i-lucide-calendar"
-        :class="selected.period === 'custom' ? 'ring-1 ring-primary' : ''"
       >
         {{ dateLabel || 'Custom' }}
         <template #trailing>

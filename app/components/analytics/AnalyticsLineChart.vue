@@ -20,7 +20,10 @@ const chartData = computed(() =>
 )
 
 const categories = computed(() => ({
-  value: { name: props.yLabel ?? 'Value', color: resolveChartColor(props.color) }
+  value: {
+    name: props.yLabel ?? 'Value',
+    color: resolveChartColor(props.color) ?? resolveChartColor(DEFAULT_CHART_COLOR_NAMES[0])!
+  }
 }))
 
 const xFormatter = (tick: number): string => {

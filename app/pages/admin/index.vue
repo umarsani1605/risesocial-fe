@@ -52,7 +52,7 @@ const statCards = computed<AnalyticsStat[]>(() => [
     value: overview.value?.totalRevenue ?? 0,
     icon: 'ph:wallet',
     color: 'green',
-    to: '/admin/analytics/revenue'
+    to: '/admin/analytics'
   },
   {
     title: 'Active Academies',
@@ -66,14 +66,14 @@ const statCards = computed<AnalyticsStat[]>(() => [
     value: overview.value?.rylsRegistrations ?? 0,
     icon: 'ph:medal',
     color: 'orange',
-    to: '/admin/analytics/programs'
+    to: '/admin/analytics'
   },
   {
     title: 'Total Users',
     value: overview.value?.totalUsers ?? 0,
     icon: 'ph:users-three',
     color: 'blue',
-    to: '/admin/analytics/users'
+    to: '/admin/analytics'
   }
 ])
 
