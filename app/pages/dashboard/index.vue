@@ -74,7 +74,7 @@ const dynamicSubtitle = computed(() => {
 })
 
 const { data: upcomingData } = await useAsyncData('dashboard:upcoming', () =>
-  api<ApiResponse<UpcomingSession[]>>('/cohorts/upcoming', { query: { limit: 7 } })
+  api<ApiResponse<UpcomingSession[]>>('/cohorts/upcoming', { query: { limit: 4 } })
 )
 
 const upcomingSessions = computed(() => upcomingData.value?.data ?? [])

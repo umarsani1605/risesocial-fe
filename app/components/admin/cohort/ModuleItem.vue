@@ -17,7 +17,15 @@ function getStatus(module: AdminCohortModule) {
   return computeModuleStatus(module, now.value)
 }
 
-function getAttachmentHref(attachment: { type: string; file_url: string | null; url: string | null }) {
+function isLiveNow(module: AdminCohortModule) {
+  return ['live', 'closing_soon'].includes(getStatus(module))
+}
+
+function getAttachmentHref(attachment: {
+  type: string
+  file_url: string | null
+  url: string | null
+}) {
   if (attachment.type === 'file') return attachment.file_url ?? undefined
   const raw = attachment.url?.trim()
   if (!raw) return undefined
@@ -31,12 +39,28 @@ function getAttachmentHref(attachment: { type: string; file_url: string | null; 
     <template #header>
       <span
         class="flex items-center justify-center size-7 rounded-full border border-slate-200 bg-slate-50 text-slate-500 group-hover:border-slate-200 transition-colors text-sm font-bold shrink-0"
-        :class="getStatus(module) === 'completed' ? 'bg-primary! text-white! border-transparent!' : ''"
+        :class="
+          ['live', 'closing_soon', 'completed'].includes(getStatus(module))
+            ? 'bg-primary! text-white! border-transparent!'
+            : ''
+        "
       >
         {{ module.order }}
       </span>
-      <div class="flex items-center gap-2 flex-1 min-w-0">
+      <div class="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
         <span class="font-medium text-sm leading-snug truncate">{{ module.title }}</span>
+        <span
+          v-if="isLiveNow(module)"
+          class="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] uppercase font-semibold text-red-500 shrink-0"
+        >
+          <span class="relative flex size-2">
+            <span
+              class="absolute inline-flex size-full rounded-full bg-red-400 opacity-75 motion-safe:animate-ping motion-safe:[animation-duration:1.25s] motion-reduce:animate-none"
+            />
+            <span class="relative inline-flex size-2 rounded-full bg-red-500" />
+          </span>
+          Live Now
+        </span>
         <UBadge
           v-if="!module.is_published"
           label="Draft"
@@ -136,6 +160,7 @@ function getAttachmentHref(attachment: { type: string; file_url: string | null; 
         <UButton
           label="Edit Module"
           icon="i-ph-pencil-simple-bold"
+          size="sm"
           color="primary"
           variant="subtle"
           @click.stop="emit('edit', module)"
@@ -143,6 +168,7 @@ function getAttachmentHref(attachment: { type: string; file_url: string | null; 
         <UButton
           label="Delete"
           icon="i-ph-trash-simple-bold"
+          size="sm"
           color="error"
           variant="light"
           @click.stop="emit('delete', module.id)"

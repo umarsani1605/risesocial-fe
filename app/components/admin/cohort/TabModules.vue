@@ -10,16 +10,7 @@ const emit = defineEmits<{
   'delete-module': [moduleId: number]
 }>()
 
-const openModules = ref<Set<number>>(new Set(props.modules.slice(0, 1).map((m) => m.id)))
-
-watch(
-  () => props.modules,
-  (newModules) => {
-    if (openModules.value.size === 0 && newModules.length > 0) {
-      openModules.value = new Set(newModules.slice(0, 1).map((m) => m.id))
-    }
-  }
-)
+const openModules = ref<Set<number>>(new Set())
 
 function toggleModule(id: number) {
   if (openModules.value.has(id)) openModules.value.delete(id)

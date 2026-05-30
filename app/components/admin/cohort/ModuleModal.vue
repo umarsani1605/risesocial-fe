@@ -173,6 +173,18 @@ function getPendingAttachmentName(att: PendingAttachment) {
 function getRealAttachmentName(a: AdminCohortAttachment) {
   return a.label || a.url || a.file_path?.split('/').pop() || `Attachment #${a.id}`
 }
+
+function getAttachmentHref(attachment: {
+  type: string
+  file_url: string | null
+  url: string | null
+}) {
+  if (attachment.type === 'file') return attachment.file_url ?? undefined
+  const raw = attachment.url?.trim()
+  if (!raw) return undefined
+  if (/^https?:\/\//i.test(raw) || raw.startsWith('//') || raw.startsWith('mailto:')) return raw
+  return `https://${raw}`
+}
 </script>
 
 <template>
@@ -442,7 +454,7 @@ function getRealAttachmentName(a: AdminCohortAttachment) {
               <AdminCohortAttachmentItem
                 v-for="a in attachments"
                 :key="a.id"
-                :href="a.file_url ?? undefined"
+                :href="getAttachmentHref(a)"
                 :name="getRealAttachmentName(a)"
                 :background="resolveStyle(a).background"
                 :foreground="resolveStyle(a).foreground"

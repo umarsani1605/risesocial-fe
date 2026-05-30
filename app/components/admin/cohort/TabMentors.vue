@@ -49,10 +49,10 @@ const columns: TableColumn<AdminCohortMentor>[] = [
 </script>
 
 <template>
-  <div class="pt-6 min-h-[400px]">
-    <div v-if="canEdit" class="flex justify-end mb-4">
+  <div class="space-y-3 pt-4 min-h-[400px]">
+    <div v-if="canEdit" class="flex items-center justify-between px-2 mb-4">
       <UButton
-        label="Add"
+        label="Add Mentor"
         icon="i-ph-plus-bold"
         color="primary"
         class="shrink-0"

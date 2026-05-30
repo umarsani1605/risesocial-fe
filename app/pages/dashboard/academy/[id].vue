@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
-import type { ComputedRef } from 'vue'
 import type { Cohort, CohortModule } from '@/types'
+import { isModuleHash } from '@/utils/cohort'
 
 definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
@@ -52,8 +52,20 @@ const tabItems: TabsItem[] = [
 ]
 
 const activeTab = ref('0')
-const tabModulesRef = ref<{ isAnyOpen: ComputedRef<boolean>; toggleAll: () => void } | null>(null)
-const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? false)
+const tabModulesRef = ref<{
+  isAnyOpen: () => boolean
+  isAllOpen: () => boolean
+  toggleAll: () => void
+} | null>(null)
+const isModulesAllOpen = computed(() => tabModulesRef.value?.isAllOpen() ?? false)
+
+watch(
+  () => route.hash,
+  (hash) => {
+    if (isModuleHash(hash)) activeTab.value = '0'
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -151,17 +163,22 @@ const isModulesAnyOpen = computed(() => tabModulesRef.value?.isAnyOpen.value ?? 
         <template #list-trailing>
           <div v-if="activeTab === '0'" class="ml-auto pr-1">
             <UButton
-              :label="isModulesAnyOpen ? 'Collapse All' : 'Expand All'"
+              :label="isModulesAllOpen ? 'Collapse All' : 'Expand All'"
               icon="i-ph-arrows-down-up"
               color="neutral"
-              variant="ghost"
+              variant="link"
               size="sm"
+              class="w-30"
               @click="tabModulesRef?.toggleAll()"
             />
           </div>
         </template>
         <template #modules>
-          <DashboardAcademyTabModules ref="tabModulesRef" :modules="modules" />
+          <DashboardAcademyTabModules
+            ref="tabModulesRef"
+            :modules="modules"
+            :target-module-hash="route.hash"
+          />
         </template>
         <template #mentors>
           <DashboardAcademyTabMentors :mentors="cohort.mentors" />

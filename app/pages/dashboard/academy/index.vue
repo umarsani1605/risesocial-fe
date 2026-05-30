@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { CohortEnrollment } from '@/types'
+import { useNow } from '@vueuse/core'
+import type { CohortEnrollment, UpcomingSession } from '@/types'
 
 definePageMeta({ layout: 'dashboard-user', middleware: 'auth' })
 
@@ -12,7 +13,18 @@ const { api } = useApi()
 const { data: enrollmentsData } = await useAsyncData('dashboard:enrollments', () =>
   api<PaginatedResponse<CohortEnrollment>>('/cohorts/my')
 )
+const { data: upcomingData } = await useAsyncData('dashboard:upcoming', () =>
+  api<ApiResponse<UpcomingSession[]>>('/cohorts/upcoming', { query: { limit: 4 } })
+)
 const STATUS_ORDER: Record<string, number> = { ongoing: 0, not_started: 1, completed: 2 }
+const currentTime = useState('dashboard:academy:current-time', () => new Date().toISOString())
+const tickingNow = useNow({ interval: 60_000 })
+
+if (import.meta.client) {
+  watch(tickingNow, (value) => {
+    currentTime.value = value.toISOString()
+  })
+}
 
 const enrollments = computed(() =>
   [...(enrollmentsData.value?.data ?? [])].sort(
@@ -20,6 +32,24 @@ const enrollments = computed(() =>
       (STATUS_ORDER[a.cohort?.status ?? ''] ?? 99) - (STATUS_ORDER[b.cohort?.status ?? ''] ?? 99)
   )
 )
+
+const liveCohortIds = computed(() => {
+  const ids = new Set<number>()
+
+  for (const session of upcomingData.value?.data ?? []) {
+    if (session.type !== 'session' || !session.session_start_time) continue
+
+    const start = new Date(session.session_start_time)
+    const end = session.session_end_time
+      ? new Date(session.session_end_time)
+      : new Date(start.getTime() + 120 * 60 * 1000)
+
+    const now = new Date(currentTime.value)
+    if (now >= start && now <= end) ids.add(session.cohort_id)
+  }
+
+  return ids
+})
 </script>
 
 <template>
@@ -50,12 +80,12 @@ const enrollments = computed(() =>
       <div
         class="size-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center"
       >
-        <UIcon name="i-ph-graduation-cap-bold-duotone" class="size-8 text-slate-400" />
+        <UIcon name="i-ph-graduation-cap-duotone" class="size-8 text-slate-400" />
       </div>
       <div>
-        <p class="text-base font-semibold text-slate-800">No programs yet</p>
+        <p class="text-base font-semibold text-slate-800">No active program</p>
         <p class="text-sm text-slate-500 mt-2 max-w-sm leading-relaxed">
-          Explore our academy programs and start learning.
+          You are not currently enrolled in any learning program.
         </p>
       </div>
       <UButton to="/academy" color="primary" variant="solid" size="sm" class="mt-2">
@@ -68,6 +98,8 @@ const enrollments = computed(() =>
         v-for="enrollment in enrollments"
         :key="enrollment.id"
         :enrollment="enrollment"
+        :current-time="currentTime"
+        :is-live-now="enrollment.cohort ? liveCohortIds.has(enrollment.cohort.id) : false"
       />
     </div>
   </UCard>
