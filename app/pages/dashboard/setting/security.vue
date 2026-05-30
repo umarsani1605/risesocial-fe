@@ -19,7 +19,13 @@ const isSubmitting = ref(false)
 async function onChangePassword() {
   isSubmitting.value = true
   try {
-    await api('/users/security', { method: 'PUT', body: { password: form.password } })
+    await api('/users/security', {
+      method: 'PUT',
+      body: {
+        password: form.password,
+        repeatPassword: form.repeatPassword
+      }
+    })
     form.password = ''
     form.repeatPassword = ''
     toast.add({ title: 'Password updated', color: 'success' })

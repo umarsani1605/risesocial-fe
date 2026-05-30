@@ -90,7 +90,6 @@ interface AdminUserDetailForm {
 }
 
 interface NotificationPreferences {
-  promo: boolean
   jobs: boolean
   programs: boolean
 }

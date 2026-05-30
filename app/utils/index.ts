@@ -156,8 +156,12 @@ export function formatPriceCompact(price: number): string {
 }
 
 export function getApiErrorMessage(error: unknown, fallback = 'An error occurred'): string {
-  const data = (error as Record<string, unknown> & { data?: Record<string, string> })?.data
-  const message = data?.details ?? data?.message ?? (error instanceof Error ? error.message : fallback)
+  const data = (error as Record<string, unknown> & { data?: Record<string, unknown> })?.data
+  const details = typeof data?.details === 'string' && data.details.trim() ? data.details : null
+  const message =
+    details ??
+    (typeof data?.message === 'string' && data.message.trim() ? data.message : null) ??
+    (error instanceof Error ? error.message : fallback)
 
   if (message === 'start_date must be before end_date') {
     return 'Please set the start date before the end date'
@@ -187,15 +191,21 @@ export type ModuleStatusInput = {
   session_end_time: string | null
 }
 
+export type ModuleStatus = 'upcoming' | 'pre_live' | 'live' | 'closing_soon' | 'completed'
+
 export function computeModuleStatus(
   module: ModuleStatusInput,
   now: Date
-): 'upcoming' | 'live' | 'completed' {
+): ModuleStatus {
   if (!module.session_start_time) return 'upcoming'
   const start = new Date(module.session_start_time)
-  const end = module.session_end_time ? new Date(module.session_end_time) : null
-  if (now < start) return 'upcoming'
-  if (end && now > end) return 'completed'
-  if (!end && now > new Date(start.getTime() + 120 * 60 * 1000)) return 'completed'
+  const end = module.session_end_time ? new Date(module.session_end_time) : new Date(start.getTime() + 120 * 60 * 1000)
+  const preLiveStart = new Date(start.getTime() - 30 * 60 * 1000)
+  const closingSoonStart = new Date(end.getTime() - 30 * 60 * 1000)
+
+  if (now < preLiveStart) return 'upcoming'
+  if (now < start) return 'pre_live'
+  if (now > end) return 'completed'
+  if (now >= closingSoonStart) return 'closing_soon'
   return 'live'
 }

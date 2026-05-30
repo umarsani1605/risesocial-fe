@@ -224,7 +224,7 @@ export default defineAppConfig({
     input: {
       slots: {
         base: [
-          'transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600'
+          'transition duration-300 ease-in-out rounded-lg !bg-white disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600'
         ]
       },
       compoundVariants: [
@@ -246,7 +246,7 @@ export default defineAppConfig({
     inputTags: {
       slots: {
         base: [
-          'transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600'
+          'transition duration-300 ease-in-out rounded-lg !bg-white disabled:bg-muted disabled:text-gray-700 read-only:bg-muted read-only:text-gray-600'
         ]
       },
       compoundVariants: [
@@ -268,7 +268,7 @@ export default defineAppConfig({
     textarea: {
       slots: {
         base: [
-          'transition duration-300 ease-in-out rounded-lg disabled:bg-muted disabled:text-gray-600 read-only:bg-muted read-only:text-gray-600'
+          'transition duration-300 ease-in-out rounded-lg !bg-white disabled:bg-muted disabled:text-gray-600 read-only:bg-muted read-only:text-gray-600'
         ]
       },
       compoundVariants: [
@@ -289,7 +289,7 @@ export default defineAppConfig({
     },
     select: {
       slots: {
-        base: ['cursor-pointer rounded-lg'],
+        base: ['cursor-pointer rounded-lg !bg-white'],
         item: ['cursor-pointer']
       },
       compoundVariants: [
@@ -310,7 +310,7 @@ export default defineAppConfig({
     },
     selectMenu: {
       slots: {
-        base: ['cursor-pointer rounded-lg'],
+        base: ['cursor-pointer rounded-lg !bg-white'],
         item: ['cursor-pointer']
       },
       compoundVariants: [

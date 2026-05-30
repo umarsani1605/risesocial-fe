@@ -58,18 +58,6 @@ const teamMembersData = [
     name: 'Aswandatu Putra Inderajao',
     position: 'Partnership & Outreach',
     image: '/images/teams/aswandatu.png'
-  },
-  {
-    id: 4,
-    name: 'Dwi Putri Handayani',
-    position: 'Product Officer',
-    image: '/images/teams/dwi.png'
-  },
-  {
-    id: 5,
-    name: 'Alya Firda Rahmawati',
-    position: 'Project Officer',
-    image: '/images/teams/alya.png'
   }
 ]
 </script>

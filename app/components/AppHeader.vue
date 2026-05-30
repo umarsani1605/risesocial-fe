@@ -72,15 +72,8 @@ const userMenuItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: isAdmin.value ? 'Admin Panel' : 'Dashboard',
-      icon: isAdmin.value ? 'i-ph-shield-bold' : 'i-ph-squares-four-bold',
+      icon: 'i-ph-squares-four-bold',
       to: isAdmin.value ? '/admin' : '/dashboard'
-    }
-  ],
-  [
-    {
-      label: 'Settings',
-      icon: 'i-ph-gear-bold',
-      to: '/dashboard/setting'
     }
   ],
   [

@@ -7,7 +7,8 @@ import {
   formatExperienceLevel,
   formatSalary,
   formatPrice,
-  getApiErrorMessage
+  getApiErrorMessage,
+  computeModuleStatus
 } from '../../app/utils/index'
 import { cohortEditSchema } from '../../app/schemas/cohort'
 
@@ -301,9 +302,55 @@ describe('getApiErrorMessage', () => {
     expect(getApiErrorMessage(error, 'Should not appear')).toBe('Unauthorized')
   })
 
+  it('ignores object-shaped details and falls back to the server message', () => {
+    const error = { data: { message: 'repeatPassword is required', details: {} } }
+    expect(getApiErrorMessage(error)).toBe('repeatPassword is required')
+  })
+
   it('maps technical cohort date-range errors to a friendly message', () => {
     const error = { data: { message: 'start_date must be before end_date' } }
     expect(getApiErrorMessage(error)).toBe('Please set the start date before the end date')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// computeModuleStatus
+// ---------------------------------------------------------------------------
+
+describe('computeModuleStatus', () => {
+  const session = {
+    session_start_time: '2026-06-01T10:00:00.000Z',
+    session_end_time: '2026-06-01T12:00:00.000Z'
+  }
+
+  it('returns upcoming when the module starts more than 30 minutes later', () => {
+    expect(computeModuleStatus(session, new Date('2026-06-01T09:29:59.000Z'))).toBe('upcoming')
+  })
+
+  it('returns pre_live during the 30 minutes before the module starts', () => {
+    expect(computeModuleStatus(session, new Date('2026-06-01T09:30:00.000Z'))).toBe('pre_live')
+  })
+
+  it('returns live after start before the closing window', () => {
+    expect(computeModuleStatus(session, new Date('2026-06-01T10:15:00.000Z'))).toBe('live')
+  })
+
+  it('returns closing_soon during the 30 minutes before the module ends', () => {
+    expect(computeModuleStatus(session, new Date('2026-06-01T11:30:00.000Z'))).toBe('closing_soon')
+  })
+
+  it('returns completed after the module ends', () => {
+    expect(computeModuleStatus(session, new Date('2026-06-01T12:00:01.000Z'))).toBe('completed')
+  })
+
+  it('uses the 120 minute fallback end time when the module has no end time', () => {
+    const moduleWithoutEnd = {
+      session_start_time: '2026-06-01T10:00:00.000Z',
+      session_end_time: null
+    }
+
+    expect(computeModuleStatus(moduleWithoutEnd, new Date('2026-06-01T11:30:00.000Z'))).toBe('closing_soon')
+    expect(computeModuleStatus(moduleWithoutEnd, new Date('2026-06-01T12:00:01.000Z'))).toBe('completed')
   })
 })
 

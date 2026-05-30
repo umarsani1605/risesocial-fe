@@ -7,7 +7,6 @@ const toast = useToast()
 const { api } = useApi()
 
 const prefs = reactive<NotificationPreferences>({
-  promo: false,
   jobs: false,
   programs: false
 })
@@ -41,7 +40,6 @@ async function saveSettings() {
     <h1 class="text-xl font-bold mb-2">Notifications</h1>
 
     <div class="space-y-4">
-      <UCheckbox v-model="prefs.promo" label="Promo notifications" color="primary" />
       <UCheckbox v-model="prefs.jobs" label="Job notifications" color="primary" />
       <UCheckbox v-model="prefs.programs" label="Program notifications" color="primary" />
     </div>
